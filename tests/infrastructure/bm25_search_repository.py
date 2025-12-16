@@ -6,7 +6,7 @@ functionality with actual Book entities and the rank-bm25 library.
 """
 
 from datetime import datetime, timezone
-from uuid import uuid4
+from app.domain.utils.uuid7 import uuid7
 
 import pytest
 
@@ -20,7 +20,7 @@ def sample_books():
     """Create a small collection of books for testing."""
     return [
         Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Introduction to Machine Learning",
             authors=["John Smith"],
             description="A comprehensive guide to machine learning algorithms and techniques.",
@@ -31,7 +31,7 @@ def sample_books():
             source_id="test_ml_001",
         ),
         Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Deep Learning Fundamentals",
             authors=["Jane Doe"],
             description="Learn the fundamentals of deep learning and neural networks.",
@@ -42,7 +42,7 @@ def sample_books():
             source_id="test_dl_002",
         ),
         Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Python Programming for Beginners",
             authors=["Alice Johnson"],
             description="Start your programming journey with Python. No prior experience required.",
@@ -53,7 +53,7 @@ def sample_books():
             source_id="test_py_003",
         ),
         Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Historia de España",
             authors=["Carlos García"],
             description="Un recorrido por la historia de España desde sus orígenes.",
@@ -64,7 +64,7 @@ def sample_books():
             source_id="test_es_004",
         ),
         Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Advanced Neural Networks",
             authors=["Bob Wilson"],
             description="Explore advanced topics in neural networks and deep learning architectures.",
@@ -208,7 +208,7 @@ class TestBM25SearchRepository:
     def test_add_to_index_adds_new_book(self, bm25_repo):
         """Test adding a single book to existing index."""
         new_book = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Quantum Computing Basics",
             authors=["David Lee"],
             description="Introduction to quantum computing principles.",

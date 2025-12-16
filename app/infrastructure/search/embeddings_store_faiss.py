@@ -186,7 +186,16 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         self, book_ids: List[UUID], embeddings: List[List[float]]
     ) -> None:
         """
-        Store multiple embeddings in a batch.
+        Store multiple embeddings in a batch (FULL REFRESH - clears existing).
+
+        WARNING: This method performs a FULL REFRESH, not an incremental update.
+        All previously stored embeddings are cleared before the new batch is stored.
+
+        This semantic is intentional for use with CatalogIngestionService, which
+        rebuilds from the complete SQLite catalog (source of truth). Without clearing,
+        embeddings from deleted books would remain as stale data in the FAISS index.
+
+        For incremental updates (adding one book at a time), use store_embedding().
 
         Args:
             book_ids: List of book UUIDs.
@@ -200,6 +209,15 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
                 f"Mismatched lengths: {len(book_ids)} book_ids vs "
                 f"{len(embeddings)} embeddings"
             )
+
+        # Log before clearing to make the full-refresh behavior explicit
+        if self._embeddings:
+            logger.info(
+                f"store_embeddings_batch: clearing {len(self._embeddings)} existing "
+                f"embeddings (full refresh)"
+            )
+
+        self._embeddings.clear()
 
         for book_id, embedding in zip(book_ids, embeddings):
             self.store_embedding(book_id, embedding)

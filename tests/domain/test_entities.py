@@ -4,7 +4,9 @@ Tests for domain entities.
 
 import pytest
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
+
+from app.domain.utils.uuid7 import uuid7
 
 from app.domain.entities import Book, SearchResult, Explanation
 from app.domain.value_objects import BookMetadata
@@ -15,7 +17,7 @@ class TestBook:
 
     def test_create_book_with_minimum_data(self):
         """Test creating a book with only required fields."""
-        book_id = uuid4()
+        book_id = uuid7()
         book = Book(
             id=book_id,
             title="Clean Code",
@@ -49,7 +51,7 @@ class TestBook:
         """Test that empty title raises ValueError."""
         with pytest.raises(ValueError, match="title cannot be empty"):
             Book(
-                id=uuid4(),
+                id=uuid7(),
                 title="",
                 authors=["Author"],
             )
@@ -58,7 +60,7 @@ class TestBook:
         """Test that book without authors raises ValueError."""
         with pytest.raises(ValueError, match="at least one author"):
             Book(
-                id=uuid4(),
+                id=uuid7(),
                 title="Book Title",
                 authors=[],
             )
@@ -67,7 +69,7 @@ class TestBook:
         """Test that invalid language code raises ValueError."""
         with pytest.raises(ValueError, match="2-letter ISO 639-1 code"):
             Book(
-                id=uuid4(),
+                id=uuid7(),
                 title="Book Title",
                 authors=["Author"],
                 language="english",  # Should be "en"
@@ -75,7 +77,7 @@ class TestBook:
 
     def test_book_equality(self):
         """Test that books with same ID are equal."""
-        book_id = uuid4()
+        book_id = uuid7()
         book1 = Book(id=book_id, title="Title 1", authors=["Author 1"])
         book2 = Book(id=book_id, title="Title 2", authors=["Author 2"])
 
@@ -83,15 +85,15 @@ class TestBook:
 
     def test_book_inequality(self):
         """Test that books with different IDs are not equal."""
-        book1 = Book(id=uuid4(), title="Title", authors=["Author"])
-        book2 = Book(id=uuid4(), title="Title", authors=["Author"])
+        book1 = Book(id=uuid7(), title="Title", authors=["Author"])
+        book2 = Book(id=uuid7(), title="Title", authors=["Author"])
 
         assert book1 != book2
 
     def test_book_get_published_year(self):
         """Test extracting publication year."""
         book = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Book",
             authors=["Author"],
             published_date=datetime(2020, 5, 15),
@@ -102,7 +104,7 @@ class TestBook:
     def test_book_get_published_year_none(self):
         """Test getting year when no date is set."""
         book = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Book",
             authors=["Author"],
         )
@@ -112,19 +114,19 @@ class TestBook:
     def test_book_has_description(self):
         """Test description check."""
         book1 = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Book",
             authors=["Author"],
             description="A good book",
         )
         book2 = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Book",
             authors=["Author"],
             description="",
         )
         book3 = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Book",
             authors=["Author"],
         )
@@ -136,7 +138,7 @@ class TestBook:
     def test_book_get_searchable_text(self):
         """Test searchable text generation."""
         book = Book(
-            id=uuid4(),
+            id=uuid7(),
             title="Clean Code",
             authors=["Robert C. Martin"],
             description="A handbook of agile software craftsmanship",
@@ -210,7 +212,7 @@ class TestExplanation:
 
     def test_create_explanation(self):
         """Test creating an explanation."""
-        book_id = uuid4()
+        book_id = uuid7()
         explanation = Explanation(
             book_id=book_id,
             query_text="python programming books",
@@ -227,7 +229,7 @@ class TestExplanation:
         """Test that empty explanation text raises ValueError."""
         with pytest.raises(ValueError, match="Explanation text cannot be empty"):
             Explanation(
-                book_id=uuid4(),
+                book_id=uuid7(),
                 query_text="query",
                 text="",
             )
@@ -236,7 +238,7 @@ class TestExplanation:
         """Test that empty query text raises ValueError."""
         with pytest.raises(ValueError, match="Query text cannot be empty"):
             Explanation(
-                book_id=uuid4(),
+                book_id=uuid7(),
                 query_text="",
                 text="Some explanation",
             )
@@ -244,7 +246,7 @@ class TestExplanation:
     def test_explanation_get_short_summary(self):
         """Test short summary generation."""
         explanation = Explanation(
-            book_id=uuid4(),
+            book_id=uuid7(),
             query_text="query",
             text="This is a very long explanation that should be truncated when we ask for a short summary.",
         )
@@ -258,7 +260,7 @@ class TestExplanation:
     def test_explanation_get_short_summary_no_truncation(self):
         """Test that short text is not truncated."""
         explanation = Explanation(
-            book_id=uuid4(),
+            book_id=uuid7(),
             query_text="query",
             text="Short explanation.",
         )

@@ -16,7 +16,9 @@ on first run (~80MB for all-MiniLM-L6-v2).
 
 import tempfile
 from pathlib import Path
-from uuid import uuid4, UUID
+from uuid import UUID
+
+from app.domain.utils.uuid7 import uuid7
 
 import numpy as np
 import pytest
@@ -39,12 +41,12 @@ def store() -> EmbeddingsStoreFaiss:
 def sample_books() -> list[tuple[UUID, str]]:
     """Sample books with UUIDs and searchable text."""
     return [
-        (uuid4(), "Detective mystery novel set in London with crime investigation"),
-        (uuid4(), "Science fiction space opera adventure in distant galaxies"),
-        (uuid4(), "Historical romance story in Victorian England"),
-        (uuid4(), "Italian cookbook with pasta recipes and Mediterranean cuisine"),
-        (uuid4(), "Fantasy epic with dragons and medieval kingdoms"),
-        (uuid4(), "Thriller crime fiction featuring FBI agent investigation"),
+        (uuid7(), "Detective mystery novel set in London with crime investigation"),
+        (uuid7(), "Science fiction space opera adventure in distant galaxies"),
+        (uuid7(), "Historical romance story in Victorian England"),
+        (uuid7(), "Italian cookbook with pasta recipes and Mediterranean cuisine"),
+        (uuid7(), "Fantasy epic with dragons and medieval kingdoms"),
+        (uuid7(), "Thriller crime fiction featuring FBI agent investigation"),
     ]
 
 
@@ -174,7 +176,7 @@ class TestStoringEmbeddings:
 
     def test_store_and_retrieve_embedding(self, store: EmbeddingsStoreFaiss):
         """Can store and retrieve an embedding by book_id."""
-        book_id = uuid4()
+        book_id = uuid7()
         embedding = store.generate_embedding("Test book description")
 
         store.store_embedding(book_id, embedding)
@@ -184,12 +186,12 @@ class TestStoringEmbeddings:
 
     def test_get_embedding_nonexistent_returns_none(self, store: EmbeddingsStoreFaiss):
         """Getting a non-existent embedding should return None."""
-        result = store.get_embedding(uuid4())
+        result = store.get_embedding(uuid7())
         assert result is None
 
     def test_store_embedding_wrong_dimension_raises(self, store: EmbeddingsStoreFaiss):
         """Storing embedding with wrong dimension should raise ValueError."""
-        book_id = uuid4()
+        book_id = uuid7()
         wrong_embedding = [0.1] * 100  # Should be 384
 
         with pytest.raises(ValueError, match="dimension mismatch"):
@@ -197,7 +199,7 @@ class TestStoringEmbeddings:
 
     def test_store_embeddings_batch(self, store: EmbeddingsStoreFaiss):
         """Can store multiple embeddings in batch."""
-        book_ids = [uuid4() for _ in range(3)]
+        book_ids = [uuid7() for _ in range(3)]
         texts = ["Book one", "Book two", "Book three"]
         embeddings = store.generate_embeddings_batch(texts)
 
@@ -208,7 +210,7 @@ class TestStoringEmbeddings:
 
     def test_store_embeddings_batch_mismatched_lengths_raises(self, store: EmbeddingsStoreFaiss):
         """Batch store with mismatched lengths should raise ValueError."""
-        book_ids = [uuid4(), uuid4()]
+        book_ids = [uuid7(), uuid7()]
         embeddings = [store.generate_embedding("One")]  # Only one embedding
 
         with pytest.raises(ValueError, match="Mismatched lengths"):
@@ -216,7 +218,7 @@ class TestStoringEmbeddings:
 
     def test_store_overwrites_existing(self, store: EmbeddingsStoreFaiss):
         """Storing with same book_id should overwrite."""
-        book_id = uuid4()
+        book_id = uuid7()
         emb1 = store.generate_embedding("First version")
         emb2 = store.generate_embedding("Second version completely different")
 
@@ -236,7 +238,7 @@ class TestBuildIndex:
 
     def test_build_index_creates_searchable_index(self, store: EmbeddingsStoreFaiss):
         """Building index should create a FAISS index."""
-        book_id = uuid4()
+        book_id = uuid7()
         embedding = store.generate_embedding("Test book")
         store.store_embedding(book_id, embedding)
 
@@ -293,13 +295,13 @@ class TestBuildIndex:
     def test_rebuild_index_updates_mapping(self, store: EmbeddingsStoreFaiss):
         """Rebuilding index after adding more embeddings should update."""
         # Initial build
-        id1 = uuid4()
+        id1 = uuid7()
         store.store_embedding(id1, store.generate_embedding("First book"))
         store.build_index()
         assert store.get_index_size() == 1
 
         # Add more and rebuild
-        id2 = uuid4()
+        id2 = uuid7()
         store.store_embedding(id2, store.generate_embedding("Second book"))
         store.build_index()
         assert store.get_index_size() == 2
@@ -407,7 +409,7 @@ class TestClearOperation:
     def test_can_rebuild_after_clear(self, store: EmbeddingsStoreFaiss):
         """Should be able to add and build again after clear."""
         # First build
-        id1 = uuid4()
+        id1 = uuid7()
         store.store_embedding(id1, store.generate_embedding("First book"))
         store.build_index()
 
@@ -415,7 +417,7 @@ class TestClearOperation:
         store.clear()
 
         # Rebuild with different data
-        id2 = uuid4()
+        id2 = uuid7()
         store.store_embedding(id2, store.generate_embedding("Second book"))
         store.build_index()
 

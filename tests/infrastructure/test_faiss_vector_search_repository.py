@@ -21,7 +21,9 @@ import pytest
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Any
-from uuid import uuid4, UUID
+from uuid import UUID
+
+from app.domain.utils.uuid7 import uuid7
 
 import numpy as np
 
@@ -151,7 +153,7 @@ def create_test_book(
         published_date = datetime(published_year, 1, 1)
 
     return Book(
-        id=book_id or uuid4(),
+        id=book_id or uuid7(),
         title=title,
         authors=authors or ["Test Author"],
         description=f"Description of {title}",
@@ -159,7 +161,7 @@ def create_test_book(
         categories=categories or [],
         published_date=published_date,
         source="test",
-        source_id=str(book_id or uuid4()),
+        source_id=str(book_id or uuid7()),
     )
 
 

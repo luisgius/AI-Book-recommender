@@ -8,7 +8,9 @@ different representations. They are the core building blocks of the domain.
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from typing import Optional, List
-from uuid import UUID, uuid4
+from uuid import UUID
+
+from .utils.uuid7 import uuid7
 
 from .value_objects import BookMetadata
 
@@ -131,7 +133,7 @@ class Book:
             A new Book instance with generated UUID
         """
         return Book(
-            id=uuid4(),
+            id=uuid7(),
             title=title,
             authors=authors,
             source=source,

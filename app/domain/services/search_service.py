@@ -1,25 +1,27 @@
 """
-Domain services for the book recommendation system.
+Domain service for hybrid search combining lexical and semantic approaches.
 
-Services orchestrate domain logic that doesn't naturally belong to a single
-entity. They coordinate between entities and ports to implement use cases.
-
-Following Hexagonal Architecture principles, services depend only on domain
-entities, value objects, and port protocols (never on concrete implementations).
+This service orchestrates the search use case:
+1. Execute both BM25 and vector searches sequentially
+2. Fuse results using Reciprocal Rank Fusion (RRF)
+3. Apply filters to final results
+4. Optionally generate explanations via LLM
 """
 
 from typing import List, Optional, Dict
 from uuid import UUID
 import logging
 
-from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters
-from .ports import (
+from app.domain.entities import Book, SearchResult, Explanation
+from app.domain.value_objects import SearchQuery, SearchFilters
+from app.domain.ports import (
     LexicalSearchRepository,
     VectorSearchRepository,
     EmbeddingsStore,
     LLMClient,
 )
+
+__all__ = ["SearchService"]
 
 logger = logging.getLogger(__name__)
 
@@ -257,6 +259,11 @@ class SearchService:
         Note: Filters may already be partially applied by search repositories,
         but we ensure they are fully applied here for consistency.
 
+        Filter logic matches repository implementations:
+        - language: case-insensitive exact match
+        - category: case-insensitive substring match in any category
+        - min_year/max_year: inclusive range, excludes books without year
+
         Args:
             results: List of search results
             filters: Filters to apply (guaranteed non-None by SearchQuery)
@@ -274,22 +281,30 @@ class SearchService:
         for result in results:
             book = result.book
 
-            # Language filter
+            # Language filter: case-insensitive exact match
             if filters.language is not None:
-                if book.language != filters.language:
+                if book.language is None:
+                    continue
+                if book.language.lower() != filters.language.lower():
                     continue
 
-            # Category filter
+            # Category filter: case-insensitive substring match
             if filters.category is not None:
-                if filters.category not in book.categories:
+                if not book.categories:
+                    continue
+                category_lower = filters.category.lower()
+                if not any(category_lower in cat.lower() for cat in book.categories):
                     continue
 
-            # Year range filter
+            # Year range filters: inclusive bounds, excludes books without year
             pub_year = book.get_published_year()
-            if pub_year is not None:
-                if filters.min_year is not None and pub_year < filters.min_year:
+
+            if filters.min_year is not None:
+                if pub_year is None or pub_year < filters.min_year:
                     continue
-                if filters.max_year is not None and pub_year > filters.max_year:
+
+            if filters.max_year is not None:
+                if pub_year is None or pub_year > filters.max_year:
                     continue
 
             filtered.append(result)
