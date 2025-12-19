@@ -345,3 +345,14 @@ class BM25SearchRepository(LexicalSearchRepository):
                 return False
 
         return True
+
+    def is_ready(self) -> bool:
+        """
+        Check if the BM25 index is loaded and ready for search operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if the index is built and searchable, False otherwise
+        """
+        return self._index is not None and len(self._books) > 0

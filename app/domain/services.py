@@ -11,9 +11,10 @@ entities, value objects, and port protocols (never on concrete implementations).
 from typing import List, Optional, Dict
 from uuid import UUID
 import logging
+import time
 
 from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters
+from .value_objects import SearchQuery, SearchFilters, SearchResponse
 from .ports import (
     LexicalSearchRepository,
     VectorSearchRepository,
@@ -57,6 +58,121 @@ class SearchService:
         self._embeddings_store = embeddings_store
         self._llm_client = llm_client
 
+    def get_health_status(self) -> Dict[str, bool]:
+        """
+        Check the health status of all search components (RNF-06).
+
+        Returns:
+            Dictionary with component names and their ready status:
+            {
+                "lexical_search": True/False,
+                "vector_search": True/False,
+                "embeddings_store": True/False,
+                "overall": True/False
+            }
+        """
+        lexical_ready = self._lexical_search.is_ready()
+        vector_ready = self._vector_search.is_ready()
+        embeddings_ready = self._embeddings_store.is_ready()
+
+        return {
+            "lexical_search": lexical_ready,
+            "vector_search": vector_ready,
+            "embeddings_store": embeddings_ready,
+            "overall": lexical_ready and vector_ready and embeddings_ready,
+        }
+
+    def search_with_fallback(self, query: SearchQuery) -> SearchResponse:
+        """
+        Execute search with graceful degradation (RNF-08).
+
+        If vector search fails or is unavailable, automatically falls back
+        to lexical-only search and returns a degraded response with metadata.
+
+        Args:
+            query: The search query
+
+        Returns:
+            SearchResponse with results and degradation metadata
+        """
+        start_time = time.time()
+        degraded = False
+        degradation_reason = None
+        search_mode = "hybrid"
+
+        # Check if vector search is available
+        vector_available = self._vector_search.is_ready() and self._embeddings_store.is_ready()
+
+        if not vector_available:
+            # Graceful degradation: use lexical search only
+            logger.warning("Vector search unavailable, degrading to lexical-only search")
+            degraded = True
+            degradation_reason = "Vector index (FAISS) unavailable - using lexical search only"
+            search_mode = "lexical_only"
+
+            try:
+                results = self._search_lexical_only(query)
+            except Exception as e:
+                logger.error(f"Lexical search also failed: {e}")
+                raise RuntimeError("Both vector and lexical search unavailable") from e
+        else:
+            # Try hybrid search, fallback to lexical if vector fails
+            try:
+                results = self.search(query)
+            except Exception as e:
+                logger.warning(f"Hybrid search failed, falling back to lexical: {e}")
+                degraded = True
+                degradation_reason = f"Vector search failed ({str(e)}) - using lexical search only"
+                search_mode = "lexical_only"
+                results = self._search_lexical_only(query)
+
+        latency_ms = (time.time() - start_time) * 1000
+
+        return SearchResponse(
+            results=results,
+            degraded=degraded,
+            degradation_reason=degradation_reason,
+            search_mode=search_mode,
+            latency_ms=latency_ms,
+        )
+
+    def _search_lexical_only(self, query: SearchQuery) -> List[SearchResult]:
+        """
+        Execute lexical-only search (fallback mode).
+
+        Used when vector search is unavailable for graceful degradation.
+
+        Args:
+            query: The search query
+
+        Returns:
+            List of SearchResult from BM25 search only
+        """
+        logger.info(f"Executing lexical-only search for query: '{query.text}'")
+
+        results = self._lexical_search.search(
+            query_text=query.text,
+            max_results=query.max_results,
+            filters=query.filters,
+        )
+
+        # Apply diversification if requested (uses embeddings if available)
+        if query.use_diversification and len(results) > 1:
+            try:
+                if self._embeddings_store.is_ready():
+                    results = self._apply_mmr_diversification(
+                        results=results,
+                        top_k=query.max_results,
+                        lambda_param=query.diversity_lambda,
+                    )
+            except Exception as e:
+                logger.warning(f"MMR diversification failed in degraded mode: {e}")
+
+        # Re-assign ranks
+        for i, result in enumerate(results, start=1):
+            result.rank = i
+
+        return results
 
     def search(self, query: SearchQuery) -> list[SearchResult]:
         """
@@ -148,20 +264,106 @@ class SearchService:
         # Apply filters (may already be applied by repositories, but ensure here)
         filtered_results = self._apply_filters(fused_results, query.filters)
 
-        # Limit to requested number of results
-        final_results = filtered_results[: query.max_results]
-
-        # Re-assign ranks
-        for i, result in enumerate(final_results, start=1):
-            result.rank = i
+        # Step 4: Optional MMR diversification
+        if query.use_diversification:
+            logger.debug(f"Applying MMR diversification with lambda={query.diversity_lambda}")
+            final_results = self._apply_mmr_diversification(
+                results=filtered_results,
+                top_k=query.max_results,
+                lambda_param=query.diversity_lambda,
+            )
+        else:
+            # Limit to requested number of results
+            final_results = filtered_results[: query.max_results]
+            # Re-assign ranks
+            for i, result in enumerate(final_results, start=1):
+                result.rank = i
 
         logger.info(f"Returning {len(final_results)} results")
 
-        # Step 4: Optional explanation generation
+        # Step 5: Optional explanation generation
         if query.use_explanations and self._llm_client is not None:
             logger.debug("Generating explanations for top results")
             final_results = self._add_explanations(query, final_results)
 
+        return final_results
+
+    def find_similar_books(
+        self,
+        book_id: UUID,
+        max_results: int = 10,
+        filters: Optional[SearchFilters] = None,
+        use_diversification: bool = False,
+        diversity_lambda: float = 0.6,
+    ) -> List[SearchResult]:
+        """
+        Find books similar to a given book using pure vector search (Item-to-Item).
+
+        This implements the RF-02 requirement for item-to-item recommendations.
+        Unlike the hybrid search() method, this uses only semantic similarity
+        based on the source book's embedding vector.
+
+        Algorithm:
+        1. Retrieve the source book's embedding from EmbeddingsStore
+        2. Perform vector search to find nearest neighbors
+        3. Exclude the source book from results
+        4. Optionally apply filters and MMR diversification
+
+        Args:
+            book_id: UUID of the source book to find similar books for
+            max_results: Maximum number of similar books to return
+            filters: Optional filters (language, category, year range)
+            use_diversification: Whether to apply MMR diversification
+            diversity_lambda: Trade-off between similarity and diversity
+
+        Returns:
+            List of SearchResult entities, ranked by vector similarity (descending)
+
+        Raises:
+            ValueError: If book_id is not found or has no embedding
+        """
+        logger.info(f"Finding similar books for book_id: {book_id}")
+
+        # Step 1: Get the source book's embedding
+        source_embedding = self._embeddings_store.get_embedding(book_id)
+        if source_embedding is None:
+            raise ValueError(f"No embedding found for book_id: {book_id}")
+
+        # Step 2: Perform vector search (retrieve extra to account for filtering)
+        candidate_limit = max_results * 2 + 1  # +1 to exclude source book
+
+        vector_results = self._vector_search.search(
+            query_embedding=source_embedding,
+            max_results=candidate_limit,
+            filters=filters,
+        )
+
+        logger.debug(f"Retrieved {len(vector_results)} vector results")
+
+        # Step 3: Exclude the source book from results
+        filtered_results = [r for r in vector_results if r.book.id != book_id]
+
+        logger.debug(f"After excluding source book: {len(filtered_results)} results")
+
+        # Step 4: Apply additional filters if provided
+        if filters is not None and not filters.is_empty():
+            filtered_results = self._apply_filters(filtered_results, filters)
+
+        # Step 5: Apply diversification or limit results
+        if use_diversification and len(filtered_results) > 1:
+            logger.debug(f"Applying MMR diversification with lambda={diversity_lambda}")
+            final_results = self._apply_mmr_diversification(
+                results=filtered_results,
+                top_k=max_results,
+                lambda_param=diversity_lambda,
+            )
+        else:
+            final_results = filtered_results[:max_results]
+            # Re-assign ranks
+            for i, result in enumerate(final_results, start=1):
+                result.rank = i
+
+        logger.info(f"Returning {len(final_results)} similar books")
         return final_results
 
     def _fuse_results_rrf(
@@ -337,3 +539,124 @@ class SearchService:
                 # Continue with no explanation for this result
 
         return results
+
+    def _apply_mmr_diversification(
+        self,
+        results: List[SearchResult],
+        top_k: int,
+        lambda_param: float = 0.6,
+    ) -> List[SearchResult]:
+        """
+        Rerank results using Maximal Marginal Relevance (MMR) to increase diversity.
+
+        MMR iteratively selects documents that are both relevant to the query AND
+        different from already-selected documents.
+
+        Formula:
+            MMR(d) = lambda * Relevance(d) - (1-lambda) * max(Similarity(d, d_selected))
+
+        Where:
+        - lambda: trade-off between relevance (1.0) and diversity (0.0)
+        - Relevance(d): the RRF score from hybrid search
+        - Similarity: cosine similarity between book embeddings
+
+        Args:
+            results: List of search results (already ranked by RRF)
+            top_k: Number of results to select
+            lambda_param: Trade-off parameter (default: 0.6, slight preference for relevance)
+
+        Returns:
+            Reranked list of top_k results optimized for diversity
+        """
+        if len(results) <= 1:
+            return results
+
+        # Get embeddings for all candidate books
+        book_embeddings: Dict[UUID, List[float]] = {}
+        for result in results:
+            embedding = self._embeddings_store.get_embedding(result.book.id)
+            if embedding is not None:
+                book_embeddings[result.book.id] = embedding
+
+        # If no embeddings available, return original results
+        if not book_embeddings:
+            logger.warning("No embeddings available for MMR diversification, skipping")
+            return results[:top_k]
+
+        # Normalize RRF scores to [0, 1] for fair comparison with similarity
+        max_score = max(r.final_score for r in results) if results else 1.0
+        min_score = min(r.final_score for r in results) if results else 0.0
+        score_range = max_score - min_score if max_score != min_score else 1.0
+
+        def normalize_score(score: float) -> float:
+            return (score - min_score) / score_range
+
+        # Greedy MMR selection
+        selected: List[SearchResult] = []
+        candidates = list(results)
+
+        while len(selected) < top_k and candidates:
+            best_mmr_score = float('-inf')
+            best_idx = 0
+
+            for i, candidate in enumerate(candidates):
+                # Skip if no embedding
+                if candidate.book.id not in book_embeddings:
+                    continue
+
+                # Relevance term (normalized RRF score)
+                relevance = normalize_score(candidate.final_score)
+
+                # Diversity term: max similarity to any already-selected document
+                if selected:
+                    max_similarity = max(
+                        self._cosine_similarity(
+                            book_embeddings[candidate.book.id],
+                            book_embeddings[s.book.id]
+                        )
+                        for s in selected
+                        if s.book.id in book_embeddings
+                    ) if any(s.book.id in book_embeddings for s in selected) else 0.0
+                else:
+                    max_similarity = 0.0
+
+                # MMR score: balance relevance and diversity
+                mmr_score = lambda_param * relevance - (1 - lambda_param) * max_similarity
+
+                if mmr_score > best_mmr_score:
+                    best_mmr_score = mmr_score
+                    best_idx = i
+
+            # Add best candidate to selected
+            selected.append(candidates.pop(best_idx))
+
+        # Reassign ranks (1-indexed)
+        for i, result in enumerate(selected, start=1):
+            result.rank = i
+
+        logger.debug(f"MMR diversification selected {len(selected)} results")
+        return selected
+
+    @staticmethod
+    def _cosine_similarity(vec_a: List[float], vec_b: List[float]) -> float:
+        """
+        Compute cosine similarity between two vectors.
+
+        Args:
+            vec_a: First vector
+            vec_b: Second vector
+
+        Returns:
+            Cosine similarity in range [-1, 1], typically [0, 1] for embeddings
+        """
+        if len(vec_a) != len(vec_b):
+            return 0.0
+
+        dot_product = sum(a * b for a, b in zip(vec_a, vec_b))
+        norm_a = sum(a * a for a in vec_a) ** 0.5
+        norm_b = sum(b * b for b in vec_b) ** 0.5
+
+        if norm_a == 0 or norm_b == 0:
+            return 0.0
+
+        return dot_product / (norm_a * norm_b)

@@ -1,0 +1,7 @@
+Key Design Decisions Explained
+INTEGER PRIMARY KEY + TEXT uuid: SQLite lacks native UUID support. We use an auto-increment id for internal row identification (efficient for joins) and a separate uuid TEXT column for domain identity. The domain layer only ever sees UUIDs.
+JSON for lists: Storing authors and categories as JSON arrays in TEXT columns keeps the schema simple (single table) while supporting variable-length lists. ensure_ascii=False preserves non-ASCII characters like Spanish names.
+Upsert with UUID preservation: When a book with the same (source, source_id) already exists, we update all fields EXCEPT the uuid. This prevents breaking references in the BM25 and vector indices that use UUID as their key.
+ISO8601 for datetimes: Storing datetimes as ISO8601 strings is SQLite's recommended approach. Python 3.11+ handles parsing with timezone info automatically via fromisoformat().
+Transactional save_many: All books in a batch are saved in one transaction. If any fails, all changes are rolled back, ensuring data consistency.
+In-memory tests: Using sqlite:///:memory: for tests ensures isolation and speed without filesystem overhead.

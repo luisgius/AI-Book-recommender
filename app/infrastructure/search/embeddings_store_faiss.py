@@ -426,6 +426,24 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
             return 0
         return self._index.ntotal
 
+    def is_ready(self) -> bool:
+        """
+        Check if the embeddings store and FAISS index are ready for operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if embeddings can be generated and index is searchable, False otherwise
+        """
+        try:
+            return (
+                self._model is not None
+                and self._index is not None
+                and self._index.ntotal > 0
+            )
+        except Exception:
+            return False
+
     def clear(self) -> None:
         """Clear the index and all stored embeddings."""
         self._index = None

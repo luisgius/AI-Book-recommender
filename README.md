@@ -1,78 +1,162 @@
-# Sistema Inteligente de Recomendación de Libros mediante PLN y LLMs
+# Sistema Inteligente de Recomendacion de Libros mediante PLN y LLMs
 
-TFG (Bachelor's Thesis) - Book Recommendation System
+**TFG (Bachelor's Thesis) - Hybrid Book Recommendation System**
 
-## Descripción
+A production-style book recommendation system demonstrating modern AI Engineering skills including RAG pipelines, LangChain/LangGraph, embeddings, and LLM evaluation.
 
-Sistema híbrido de búsqueda y recomendación de libros que combina:
-- Búsqueda léxica (BM25)
-- Búsqueda semántica (embeddings + FAISS)
-- LLM para interpretación de consultas y generación de explicaciones
+## Project Goals
 
-## Arquitectura
+This project serves two purposes:
 
-Hexagonal Architecture (Ports & Adapters):
-- **Domain**: Entidades, servicios y puertos
-- **Infrastructure**: Implementaciones de BD, búsqueda, LLM, etc.
-- **API**: FastAPI REST endpoints
-- **UI**: Interfaz web simple para testing
+1. **Academic**: A Bachelor's Thesis demonstrating hybrid search and LLM-powered recommendations.
+2. **Professional**: A portfolio project showcasing junior AI Engineer skills.
 
-## Estructura del Proyecto
+### AI Engineering Skills Demonstrated
+
+| Skill | Implementation |
+|-------|---------------|
+| **RAG Pipelines** | BM25 + vector retrieval with LLM-generated explanations |
+| **LangChain** | Chains for prompt management and LLM orchestration |
+| **LangGraph** | Stateful flows for query understanding and agentic search |
+| **Embeddings** | sentence-transformers for semantic search |
+| **FAISS** | Approximate nearest neighbor search |
+| **Prompt Engineering** | Versioned prompts with Pydantic structured outputs |
+| **Agentic Patterns** | Tool use, ReAct, self-reflection |
+| **LLM Evaluation** | IR metrics + LLM-as-judge |
+| **Pydantic** | Structured outputs, API schemas, configuration |
+
+## Architecture
+
+**Hexagonal Architecture (Ports & Adapters)**
 
 ```
-.
-├── app/                    # Código principal
-│   ├── api/               # API REST
-│   ├── domain/            # Capa de dominio
-│   ├── infrastructure/    # Adaptadores
-│   ├── ingestion/         # Jobs de ingesta de datos
-│   ├── evaluation/        # Evaluación del sistema
-│   └── ui/                # Interfaz web
-├── tests/                 # Tests unitarios e integración
-├── data/                  # Datos, índices, BD
-├── docs/                  # Documentación
-├── scripts/               # Scripts auxiliares
-├── requirements.txt       # Dependencias Python
-└── Dockerfile            # Containerización
+                    +------------------+
+                    |   FastAPI API    |
+                    +--------+---------+
+                             |
+                    +--------v---------+
+                    |  Domain Layer    |
+                    |  - SearchService |
+                    |  - Ports (interfaces)
+                    +--------+---------+
+                             |
+        +--------------------+--------------------+
+        |                    |                    |
++-------v-------+   +--------v--------+   +------v------+
+| BM25 Search   |   | FAISS Vectors   |   | LangChain   |
+| (rank-bm25)   |   | (embeddings)    |   | LLM Client  |
++---------------+   +-----------------+   +-------------+
 ```
 
-## Instalación
+## Project Structure
+
+```
+app/
+├── domain/                 # Core business logic (framework-agnostic)
+│   ├── entities.py         # Book, SearchResult, Explanation
+│   ├── services.py         # SearchService with RRF fusion
+│   ├── ports.py            # Interface definitions
+│   └── value_objects.py    # SearchQuery, SearchFilters
+├── infrastructure/         # Adapters implementing ports
+│   ├── search/             # BM25, FAISS, embeddings
+│   ├── llm/                # LangChain client, prompts, graphs
+│   ├── db/                 # SQLite repository
+│   └── external/           # Google Books API client
+├── evaluation/             # IR metrics, LLM-as-judge
+└── api/                    # FastAPI endpoints
+```
+
+## Installation
 
 ```bash
-# Crear entorno virtual
+# Clone and setup
+git clone <repo-url>
+cd luis-tfg
+
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your OPENAI_API_KEY or ANTHROPIC_API_KEY
 ```
 
-## Uso
+## Usage
 
 ```bash
-# Ejecutar API
-python -m app.main
-
-# Ejecutar tests
+# Run tests
 pytest
 
-# Ingestar libros
-python -m app.ingestion.ingest_books_job
+# Run API server
+python -m app.main
 
-# Evaluar sistema
-python -m app.evaluation.evaluation_job
+# Ingest books from Google Books
+python -m app.ingestion.ingest_books_job --query "machine learning" --max-results 50
+
+# Run evaluation
+python -m app.evaluation.evaluation_job --output data/evaluation/results.json
 ```
 
-## Tecnologías
+## Key Components
 
-- Python 3.11+
-- FastAPI
-- SQLite
-- BM25
-- FAISS
-- LangChain
-- pytest
+### Hybrid Search (SearchService)
 
-## Autor
+Combines lexical and semantic search using Reciprocal Rank Fusion:
 
-Luis Giménez - TFG 2025
+```python
+# Retrieval
+lexical_results = bm25_repo.search(query, max_results=20)
+vector_results = faiss_repo.search(query_embedding, max_results=20)
+
+# Fusion
+fused = rrf_fusion(lexical_results, vector_results, k=60)
+```
+
+### RAG Pipeline
+
+```
+User Query --> Query Understanding --> Hybrid Retrieval --> Context Construction --> LLM Generation
+                (LangGraph)            (BM25 + FAISS)        (top-k books)          (explanation)
+```
+
+### LLM Integration (LangChain)
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+chain = prompt | llm.with_structured_output(BookExplanation)
+explanation = chain.invoke({"query": query, "book": book_info})
+```
+
+## Technologies
+
+| Category | Technology |
+|----------|------------|
+| Language | Python 3.11+ |
+| Web Framework | FastAPI |
+| Database | SQLite |
+| Lexical Search | rank-bm25 |
+| Vector Search | FAISS |
+| Embeddings | sentence-transformers |
+| LLM Orchestration | LangChain, LangGraph |
+| LLM Backends | OpenAI API, Anthropic API |
+| Validation | Pydantic |
+| Testing | pytest |
+
+## Development Status
+
+- [x] Phase 1: Retrieval Foundation (BM25, FAISS, hybrid search)
+- [ ] Phase 2: Basic RAG Pipeline (LangChain client, explanations)
+- [ ] Phase 3: Query Understanding (intent extraction, LangGraph)
+- [ ] Phase 4: Agentic Patterns (tool use, ReAct)
+- [ ] Phase 5: Evaluation Pipeline (IR metrics, LLM-as-judge)
+- [ ] Phase 6: API and Integration (FastAPI, UI)
+
+## Author
+
+Luis Gimenez - TFG 2025

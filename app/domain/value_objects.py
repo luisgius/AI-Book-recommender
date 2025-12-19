@@ -72,6 +72,12 @@ class SearchQuery:
     use_explanations: bool = False
     """Whether to generate LLM explanations for results"""
 
+    use_diversification: bool = False
+    """Whether to apply MMR diversification to reduce redundancy in results"""
+
+    diversity_lambda: float = 0.6
+    """Trade-off between relevance and diversity (0.0 = max diversity, 1.0 = max relevance)"""
+
     def __post_init__(self) -> None:
         """Validate query constraints."""
         if not self.text or not self.text.strip():
@@ -82,6 +88,11 @@ class SearchQuery:
 
         if self.max_results > 100:
             raise ValueError(f"max_results cannot exceed 100, got {self.max_results}")
+
+        if not (0.0 <= self.diversity_lambda <= 1.0):
+            raise ValueError(
+                f"diversity_lambda must be between 0.0 and 1.0, got {self.diversity_lambda}"
+            )
 
 
 @dataclass(frozen=True)
@@ -131,4 +142,90 @@ class BookMetadata:
         if self.ratings_count is not None and self.ratings_count < 0:
             raise ValueError(
                 f"ratings_count cannot be negative, got {self.ratings_count}"
+            )
+
+
+@dataclass(frozen=True)
+class SearchResponse:
+    """
+    Response wrapper for search operations with degradation metadata (RNF-08).
+
+    This value object wraps search results and includes metadata about
+    the search execution, particularly for graceful degradation scenarios.
+    """
+
+    results: list
+    """List of SearchResult entities"""
+
+    degraded: bool = False
+    """True if the search was performed in degraded mode (e.g., FAISS unavailable)"""
+
+    degradation_reason: Optional[str] = None
+    """Human-readable explanation of why degradation occurred"""
+
+    search_mode: str = "hybrid"
+    """The search mode used: 'hybrid', 'lexical_only', or 'vector_only'"""
+
+    latency_ms: Optional[float] = None
+    """Search execution time in milliseconds"""
+
+    def __post_init__(self) -> None:
+        """Validate response constraints."""
+        if self.degraded and self.degradation_reason is None:
+            raise ValueError("degradation_reason is required when degraded=True")
+
+        valid_modes = {"hybrid", "lexical_only", "vector_only"}
+        if self.search_mode not in valid_modes:
+            raise ValueError(
+                f"search_mode must be one of {valid_modes}, got '{self.search_mode}'"
+            )
+
+
+@dataclass(frozen=True)
+class IngestionSummary:
+    """
+    Summary of an ingestion operation.
+
+    This value object captures the outcome of ingesting books from
+    an external provider into the catalog repository.
+    """
+
+    n_fetched: int
+    """Number of books fetched from the external provider"""
+
+    n_inserted: int
+    """Number of books successfully inserted into the catalog"""
+
+    n_skipped: int
+    """Number of books skipped (e.g., duplicates)"""
+
+    n_errors: int
+    """Number of books that failed to insert due to errors"""
+
+    query: str
+    """The query used to fetch books"""
+
+    language: Optional[str] = None
+    """Language filter applied (ISO 639-1 code)"""
+
+    errors: list[str] = field(default_factory=list)
+    """List of error messages (optional, for debugging)"""
+
+    def __post_init__(self) -> None:
+        """Validate summary constraints."""
+        if self.n_fetched < 0:
+            raise ValueError(f"n_fetched cannot be negative, got {self.n_fetched}")
+        if self.n_inserted < 0:
+            raise ValueError(f"n_inserted cannot be negative, got {self.n_inserted}")
+        if self.n_skipped < 0:
+            raise ValueError(f"n_skipped cannot be negative, got {self.n_skipped}")
+        if self.n_errors < 0:
+            raise ValueError(f"n_errors cannot be negative, got {self.n_errors}")
+
+        # Invariant: fetched = inserted + skipped + errors
+        expected_fetched = self.n_inserted + self.n_skipped + self.n_errors
+        if self.n_fetched != expected_fetched:
+            raise ValueError(
+                f"Invariant violated: n_fetched ({self.n_fetched}) must equal "
+                f"n_inserted + n_skipped + n_errors ({expected_fetched})"
             )

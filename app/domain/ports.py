@@ -227,6 +227,17 @@ class LexicalSearchRepository(Protocol):
         """
         ...
 
+    def is_ready(self) -> bool:
+        """
+        Check if the index is loaded and ready for search operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if the index is loaded and searchable, False otherwise
+        """
+        ...
+
 
 class VectorSearchRepository(Protocol):
     """
@@ -278,6 +289,17 @@ class VectorSearchRepository(Protocol):
         Raises:
             ValueError: If query_embedding has wrong dimensionality
             RuntimeError: If search execution fails
+        """
+        ...
+
+    def is_ready(self) -> bool:
+        """
+        Check if the vector index is loaded and ready for search operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if the index is loaded and searchable, False otherwise
         """
         ...
 
@@ -425,6 +447,17 @@ class EmbeddingsStore(Protocol):
 
         Returns:
             The embedding dimension (e.g., 384 for MiniLM, 768 for BERT)
+        """
+        ...
+
+    def is_ready(self) -> bool:
+        """
+        Check if the embeddings store and index are ready for operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if embeddings can be generated and index is searchable, False otherwise
         """
         ...
 
