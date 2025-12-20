@@ -35,6 +35,8 @@ This project is designed to demonstrate proficiency in modern AI Engineering ski
 | **OpenAI/Anthropic APIs** | LLM backends accessed via LangChain abstractions |
 | **Embeddings** | sentence-transformers for dense vector representations of books and queries |
 | **FAISS** | Approximate nearest neighbor search for semantic retrieval |
+| **Vector Databases (Chroma)** | Optional local vector database adapter for storing/querying embeddings; benchmarked against FAISS without becoming a required dependency. |
+| **Fine-tuning (Out of Scope)** | Not implemented. The project uses pre-trained models via API + retrieval + prompt engineering; fine-tuning is discussed only as background. |
 | **Prompt Engineering** | Explicit, versioned prompts with structured outputs for all LLM interactions |
 | **Agentic Design Patterns** | ReAct-style agents, tool use, planning loops for complex queries |
 | **LLM Evaluation & Benchmarking** | IR metrics (NDCG, precision@k), LLM-as-judge, automated evaluation pipelines |
@@ -184,6 +186,7 @@ The application layer coordinates HTTP I/O and translation between API models (P
 * DB: SQLite (no external DB server).
 * Lexical search: BM25 (rank-bm25 library).
 * Vector search: embeddings + FAISS.
+* Optional vector database: Chroma (local), used only for an optional adapter + benchmarking against FAISS.
 * Embeddings: sentence-transformers (all-MiniLM-L6-v2 or similar).
 * LLM orchestration:
   * **LangChain** as the primary abstraction layer for prompts, chains, and LLM calls.

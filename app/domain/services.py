@@ -14,7 +14,7 @@ import logging
 import time
 
 from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters, SearchResponse
+from .value_objects import SearchQuery, SearchFilters, SearchResponse, SearchMetadata
 from .ports import (
     LexicalSearchRepository,
     VectorSearchRepository,
@@ -99,6 +99,7 @@ class SearchService:
         degraded = False
         degradation_reason = None
         search_mode = "hybrid"
+        metadata: Optional[SearchMetadata] = None
 
         # Check if vector search is available
         vector_available = self._vector_search.is_ready() and self._embeddings_store.is_ready()
@@ -111,20 +112,41 @@ class SearchService:
             search_mode = "lexical_only"
 
             try:
-                results = self._search_lexical_only(query)
+                results, meta = self._search_lexical_only_with_debug(query)
+                metadata = SearchMetadata(
+                    fusion_method="none",
+                    rrf_k=None,
+                    diversification_enabled=bool(query.use_diversification),
+                    candidates_lexical=meta.get("candidates_lexical", 0),
+                    candidates_vector=0,
+                )
             except Exception as e:
                 logger.error(f"Lexical search also failed: {e}")
                 raise RuntimeError("Both vector and lexical search unavailable") from e
         else:
             # Try hybrid search, fallback to lexical if vector fails
             try:
-                results = self.search(query)
+                results, meta = self._search_hybrid_with_debug(query)
+                metadata = SearchMetadata(
+                    fusion_method="rrf",
+                    rrf_k=meta.get("rrf_k", 60),
+                    diversification_enabled=bool(query.use_diversification),
+                    candidates_lexical=meta.get("candidates_lexical", 0),
+                    candidates_vector=meta.get("candidates_vector", 0),
+                )
             except Exception as e:
                 logger.warning(f"Hybrid search failed, falling back to lexical: {e}")
                 degraded = True
                 degradation_reason = f"Vector search failed ({str(e)}) - using lexical search only"
                 search_mode = "lexical_only"
-                results = self._search_lexical_only(query)
+                results, meta = self._search_lexical_only_with_debug(query)
+                metadata = SearchMetadata(
+                    fusion_method="none",
+                    rrf_k=None,
+                    diversification_enabled=bool(query.use_diversification),
+                    candidates_lexical=meta.get("candidates_lexical", 0),
+                    candidates_vector=0,
+                )
 
         latency_ms = (time.time() - start_time) * 1000
 
@@ -134,7 +156,73 @@ class SearchService:
             degradation_reason=degradation_reason,
             search_mode=search_mode,
             latency_ms=latency_ms,
+            metadata=metadata,
         )
+
+    def _search_lexical_only_with_debug(self, query: SearchQuery) -> tuple[List[SearchResult], Dict]:
+        results = self._search_lexical_only(query)
+        return results, {"candidates_lexical": len(results)}
+
+    def _search_hybrid_with_debug(self, query: SearchQuery) -> tuple[list[SearchResult], Dict]:
+        logger.info(f"Executing hybrid search for query: '{query.text}'")
+
+        candidate_limit = query.max_results * 2
+
+        logger.debug("Executing lexical (BM25) search")
+        lexical_results = self._lexical_search.search(
+            query_text=query.text,
+            max_results=candidate_limit,
+            filters=query.filters
+        )
+
+        logger.debug("Generating query embedding and executing vector search")
+        query_embedding = self._embeddings_store.generate_embedding(query.text)
+        vector_results = self._vector_search.search(
+            query_embedding=query_embedding,
+            max_results=candidate_limit,
+            filters=query.filters,
+        )
+
+        logger.debug(
+            f"Retrieved {len(lexical_results)} lexical results, "
+            f"{len(vector_results)} vector results"
+        )
+
+        rrf_k = 60
+        fused_results = self._fuse_results_rrf(
+            lexical_results=lexical_results,
+            vector_results=vector_results,
+            k=rrf_k,
+        )
+
+        logger.debug(f"Fused into {len(fused_results)} unique results")
+
+        filtered_results = self._apply_filters(fused_results, query.filters)
+
+        if query.use_diversification:
+            logger.debug(f"Applying MMR diversification with lambda={query.diversity_lambda}")
+            final_results = self._apply_mmr_diversification(
+                results=filtered_results,
+                top_k=query.max_results,
+                lambda_param=query.diversity_lambda,
+            )
+        else:
+            final_results = filtered_results[: query.max_results]
+            for i, result in enumerate(final_results, start=1):
+                result.rank = i
+
+        logger.info(f"Returning {len(final_results)} results")
+
+        if query.use_explanations and self._llm_client is not None:
+            logger.debug("Generating explanations for top results")
+            final_results = self._add_explanations(query, final_results)
+
+        return final_results, {
+            "fusion_method": "rrf",
+            "rrf_k": rrf_k,
+            "candidates_lexical": len(lexical_results),
+            "candidates_vector": len(vector_results),
+        }
 
     def _search_lexical_only(self, query: SearchQuery) -> List[SearchResult]:
         """

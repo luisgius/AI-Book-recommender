@@ -146,6 +146,49 @@ class BookMetadata:
 
 
 @dataclass(frozen=True)
+class SearchMetadata:
+    """
+    Debug/telemetry metadata for search operations.
+
+    This value object captures internal details about how a search was executed,
+    useful for debugging, evaluation, and transparency in the TFG.
+    """
+
+    fusion_method: str
+    """The fusion method used: 'rrf' (Reciprocal Rank Fusion) or 'none'"""
+
+    rrf_k: Optional[int] = None
+    """The k parameter used in RRF formula (typically 60), None if fusion_method='none'"""
+
+    diversification_enabled: bool = False
+    """Whether MMR diversification was applied"""
+
+    candidates_lexical: int = 0
+    """Number of candidates retrieved from lexical (BM25) search"""
+
+    candidates_vector: int = 0
+    """Number of candidates retrieved from vector search"""
+
+    def __post_init__(self) -> None:
+        """Validate metadata constraints."""
+        valid_fusion_methods = {"rrf", "none"}
+        if self.fusion_method not in valid_fusion_methods:
+            raise ValueError(
+                f"fusion_method must be one of {valid_fusion_methods}, "
+                f"got '{self.fusion_method}'"
+            )
+
+        if self.fusion_method == "rrf" and self.rrf_k is None:
+            raise ValueError("rrf_k is required when fusion_method='rrf'")
+
+        if self.candidates_lexical < 0:
+            raise ValueError(f"candidates_lexical cannot be negative, got {self.candidates_lexical}")
+
+        if self.candidates_vector < 0:
+            raise ValueError(f"candidates_vector cannot be negative, got {self.candidates_vector}")
+
+
+@dataclass(frozen=True)
 class SearchResponse:
     """
     Response wrapper for search operations with degradation metadata (RNF-08).
@@ -168,6 +211,9 @@ class SearchResponse:
 
     latency_ms: Optional[float] = None
     """Search execution time in milliseconds"""
+
+    metadata: Optional[SearchMetadata] = None
+    """Optional debug/telemetry metadata about the search execution"""
 
     def __post_init__(self) -> None:
         """Validate response constraints."""
