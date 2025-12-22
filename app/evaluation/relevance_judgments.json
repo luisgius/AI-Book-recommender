@@ -1,0 +1,3407 @@
+[
+  {
+    "query_id": "q01",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q02",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 3
+      }
+    ]
+  },
+  {
+    "query_id": "q03",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q04",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "mRONzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "8wzUugEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "iNtizwEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "gNjsDwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jwikxAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "bvntEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "PEZixgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CEC20AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Ifr7wwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "9prPDQAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "vLK6zwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "oCPqtAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "96fdDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "duoaEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "3Wc6ywEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q05",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "RTyXEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "LEaRDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "IW6gEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wxwxEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "duoaEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "xbSoEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uAkIEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "WCypDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "UxSNEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Ifr7wwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "3ctAzQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "KgxfzQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "m_FLEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhoonlqqGP8C",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wgVOAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "nINSDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "6ljmBwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ixJSDwAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "VRmtQgAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "f3lQAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "9xRJAQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "sqFDAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "5LrmDwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uD9YAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "iNtizwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "LrwuAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "8TFTzwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "asNU1T97imwC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bjrmAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "zbUpQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "bvntEAAAQBAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q06",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uO3aEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "nINSDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "vLK6zwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhoonlqqGP8C",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "4EJEEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9prPDQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Na4jedkK4tgC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Ifr7wwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "_QPnywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "xbSoEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "_O2LzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "kcqb0QEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "d-krEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "YYwoAQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "asNU1T97imwC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AnKroAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "6ljmBwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "6YmbEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "VRmtQgAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "S6EXuAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "GDFoEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Yo0pEQAAQBAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q07",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7iseEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "LEaRDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wxwxEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "IW6gEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "pwwnAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Ez3OjgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "WZ4KAAAAQAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "O8EQvfFlxTEC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "dWc5Iry8DUIC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "RTyXEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "d-krEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "WCypDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "KgxfzQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "YYwoAQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "i7AYCgAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "gqYgEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "kcqb0QEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "CEC20AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "hFWIDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ixJSDwAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Na4jedkK4tgC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "S6EXuAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "f3lQAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "UxSNEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uD9YAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "6ljmBwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9HM9AAAAYAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q08",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "E7k0EAAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "BthOEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CEC20AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "duoaEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mRONzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "GDFoEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "vLK6zwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Na4jedkK4tgC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "gNjsDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "hFWIDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "S6EXuAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "6YmbEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "PEZixgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "WCypDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "sqFDAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "VRmtQgAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q09",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "YZZUzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "iy7_zQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "byACzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "ZaL8zQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "hFWIDwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "qv9azwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "PGjpDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "NUikAgAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wgVOAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "FhAtEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "bvntEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "BthOEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "_O2LzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wo4TEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uES4AwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "X_ntDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "5RP_zQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uO3aEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "CEC20AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uoX3zgEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q10",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "LEaRDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "RTyXEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "IW6gEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wxwxEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7iseEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uAkIEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Mi97G2LTpqsC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "dZbE0HTJIegC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "OQ83AQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uES4AwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "X_ntDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wo4TEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uO3aEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "S6EXuAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "_QPnywEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "f3lQAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "qv9azwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q11",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jwikxAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "PEZixgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "BthOEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "qv9azwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "bqwmEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ixJSDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "f3lQAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "_O2LzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "a4iQzQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5RP_zQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Hn4kygEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "3ctAzQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "5LrmDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mRONzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "9prPDQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CEC20AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q12",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "ahUsAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "sBAPAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uD9YAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "VBAhAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "LrwuAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ghKMEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "asNU1T97imwC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bjrmAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "RTyXEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "IW6gEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "LEaRDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9prPDQAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7iseEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "9HM9AAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "iNtizwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "zbUpQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Ez3OjgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bvntEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "wxwxEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uAkIEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q13",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "8wzUugEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "gNjsDwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "oCPqtAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "3ctAzQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "QC2azgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jORjEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mRONzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "vLK6zwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "_O2LzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "nxUfzgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AnKroAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "duoaEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "GDFoEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "CVrmzgEACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q14",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "X_ntDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "pbsTEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "vLK6zwEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "YZZUzgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "FhAtEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "WCypDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Yo0pEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "_O2LzgEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AnKroAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uES4AwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "6ljmBwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "S6EXuAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "asNU1T97imwC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "kcqb0QEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "GDFoEQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "yRY6EAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "uO3aEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "nINSDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "ewiNzQEACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q15",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "sqFDAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "ghKMEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "UxSNEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "wxwxEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "ahUsAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "sBAPAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uD9YAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "VBAhAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "LrwuAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uUVAAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "-kQ-5OCdi48C",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "OQ83AQAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "FtAHAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "dWc5Iry8DUIC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "BA83AQAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "O8EQvfFlxTEC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "dtEAAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5dU4AQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "asNU1T97imwC",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q16",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "ghKMEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "EZ_0zQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bqwmEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "gqYgEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "E7k0EAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "BthOEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bvntEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "mppXEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "QC2azgEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "FhAtEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5dU4AQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "9xRJAQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "uUVAAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "LrwuAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "dtEAAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "WZ4KAAAAQAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "FtAHAQAAIAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "dWc5Iry8DUIC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "OQ83AQAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "i7AYCgAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "K9oFEQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "8wzUugEACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q17",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "OQ83AQAAMAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "FtAHAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "BA83AQAAMAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "O8EQvfFlxTEC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "WZ4KAAAAQAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "dWc5Iry8DUIC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uUVAAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "dtEAAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q18",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q19",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q20",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q21",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q22",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q23",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q24",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q25",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q26",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q27",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q28",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q29",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q30",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q31",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q32",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q33",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 3
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q34",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q35",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "UZs8wQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "X_ntDwAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "fu8vzgEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uES4AwAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "_QPnywEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q36",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "uUVAAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "dtEAAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "FtAHAQAAIAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q37",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "2sT73IyYmSQC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "HjezZZViDssC",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "xzdjAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q38",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "aJQILlLxRmAC",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "tQwzEAAAQBAJ",
+        "relevance": 0
+      },
+      {
+        "source": "google_books",
+        "source_id": "C3jIAwAAQBAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q39",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 0
+      }
+    ]
+  },
+  {
+    "query_id": "q40",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "iNtizwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "8wzUugEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "9prPDQAAQBAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q41",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "a2lZEAAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "6YmbEAAAQBAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "TWzuUd5gsnkC",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "V8PJxwEACAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 2
+      }
+    ]
+  },
+  {
+    "query_id": "q42",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "Wl5iQwAACAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "jXhjAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "rX1jAAAAMAAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 2
+      },
+      {
+        "source": "google_books",
+        "source_id": "fJzX0AEACAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q43",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "LrwuAAAAYAAJ",
+        "relevance": 1
+      },
+      {
+        "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 1
+      }
+    ]
+  },
+  {
+    "query_id": "q44",
+    "judgments": [
+      {
+        "source": "google_books",
+        "source_id": "bXQzAAAAMAAJ",
+        "relevance": 1
+      }
+    ]
+  }
+]
