@@ -3,8 +3,8 @@ Evaluation service for computing IR metrics.
 """
 
 import math
-from typing import List, Dict
-from uuid import UUID
+from itertools import combinations
+from typing import List
 
 from app.domain.entities import SearchResult
 from app.evaluation.types import RelevanceJudgment
@@ -20,6 +20,38 @@ class EvaluationService:
     - MRR (Mean Reciprocal Rank)
     - ILD@k (Intra-List Diversity)
     """
+
+    @staticmethod
+    def _jaccard_distance(a: set, b: set) -> float | None:
+        union = a | b
+        if not union:
+            return None
+        inter = a & b
+        return 1.0 - (len(inter) / len(union))
+
+    @classmethod
+    def _pair_distance(
+        cls,
+        *,
+        authors_i: set,
+        authors_j: set,
+        cats_i: set,
+        cats_j: set,
+    ) -> float | None:
+        distances: List[float] = []
+
+        author_distance = cls._jaccard_distance(authors_i, authors_j)
+        if author_distance is not None:
+            distances.append(author_distance)
+
+        cat_distance = cls._jaccard_distance(cats_i, cats_j)
+        if cat_distance is not None:
+            distances.append(cat_distance)
+
+        if not distances:
+            return None
+
+        return sum(distances) / len(distances)
 
     def compute_ndcg(
         self,
@@ -46,13 +78,15 @@ class EvaluationService:
         for i, result in enumerate(top_k, start=1):
             book_id = result.book.id
             relevance = judgment.judgments.get(book_id, 0)
-            dcg += relevance / math.log2(i + 1)
+            gain = (2 ** relevance) - 1
+            dcg += gain / math.log2(i + 1)
         
         # Compute IDCG (ideal DCG)
         ideal_relevances = sorted(judgment.judgments.values(), reverse=True)[:k]
         idcg = 0.0
         for i, rel in enumerate(ideal_relevances, start=1):
-            idcg += rel / math.log2(i + 1)
+            gain = (2 ** rel) - 1
+            idcg += gain / math.log2(i + 1)
         
         # Handle edge case: no relevant documents
         if idcg == 0:
@@ -143,10 +177,18 @@ class EvaluationService:
         Returns:
             ILD score in [0, 1], higher is more diverse
         """
+        ild, _coverage = self.compute_ild_with_coverage(results, k=k)
+        return ild
+
+    def compute_ild_with_coverage(
+        self,
+        results: List[SearchResult],
+        k: int = 10
+    ) -> tuple[float, float]:
         top_k = results[:k]
         
         if len(top_k) < 2:
-            return 0.0
+            return 0.0, 0.0
         
         # Collect features for diversity computation
         authors_sets = []
@@ -158,39 +200,24 @@ class EvaluationService:
         
         # Compute pairwise diversity
         total_distance = 0.0
-        num_pairs = 0
+        used_pairs = 0
+        total_pairs = (len(top_k) * (len(top_k) - 1)) // 2
+
+        items = list(zip(authors_sets, categories_sets))
+        for (authors_i, cats_i), (authors_j, cats_j) in combinations(items, 2):
+            pair_distance = self._pair_distance(
+                authors_i=authors_i,
+                authors_j=authors_j,
+                cats_i=cats_i,
+                cats_j=cats_j,
+            )
+            if pair_distance is None:
+                continue
+
+            total_distance += pair_distance
+            used_pairs += 1
         
-        for i in range(len(top_k)):
-            for j in range(i + 1, len(top_k)):
-                # Jaccard distance on authors
-                authors_i = authors_sets[i]
-                authors_j = authors_sets[j]
-                union_authors = authors_i | authors_j
-                inter_authors = authors_i & authors_j
-                
-                if len(union_authors) > 0:
-                    author_distance = 1.0 - (len(inter_authors) / len(union_authors))
-                else:
-                    author_distance = 1.0
-                
-                # Jaccard distance on categories
-                cats_i = categories_sets[i]
-                cats_j = categories_sets[j]
-                union_cats = cats_i | cats_j
-                inter_cats = cats_i & cats_j
-                
-                if len(union_cats) > 0:
-                    cat_distance = 1.0 - (len(inter_cats) / len(union_cats))
-                else:
-                    cat_distance = 1.0
-                
-                # Average distance
-                pair_distance = (author_distance + cat_distance) / 2.0
-                total_distance += pair_distance
-                num_pairs += 1
+        if used_pairs == 0:
+            return 0.0, 0.0
         
-        # Average over all pairs
-        if num_pairs == 0:
-            return 0.0
-        
-        return total_distance / num_pairs
+        return (total_distance / used_pairs), (used_pairs / total_pairs if total_pairs else 0.0)

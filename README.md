@@ -99,7 +99,29 @@ python -m app.ingestion.ingest_books_job --query "machine learning" --max-result
 
 # Run evaluation
 python -m app.evaluation.evaluation_job --output data/evaluation/results.json
+
+# Run evaluation (v2, reproducible)
+python -m app.evaluation.evaluation_job \
+  --db-path data/catalog.db \
+  --indexes-dir data/indexes \
+  --output data/evaluation/results_v2.json \
+  --export-pool data/evaluation/pool_candidates_v2.json \
+  --pool-per-mode-limit 50
 ```
+
+### Evaluation artifacts (evidence)
+
+- **results_v2.json**: `data/evaluation/results_v2.json`
+- **pool_candidates_v2.json**: `data/evaluation/pool_candidates_v2.json`
+- **comparison_v1_v2.txt**: `data/evaluation/comparison_v1_v2.txt`
+- **EVALUATION_SUMMARY.md**: `data/evaluation/EVALUATION_SUMMARY.md`
+
+### FAISS dependency note (faiss-cpu vs faiss)
+
+- This project imports the Python module `faiss`.
+- On pip, the package that provides `import faiss` is typically **`faiss-cpu`** (CPU-only).
+- `requirements.txt` pins: `faiss-cpu==1.9.0.post1`.
+- In some environments (often macOS/conda), FAISS is installed via conda-forge (e.g., `faiss-cpu`), but it still exposes the same Python module name: `faiss`.
 
 ## Key Components
 

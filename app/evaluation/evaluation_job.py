@@ -21,7 +21,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Callable, Optional
 
 # Add project root to path
 project_root = Path(__file__).resolve().parents[2]
@@ -56,6 +56,7 @@ DEFAULT_INDEXES_DIR = "data/indexes"
 DEFAULT_QUERIES_PATH = "app/evaluation/test_queries.json"
 DEFAULT_JUDGMENTS_PATH = "app/evaluation/relevance_judgments.json"
 DEFAULT_OUTPUT_PATH = "data/evaluation/results.json"
+DEFAULT_POOL_PER_MODE_LIMIT = 50
 
 NDCG_KS = (5, 10, 20)
 RECALL_KS = (10, 20, 100)
@@ -77,7 +78,6 @@ def load_test_queries(path: str) -> List[TestQuery]:
         queries.append(query)
 
     return queries
-    
 
 
 def load_relevance_judgments(path: str) -> Dict[str, List[dict]]:
@@ -90,8 +90,6 @@ def load_relevance_judgments(path: str) -> Dict[str, List[dict]]:
         judgments[item["query_id"]] = item["judgments"]
 
     return judgments
-
-
 
 
 def resolve_judgments_to_uuids(
@@ -117,7 +115,6 @@ def resolve_judgments_to_uuids(
     return result
 
 
-
 def run_lexical_search(
     query_text: str,
     bm25_repo: BM25SearchRepository,
@@ -126,7 +123,6 @@ def run_lexical_search(
     """Mode 1: Lexical-only search (BM25)."""
     
     return bm25_repo.search(query_text, max_results)
-
 
 
 def run_vector_search(
@@ -151,6 +147,72 @@ def _cosine_similarity(vec_a: List[float], vec_b: List[float]) -> float:
     return dot_product / (norm_a * norm_b)
 
 
+def _build_book_embeddings(
+    results: list,
+    *,
+    embeddings_store: EmbeddingsStoreFaiss,
+) -> Dict[str, List[float]]:
+    book_embeddings: Dict[str, List[float]] = {}
+    for r in results:
+        emb = embeddings_store.get_embedding(r.book.id)
+        if emb is not None:
+            book_embeddings[str(r.book.id)] = emb
+    return book_embeddings
+
+
+def _make_score_normalizer(results: list) -> Callable[[float], float]:
+    max_score = max(r.final_score for r in results) if results else 1.0
+    min_score = min(r.final_score for r in results) if results else 0.0
+    score_range = max_score - min_score if max_score != min_score else 1.0
+
+    def _norm(score: float) -> float:
+        return (score - min_score) / score_range
+
+    return _norm
+
+
+def _max_similarity(
+    *,
+    candidate_id: str,
+    selected: list,
+    book_embeddings: Dict[str, List[float]],
+) -> float:
+    max_sim = 0.0
+    for s in selected:
+        s_id = str(s.book.id)
+        sim = _cosine_similarity(book_embeddings[candidate_id], book_embeddings[s_id])
+        if sim > max_sim:
+            max_sim = sim
+    return max_sim
+
+
+def _pick_best_candidate_index(
+    *,
+    candidates: list,
+    selected: list,
+    book_embeddings: Dict[str, List[float]],
+    norm: Callable[[float], float],
+    lambda_param: float,
+) -> Optional[int]:
+    best_score = float("-inf")
+    best_idx: Optional[int] = None
+
+    for i, cand in enumerate(candidates):
+        cand_id = str(cand.book.id)
+        relevance = norm(cand.final_score)
+        max_sim = _max_similarity(
+            candidate_id=cand_id,
+            selected=selected,
+            book_embeddings=book_embeddings,
+        ) if selected else 0.0
+        mmr_score = lambda_param * relevance - (1.0 - lambda_param) * max_sim
+        if mmr_score > best_score:
+            best_score = mmr_score
+            best_idx = i
+
+    return best_idx
+
+
 def _mmr_rerank(
     results: list,
     *,
@@ -163,61 +225,27 @@ def _mmr_rerank(
 
     mmr_top_k = min(mmr_top_k, len(results))
 
-    book_embeddings: Dict[str, List[float]] = {}
-    for r in results:
-        emb = embeddings_store.get_embedding(r.book.id)
-        if emb is not None:
-            book_embeddings[str(r.book.id)] = emb
-
+    book_embeddings = _build_book_embeddings(results, embeddings_store=embeddings_store)
     if not book_embeddings:
         return results
 
-    max_score = max(r.final_score for r in results) if results else 1.0
-    min_score = min(r.final_score for r in results) if results else 0.0
-    score_range = max_score - min_score if max_score != min_score else 1.0
-
-    def _norm(score: float) -> float:
-        return (score - min_score) / score_range
+    norm = _make_score_normalizer(results)
 
     selected: list = []
-    selected_ids: set[str] = set()
-
-    candidates = list(results)
+    candidates = [r for r in results if str(r.book.id) in book_embeddings]
     while len(selected) < mmr_top_k and candidates:
-        best_score = float("-inf")
-        best_idx = None
-
-        for i, cand in enumerate(candidates):
-            cand_id = str(cand.book.id)
-            if cand_id not in book_embeddings:
-                continue
-
-            relevance = _norm(cand.final_score)
-
-            if selected:
-                max_sim = 0.0
-                for s in selected:
-                    s_id = str(s.book.id)
-                    if s_id not in book_embeddings:
-                        continue
-                    sim = _cosine_similarity(book_embeddings[cand_id], book_embeddings[s_id])
-                    if sim > max_sim:
-                        max_sim = sim
-            else:
-                max_sim = 0.0
-
-            mmr_score = lambda_param * relevance - (1.0 - lambda_param) * max_sim
-            if mmr_score > best_score:
-                best_score = mmr_score
-                best_idx = i
-
+        best_idx = _pick_best_candidate_index(
+            candidates=candidates,
+            selected=selected,
+            book_embeddings=book_embeddings,
+            norm=norm,
+            lambda_param=lambda_param,
+        )
         if best_idx is None:
             break
+        selected.append(candidates.pop(best_idx))
 
-        chosen = candidates.pop(best_idx)
-        selected.append(chosen)
-        selected_ids.add(str(chosen.book.id))
-
+    selected_ids = {str(r.book.id) for r in selected}
     remainder = [r for r in results if str(r.book.id) not in selected_ids]
     reranked = selected + remainder
 
@@ -278,53 +306,81 @@ def _candidate_key(result: Any) -> tuple[str, str]:
     return result.book.source, str(result.book.id)
 
 
+def _build_existing_judgments_map(
+    existing_raw_judgments: Dict[str, List[dict]],
+) -> Dict[str, Dict[tuple[str, str], int]]:
+    existing_map: Dict[str, Dict[tuple[str, str], int]] = {}
+    for qid, items in existing_raw_judgments.items():
+        existing_map[qid] = {
+            (it.get("source"), it.get("source_id")): it.get("relevance")
+            for it in items
+        }
+    return existing_map
+
+
+def _pool_candidates_for_query(
+    *,
+    query: TestQuery,
+    results_by_mode: Dict[str, Dict[str, list]],
+    existing_map: Dict[str, Dict[tuple[str, str], int]],
+    per_mode_limit: int = DEFAULT_POOL_PER_MODE_LIMIT,
+) -> List[dict]:
+    seen: Dict[tuple[str, str], Any] = {}
+    for mode_results in results_by_mode.values():
+        for r in mode_results.get(query.query_id, [])[:per_mode_limit]:
+            seen.setdefault(_candidate_key(r), r)
+
+    rel_map = existing_map.get(query.query_id, {})
+    return [
+        {
+            "source": r.book.source,
+            "source_id": r.book.source_id,
+            "title": r.book.title,
+            "authors": list(r.book.authors),
+            "relevance": rel_map.get((r.book.source, r.book.source_id)),
+        }
+        for r in seen.values()
+    ]
+
+
+def _pool_payload_entry(
+    *,
+    query: TestQuery,
+    results_by_mode: Dict[str, Dict[str, list]],
+    existing_map: Dict[str, Dict[tuple[str, str], int]],
+    per_mode_limit: int,
+) -> dict:
+    return {
+        "query_id": query.query_id,
+        "text": query.text,
+        "category": query.category,
+        "candidates": _pool_candidates_for_query(
+            query=query,
+            results_by_mode=results_by_mode,
+            existing_map=existing_map,
+            per_mode_limit=per_mode_limit,
+        ),
+    }
+
+
 def export_pool_candidates(
     *,
     output_path: str,
     queries: List[TestQuery],
     results_by_mode: Dict[str, Dict[str, list]],
     existing_raw_judgments: Dict[str, List[dict]],
+    per_mode_limit: int = DEFAULT_POOL_PER_MODE_LIMIT,
 ) -> None:
-    existing_map: Dict[str, Dict[tuple[str, str], int]] = {}
-    for qid, items in existing_raw_judgments.items():
-        m: Dict[tuple[str, str], int] = {}
-        for it in items:
-            m[(it.get("source"), it.get("source_id"))] = it.get("relevance")
-        existing_map[qid] = m
-
-    payload: List[dict] = []
-    for q in queries:
-        seen: Dict[tuple[str, str], Any] = {}
-        for mode_results in results_by_mode.values():
-            for r in mode_results.get(q.query_id, [])[:20]:
-                k = _candidate_key(r)
-                if k not in seen:
-                    seen[k] = r
-
-        candidates: List[dict] = []
-        for k, r in seen.items():
-            relevance = None
-            if q.query_id in existing_map:
-                relevance = existing_map[q.query_id].get((r.book.source, r.book.source_id))
-
-            candidates.append(
-                {
-                    "source": r.book.source,
-                    "source_id": r.book.source_id,
-                    "title": r.book.title,
-                    "authors": list(r.book.authors),
-                    "relevance": relevance,
-                }
-            )
-
-        payload.append(
-            {
-                "query_id": q.query_id,
-                "text": q.text,
-                "category": q.category,
-                "candidates": candidates,
-            }
+    existing_map = _build_existing_judgments_map(existing_raw_judgments)
+    payload: List[dict] = [
+        _pool_payload_entry(
+            query=q,
+            results_by_mode=results_by_mode,
+            existing_map=existing_map,
+            per_mode_limit=per_mode_limit,
         )
+        for q in queries
+    ]
 
     out_path = Path(output_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -341,24 +397,36 @@ def evaluate_mode(
     """Compute metrics for a single search mode across all queries."""
 
     per_query: Dict[str, Dict[str, float]] = {}
-    ndcg_sums: Dict[int, float] = {k: 0.0 for k in NDCG_KS}
-    recall_sums: Dict[int, float] = {k: 0.0 for k in RECALL_KS}
-    ild_sums: Dict[int, float] = {k: 0.0 for k in ILD_KS}
+    ndcg_sums: Dict[int, float] = dict.fromkeys(NDCG_KS, 0.0)
+    recall_sums: Dict[int, float] = dict.fromkeys(RECALL_KS, 0.0)
+    ild_sums: Dict[int, float] = dict.fromkeys(ILD_KS, 0.0)
+    ild_coverage_sums: Dict[int, float] = dict.fromkeys(ILD_KS, 0.0)
     mrr_sum = 0.0
     used = 0
+
+    skipped_missing_judgment = 0
+    skipped_no_resolved_mapping = 0
+    queries_no_relevant = 0
+
+    skipped_missing_judgment_query_ids: List[str] = []
+    skipped_no_resolved_mapping_query_ids: List[str] = []
+    queries_no_relevant_query_ids: List[str] = []
 
     for query_id, results in results_by_query.items():
         judgment = judgments.get(query_id)
         if judgment is None:
+            skipped_missing_judgment += 1
+            skipped_missing_judgment_query_ids.append(query_id)
             continue
         if not judgment.judgments:
             # No resolvable ground-truth docs in the catalog.
+            skipped_no_resolved_mapping += 1
+            skipped_no_resolved_mapping_query_ids.append(query_id)
             continue
 
-        # Skip queries that have no relevant documents (all rel=0).
-        # These queries are not meaningful for ranking evaluation.
         if not any(rel >= 1 for rel in judgment.judgments.values()):
-            continue
+            queries_no_relevant += 1
+            queries_no_relevant_query_ids.append(query_id)
 
         metrics: Dict[str, float] = {}
         for k in NDCG_KS:
@@ -376,16 +444,28 @@ def evaluate_mode(
         metrics["mrr"] = mrr
 
         for k in ILD_KS:
-            val = eval_service.compute_ild(results, k=k)
+            val, coverage = eval_service.compute_ild_with_coverage(results, k=k)
             ild_sums[k] += val
+            ild_coverage_sums[k] += coverage
             metrics[f"ild_at_{k}"] = val
+            metrics[f"ild_coverage_at_{k}"] = coverage
 
         per_query[query_id] = metrics
         used += 1
 
     if used == 0:
         logger.warning("No evaluable queries for mode '%s' (no judgments resolved)", mode_name)
-        out: Dict[str, Any] = {"num_queries": 0, "per_query_metrics": per_query}
+        out: Dict[str, Any] = {
+            "n_total_queries": len(results_by_query),
+            "num_queries": 0,
+            "n_skipped_missing_judgment": skipped_missing_judgment,
+            "n_skipped_no_resolved_mapping": skipped_no_resolved_mapping,
+            "n_queries_no_relevant": queries_no_relevant,
+            "skipped_missing_judgment_query_ids": skipped_missing_judgment_query_ids,
+            "skipped_no_resolved_mapping_query_ids": skipped_no_resolved_mapping_query_ids,
+            "queries_no_relevant_query_ids": queries_no_relevant_query_ids,
+            "per_query_metrics": per_query,
+        }
         for k in NDCG_KS:
             out[f"ndcg_at_{k}"] = 0.0
         for k in RECALL_KS:
@@ -393,9 +473,20 @@ def evaluate_mode(
         out["mrr"] = 0.0
         for k in ILD_KS:
             out[f"ild_at_{k}"] = 0.0
+            out[f"ild_coverage_at_{k}"] = 0.0
         return out
 
-    out2: Dict[str, Any] = {"num_queries": used, "per_query_metrics": per_query}
+    out2: Dict[str, Any] = {
+        "n_total_queries": len(results_by_query),
+        "num_queries": used,
+        "n_skipped_missing_judgment": skipped_missing_judgment,
+        "n_skipped_no_resolved_mapping": skipped_no_resolved_mapping,
+        "n_queries_no_relevant": queries_no_relevant,
+        "skipped_missing_judgment_query_ids": skipped_missing_judgment_query_ids,
+        "skipped_no_resolved_mapping_query_ids": skipped_no_resolved_mapping_query_ids,
+        "queries_no_relevant_query_ids": queries_no_relevant_query_ids,
+        "per_query_metrics": per_query,
+    }
     for k in NDCG_KS:
         out2[f"ndcg_at_{k}"] = ndcg_sums[k] / used
     for k in RECALL_KS:
@@ -403,6 +494,7 @@ def evaluate_mode(
     out2["mrr"] = mrr_sum / used
     for k in ILD_KS:
         out2[f"ild_at_{k}"] = ild_sums[k] / used
+        out2[f"ild_coverage_at_{k}"] = ild_coverage_sums[k] / used
     return out2
 
 
@@ -413,6 +505,7 @@ def main(
     judgments_path: str = DEFAULT_JUDGMENTS_PATH,
     output_path: str = DEFAULT_OUTPUT_PATH,
     export_pool_path: str | None = None,
+    pool_per_mode_limit: int = DEFAULT_POOL_PER_MODE_LIMIT,
     max_results: int = 100,
     mmr_top_k: int = 20,
     mmr_lambdas: List[float] | None = None,
@@ -502,10 +595,10 @@ def main(
     logger.info("Resolved judgments (UUID-mapped) per query: %s", resolved_counts)
 
     evaluable_query_ids = [
-        qid for qid, j in judgments.items() if j.judgments and any(rel >= 1 for rel in j.judgments.values())
+        qid for qid, j in judgments.items() if j.judgments
     ]
     non_evaluable_query_ids = [
-        qid for qid, j in judgments.items() if (not j.judgments) or (not any(rel >= 1 for rel in j.judgments.values()))
+        qid for qid, j in judgments.items() if (not j.judgments)
     ]
     logger.info(
         "Evaluable queries (after UUID resolution): %s/%s",
@@ -580,12 +673,14 @@ def main(
             "queries_with_any_relevant_entries": len(queries_with_any_relevant_entries),
             "queries_missing_judgments": len(queries_missing_judgments_ids),
             "evaluable_queries_after_uuid_resolution": len(evaluable_query_ids),
+            "ndcg_gain": "exp2_minus_1",
             "ndcg_ks": list(NDCG_KS),
             "recall_ks": list(RECALL_KS),
             "ild_ks": list(ILD_KS),
             "max_results": max_results,
             "mmr_top_k": mmr_top_k,
             "mmr_lambdas": mmr_lambdas_sorted,
+            "pool_per_mode_limit": pool_per_mode_limit,
         },
         "modes": {},
         "debug": {
@@ -669,6 +764,7 @@ def main(
                 "hybrid_rrf_mmr": hybrid_mmr_results_by_query,
             },
             existing_raw_judgments=raw_judgments,
+            per_mode_limit=pool_per_mode_limit,
         )
 
     logger.info("=" * 70)
@@ -717,7 +813,14 @@ if __name__ == "__main__":
         "--export-pool",
         type=str,
         default=None,
-        help="Optional path to export pooling candidates JSON (union of top-20 across modes)",
+        help="Optional path to export pooling candidates JSON (union of top-N across modes)",
+    )
+
+    parser.add_argument(
+        "--pool-per-mode-limit",
+        type=int,
+        default=DEFAULT_POOL_PER_MODE_LIMIT,
+        help=f"When using --export-pool, how many top results per mode to include (default: {DEFAULT_POOL_PER_MODE_LIMIT})",
     )
 
     parser.add_argument(
@@ -752,6 +855,7 @@ if __name__ == "__main__":
             judgments_path=args.judgments_path,
             output_path=args.output,
             export_pool_path=args.export_pool,
+            pool_per_mode_limit=args.pool_per_mode_limit,
             max_results=args.max_results,
             mmr_top_k=args.mmr_top_k,
             mmr_lambdas=args.mmr_lambdas,
