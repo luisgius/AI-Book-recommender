@@ -1,7 +1,58 @@
-node_modules/
+# Environment variables and secrets
 .env
-.DS_Store
-dist/
-build/
+.env.local
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+.DS_Store
+
+# Build and dist
+dist/
+build/
+*.egg-info/
+node_modules/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Data and indices (local development)
+data/indices/*.pkl
+data/indices/*.faiss
+data/indices/*.index
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Claude Code / IDE
+.claude/
+
+# Misc artifacts
+nul
+opencode.json
