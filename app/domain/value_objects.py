@@ -7,7 +7,7 @@ of the domain with no conceptual identity.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 
 
 @dataclass(frozen=True)
@@ -275,3 +275,54 @@ class IngestionSummary:
                 f"Invariant violated: n_fetched ({self.n_fetched}) must equal "
                 f"n_inserted + n_skipped + n_errors ({expected_fetched})"
             )
+
+@dataclass(frozen=True)
+class QueryIntent:
+    """
+    Value object representing the understood intent of a user query.
+
+    This is the result of the query understanding LangGraph flow (Block 2),
+    containing the classified intent, extracted filters, and optimized query.
+
+    The intent classification helps the system choose the best search strategy:
+    - recommendation: Focus on similarity, use vector search heavily
+    - factual: Direct lookup, prioritize exact matches
+    - exploratory: Diverse results, balance precision and discovery
+    """
+
+    intent_type: Literal["recommendation", "factual", "exploratory"]
+    """The classified intent type"""
+
+    original_query: str
+    """The raw query text as entered by the user"""
+
+    reformulated_query: str
+    """Optimized query for better retrieval (cleaned, expanded, or focused)"""
+
+    extracted_filters: SearchFilters
+    """Filters extracted from natural language (language, year, category)"""
+
+    confidence: float
+    """LLM's confidence in the classification (0.0 to 1.0)"""
+
+    reasoning: str
+    """Explanation of why the LLM classified the query this way"""
+
+    def __post_init__(self) -> None:
+        """Validate query intent constraints."""
+        if not self.original_query or not self.original_query.strip():
+            raise ValueError("original_query cannot be empty")
+
+        if not self.reformulated_query or not self.reformulated_query.strip():
+            raise ValueError("reformulated_query cannot be empty")
+
+        if not (0.0 <= self.confidence <= 1.0):
+            raise ValueError(
+                f"confidence must be between 0.0 and 1.0, got {self.confidence}"
+            )
+
+        if not self.reasoning or not self.reasoning.strip():
+            raise ValueError("reasoning cannot be empty")
+
+        # Note: intent_type is validated by Literal type hint at runtime
+        # extracted_filters is validated by SearchFilters.__post_init__

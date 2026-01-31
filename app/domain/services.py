@@ -14,7 +14,7 @@ import logging
 import time
 
 from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters, SearchResponse, SearchMetadata
+from .value_objects import SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent
 from .ports import (
     LexicalSearchRepository,
     VectorSearchRepository,
@@ -42,7 +42,7 @@ class SearchService:
         lexical_search: LexicalSearchRepository,
         vector_search: VectorSearchRepository,
         embeddings_store: EmbeddingsStore,
-        llm_client: Optional[LLMClient] = None,
+        llm_client: LLMClient | None = None,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -159,6 +159,135 @@ class SearchService:
             metadata=metadata,
         )
 
+    def search_with_understanding(
+        self,
+        query_text: str,
+        max_results: int = 10,
+        use_explanations: bool = False,
+        use_diversification: bool = False,
+        diversity_lambda: float = 0.6,
+    ) -> tuple[SearchResponse, QueryIntent]:
+        """
+        Execute search with LLM-powered query understanding (Block 2).
+
+        This method implements intelligent search by:
+        1. Using LLM to understand query intent (recommendation, factual, exploratory)
+        2. Extracting filters from natural language (language, category, year)
+        3. Reformulating the query for better retrieval
+        4. Adjusting search strategy based on intent type
+
+        Intent-based search strategies:
+        - recommendation: Higher weight on vector search (semantic similarity)
+        - factual: Higher weight on lexical search (exact keyword matches)
+        - exploratory: Balanced hybrid + increased diversification
+
+        Args:
+            query_text: Raw user query in natural language
+            max_results: Maximum number of results to return
+            use_explanations: Whether to generate LLM explanations for results
+            use_diversification: Whether to apply MMR diversification
+            diversity_lambda: Trade-off between relevance and diversity
+
+        Returns:
+            Tuple of (SearchResponse, QueryIntent):
+            - SearchResponse: Results with metadata
+            - QueryIntent: The understood intent (for debugging/display)
+
+        Raises:
+            ValueError: If query_text is empty
+            RuntimeError: If both query understanding and search fail
+
+        Example:
+            >>> response, intent = search_service.search_with_understanding(
+            ...     query_text="Spanish novels like Don Quixote from the 1900s"
+            ... )
+            >>> print(f"Intent: {intent.intent_type}")  # "recommendation"
+            >>> print(f"Filters: {intent.extracted_filters}")  # language=es, min_year=1900
+            >>> print(f"Reformulated: {intent.reformulated_query}")  # "Don Quixote Spanish literature"
+        """
+        start_time = time.time()
+
+        # 1. Validate input
+        if not query_text or not query_text.strip():
+            raise ValueError("query_text cannot be empty")
+
+        logger.info(f"Executing search with understanding for: '{query_text[:50]}...'")
+
+        # 2. Extract query intent using LLM
+        if self._llm_client is None:
+            logger.warning("LLM client not available, using basic search without understanding")
+            # Fallback: create a basic QueryIntent with defaults
+            query_intent = QueryIntent(
+                intent_type="exploratory",
+                original_query=query_text,
+                reformulated_query=query_text,
+                extracted_filters=SearchFilters(),
+                confidence=0.0,
+                reasoning="LLM client not available - using default exploratory intent"
+            )
+        else:
+            try:
+                query_intent = self._llm_client.extract_query_intent(query_text)
+                logger.info(
+                    f"Query understood - Intent: {query_intent.intent_type} "
+                    f"(confidence: {query_intent.confidence:.2f})"
+                )
+            except Exception as e:
+                logger.error(f"Query understanding failed: {e}")
+                # Fallback to basic intent
+                query_intent = QueryIntent(
+                    intent_type="exploratory",
+                    original_query=query_text,
+                    reformulated_query=query_text,
+                    extracted_filters=SearchFilters(),
+                    confidence=0.0,
+                    reasoning=f"Query understanding failed: {str(e)}"
+                )
+
+        # 3. Adjust search parameters based on intent
+        adjusted_diversification = use_diversification
+        adjusted_lambda = diversity_lambda
+
+        if query_intent.intent_type == "exploratory":
+            # Exploratory: increase diversification for discovery
+            adjusted_diversification = True
+            adjusted_lambda = 0.5  # More diversity
+            logger.debug("Exploratory intent: enabling diversification")
+
+        elif query_intent.intent_type == "recommendation":
+            # Recommendation: keep user preferences, slightly more diversity
+            adjusted_lambda = 0.6  # Balanced
+            logger.debug("Recommendation intent: balanced search")
+
+        elif query_intent.intent_type == "factual":
+            # Factual: prioritize relevance over diversity
+            adjusted_lambda = 0.8  # More relevance
+            logger.debug("Factual intent: prioritizing relevance")
+
+        # 4. Build SearchQuery with reformulated query and extracted filters
+        search_query = SearchQuery(
+            text=query_intent.reformulated_query,
+            filters=query_intent.extracted_filters,
+            max_results=max_results,
+            use_explanations=use_explanations,
+            use_diversification=adjusted_diversification,
+            diversity_lambda=adjusted_lambda,
+        )
+
+        # 5. Execute search with fallback (handles graceful degradation)
+        response = self.search_with_fallback(search_query)
+
+        # 6. Log timing information
+        total_time_ms = (time.time() - start_time) * 1000
+        understanding_time_ms = total_time_ms - response.latency_ms
+
+        logger.info(
+            f"Search with understanding completed in {total_time_ms:.1f}ms "
+            f"(understanding: {understanding_time_ms:.1f}ms, search: {response.latency_ms:.1f}ms)"
+        )
+
+        return response, query_intent
+
     def _search_lexical_only_with_debug(self, query: SearchQuery) -> tuple[List[SearchResult], Dict]:
         results = self._search_lexical_only(query)
         return results, {"candidates_lexical": len(results)}
@@ -215,7 +344,7 @@ class SearchService:
 
         if query.use_explanations and self._llm_client is not None:
             logger.debug("Generating explanations for top results")
-            final_results = self._add_explanations(query, final_results)
+            final_results = self._add_explanations(query.text, final_results)
 
         return final_results, {
             "fusion_method": "rrf",
@@ -372,7 +501,7 @@ class SearchService:
         # Step 5: Optional explanation generation
         if query.use_explanations and self._llm_client is not None:
             logger.debug("Generating explanations for top results")
-            final_results = self._add_explanations(query, final_results)
+            final_results = self._add_explanations(query.text, final_results)
 
         return final_results
 
@@ -588,7 +717,7 @@ class SearchService:
 
     def _add_explanations(
         self,
-        query: SearchQuery,
+        query_text: str,
         results: List[SearchResult],
     ) -> List[SearchResult]:
         """
@@ -609,19 +738,13 @@ class SearchService:
             logger.warning("LLM Client not available, skipping explanations")
             return results
 
-        for result in results:
+        for result in results[:5]:
             try:
-                explanation = self._llm_client.generate_explanation(
-                    query=query,
+                explanation = self._llm_client.generate_grounded_explanation(
+                    query_text=query_text,
                     book=result.book,
-                    context={
-                        "rank": result.rank,
-                        "final_score": result.final_score,
-                        "lexical_score": result.lexical_score,
-                        "vector_score": result.vector_score,
-                    },
                 )
-                result.explanation = explanation.text
+                result.explanation = explanation
             except Exception as e:
                 logger.error(f"Failed to generate explanation for book {result.book.id}: {e}")
                 # Continue with no explanation for this result

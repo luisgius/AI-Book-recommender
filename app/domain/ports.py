@@ -9,11 +9,14 @@ Following Hexagonal Architecture principles, the domain layer depends only
 on these abstract protocols, never on concrete implementations.
 """
 
-from typing import Protocol, List, Optional, Dict, Any
+from typing import Protocol, List, Optional, Dict, Any, TYPE_CHECKING
 from uuid import UUID
 
 from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters
+from .value_objects import SearchQuery, SearchFilters, QueryIntent
+
+if TYPE_CHECKING:
+    from app.infrastructure.llm.schemas_judge import ExplanationJudgmentLLM
 
 class BookCatalogRepository(Protocol):
     """
@@ -527,66 +530,141 @@ class LLMClient(Protocol):
 
     This client is used for:
     - Query understanding and intent extraction
-    - Generating natural language explanations for search results (RAG pattern)
+    - Generating GROUNDED natural language explanations with citations (RAG pattern)
 
-    The implementation should support RAG-style flows:
-    1. Retrieve relevant context (books, metadata)
-    2. Construct a prompt with context
-    3. Generate a response conditioned on that context
+    The implementation MUST support grounded generation:
+    1. Retrieve relevant context (book data)
+    2. Construct a prompt that enforces citation requirements
+    3. Generate explanation with citations to specific book fields
+    4. Validate citations against actual book content (guardrails)
+    5. Return explanation with traceable evidence
 
     The actual LLM (OpenAI, Anthropic, local model, etc.) and orchestration
     framework (LangChain, LangGraph) are implementation details.
     """
 
-    def generate_explanation(
-        self, query: SearchQuery, book: Book, context: Optional[Dict[str, Any]] = None
+    def generate_grounded_explanation(
+        self, query_text: str, book: Book
     ) -> Explanation:
         """
-        Generate a natural language explanation for why a book is relevant.
+        Generate a GROUNDED explanation for why a book is relevant to a query.
 
-        This implements the "generation" step of the RAG pattern:
-        - Context (book data) has already been retrieved
-        - The LLM generates an explanation conditioned on this context
+        This implements the RAG pattern with explicit grounding requirements:
+        - The explanation MUST be supported by citations from the book data
+        - Each citation references a specific book field (title, description, etc.)
+        - Citations include verbatim snippets (max 200 chars) from those fields
+        - Infrastructure layer validates citations are not hallucinated
+
+        The returned Explanation includes:
+        - text: The natural language explanation
+        - citations: List[Citation] with book_id, chunk_id, snippet, relevance_score
+        - If grounding fails: returns "no evidence" text with empty citations list
 
         Args:
-            query: The user's search query
-            book: The book to explain
-            context: Optional additional context (e.g., other results, metadata)
+            query_text: The user's search query as plain text
+            book: The book entity to explain (provides context for grounding)
 
         Returns:
-            An Explanation entity with the generated text
+            An Explanation entity with:
+            - text: Generated explanation (or "no evidence" message if ungrounded)
+            - citations: List of Citation objects (may be empty if no valid evidence)
+            - book_id: Same as input book.id
+            - query_text: Same as input query_text
+            - model: LLM model identifier
+            - created_at: Timestamp of generation
 
         Raises:
-            ValueError: If inputs are invalid
-            RuntimeError: If LLM generation fails
+            ValueError: If query_text is empty or book is invalid
+            RuntimeError: If LLM generation fails completely
         """
         ...
 
-    def extract_query_intent(
-        self, query_text: str
-    ) -> Dict[str, Any]:
+    def extract_query_intent(self, query_text: str) -> QueryIntent:
         """
         Analyze a user query to extract intent and structured information.
 
-        This can be used to:
-        - Identify whether the query is asking for recommendations, facts, etc.
-        - Extract implicit filters (e.g., "recent books" -> max_year filter)
-        - Detect the query language
+        This implements the query understanding LangGraph flow (Block 2):
+        1. Classify query intent (recommendation, factual, exploratory)
+        2. Extract filters from natural language (language, category, year range)
+        3. Reformulate query for better retrieval (clean, expand, focus)
+        4. Apply intent-specific post-processing
+
+        The returned QueryIntent helps the search service choose the best strategy:
+        - recommendation: Emphasize vector similarity search
+        - factual: Emphasize lexical search + exact matches
+        - exploratory: Balanced hybrid search with diversity
+
+        Implementation uses LangGraph with 3 LLM calls:
+        - parse_intent → QueryIntentLLM (classification + confidence)
+        - extract_filters → ExtractedFiltersLLM (language, category, year)
+        - reformulate_query → ReformulatedQueryLLM (optimized query + keywords)
+
+        Graceful degradation: If any node fails, falls back to original query
+        and default intent (exploratory).
 
         Args:
             query_text: The raw user query
 
         Returns:
-            A dictionary with extracted information, e.g.:
-            {
-                "intent": "recommendation",
-                "filters": {"language": "en", "min_year": 2020},
-                "reformulated_query": "science fiction novels"
-            }
+            QueryIntent value object containing:
+            - intent_type: One of "recommendation", "factual", "exploratory"
+            - original_query: The raw input query
+            - reformulated_query: Optimized query for search
+            - extracted_filters: SearchFilters (language, category, min_year, max_year)
+            - confidence: LLM's confidence in classification (0.0 to 1.0)
+            - reasoning: Explanation of why the query was classified this way
 
         Raises:
-            ValueError: If query_text is empty
-            RuntimeError: If LLM analysis fails
+            ValueError: If query_text is empty or whitespace-only
+            RuntimeError: If the entire LangGraph flow fails (extremely rare due to fallbacks)
+
+        Example:
+            >>> intent = llm_client.extract_query_intent("books like 1984")
+            >>> print(intent.intent_type)  # "recommendation"
+            >>> print(intent.reformulated_query)  # "1984 similar dystopian fiction"
+        """
+        ...
+    
+    def judge_explanation(
+        self, query_text: str, book: Book, explanation: Explanation
+    ) -> "ExplanationJudgmentLLM":
+        """
+        Evaluate explanation quality using LLM-as-Judge (Block 3).
+
+        This implements the LLM-as-Judge pattern for explanation evaluation:
+        1. Takes a generated explanation with its context (query, book)
+        2. Sends to LLM with evaluation rubrics for 3 dimensions
+        3. Returns structured judgment with scores and reasoning
+
+        The LLM evaluates on:
+        - Groundedness: Are claims supported by citations? (1-5)
+        - Clarity: Is it well-structured and understandable? (1-5)
+        - Relevance: Does it address the user's query intent? (1-5)
+
+        This is used during evaluation to measure explanation quality
+        and validate that the grounding pipeline is working correctly.
+
+        Args:
+            query_text: The user's search query as plain text
+            book: The book entity that was explained
+            explanation: The Explanation entity to evaluate
+
+        Returns:
+            ExplanationJudgmentLLM with:
+            - groundedness: JudgmentDimension (score 1-5, reasoning)
+            - clarity: JudgmentDimension (score 1-5, reasoning)
+            - relevance: JudgmentDimension (score 1-5, reasoning)
+
+        Raises:
+            ValueError: If inputs are invalid (empty query, None book/explanation)
+            RuntimeError: If LLM judge call fails (API error, timeout, etc.)
+
+        Example:
+            >>> judgment = llm_client.judge_explanation(
+            ...     "books about AI", book, explanation
+            ... )
+            >>> print(judgment.groundedness.score)  # 5
+            >>> print(judgment.groundedness.reasoning)  # "All claims supported"
         """
         ...
 
