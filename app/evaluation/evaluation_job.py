@@ -19,7 +19,10 @@ import argparse
 import copy
 import json
 import logging
+import subprocess
 import sys
+import time
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional
 
@@ -40,7 +43,11 @@ from app.domain.value_objects import SearchQuery
 from app.domain.entities import SearchResult
 
 # Evaluation imports
-from app.evaluation.types import TestQuery, RelevanceJudgment, ExplanationJudgmentResult
+from app.evaluation.types import (
+    TestQuery, RelevanceJudgment, ExplanationJudgmentResult,
+    EvaluationRunArtifact, EvaluationResult, QueryEvaluationResult, LLMCallTrace,
+    generate_run_id, save_run_artifact, list_run_artifacts,
+)
 from app.evaluation.evaluation_service import EvaluationService
 from app.evaluation.llm_judge_service import LLMJudgeService
 
@@ -53,6 +60,29 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+DEFAULT_RUNS_DIR = "data/evaluation/runs"
+
+
+def _get_git_commit() -> str | None:
+    """
+    Get the current git commit hash (short form).
+
+    Returns None if not in a git repo or git is not available.
+    This is captured at run start so the artifact records exactly
+    which code version produced these results.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return None
+
 
 # Default paths
 DEFAULT_DB_PATH = "data/catalog.db"
@@ -644,6 +674,8 @@ def main(
     with_judge: bool = False,
     judge_top_k: int = 3,
     judge_mode: str = "hybrid_rrf",
+    save_artifact: bool = True,
+    runs_dir: str = DEFAULT_RUNS_DIR,
 ) -> None:
     """
     Main entry point for evaluation job.
@@ -659,6 +691,14 @@ def main(
     logger.info("=" * 70)
     logger.info("EVALUATION JOB")
     logger.info("=" * 70)
+
+    # Capture run metadata at the start (before any work)
+    run_id = generate_run_id()
+    run_timestamp = datetime.now(UTC)
+    git_commit = _get_git_commit()
+    llm_traces: List[LLMCallTrace] = []
+    failures: List[str] = []
+    logger.info("Run ID: %s (git: %s)", run_id, git_commit or "unknown")
 
     # Step 1: Load test queries and judgments
     logger.info("Step 1: Loading test queries and relevance judgments...")
@@ -964,6 +1004,63 @@ def main(
             per_mode_limit=pool_per_mode_limit,
         )
 
+    # Step 7: Build and save structured evaluation run artifact
+    if save_artifact:
+        logger.info("Step 7: Building evaluation run artifact...")
+
+        # Use hybrid_rrf as the primary mode for the artifact
+        primary_mode = results["modes"].get("hybrid_rrf", {})
+        primary_per_query = primary_mode.get("per_query_metrics", {})
+        num_queries_evaluated = primary_mode.get("num_queries", 0)
+
+        # Build per-query results from the primary mode metrics
+        per_query_results = []
+        for query_id, metrics in primary_per_query.items():
+            # Get retrieved book IDs for this query
+            retrieved_ids = [
+                str(r.book.id)
+                for r in hybrid_results_by_query.get(query_id, [])[:10]
+            ]
+
+            per_query_results.append(QueryEvaluationResult(
+                query_id=query_id,
+                query_text=next(
+                    (q.text for q in queries if q.query_id == query_id), ""
+                ),
+                ndcg_at_10=metrics.get("ndcg_at_10", 0.0),
+                precision_at_5=metrics.get("ndcg_at_5", 0.0),
+                recall_at_10=metrics.get("recall_at_10", 0.0),
+                mrr=metrics.get("mrr", 0.0),
+                ild=metrics.get("ild_at_10", 0.0),
+                latency_ms=0,  # Not tracked per-query in current job
+                retrieved_book_ids=retrieved_ids,
+            ))
+
+        # Build aggregate EvaluationResult
+        aggregate = EvaluationResult(
+            ndcg_at_10=primary_mode.get("ndcg_at_10", 0.0),
+            recall_at_100=primary_mode.get("recall_at_100", 0.0),
+            mrr=primary_mode.get("mrr", 0.0),
+            ild_at_10=primary_mode.get("ild_at_10", 0.0),
+            num_queries=num_queries_evaluated,
+            per_query_metrics=primary_per_query,
+        )
+
+        artifact = EvaluationRunArtifact(
+            run_id=run_id,
+            timestamp=run_timestamp,
+            prompt_versions={},  # Populated when prompt versioning is added
+            model_name="N/A (IR-only)" if not with_judge else "gpt-4o-mini",
+            per_query_results=per_query_results,
+            aggregate_metrics=aggregate,
+            git_commit=git_commit,
+            failures=failures,
+            llm_traces=llm_traces,
+        )
+
+        artifact_path = save_run_artifact(artifact, runs_dir=runs_dir)
+        logger.info("Saved run artifact to %s", artifact_path)
+
     logger.info("=" * 70)
     logger.info("EVALUATION COMPLETE")
     logger.info("=" * 70)
@@ -1062,7 +1159,41 @@ if __name__ == "__main__":
         help="Which search mode's results to judge (default: hybrid_rrf)",
     )
 
+    # Run artifact arguments
+    parser.add_argument(
+        "--no-artifact",
+        action="store_true",
+        help="Skip saving a structured run artifact",
+    )
+    parser.add_argument(
+        "--runs-dir",
+        type=str,
+        default=DEFAULT_RUNS_DIR,
+        help=f"Directory for run artifacts (default: {DEFAULT_RUNS_DIR})",
+    )
+    parser.add_argument(
+        "--list-runs",
+        action="store_true",
+        help="List past evaluation runs and exit (does not run evaluation)",
+    )
+
     args = parser.parse_args()
+
+    # Handle --list-runs: print summary and exit
+    if args.list_runs:
+        runs = list_run_artifacts(args.runs_dir)
+        if not runs:
+            print(f"No evaluation runs found in {args.runs_dir}")
+        else:
+            print(f"{'Run ID':<30} {'Model':<20} {'Queries':<10} {'Git':<12} {'Timestamp'}")
+            print("-" * 100)
+            for run in runs:
+                print(
+                    f"{run['run_id']:<30} {run['model_name']:<20} "
+                    f"{run['num_queries']:<10} {(run['git_commit'] or 'N/A'):<12} "
+                    f"{run['timestamp']}"
+                )
+        sys.exit(0)
 
     try:
         main(
@@ -1079,6 +1210,8 @@ if __name__ == "__main__":
             with_judge=args.with_judge,
             judge_top_k=args.judge_top_k,
             judge_mode=args.judge_mode,
+            save_artifact=not args.no_artifact,
+            runs_dir=args.runs_dir,
         )
     except KeyboardInterrupt:
         logger.info("\nEvaluation interrupted by user")

@@ -2,10 +2,12 @@
 Value objects for evaluation domain.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, List
-from uuid import UUID
+import json
+from dataclasses import dataclass, field, asdict
+from datetime import datetime, UTC
+from pathlib import Path
+from typing import Dict, List, Optional
+from uuid import UUID, uuid4
 
 
 @dataclass(frozen=True)
@@ -125,6 +127,7 @@ class EvaluationRunArtifact:
     git_commit: str | None = None
     model_temperature: float = 0.0
     failures: List[str] = field(default_factory=list)  # Error messages
+    llm_traces: List["LLMCallTrace"] = field(default_factory=list)  # Individual LLM call records
 
 
 @dataclass(frozen=True)
@@ -150,3 +153,156 @@ class ExplanationJudgmentResult:
     clarity_reasoning: str | None = None
     relevance_score: float | None = None
     relevance_reasoning: str | None = None
+
+
+@dataclass(frozen=True)
+class LLMCallTrace:
+    """
+    Record of a single LLM invocation during an evaluation run.
+
+    Captures enough information to:
+    - Estimate cost (model + token counts)
+    - Debug latency issues (latency_ms)
+    - Track reliability (success + error)
+    - Reproduce (operation + prompt_version)
+    """
+
+    operation: str
+    """What was being done: 'generate_explanation', 'judge_explanation', 'extract_intent'"""
+
+    model: str
+    """Model identifier (e.g., 'gpt-4o-mini')"""
+
+    latency_ms: float
+    """Wall-clock time for this call in milliseconds"""
+
+    success: bool
+    """Whether the call completed without error"""
+
+    query_id: str | None = None
+    """Which test query this call was for (None if not query-specific)"""
+
+    book_id: str | None = None
+    """Which book this call was for (None if not book-specific)"""
+
+    error: str | None = None
+    """Error message if success=False"""
+
+    prompt_version: str | None = None
+    """Version tag of the prompt used (e.g., 'v1.2')"""
+
+    input_tokens: int | None = None
+    """Approximate input token count (None if not tracked)"""
+
+    output_tokens: int | None = None
+    """Approximate output token count (None if not tracked)"""
+
+
+# =============================================================================
+# Run Artifact Serialization
+# =============================================================================
+
+
+class _EvaluationEncoder(json.JSONEncoder):
+    """
+    Custom JSON encoder for evaluation artifacts.
+
+    Handles types that json.dump() can't serialize by default:
+    - datetime -> ISO 8601 string
+    - UUID -> string
+    - set -> sorted list
+
+    Used internally by save_run_artifact().
+    """
+
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, UUID):
+            return str(obj)
+        if isinstance(obj, set):
+            return sorted(obj)
+        return super().default(obj)
+
+
+def generate_run_id() -> str:
+    """
+    Generate a human-readable run ID: {date}_{short_uuid}.
+
+    Examples: '2026-01-31_a3f7bc12', '2026-02-15_9e4d1f0a'
+
+    The date prefix makes files sortable chronologically.
+    The UUID suffix guarantees uniqueness.
+    """
+    date_str = datetime.now(UTC).strftime("%Y-%m-%d")
+    short_id = uuid4().hex[:8]
+    return f"{date_str}_{short_id}"
+
+
+def save_run_artifact(
+    artifact: EvaluationRunArtifact,
+    runs_dir: str = "data/evaluation/runs",
+) -> Path:
+    """
+    Persist an evaluation run artifact as a JSON file.
+
+    Creates the runs directory if it doesn't exist.
+    File name: {run_id}.json
+
+    Args:
+        artifact: The completed run artifact to save
+        runs_dir: Directory for run artifacts
+
+    Returns:
+        Path to the saved JSON file
+    """
+    runs_path = Path(runs_dir)
+    runs_path.mkdir(parents=True, exist_ok=True)
+
+    file_path = runs_path / f"{artifact.run_id}.json"
+
+    artifact_dict = asdict(artifact)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(artifact_dict, f, indent=2, ensure_ascii=False, cls=_EvaluationEncoder)
+
+    return file_path
+
+
+def list_run_artifacts(runs_dir: str = "data/evaluation/runs") -> List[dict]:
+    """
+    List all saved evaluation run artifacts with summary info.
+
+    Returns a list of dicts with: run_id, timestamp, model_name, num_queries, file_path.
+    Sorted by timestamp (most recent first).
+
+    Args:
+        runs_dir: Directory containing run artifact JSON files
+
+    Returns:
+        List of summary dicts, or empty list if no runs found
+    """
+    runs_path = Path(runs_dir)
+
+    if not runs_path.exists():
+        return []
+
+    summaries = []
+    for json_file in sorted(runs_path.glob("*.json"), reverse=True):
+        try:
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            summaries.append({
+                "run_id": data.get("run_id", json_file.stem),
+                "timestamp": data.get("timestamp", "unknown"),
+                "model_name": data.get("model_name", "unknown"),
+                "git_commit": data.get("git_commit", "unknown"),
+                "num_queries": len(data.get("per_query_results", [])),
+                "num_failures": len(data.get("failures", [])),
+                "file_path": str(json_file),
+            })
+        except (json.JSONDecodeError, KeyError):
+            continue
+
+    return summaries
