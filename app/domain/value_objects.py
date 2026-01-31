@@ -7,7 +7,46 @@ of the domain with no conceptual identity.
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Optional, Literal
+
+
+class RetrievalStrategy(Enum):
+    """
+    Retrieval strategy that controls the balance between lexical and vector search.
+
+    The strategy determines candidate pool sizes for each retrieval method before
+    RRF fusion. Since RRF is rank-based, we influence the final ranking by adjusting
+    how many candidates come from each source.
+
+    Mapping from intent:
+    - recommendation -> VECTOR_HEAVY (similarity is semantic)
+    - factual -> LEXICAL_HEAVY (exact keyword matches matter)
+    - exploratory -> BALANCED (cast a wide net)
+    """
+    LEXICAL_HEAVY = "lexical_heavy"
+    VECTOR_HEAVY = "vector_heavy"
+    BALANCED = "balanced"
+
+
+# Strategy-to-pool-size mapping.
+# Factors are multiplied by max_results to get candidate counts.
+# Example with max_results=10:
+#   LEXICAL_HEAVY -> BM25 gets 40 candidates, FAISS gets 10
+#   VECTOR_HEAVY  -> BM25 gets 10, FAISS gets 40
+#   BALANCED      -> both get 20 (same as current behavior)
+STRATEGY_POOL_SIZES = {
+    RetrievalStrategy.LEXICAL_HEAVY: {"bm25_factor": 4, "vector_factor": 1},
+    RetrievalStrategy.VECTOR_HEAVY: {"bm25_factor": 1, "vector_factor": 4},
+    RetrievalStrategy.BALANCED: {"bm25_factor": 2, "vector_factor": 2},
+}
+
+# Maps intent type to retrieval strategy
+INTENT_TO_STRATEGY = {
+    "recommendation": RetrievalStrategy.VECTOR_HEAVY,
+    "factual": RetrievalStrategy.LEXICAL_HEAVY,
+    "exploratory": RetrievalStrategy.BALANCED,
+}
 
 
 @dataclass(frozen=True)
@@ -307,6 +346,18 @@ class QueryIntent:
 
     reasoning: str
     """Explanation of why the LLM classified the query this way"""
+
+    query_variations: list = field(default_factory=list)
+    """Alternative query formulations for multi-query retrieval.
+
+    Each variation is searched independently (in parallel), then results are
+    fused with RRF across all variations. Books appearing in multiple variation
+    rankings get boosted scores.
+
+    If empty, only reformulated_query is used (single-query mode).
+    The reformulated_query is always included as the primary variation
+    by the SearchService - these are ADDITIONAL variations.
+    """
 
     def __post_init__(self) -> None:
         """Validate query intent constraints."""

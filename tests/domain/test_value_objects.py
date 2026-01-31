@@ -4,7 +4,10 @@ Tests for domain value objects.
 
 import pytest
 
-from app.domain.value_objects import SearchFilters, SearchQuery, BookMetadata, QueryIntent
+from app.domain.value_objects import (
+    SearchFilters, SearchQuery, BookMetadata, QueryIntent,
+    RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
+)
 
 
 class TestSearchFilters:
@@ -350,3 +353,130 @@ class TestQueryIntent:
             reasoning="Test"
         )
         assert intent.intent_type == "invalid_type"
+
+    def test_query_variations_defaults_to_empty_list(self):
+        """Test that query_variations defaults to empty list."""
+        intent = QueryIntent(
+            intent_type="exploratory",
+            original_query="test query",
+            reformulated_query="test query",
+            extracted_filters=SearchFilters(),
+            confidence=0.5,
+            reasoning="Test"
+        )
+        assert intent.query_variations == []
+
+    def test_query_variations_can_be_set(self):
+        """Test that query_variations accepts a list of strings."""
+        variations = ["variation 1", "variation 2"]
+        intent = QueryIntent(
+            intent_type="recommendation",
+            original_query="books like 1984",
+            reformulated_query="1984 dystopian",
+            extracted_filters=SearchFilters(),
+            confidence=0.9,
+            reasoning="Test",
+            query_variations=variations,
+        )
+        assert intent.query_variations == ["variation 1", "variation 2"]
+
+    def test_query_variations_does_not_share_default(self):
+        """Test that each instance gets its own list (no mutable default trap)."""
+        intent_a = QueryIntent(
+            intent_type="exploratory",
+            original_query="query a",
+            reformulated_query="query a",
+            extracted_filters=SearchFilters(),
+            confidence=0.5,
+            reasoning="A"
+        )
+        intent_b = QueryIntent(
+            intent_type="exploratory",
+            original_query="query b",
+            reformulated_query="query b",
+            extracted_filters=SearchFilters(),
+            confidence=0.5,
+            reasoning="B"
+        )
+        # They should be equal but NOT the same object
+        assert intent_a.query_variations is not intent_b.query_variations
+
+
+# =============================================================================
+# Tests: RetrievalStrategy and Mappings
+# =============================================================================
+
+
+class TestRetrievalStrategy:
+    """Tests for RetrievalStrategy enum and associated mappings."""
+
+    def test_enum_has_three_values(self):
+        """RetrievalStrategy should have exactly 3 members."""
+        assert len(RetrievalStrategy) == 3
+
+    def test_lexical_heavy_value(self):
+        """LEXICAL_HEAVY should have string value 'lexical_heavy'."""
+        assert RetrievalStrategy.LEXICAL_HEAVY.value == "lexical_heavy"
+
+    def test_vector_heavy_value(self):
+        """VECTOR_HEAVY should have string value 'vector_heavy'."""
+        assert RetrievalStrategy.VECTOR_HEAVY.value == "vector_heavy"
+
+    def test_balanced_value(self):
+        """BALANCED should have string value 'balanced'."""
+        assert RetrievalStrategy.BALANCED.value == "balanced"
+
+    def test_strategy_pool_sizes_covers_all_strategies(self):
+        """Every strategy must have a pool size entry."""
+        for strategy in RetrievalStrategy:
+            assert strategy in STRATEGY_POOL_SIZES, (
+                f"Missing pool size mapping for {strategy}"
+            )
+
+    def test_pool_sizes_have_both_factors(self):
+        """Each pool size entry must define bm25_factor and vector_factor."""
+        for strategy, sizes in STRATEGY_POOL_SIZES.items():
+            assert "bm25_factor" in sizes, f"Missing bm25_factor for {strategy}"
+            assert "vector_factor" in sizes, f"Missing vector_factor for {strategy}"
+
+    def test_lexical_heavy_favors_bm25(self):
+        """LEXICAL_HEAVY should have bm25_factor > vector_factor."""
+        sizes = STRATEGY_POOL_SIZES[RetrievalStrategy.LEXICAL_HEAVY]
+        assert sizes["bm25_factor"] > sizes["vector_factor"]
+
+    def test_vector_heavy_favors_vector(self):
+        """VECTOR_HEAVY should have vector_factor > bm25_factor."""
+        sizes = STRATEGY_POOL_SIZES[RetrievalStrategy.VECTOR_HEAVY]
+        assert sizes["vector_factor"] > sizes["bm25_factor"]
+
+    def test_balanced_has_equal_factors(self):
+        """BALANCED should have equal bm25_factor and vector_factor."""
+        sizes = STRATEGY_POOL_SIZES[RetrievalStrategy.BALANCED]
+        assert sizes["bm25_factor"] == sizes["vector_factor"]
+
+    def test_all_factors_are_positive(self):
+        """All pool size factors must be > 0."""
+        for strategy, sizes in STRATEGY_POOL_SIZES.items():
+            assert sizes["bm25_factor"] > 0, f"Non-positive bm25_factor for {strategy}"
+            assert sizes["vector_factor"] > 0, f"Non-positive vector_factor for {strategy}"
+
+
+class TestIntentToStrategy:
+    """Tests for the INTENT_TO_STRATEGY mapping."""
+
+    def test_recommendation_maps_to_vector_heavy(self):
+        """Recommendation intent should use VECTOR_HEAVY strategy."""
+        assert INTENT_TO_STRATEGY["recommendation"] == RetrievalStrategy.VECTOR_HEAVY
+
+    def test_factual_maps_to_lexical_heavy(self):
+        """Factual intent should use LEXICAL_HEAVY strategy."""
+        assert INTENT_TO_STRATEGY["factual"] == RetrievalStrategy.LEXICAL_HEAVY
+
+    def test_exploratory_maps_to_balanced(self):
+        """Exploratory intent should use BALANCED strategy."""
+        assert INTENT_TO_STRATEGY["exploratory"] == RetrievalStrategy.BALANCED
+
+    def test_all_intent_types_are_mapped(self):
+        """All three intent types must be present in the mapping."""
+        expected_intents = {"recommendation", "factual", "exploratory"}
+        assert set(INTENT_TO_STRATEGY.keys()) == expected_intents

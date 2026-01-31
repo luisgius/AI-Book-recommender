@@ -292,6 +292,7 @@ class LangChainLLMClient(LLMClient):
                     "filters": None,
                     "reformulated": None,
                     "final_query": None,
+                    "query_variations": [],
                     "error": None
                 }),
                 operation_name="Query understanding"
@@ -350,13 +351,17 @@ class LangChainLLMClient(LLMClient):
         # Get reformulated query (fallback to original)
         reformulated_query = result.get("final_query") or result["original_query"]
 
+        # Get query variations for multi-query retrieval
+        query_variations = result.get("query_variations", [])
+
         return QueryIntent(
             intent_type=intent_type,
             original_query=result["original_query"],
             reformulated_query=reformulated_query,
             extracted_filters=extracted_filters,
             confidence=confidence,
-            reasoning=reasoning
+            reasoning=reasoning,
+            query_variations=query_variations,
         )
 
     def _create_fallback_query_intent(self, query_text: str) -> QueryIntent:

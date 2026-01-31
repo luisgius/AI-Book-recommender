@@ -8,13 +8,17 @@ Following Hexagonal Architecture principles, services depend only on domain
 entities, value objects, and port protocols (never on concrete implementations).
 """
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Optional, Dict
 from uuid import UUID
 import logging
 import time
 
 from .entities import Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent
+from .value_objects import (
+    SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent,
+    RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
+)
 from .ports import (
     LexicalSearchRepository,
     VectorSearchRepository,
@@ -244,27 +248,33 @@ class SearchService:
                     reasoning=f"Query understanding failed: {str(e)}"
                 )
 
-        # 3. Adjust search parameters based on intent
+        # 3. Map intent to retrieval strategy
+        strategy = INTENT_TO_STRATEGY.get(
+            query_intent.intent_type, RetrievalStrategy.BALANCED
+        )
+        logger.info(f"Intent '{query_intent.intent_type}' -> strategy '{strategy.value}'")
+
+        # 4. Adjust diversification based on intent
         adjusted_diversification = use_diversification
         adjusted_lambda = diversity_lambda
 
         if query_intent.intent_type == "exploratory":
-            # Exploratory: increase diversification for discovery
             adjusted_diversification = True
-            adjusted_lambda = 0.5  # More diversity
-            logger.debug("Exploratory intent: enabling diversification")
-
+            adjusted_lambda = 0.5
         elif query_intent.intent_type == "recommendation":
-            # Recommendation: keep user preferences, slightly more diversity
-            adjusted_lambda = 0.6  # Balanced
-            logger.debug("Recommendation intent: balanced search")
-
+            adjusted_lambda = 0.6
         elif query_intent.intent_type == "factual":
-            # Factual: prioritize relevance over diversity
-            adjusted_lambda = 0.8  # More relevance
-            logger.debug("Factual intent: prioritizing relevance")
+            adjusted_lambda = 0.8
 
-        # 4. Build SearchQuery with reformulated query and extracted filters
+        # 5. Build variations list.
+        #    reformulated_query is always the primary. Additional variations
+        #    from LangGraph are appended if they're different.
+        variations = [query_intent.reformulated_query]
+        for v in query_intent.query_variations:
+            if v not in variations:
+                variations.append(v)
+
+        # 6. Build a SearchQuery (used for filters/max_results/explanations)
         search_query = SearchQuery(
             text=query_intent.reformulated_query,
             filters=query_intent.extracted_filters,
@@ -274,16 +284,67 @@ class SearchService:
             diversity_lambda=adjusted_lambda,
         )
 
-        # 5. Execute search with fallback (handles graceful degradation)
-        response = self.search_with_fallback(search_query)
+        # 7. Execute multi-query search with strategy routing
+        #    Check vector availability first for graceful degradation
+        vector_available = (
+            self._vector_search.is_ready() and self._embeddings_store.is_ready()
+        )
 
-        # 6. Log timing information
+        if vector_available:
+            try:
+                results, meta = self._multi_query_search(
+                    variations=variations,
+                    strategy=strategy,
+                    query=search_query,
+                )
+
+                # Apply filters (may already be partially applied by repos)
+                results = self._apply_filters(results, search_query.filters)
+
+                # Apply diversification if requested
+                if adjusted_diversification and len(results) > 1:
+                    results = self._apply_mmr_diversification(
+                        results=results,
+                        top_k=max_results,
+                        lambda_param=adjusted_lambda,
+                    )
+                else:
+                    results = results[:max_results]
+                    for i, r in enumerate(results, start=1):
+                        r.rank = i
+
+                # Generate explanations if requested
+                if use_explanations and self._llm_client is not None:
+                    results = self._add_explanations(query_text, results)
+
+                search_time_ms = (time.time() - start_time) * 1000
+                metadata = SearchMetadata(
+                    fusion_method="rrf",
+                    rrf_k=60,
+                    diversification_enabled=adjusted_diversification,
+                    candidates_lexical=meta.get("variations_succeeded", 0),
+                    candidates_vector=meta.get("variations_succeeded", 0),
+                )
+                response = SearchResponse(
+                    results=results,
+                    degraded=False,
+                    search_mode="hybrid",
+                    latency_ms=search_time_ms,
+                    metadata=metadata,
+                )
+            except Exception as e:
+                logger.warning(f"Multi-query search failed, falling back: {e}")
+                response = self.search_with_fallback(search_query)
+        else:
+            # Graceful degradation: vector unavailable, use lexical fallback
+            logger.warning("Vector search unavailable, using fallback for understanding search")
+            response = self.search_with_fallback(search_query)
+
+        # 8. Log timing
         total_time_ms = (time.time() - start_time) * 1000
-        understanding_time_ms = total_time_ms - response.latency_ms
-
         logger.info(
             f"Search with understanding completed in {total_time_ms:.1f}ms "
-            f"(understanding: {understanding_time_ms:.1f}ms, search: {response.latency_ms:.1f}ms)"
+            f"({len(variations)} variations, strategy={strategy.value})"
         )
 
         return response, query_intent
@@ -582,6 +643,189 @@ class SearchService:
 
         logger.info(f"Returning {len(final_results)} similar books")
         return final_results
+
+    # ==========================================================================
+    # Multi-Query Retrieval with Strategy Router
+    # ==========================================================================
+
+    def _search_hybrid_with_strategy(
+        self,
+        variation_text: str,
+        strategy: RetrievalStrategy,
+        filters: SearchFilters,
+        max_results: int,
+    ) -> List[SearchResult]:
+        """
+        Execute a single hybrid search with strategy-controlled pool sizes.
+
+        The strategy determines how many candidates each retrieval method
+        contributes before RRF fusion. This biases the final ranking toward
+        the method that best suits the query intent.
+
+        Args:
+            variation_text: The query text for this variation
+            strategy: Controls BM25/vector candidate ratio
+            filters: Filters to apply
+            max_results: Used to compute pool sizes via strategy factors
+
+        Returns:
+            Ranked list of SearchResult (fused via RRF)
+        """
+        pool_sizes = STRATEGY_POOL_SIZES[strategy]
+        bm25_top_k = max_results * pool_sizes["bm25_factor"]
+        vector_top_k = max_results * pool_sizes["vector_factor"]
+
+        logger.debug(
+            f"Strategy {strategy.value}: BM25 top_k={bm25_top_k}, "
+            f"vector top_k={vector_top_k} for '{variation_text[:40]}...'"
+        )
+
+        # Lexical search
+        lexical_results = self._lexical_search.search(
+            query_text=variation_text,
+            max_results=bm25_top_k,
+            filters=filters,
+        )
+
+        # Vector search
+        query_embedding = self._embeddings_store.generate_embedding(variation_text)
+        vector_results = self._vector_search.search(
+            query_embedding=query_embedding,
+            max_results=vector_top_k,
+            filters=filters,
+        )
+
+        # RRF fusion within this variation
+        fused = self._fuse_results_rrf(lexical_results, vector_results, k=60)
+
+        return fused
+
+    def _fuse_multi_query_results(
+        self,
+        all_results: List[List[SearchResult]],
+        max_results: int,
+    ) -> List[SearchResult]:
+        """
+        Fuse results from multiple query variations using RRF.
+
+        Each variation produced its own ranked list. We treat each as a
+        separate "ranking system" and fuse with RRF - the same algorithm
+        used for BM25+FAISS fusion, applied at a higher level.
+
+        Books appearing in multiple variation rankings get boosted scores,
+        which naturally surfaces results that are relevant from multiple
+        perspectives.
+
+        Args:
+            all_results: List of ranked results, one per query variation
+            max_results: Maximum number of final results
+
+        Returns:
+            Fused and deduplicated list of SearchResult
+        """
+        rrf_scores: Dict[UUID, float] = {}
+        books_map: Dict[UUID, Book] = {}
+        k = 60
+
+        for variation_results in all_results:
+            for result in variation_results:
+                book_id = result.book.id
+                rrf_scores[book_id] = (
+                    rrf_scores.get(book_id, 0.0) + (1.0 / (k + result.rank))
+                )
+                books_map[book_id] = result.book
+
+        sorted_ids = sorted(rrf_scores, key=lambda bid: rrf_scores[bid], reverse=True)
+
+        return [
+            SearchResult(
+                book=books_map[bid],
+                final_score=rrf_scores[bid],
+                rank=i + 1,
+                source="hybrid",
+            )
+            for i, bid in enumerate(sorted_ids[:max_results])
+        ]
+
+    def _multi_query_search(
+        self,
+        variations: List[str],
+        strategy: RetrievalStrategy,
+        query: SearchQuery,
+    ) -> tuple[List[SearchResult], Dict]:
+        """
+        Run hybrid search for each query variation IN PARALLEL, then fuse.
+
+        Uses ThreadPoolExecutor because:
+        - FAISS (C extension) and embeddings (PyTorch) release the GIL
+        - Each variation is fully independent (no shared mutable state)
+        - 2-3 threads is lightweight; no global pool needed
+
+        If a variation fails, results from other variations are still used
+        (graceful degradation). If ALL fail, falls back to single balanced search.
+
+        Args:
+            variations: List of query text variations (2-3 typically)
+            strategy: Retrieval strategy controlling pool sizes
+            query: Original SearchQuery (for filters and max_results)
+
+        Returns:
+            Tuple of (fused results, debug metadata dict)
+        """
+        logger.info(
+            f"Multi-query search: {len(variations)} variations, "
+            f"strategy={strategy.value}"
+        )
+
+        all_variation_results: List[List[SearchResult]] = []
+
+        # Run all variations in parallel
+        with ThreadPoolExecutor(max_workers=len(variations)) as executor:
+            future_to_variation = {
+                executor.submit(
+                    self._search_hybrid_with_strategy,
+                    variation_text=variation,
+                    strategy=strategy,
+                    filters=query.filters,
+                    max_results=query.max_results,
+                ): variation
+                for variation in variations
+            }
+
+            for future in as_completed(future_to_variation):
+                variation = future_to_variation[future]
+                try:
+                    results = future.result()
+                    all_variation_results.append(results)
+                    logger.debug(
+                        f"Variation '{variation[:30]}...' returned {len(results)} results"
+                    )
+                except Exception as e:
+                    logger.warning(f"Variation '{variation[:30]}...' failed: {e}")
+
+        if not all_variation_results:
+            # All variations failed - fall back to single balanced search
+            logger.warning("All variations failed, falling back to single balanced search")
+            fallback = self._search_hybrid_with_strategy(
+                variation_text=variations[0],
+                strategy=RetrievalStrategy.BALANCED,
+                filters=query.filters,
+                max_results=query.max_results,
+            )
+            all_variation_results = [fallback]
+
+        # Fuse results across all variations
+        fused = self._fuse_multi_query_results(all_variation_results, query.max_results)
+
+        metadata = {
+            "fusion_method": "rrf",
+            "rrf_k": 60,
+            "strategy": strategy.value,
+            "variations_attempted": len(variations),
+            "variations_succeeded": len(all_variation_results),
+        }
+
+        return fused, metadata
 
     def _fuse_results_rrf(
         self,
