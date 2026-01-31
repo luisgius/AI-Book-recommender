@@ -4,7 +4,7 @@ Tests for domain value objects.
 
 import pytest
 
-from app.domain.value_objects import SearchFilters, SearchQuery, BookMetadata
+from app.domain.value_objects import SearchFilters, SearchQuery, BookMetadata, QueryIntent
 
 
 class TestSearchFilters:
@@ -165,3 +165,188 @@ class TestBookMetadata:
 
         with pytest.raises(Exception):
             metadata.isbn = "654321"
+
+
+class TestQueryIntent:
+    """Tests for the QueryIntent value object (Block 2)."""
+
+    def test_create_recommendation_intent(self):
+        """Test creating a recommendation intent."""
+        intent = QueryIntent(
+            intent_type="recommendation",
+            original_query="books like 1984",
+            reformulated_query="1984 dystopian fiction similar",
+            extracted_filters=SearchFilters(),
+            confidence=0.95,
+            reasoning="User wants similar books to 1984"
+        )
+
+        assert intent.intent_type == "recommendation"
+        assert intent.original_query == "books like 1984"
+        assert intent.reformulated_query == "1984 dystopian fiction similar"
+        assert intent.confidence == 0.95
+
+    def test_create_factual_intent(self):
+        """Test creating a factual intent."""
+        intent = QueryIntent(
+            intent_type="factual",
+            original_query="who wrote Don Quixote",
+            reformulated_query="Don Quixote author",
+            extracted_filters=SearchFilters(),
+            confidence=0.9,
+            reasoning="User asking a specific question about authorship"
+        )
+
+        assert intent.intent_type == "factual"
+
+    def test_create_exploratory_intent(self):
+        """Test creating an exploratory intent."""
+        intent = QueryIntent(
+            intent_type="exploratory",
+            original_query="science fiction about AI",
+            reformulated_query="science fiction artificial intelligence",
+            extracted_filters=SearchFilters(category="Science Fiction"),
+            confidence=0.8,
+            reasoning="User exploring a topic/genre"
+        )
+
+        assert intent.intent_type == "exploratory"
+        assert intent.extracted_filters.category == "Science Fiction"
+
+    def test_intent_with_extracted_filters(self):
+        """Test intent with filters extracted from natural language."""
+        filters = SearchFilters(language="es", min_year=1900, max_year=1999)
+        intent = QueryIntent(
+            intent_type="recommendation",
+            original_query="Spanish novels from the 1900s like Don Quixote",
+            reformulated_query="Don Quixote Spanish literature novels",
+            extracted_filters=filters,
+            confidence=0.85,
+            reasoning="Recommendation query with language and year filters"
+        )
+
+        assert intent.extracted_filters.language == "es"
+        assert intent.extracted_filters.min_year == 1900
+        assert intent.extracted_filters.max_year == 1999
+
+    def test_intent_validation_empty_original_query(self):
+        """Test that empty original_query raises ValueError."""
+        with pytest.raises(ValueError, match="original_query cannot be empty"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="",
+                reformulated_query="some query",
+                extracted_filters=SearchFilters(),
+                confidence=0.5,
+                reasoning="Test"
+            )
+
+    def test_intent_validation_whitespace_original_query(self):
+        """Test that whitespace-only original_query raises ValueError."""
+        with pytest.raises(ValueError, match="original_query cannot be empty"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="   ",
+                reformulated_query="some query",
+                extracted_filters=SearchFilters(),
+                confidence=0.5,
+                reasoning="Test"
+            )
+
+    def test_intent_validation_empty_reformulated_query(self):
+        """Test that empty reformulated_query raises ValueError."""
+        with pytest.raises(ValueError, match="reformulated_query cannot be empty"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="valid query",
+                reformulated_query="",
+                extracted_filters=SearchFilters(),
+                confidence=0.5,
+                reasoning="Test"
+            )
+
+    def test_intent_validation_empty_reasoning(self):
+        """Test that empty reasoning raises ValueError."""
+        with pytest.raises(ValueError, match="reasoning cannot be empty"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="valid query",
+                reformulated_query="valid reformulation",
+                extracted_filters=SearchFilters(),
+                confidence=0.5,
+                reasoning=""
+            )
+
+    def test_intent_validation_confidence_too_low(self):
+        """Test that confidence < 0 raises ValueError."""
+        with pytest.raises(ValueError, match="confidence must be between 0.0 and 1.0"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="valid query",
+                reformulated_query="valid reformulation",
+                extracted_filters=SearchFilters(),
+                confidence=-0.1,
+                reasoning="Test reasoning"
+            )
+
+    def test_intent_validation_confidence_too_high(self):
+        """Test that confidence > 1 raises ValueError."""
+        with pytest.raises(ValueError, match="confidence must be between 0.0 and 1.0"):
+            QueryIntent(
+                intent_type="exploratory",
+                original_query="valid query",
+                reformulated_query="valid reformulation",
+                extracted_filters=SearchFilters(),
+                confidence=1.5,
+                reasoning="Test reasoning"
+            )
+
+    def test_intent_confidence_boundaries(self):
+        """Test that confidence at boundaries (0.0 and 1.0) is valid."""
+        intent_zero = QueryIntent(
+            intent_type="exploratory",
+            original_query="query",
+            reformulated_query="query",
+            extracted_filters=SearchFilters(),
+            confidence=0.0,
+            reasoning="Fallback - no confidence"
+        )
+        assert intent_zero.confidence == 0.0
+
+        intent_one = QueryIntent(
+            intent_type="recommendation",
+            original_query="query",
+            reformulated_query="query",
+            extracted_filters=SearchFilters(),
+            confidence=1.0,
+            reasoning="Maximum confidence"
+        )
+        assert intent_one.confidence == 1.0
+
+    def test_intent_immutability(self):
+        """Test that QueryIntent is immutable (frozen dataclass)."""
+        intent = QueryIntent(
+            intent_type="exploratory",
+            original_query="test query",
+            reformulated_query="test query",
+            extracted_filters=SearchFilters(),
+            confidence=0.5,
+            reasoning="Test"
+        )
+
+        with pytest.raises(Exception):  # FrozenInstanceError
+            intent.intent_type = "factual"
+
+    def test_intent_invalid_type_not_enforced_by_dataclass(self):
+        """Test that invalid intent_type is accepted at runtime (Literal not enforced)."""
+        # Note: Literal types are not enforced at runtime in Python
+        # This test documents the behavior - type checking happens at static analysis
+        intent = QueryIntent(
+            intent_type="invalid_type",  # type: ignore
+            original_query="query",
+            reformulated_query="query",
+            extracted_filters=SearchFilters(),
+            confidence=0.5,
+            reasoning="Test"
+        )
+        assert intent.intent_type == "invalid_type"
