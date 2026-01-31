@@ -2,8 +2,9 @@
 Value objects for evaluation domain.
 """
 
-from dataclasses import dataclass
-from typing import Dict
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Dict, List
 from uuid import UUID
 
 
@@ -71,3 +72,81 @@ class EvaluationResult:
 
         if self.num_queries < 0:
             raise ValueError(f"num_queries cannot be negative, got {self.num_queries}")
+
+@dataclass(frozen=True)
+class QueryEvaluationResult:
+    """
+    Results for a single test query (for run artifacts).
+
+    Contains both IR metrics and LLM-as-judge scores.
+    """
+    query_id: str
+    query_text: str
+
+    # IR metrics
+    ndcg_at_10: float
+    precision_at_5: float
+    recall_at_10: float
+    mrr: float
+    ild: float  # Intra-List Diversity
+
+    # Timing
+    latency_ms: int
+
+    # Raw outputs for debugging
+    retrieved_book_ids: List[str]  # UUIDs as strings for JSON serialization
+
+    # LLM-as-judge metrics (optional - None if not evaluated)
+    groundedness_score: float | None = None
+    clarity_score: float | None = None
+    relevance_score: float | None = None
+
+
+@dataclass
+class EvaluationRunArtifact:
+    """
+    Complete record of an evaluation run (for reproducibility).
+
+    Stored at: data/evaluation/runs/{run_id}.json
+    """
+    # Run metadata - REQUIRED
+    run_id: str  # UUIDv7
+    timestamp: datetime
+
+    # Configuration - REQUIRED
+    prompt_versions: Dict[str, str]  # {"query_understanding": "v1.2", ...}
+    model_name: str
+
+    # Results - REQUIRED
+    per_query_results: List[QueryEvaluationResult]
+    aggregate_metrics: EvaluationResult  # Reuse existing type
+
+    # Optional fields with defaults
+    git_commit: str | None = None
+    model_temperature: float = 0.0
+    failures: List[str] = field(default_factory=list)  # Error messages
+
+
+@dataclass(frozen=True)
+class ExplanationJudgmentResult:
+    """
+    Detailed judgment result for a single explanation.
+
+    Combines LLM-as-judge scores with deterministic citation metrics.
+    """
+
+    # Identifiers - REQUIRED
+    query_id: str
+    book_id: UUID
+
+    # Citation metrics - REQUIRED (deterministic, always work)
+    citation_precision: float
+    citation_recall: float
+
+    # LLM scores - OPTIONAL (may fail)
+    groundedness_score: float | None = None
+    groundedness_reasoning: str | None = None
+    clarity_score: float | None = None
+    clarity_reasoning: str | None = None
+    relevance_score: float | None = None
+    relevance_reasoning: str | None = None

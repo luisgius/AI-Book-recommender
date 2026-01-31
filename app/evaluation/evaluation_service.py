@@ -9,6 +9,9 @@ from typing import List
 from app.domain.entities import SearchResult
 from app.evaluation.types import RelevanceJudgment
 
+from app.domain.entities import Book, Explanation
+from app.domain.citation_validation import get_book_field_text, is_valid_snippet
+
 
 class EvaluationService:
     """
@@ -221,3 +224,82 @@ class EvaluationService:
             return 0.0, 0.0
         
         return (total_distance / used_pairs), (used_pairs / total_pairs if total_pairs else 0.0)
+
+
+    def compute_citation_precision(
+        self,
+        explanation: Explanation,
+        book: Book
+    ) -> float:
+        """
+        
+        Compute citation precision: % of citations that are valid.
+        
+        Citation precision measures what percentage of the LLM's citations
+        are actually grounded in the book data (snippet exists in field).
+        
+        Args:
+            explanation: The explanation with citations to validate
+            book: The book entity being cited
+            
+        Returns:
+            Precision in [0.0, 1.0], or 0.0 if no citations
+            
+        Example:
+            >>> # 4 out of 5 citations are valid
+            >>> precision = service.compute_citation_precision(explanation, book)
+            >>> precision
+            0.8  # 80% precision
+        """
+        if not explanation.citations:
+            return 0.0 # no citations -> no precision
+
+        # 2. For each citation, validate using is_valid_snippet()
+        valid_count = 0
+        total_count = len(explanation.citations)
+
+        for citation in explanation.citations:
+            # Get the actual field text from the book
+            field_text = get_book_field_text(book, citation.chunk_id)
+            
+            # Check if the snippet actually exists in that field
+            if is_valid_snippet(citation.snippet, field_text):
+                valid_count += 1
+
+        # 3. Return valid_count / total_count
+        return valid_count / total_count
+
+    def compute_citation_recall(
+        self,
+        explanation: Explanation,
+        book: Book
+    ) -> float:
+        
+        # 1. Identify which fields have content
+        fields_with_content = set()
+
+        
+        if book.title:
+            fields_with_content.add("title")
+
+        if book.description:
+            fields_with_content.add("description")
+
+        if book.authors:  # Non-empty list
+            fields_with_content.add("authors")
+
+        if book.categories:  # Non-empty list
+            fields_with_content.add("categories")
+
+        # 2. Check which fields are referenced in citations
+        cited_fields = set()
+    
+        for citation in explanation.citations:
+            cited_fields.add(citation.chunk_id)
+    
+        # 3. Return cited_fields / total_fields_with_content
+        if not fields_with_content:
+            return 0.0  # Edge case: book has no content
+            
+        # Recall = fields cited / fields with content
+        return len(cited_fields & fields_with_content) / len(fields_with_content)

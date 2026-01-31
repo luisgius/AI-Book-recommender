@@ -40,8 +40,12 @@ from app.domain.value_objects import SearchQuery
 from app.domain.entities import SearchResult
 
 # Evaluation imports
-from app.evaluation.types import TestQuery, RelevanceJudgment
+from app.evaluation.types import TestQuery, RelevanceJudgment, ExplanationJudgmentResult
 from app.evaluation.evaluation_service import EvaluationService
+from app.evaluation.llm_judge_service import LLMJudgeService
+
+# LLM imports (optional, for --with-judge)
+from app.infrastructure.llm.langchain_llm_client import LangChainLLMClient
 
 # Configure logging
 logging.basicConfig(
@@ -388,6 +392,134 @@ def export_pool_candidates(
         json.dump(payload, f, indent=2, ensure_ascii=False)
 
 
+def run_judge_evaluation(
+    queries: List[TestQuery],
+    results_by_query: Dict[str, list],
+    llm_client: LangChainLLMClient,
+    eval_service: EvaluationService,
+    judge_top_k: int = 3,
+) -> Dict[str, Any]:
+    """
+    Run LLM-as-Judge evaluation on top-K results per query.
+
+    For each query, generates explanations for top-K results and judges them.
+
+    Args:
+        queries: List of test queries
+        results_by_query: Search results keyed by query_id
+        llm_client: LLM client for generating explanations and judging
+        eval_service: Evaluation service for citation metrics
+        judge_top_k: Number of top results to judge per query
+
+    Returns:
+        Dict with per-query judgment results and aggregate metrics
+    """
+    judge_service = LLMJudgeService(llm_client, eval_service)
+
+    all_judgments: List[Dict[str, Any]] = []
+    per_query_judgments: Dict[str, List[Dict[str, Any]]] = {}
+
+    # Aggregate accumulators
+    total_groundedness = 0.0
+    total_clarity = 0.0
+    total_relevance = 0.0
+    total_precision = 0.0
+    total_recall = 0.0
+    llm_success_count = 0
+    total_judged = 0
+
+    for q in queries:
+        query_id = q.query_id
+        results = results_by_query.get(query_id, [])
+
+        if not results:
+            logger.warning(f"No results for query {query_id}, skipping judge")
+            continue
+
+        query_judgments: List[Dict[str, Any]] = []
+
+        for result in results[:judge_top_k]:
+            book = result.book
+
+            try:
+                # Step 1: Generate explanation
+                logger.debug(f"Generating explanation for query={query_id}, book={book.id}")
+                explanation = llm_client.generate_grounded_explanation(q.text, book)
+
+                # Step 2: Judge the explanation
+                logger.debug(f"Judging explanation for query={query_id}, book={book.id}")
+                judgment_result = judge_service.judge_explanation(
+                    query_id=query_id,
+                    query_text=q.text,
+                    book=book,
+                    explanation=explanation
+                )
+
+                # Convert to serializable dict
+                judgment_dict = {
+                    "query_id": judgment_result.query_id,
+                    "book_id": str(judgment_result.book_id),
+                    "book_title": book.title,
+                    "groundedness_score": judgment_result.groundedness_score,
+                    "groundedness_reasoning": judgment_result.groundedness_reasoning,
+                    "clarity_score": judgment_result.clarity_score,
+                    "clarity_reasoning": judgment_result.clarity_reasoning,
+                    "relevance_score": judgment_result.relevance_score,
+                    "relevance_reasoning": judgment_result.relevance_reasoning,
+                    "citation_precision": judgment_result.citation_precision,
+                    "citation_recall": judgment_result.citation_recall,
+                    "explanation_text": explanation.text[:500],  # Truncate for storage
+                    "num_citations": len(explanation.citations),
+                }
+
+                query_judgments.append(judgment_dict)
+                all_judgments.append(judgment_dict)
+                total_judged += 1
+
+                # Accumulate metrics
+                total_precision += judgment_result.citation_precision
+                total_recall += judgment_result.citation_recall
+
+                if judgment_result.groundedness_score is not None:
+                    total_groundedness += judgment_result.groundedness_score
+                    total_clarity += judgment_result.clarity_score
+                    total_relevance += judgment_result.relevance_score
+                    llm_success_count += 1
+
+                logger.info(
+                    f"Judged q={query_id}, book={book.title[:30]}...: "
+                    f"G={judgment_result.groundedness_score}, "
+                    f"P={judgment_result.citation_precision:.2f}"
+                )
+
+            except Exception as e:
+                logger.error(f"Failed to judge query={query_id}, book={book.id}: {e}")
+                continue
+
+        per_query_judgments[query_id] = query_judgments
+
+    # Compute aggregates
+    aggregate_metrics = {}
+    if total_judged > 0:
+        aggregate_metrics["avg_citation_precision"] = total_precision / total_judged
+        aggregate_metrics["avg_citation_recall"] = total_recall / total_judged
+
+    if llm_success_count > 0:
+        aggregate_metrics["avg_groundedness_score"] = total_groundedness / llm_success_count
+        aggregate_metrics["avg_clarity_score"] = total_clarity / llm_success_count
+        aggregate_metrics["avg_relevance_score"] = total_relevance / llm_success_count
+
+    aggregate_metrics["total_judged"] = total_judged
+    aggregate_metrics["llm_success_count"] = llm_success_count
+    aggregate_metrics["llm_failure_count"] = total_judged - llm_success_count
+
+    return {
+        "aggregate_metrics": aggregate_metrics,
+        "per_query_judgments": per_query_judgments,
+        "all_judgments": all_judgments,
+    }
+
+
 def evaluate_mode(
     mode_name: str,
     results_by_query: Dict[str, list],
@@ -509,6 +641,9 @@ def main(
     max_results: int = 100,
     mmr_top_k: int = 20,
     mmr_lambdas: List[float] | None = None,
+    with_judge: bool = False,
+    judge_top_k: int = 3,
+    judge_mode: str = "hybrid_rrf",
 ) -> None:
     """
     Main entry point for evaluation job.
@@ -743,6 +878,68 @@ def main(
             for qid, res in hybrid_mmr_by_lambda[str(lam)].items()
         }
 
+    # Step 5.5: Run LLM-as-Judge evaluation (optional)
+    if with_judge:
+        logger.info("Step 5.5: Running LLM-as-Judge evaluation...")
+        logger.info(f"  Mode: {judge_mode}, Top-K per query: {judge_top_k}")
+
+        # Select results based on judge_mode
+        mode_results_map = {
+            "lexical_only": lexical_results_by_query,
+            "vector_only": vector_results_by_query,
+            "hybrid_rrf": hybrid_results_by_query,
+            "hybrid_rrf_mmr": hybrid_mmr_results_by_query,
+        }
+
+        if judge_mode not in mode_results_map:
+            logger.warning(f"Unknown judge_mode '{judge_mode}', using hybrid_rrf")
+            judge_mode = "hybrid_rrf"
+
+        judge_results_by_query = mode_results_map[judge_mode]
+
+        try:
+            # Initialize LLM client
+            llm_client = LangChainLLMClient()
+
+            judge_results = run_judge_evaluation(
+                queries=queries,
+                results_by_query=judge_results_by_query,
+                llm_client=llm_client,
+                eval_service=eval_service,
+                judge_top_k=judge_top_k,
+            )
+
+            results["judge"] = {
+                "config": {
+                    "mode": judge_mode,
+                    "top_k": judge_top_k,
+                },
+                "aggregate_metrics": judge_results["aggregate_metrics"],
+                "per_query_judgments": judge_results["per_query_judgments"],
+            }
+
+            logger.info(
+                "Judge evaluation complete: %d explanations judged",
+                judge_results["aggregate_metrics"].get("total_judged", 0)
+            )
+
+            if judge_results["aggregate_metrics"].get("avg_groundedness_score"):
+                logger.info(
+                    "  Avg scores: G=%.2f, C=%.2f, R=%.2f",
+                    judge_results["aggregate_metrics"]["avg_groundedness_score"],
+                    judge_results["aggregate_metrics"]["avg_clarity_score"],
+                    judge_results["aggregate_metrics"]["avg_relevance_score"],
+                )
+            logger.info(
+                "  Avg citation: P=%.2f, R=%.2f",
+                judge_results["aggregate_metrics"].get("avg_citation_precision", 0),
+                judge_results["aggregate_metrics"].get("avg_citation_recall", 0),
+            )
+
+        except Exception as e:
+            logger.error(f"LLM Judge evaluation failed: {e}")
+            results["judge"] = {"error": str(e)}
+
     # Step 6: Save results
     logger.info("Step 6: Saving results...")
     output_path_obj = Path(output_path)
@@ -845,6 +1042,26 @@ if __name__ == "__main__":
         help="MMR lambda values to evaluate (default: 0.3 0.6 0.8)",
     )
 
+    # LLM-as-Judge arguments
+    parser.add_argument(
+        "--with-judge",
+        action="store_true",
+        help="Enable LLM-as-Judge evaluation for explanations",
+    )
+    parser.add_argument(
+        "--judge-top-k",
+        type=int,
+        default=3,
+        help="Number of top results to judge per query (default: 3)",
+    )
+    parser.add_argument(
+        "--judge-mode",
+        type=str,
+        default="hybrid_rrf",
+        choices=["lexical_only", "vector_only", "hybrid_rrf", "hybrid_rrf_mmr"],
+        help="Which search mode's results to judge (default: hybrid_rrf)",
+    )
+
     args = parser.parse_args()
 
     try:
@@ -859,6 +1076,9 @@ if __name__ == "__main__":
             max_results=args.max_results,
             mmr_top_k=args.mmr_top_k,
             mmr_lambdas=args.mmr_lambdas,
+            with_judge=args.with_judge,
+            judge_top_k=args.judge_top_k,
+            judge_mode=args.judge_mode,
         )
     except KeyboardInterrupt:
         logger.info("\nEvaluation interrupted by user")
