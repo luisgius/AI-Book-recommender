@@ -1092,54 +1092,68 @@ PROMPT_VERSIONS = {
 ```text
 .
 ├── app/
-│   ├── main.py
+│   ├── main.py                              # Punto de entrada, wiring de dependencias
 │   ├── api/
 │   │   └── v1/
-│   │       ├── search_endpoints.py
-│   │       ├── evaluation_endpoints.py      # NEW
-│   │       └── schemas.py
+│   │       ├── search_endpoints.py          # Endpoints REST de busqueda
+│   │       ├── schemas.py                   # Pydantic request/response models
+│   │       ├── converters.py                # Conversion domain <-> API
+│   │       └── dependencies.py              # Inyeccion de dependencias FastAPI
 │   ├── domain/
 │   │   ├── entities.py                      # Book, SearchResult, Citation, Explanation (dataclass)
 │   │   ├── services.py                      # SearchService
-│   │   ├── ports.py
+│   │   ├── ports.py                         # Interfaces/contratos del dominio
 │   │   └── value_objects.py                 # SearchQuery, SearchFilters, QueryPlan (dataclass)
 │   ├── infrastructure/
 │   │   ├── db/
+│   │   │   └── sqlite_book_catalog_repository.py
 │   │   ├── search/
+│   │   │   ├── bm25_search_repository.py
+│   │   │   ├── faiss_vector_search_repository.py
+│   │   │   └── embeddings_store_faiss.py
 │   │   ├── external/
+│   │   │   └── google_books_provider.py
 │   │   ├── llm/
-│   │   │   ├── langchain_llm_client.py
-│   │   │   ├── prompts.py
-│   │   │   ├── schemas.py                   # Pydantic: QueryUnderstandingLLM, GroundedExplanationLLM, etc.
-│   │   │   ├── chains.py
+│   │   │   ├── langchain_llm_client.py      # Implementacion del puerto LLMClient
+│   │   │   ├── prompts.py                   # Prompts para explicaciones
+│   │   │   ├── prompts_query.py             # Prompts para query understanding
+│   │   │   ├── schemas.py                   # Pydantic: GroundedExplanationLLM, CitationLLM
+│   │   │   ├── schemas_query.py             # Pydantic: QueryUnderstandingLLM
+│   │   │   ├── schemas_judge.py             # Pydantic: ExplanationJudgmentLLM
+│   │   │   ├── chains.py                    # Definiciones de cadenas LangChain
+│   │   │   ├── guardrails.py                # Validacion de grounding (snippet verification)
 │   │   │   └── graphs/
-│   │   │       ├── query_understanding.py   # Block 2 (LangGraph flow)
-│   │   │       └── agentic_search.py        # Block 4 (optional)
+│   │   │       └── query_understanding.py   # LangGraph flow (Block 2)
+│   │   ├── cache/
 │   │   └── config/
+│   ├── ingestion/
+│   │   └── ingestion_service.py             # Pipeline ETL desde APIs externas
 │   ├── evaluation/
-│   │   ├── evaluation_service.py
-│   │   ├── evaluation_job.py
-│   │   ├── types.py                         # Evaluation data types
-│   │   ├── test_queries.json                # Input: curated test queries
-│   │   ├── relevance_judgments.json         # Input: query-book relevance pairs
-│   │   ├── negative_tests.json              # (Planned) Input: edge cases
-│   │   ├── llm_judge.py                     # (Planned) Block 3
-│   │   ├── grounding_evaluator.py           # (Planned) Block 1
-│   │   └── run_artifact.py                  # (Planned) Block 3
+│   │   ├── evaluation_service.py            # Metricas IR (NDCG, precision, recall)
+│   │   ├── evaluation_job.py                # CLI entry point
+│   │   ├── types.py                         # Tipos de datos de evaluacion
+│   │   ├── llm_judge.py                     # (Planned) LLM-as-judge
+│   │   └── grounding_evaluator.py           # (Planned) Evaluacion de citas
 │   └── ui/
 ├── tests/
-│   ├── infrastructure/llm/
-│   │   └── test_grounding.py                # Block 1
-│   └── evaluation/
-│       ├── test_llm_judge.py                # Block 3
-│       └── test_negative_cases.py           # Block 3
+│   ├── domain/                              # Tests de entidades, servicios, value objects
+│   ├── db/                                  # Tests del repositorio SQLite
+│   ├── infrastructure/                      # Tests de adaptadores (FAISS, BM25, integracion)
+│   │   └── llm/                             # Tests de LLM client, guardrails, graphs
+│   ├── ingestion/                           # Tests del servicio de ingesta
+│   ├── llm/                                 # Tests adicionales de LLM
+│   └── external/                            # Tests de proveedores externos
 ├── data/
-│   ├── catalog.db
-│   ├── indices/
-│   └── evaluation/                          # Output artifacts (not inputs)
-│       ├── results.json                     # Latest evaluation results
-│       ├── pool_candidates.json             # Retrieved candidates per query
-│       └── runs/                            # (Planned) Full run artifacts with tracing
+│   ├── catalog.db                           # Base de datos SQLite
+│   ├── indexes/                             # Indices BM25 y FAISS
+│   │   ├── bm25_index.pkl
+│   │   └── faiss_index/
+│   └── evaluation/                          # Artefactos de salida
+│       ├── results.json
+│       ├── pool_candidates.json
+│       └── runs/                            # (Planned) Full run artifacts
+├── scripts/                                 # Utilidades CLI (ingesta, reindex, evaluacion)
+├── docs/                                    # Documentacion tecnica
 ├── requirements.txt
 ├── README.md
 └── Dockerfile

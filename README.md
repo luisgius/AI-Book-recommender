@@ -79,10 +79,50 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your OPENAI_API_KEY or ANTHROPIC_API_KEY
+## Configuration
+
+### API Keys (Required for LLM features)
+
+This project uses LLMs for generating grounded explanations. You need to configure at least one LLM provider:
+
+1. **Create your environment file**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Add your API key** to `.env`:
+
+   **For OpenAI** (recommended for development):
+   ```bash
+   OPENAI_API_KEY=sk-your-actual-key-here
+   ```
+   - Get your key at: https://platform.openai.com/api-keys
+   - Default model: `gpt-4o-mini` (fast and cost-effective)
+
+   **For Anthropic** (alternative):
+   ```bash
+   ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
+   ```
+   - Get your key at: https://console.anthropic.com/settings/keys
+   - Models: `claude-3-haiku-20240307`, `claude-3-sonnet-20240229`
+
+3. **Security notes**:
+   - Never commit your `.env` file to git (already in `.gitignore`)
+   - Never hardcode API keys in source code
+   - API keys are loaded automatically via `python-dotenv`
+
+### Optional Configuration
+
+In `.env`, you can also configure:
+
+```bash
+# Logging level
+LOG_LEVEL=INFO
+
+# Environment
+ENVIRONMENT=development
 ```
 
 ## Usage
@@ -173,11 +213,11 @@ explanation = chain.invoke({"query": query, "book": book_info})
 ## Development Status
 
 - [x] Phase 1: Retrieval Foundation (BM25, FAISS, hybrid search)
-- [ ] Phase 2: Basic RAG Pipeline (LangChain client, explanations)
-- [ ] Phase 3: Query Understanding (intent extraction, LangGraph)
+- [x] Phase 2: Basic RAG Pipeline (LangChain client, grounded explanations, citation guardrails)
+- [x] Phase 3: Query Understanding (intent extraction, filter extraction, LangGraph)
 - [ ] Phase 4: Agentic Patterns (tool use, ReAct)
-- [ ] Phase 5: Evaluation Pipeline (IR metrics, LLM-as-judge)
-- [ ] Phase 6: API and Integration (FastAPI, UI)
+- [x] Phase 5: Evaluation Pipeline (IR metrics, LLM-as-judge, citation metrics)
+- [~] Phase 6: API and Integration (FastAPI endpoints done, UI and Docker pending)
 
 ## Author
 
