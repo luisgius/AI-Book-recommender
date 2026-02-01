@@ -46,13 +46,17 @@ from app.domain.entities import SearchResult
 from app.evaluation.types import (
     TestQuery, RelevanceJudgment, ExplanationJudgmentResult,
     EvaluationRunArtifact, EvaluationResult, QueryEvaluationResult, LLMCallTrace,
+    NegativeTestCase, NegativeTestResult,
     generate_run_id, save_run_artifact, list_run_artifacts,
 )
 from app.evaluation.evaluation_service import EvaluationService
 from app.evaluation.llm_judge_service import LLMJudgeService
 
-# LLM imports (optional, for --with-judge)
-from app.infrastructure.llm.langchain_llm_client import LangChainLLMClient
+# LLM imports (optional, loaded lazily to avoid hard dependency on langchain)
+try:
+    from app.infrastructure.llm.langchain_llm_client import LangChainLLMClient
+except ImportError:
+    LangChainLLMClient = None  # type: ignore[misc,assignment]
 
 # Configure logging
 logging.basicConfig(
@@ -62,6 +66,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DEFAULT_RUNS_DIR = "data/evaluation/runs"
+DEFAULT_NEGATIVE_TESTS_PATH = "app/evaluation/negative_tests.json"
+DEFAULT_NEGATIVE_OUTPUT_PATH = "data/evaluation/negative_results.json"
+NEGATIVE_TIMEOUT_MS = 30_000
 
 
 def _get_git_commit() -> str | None:
@@ -95,6 +102,172 @@ DEFAULT_POOL_PER_MODE_LIMIT = 50
 NDCG_KS = (5, 10, 20)
 RECALL_KS = (10, 20, 100)
 ILD_KS = (10, 20)
+
+
+def load_negative_tests(path: str = DEFAULT_NEGATIVE_TESTS_PATH) -> List[NegativeTestCase]:
+    """Load negative test cases from JSON file."""
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return [NegativeTestCase(**item) for item in data]
+
+
+def _evaluate_negative_case(
+    test_case: NegativeTestCase,
+    search_service: SearchService,
+    max_results: int = 10,
+) -> NegativeTestResult:
+    """
+    Run a single negative test case through the search pipeline.
+
+    Success criteria (applied to ALL categories):
+    - The pipeline must NOT raise an unhandled exception
+    - The pipeline must complete within NEGATIVE_TIMEOUT_MS
+    """
+    start = time.perf_counter()
+    crashed = False
+    error_message = None
+    num_results = 0
+
+    try:
+        query = SearchQuery(text=test_case.text, max_results=max_results)
+        response = search_service.search_with_fallback(query)
+        num_results = len(response.results)
+    except Exception as e:
+        crashed = True
+        error_message = str(e)
+
+    latency_ms = (time.perf_counter() - start) * 1000
+
+    # Determine pass/fail
+    passed = True
+    failure_reason = None
+
+    if crashed:
+        passed = False
+        failure_reason = f"Crashed: {error_message}"
+    elif latency_ms > NEGATIVE_TIMEOUT_MS:
+        passed = False
+        failure_reason = f"Timeout: {latency_ms:.0f}ms > {NEGATIVE_TIMEOUT_MS}ms"
+
+    return NegativeTestResult(
+        query_id=test_case.query_id,
+        category=test_case.category,
+        query_text=test_case.text,
+        crashed=crashed,
+        error_message=error_message,
+        num_results=num_results,
+        latency_ms=latency_ms,
+        passed=passed,
+        failure_reason=failure_reason,
+    )
+
+
+def run_negative_evaluation(
+    db_path: str = DEFAULT_DB_PATH,
+    indexes_dir: str = DEFAULT_INDEXES_DIR,
+    negative_tests_path: str = DEFAULT_NEGATIVE_TESTS_PATH,
+    output_path: str = DEFAULT_NEGATIVE_OUTPUT_PATH,
+) -> None:
+    """
+    Run the negative/adversarial test suite against the search pipeline.
+
+    Loads search indices, runs every negative test case, and reports
+    per-category pass/fail statistics.
+    """
+    logger.info("=" * 70)
+    logger.info("NEGATIVE TEST EVALUATION")
+    logger.info("=" * 70)
+
+    # Load indices (same as main Steps 1-2, but no queries/judgments needed)
+    logger.info("Loading search indices...")
+    catalog_repo = SqliteBookCatalogRepository(Path(db_path))
+    books = catalog_repo.get_all()
+    logger.info("Catalog loaded: %s books", len(books))
+
+    indexes_dir_path = Path(indexes_dir)
+
+    bm25_repo = BM25SearchRepository()
+    bm25_index_path = indexes_dir_path / "bm25_index.pkl"
+    if bm25_index_path.exists():
+        bm25_repo.load_index(str(bm25_index_path))
+        logger.info("BM25 index loaded from %s", bm25_index_path)
+
+    embeddings_store = EmbeddingsStoreFaiss()
+    faiss_dir = indexes_dir_path / "faiss_index"
+    if faiss_dir.exists():
+        embeddings_store.load_index(str(faiss_dir))
+        logger.info("FAISS index loaded from %s", faiss_dir)
+
+    vector_repo = FaissVectorSearchRepository(embeddings_store, books)
+    search_service = SearchService(
+        lexical_search=bm25_repo,
+        vector_search=vector_repo,
+        embeddings_store=embeddings_store,
+    )
+
+    # Load and run negative tests
+    logger.info("Loading negative tests from %s", negative_tests_path)
+    test_cases = load_negative_tests(negative_tests_path)
+    logger.info("Running %d negative test cases...", len(test_cases))
+
+    results: List[NegativeTestResult] = []
+    for tc in test_cases:
+        logger.info("  [%s] %s: %s", tc.category, tc.query_id, tc.text[:50])
+        result = _evaluate_negative_case(tc, search_service)
+        results.append(result)
+        status = "PASS" if result.passed else "FAIL"
+        logger.info(
+            "    -> %s (results=%d, latency=%.0fms)",
+            status, result.num_results, result.latency_ms,
+        )
+
+    # Summarize
+    passed_count = sum(1 for r in results if r.passed)
+    failed_count = len(results) - passed_count
+
+    categories: Dict[str, Dict[str, int]] = {}
+    for r in results:
+        cat = categories.setdefault(r.category, {"passed": 0, "failed": 0, "total": 0})
+        cat["total"] += 1
+        if r.passed:
+            cat["passed"] += 1
+        else:
+            cat["failed"] += 1
+
+    logger.info("=" * 70)
+    logger.info("NEGATIVE TEST RESULTS: %d/%d passed", passed_count, len(results))
+    for cat_name, cat_stats in sorted(categories.items()):
+        logger.info(
+            "  %-20s %d/%d passed",
+            cat_name, cat_stats["passed"], cat_stats["total"],
+        )
+
+    if failed_count > 0:
+        logger.warning("FAILURES:")
+        for r in results:
+            if not r.passed:
+                logger.warning("  [%s] %s: %s", r.category, r.query_id, r.failure_reason)
+
+    # Save results
+    output_obj = Path(output_path)
+    output_obj.parent.mkdir(parents=True, exist_ok=True)
+
+    from dataclasses import asdict
+    output_data = {
+        "summary": {
+            "total": len(results),
+            "passed": passed_count,
+            "failed": failed_count,
+            "per_category": categories,
+        },
+        "results": [asdict(r) for r in results],
+    }
+
+    with open(output_obj, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
+
+    logger.info("Saved negative test results to %s", output_obj)
+    logger.info("=" * 70)
 
 
 def load_test_queries(path: str) -> List[TestQuery]:
@@ -939,6 +1112,11 @@ def main(
 
         try:
             # Initialize LLM client
+            if LangChainLLMClient is None:
+                raise ImportError(
+                    "LangChainLLMClient not available. "
+                    "Install langchain-openai to use --with-judge."
+                )
             llm_client = LangChainLLMClient()
 
             judge_results = run_judge_evaluation(
@@ -1177,6 +1355,19 @@ if __name__ == "__main__":
         help="List past evaluation runs and exit (does not run evaluation)",
     )
 
+    # Negative testing arguments
+    parser.add_argument(
+        "--negative",
+        action="store_true",
+        help="Run negative/adversarial test suite instead of normal evaluation",
+    )
+    parser.add_argument(
+        "--negative-tests-path",
+        type=str,
+        default=DEFAULT_NEGATIVE_TESTS_PATH,
+        help=f"Path to negative test cases JSON (default: {DEFAULT_NEGATIVE_TESTS_PATH})",
+    )
+
     args = parser.parse_args()
 
     # Handle --list-runs: print summary and exit
@@ -1193,6 +1384,23 @@ if __name__ == "__main__":
                     f"{run['num_queries']:<10} {(run['git_commit'] or 'N/A'):<12} "
                     f"{run['timestamp']}"
                 )
+        sys.exit(0)
+
+    # Handle --negative: run adversarial test suite and exit
+    if args.negative:
+        try:
+            run_negative_evaluation(
+                db_path=args.db_path,
+                indexes_dir=args.indexes_dir,
+                negative_tests_path=args.negative_tests_path,
+                output_path=DEFAULT_NEGATIVE_OUTPUT_PATH,
+            )
+        except KeyboardInterrupt:
+            logger.info("\nNegative evaluation interrupted by user")
+            sys.exit(130)
+        except Exception as e:
+            logger.error(f"Negative evaluation failed: {e}", exc_info=True)
+            sys.exit(1)
         sys.exit(0)
 
     try:

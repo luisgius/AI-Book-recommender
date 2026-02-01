@@ -306,3 +306,66 @@ def list_run_artifacts(runs_dir: str = "data/evaluation/runs") -> List[dict]:
             continue
 
     return summaries
+
+
+# =============================================================================
+# Negative / Adversarial Testing
+# =============================================================================
+
+
+NEGATIVE_TEST_CATEGORIES = frozenset({
+    "out_of_catalog",
+    "ambiguous",
+    "contradictory",
+    "gibberish",
+    "prompt_injection",
+})
+
+
+@dataclass(frozen=True)
+class NegativeTestCase:
+    """
+    A single test case designed to probe system robustness.
+
+    Each case belongs to a category that defines what kind of adversarial
+    input it represents and what "passing" means for that category.
+
+    Loaded from: app/evaluation/negative_tests.json
+    """
+
+    query_id: str
+    text: str
+    category: str  # Must be one of NEGATIVE_TEST_CATEGORIES
+    expected_behavior: str  # Human-readable description of correct handling
+
+    def __post_init__(self) -> None:
+        if self.category not in NEGATIVE_TEST_CATEGORIES:
+            raise ValueError(
+                f"Invalid category '{self.category}', "
+                f"must be one of {sorted(NEGATIVE_TEST_CATEGORIES)}"
+            )
+        if not self.text or not self.text.strip():
+            raise ValueError("Negative test text cannot be empty")
+
+
+@dataclass
+class NegativeTestResult:
+    """
+    Result of running a single negative test case against the search pipeline.
+
+    Captures whether the system handled the adversarial input gracefully:
+    - crashed: did the pipeline raise an unhandled exception?
+    - num_results: how many results were returned (0 is often correct)?
+    - latency_ms: did it complete in reasonable time?
+    - passed: overall verdict based on category-specific criteria
+    """
+
+    query_id: str
+    category: str
+    query_text: str
+    crashed: bool
+    error_message: str | None
+    num_results: int
+    latency_ms: float
+    passed: bool
+    failure_reason: str | None
