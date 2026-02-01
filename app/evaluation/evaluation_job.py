@@ -47,6 +47,7 @@ from app.evaluation.types import (
     TestQuery, RelevanceJudgment, ExplanationJudgmentResult,
     EvaluationRunArtifact, EvaluationResult, QueryEvaluationResult, LLMCallTrace,
     NegativeTestCase, NegativeTestResult,
+    AblationConfig, get_standard_ablation_configs,
     generate_run_id, save_run_artifact, list_run_artifacts,
 )
 from app.evaluation.evaluation_service import EvaluationService
@@ -68,6 +69,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_RUNS_DIR = "data/evaluation/runs"
 DEFAULT_NEGATIVE_TESTS_PATH = "app/evaluation/negative_tests.json"
 DEFAULT_NEGATIVE_OUTPUT_PATH = "data/evaluation/negative_results.json"
+DEFAULT_ABLATION_OUTPUT_PATH = "data/evaluation/ablation_results.json"
 NEGATIVE_TIMEOUT_MS = 30_000
 
 
@@ -268,6 +270,229 @@ def run_negative_evaluation(
 
     logger.info("Saved negative test results to %s", output_obj)
     logger.info("=" * 70)
+
+
+def _run_ablation_search(
+    query_text: str,
+    config: AblationConfig,
+    bm25_repo: BM25SearchRepository,
+    vector_repo: FaissVectorSearchRepository,
+    embeddings_store: EmbeddingsStoreFaiss,
+    search_service: SearchService,
+    max_results: int = 100,
+    mmr_top_k: int = 20,
+) -> list:
+    """
+    Execute a single query using the given ablation configuration.
+
+    Routes to the appropriate search function based on which
+    components are enabled in the config.
+    """
+    if config.use_lexical and not config.use_vector:
+        return run_lexical_search(query_text, bm25_repo, max_results)
+
+    if config.use_vector and not config.use_lexical:
+        return run_vector_search(
+            query_text, vector_repo, embeddings_store, max_results,
+        )
+
+    # Both enabled: hybrid RRF
+    results = run_hybrid_search(
+        query_text, search_service, embeddings_store,
+        max_results=max_results,
+        use_diversification=False,
+    )
+
+    if config.use_mmr:
+        results_copy = copy.deepcopy(results)
+        results = _mmr_rerank(
+            results_copy,
+            embeddings_store=embeddings_store,
+            lambda_param=config.mmr_lambda,
+            mmr_top_k=mmr_top_k,
+        )
+
+    return results
+
+
+def _format_ablation_table(
+    all_metrics: Dict[str, Dict[str, Any]],
+    baseline_label: str = "full_pipeline",
+) -> str:
+    """
+    Format a comparison table showing metrics and deltas from baseline.
+
+    Returns a formatted string ready for printing or logging.
+    """
+    baseline = all_metrics.get(baseline_label, {})
+    b_ndcg = baseline.get("ndcg_at_10", 0.0)
+    b_recall = baseline.get("recall_at_100", 0.0)
+    b_mrr = baseline.get("mrr", 0.0)
+    b_ild = baseline.get("ild_at_10", 0.0)
+
+    def _delta(val: float, base: float) -> str:
+        d = val - base
+        return f"+{d:.4f}" if d >= 0 else f"{d:.4f}"
+
+    lines = []
+    header = (
+        f"{'Config':<20} {'nDCG@10':>9} {'delta':>8} "
+        f"{'R@100':>9} {'delta':>8} "
+        f"{'MRR':>9} {'delta':>8} "
+        f"{'ILD@10':>9} {'delta':>8}"
+    )
+    lines.append(header)
+    lines.append("-" * len(header))
+
+    for label, metrics in all_metrics.items():
+        ndcg = metrics.get("ndcg_at_10", 0.0)
+        recall = metrics.get("recall_at_100", 0.0)
+        mrr = metrics.get("mrr", 0.0)
+        ild = metrics.get("ild_at_10", 0.0)
+
+        is_baseline = label == baseline_label
+        d_ndcg = "   ---" if is_baseline else _delta(ndcg, b_ndcg)
+        d_recall = "   ---" if is_baseline else _delta(recall, b_recall)
+        d_mrr = "   ---" if is_baseline else _delta(mrr, b_mrr)
+        d_ild = "   ---" if is_baseline else _delta(ild, b_ild)
+
+        lines.append(
+            f"{label:<20} {ndcg:>9.4f} {d_ndcg:>8} "
+            f"{recall:>9.4f} {d_recall:>8} "
+            f"{mrr:>9.4f} {d_mrr:>8} "
+            f"{ild:>9.4f} {d_ild:>8}"
+        )
+
+    return "\n".join(lines)
+
+
+def run_ablation_evaluation(
+    db_path: str = DEFAULT_DB_PATH,
+    indexes_dir: str = DEFAULT_INDEXES_DIR,
+    queries_path: str = DEFAULT_QUERIES_PATH,
+    judgments_path: str = DEFAULT_JUDGMENTS_PATH,
+    output_path: str = DEFAULT_ABLATION_OUTPUT_PATH,
+    max_results: int = 100,
+    mmr_top_k: int = 20,
+    configs: List[AblationConfig] | None = None,
+) -> None:
+    """
+    Run ablation evaluation: multiple configurations compared against a baseline.
+
+    For each config, runs all test queries, computes IR metrics, and
+    prints a comparison table showing each component's contribution.
+    """
+    if configs is None:
+        configs = get_standard_ablation_configs()
+
+    logger.info("=" * 70)
+    logger.info("ABLATION EVALUATION (%d configurations)", len(configs))
+    logger.info("=" * 70)
+
+    # Step 1: Load queries and judgments
+    logger.info("Loading test queries and judgments...")
+    queries = load_test_queries(queries_path)
+    raw_judgments = load_relevance_judgments(judgments_path)
+    logger.info("Loaded %d queries and %d judgment sets", len(queries), len(raw_judgments))
+
+    # Step 2: Load indices
+    logger.info("Loading search indices...")
+    catalog_repo = SqliteBookCatalogRepository(Path(db_path))
+    books = catalog_repo.get_all()
+    logger.info("Catalog: %d books", len(books))
+
+    indexes_dir_path = Path(indexes_dir)
+
+    bm25_repo = BM25SearchRepository()
+    bm25_index_path = indexes_dir_path / "bm25_index.pkl"
+    if bm25_index_path.exists():
+        bm25_repo.load_index(str(bm25_index_path))
+
+    embeddings_store = EmbeddingsStoreFaiss()
+    faiss_dir = indexes_dir_path / "faiss_index"
+    if faiss_dir.exists():
+        embeddings_store.load_index(str(faiss_dir))
+
+    vector_repo = FaissVectorSearchRepository(embeddings_store, books)
+    search_service = SearchService(
+        lexical_search=bm25_repo,
+        vector_search=vector_repo,
+        embeddings_store=embeddings_store,
+    )
+
+    # Step 3: Resolve judgments
+    logger.info("Resolving judgments to UUIDs...")
+    judgments = resolve_judgments_to_uuids(raw_judgments, catalog_repo)
+
+    eval_service = EvaluationService()
+
+    # Step 4: Run each ablation config
+    from dataclasses import asdict
+
+    all_metrics: Dict[str, Dict[str, Any]] = {}
+
+    for config in configs:
+        logger.info("Running config: %s", config.label)
+        results_by_query: Dict[str, list] = {}
+
+        for q in queries:
+            results_by_query[q.query_id] = _run_ablation_search(
+                query_text=q.text,
+                config=config,
+                bm25_repo=bm25_repo,
+                vector_repo=vector_repo,
+                embeddings_store=embeddings_store,
+                search_service=search_service,
+                max_results=max_results,
+                mmr_top_k=mmr_top_k,
+            )
+
+        mode_metrics = evaluate_mode(
+            config.label, results_by_query, judgments, eval_service,
+        )
+        all_metrics[config.label] = mode_metrics
+        logger.info(
+            "  %s: nDCG@10=%.4f, R@100=%.4f, MRR=%.4f, ILD@10=%.4f",
+            config.label,
+            mode_metrics.get("ndcg_at_10", 0.0),
+            mode_metrics.get("recall_at_100", 0.0),
+            mode_metrics.get("mrr", 0.0),
+            mode_metrics.get("ild_at_10", 0.0),
+        )
+
+    # Step 5: Print comparison table
+    logger.info("=" * 70)
+    baseline_label = configs[0].label
+    table = _format_ablation_table(all_metrics, baseline_label)
+    for line in table.split("\n"):
+        logger.info(line)
+    logger.info("=" * 70)
+
+    # Step 6: Compute deltas and save
+    baseline_metrics = all_metrics.get(baseline_label, {})
+    delta_keys = ["ndcg_at_10", "recall_at_100", "mrr", "ild_at_10"]
+    deltas: Dict[str, Dict[str, float]] = {}
+    for label, metrics in all_metrics.items():
+        if label == baseline_label:
+            continue
+        deltas[label] = {
+            k: metrics.get(k, 0.0) - baseline_metrics.get(k, 0.0)
+            for k in delta_keys
+        }
+
+    output_data = {
+        "baseline": baseline_label,
+        "configs": [asdict(c) for c in configs],
+        "results": all_metrics,
+        "deltas_from_baseline": deltas,
+    }
+
+    output_obj = Path(output_path)
+    output_obj.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_obj, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
+
+    logger.info("Saved ablation results to %s", output_obj)
 
 
 def load_test_queries(path: str) -> List[TestQuery]:
@@ -1368,6 +1593,13 @@ if __name__ == "__main__":
         help=f"Path to negative test cases JSON (default: {DEFAULT_NEGATIVE_TESTS_PATH})",
     )
 
+    # Ablation testing arguments
+    parser.add_argument(
+        "--ablation",
+        action="store_true",
+        help="Run ablation evaluation (compare component contributions) instead of normal evaluation",
+    )
+
     args = parser.parse_args()
 
     # Handle --list-runs: print summary and exit
@@ -1400,6 +1632,26 @@ if __name__ == "__main__":
             sys.exit(130)
         except Exception as e:
             logger.error(f"Negative evaluation failed: {e}", exc_info=True)
+            sys.exit(1)
+        sys.exit(0)
+
+    # Handle --ablation: run component-contribution analysis and exit
+    if args.ablation:
+        try:
+            run_ablation_evaluation(
+                db_path=args.db_path,
+                indexes_dir=args.indexes_dir,
+                queries_path=args.queries_path,
+                judgments_path=args.judgments_path,
+                output_path=DEFAULT_ABLATION_OUTPUT_PATH,
+                max_results=args.max_results,
+                mmr_top_k=args.mmr_top_k,
+            )
+        except KeyboardInterrupt:
+            logger.info("\nAblation evaluation interrupted by user")
+            sys.exit(130)
+        except Exception as e:
+            logger.error(f"Ablation evaluation failed: {e}", exc_info=True)
             sys.exit(1)
         sys.exit(0)
 

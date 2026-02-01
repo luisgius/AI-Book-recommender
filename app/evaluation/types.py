@@ -369,3 +369,69 @@ class NegativeTestResult:
     latency_ms: float
     passed: bool
     failure_reason: str | None
+
+
+# =============================================================================
+# Ablation Testing
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class AblationConfig:
+    """
+    Configuration for a single ablation experiment.
+
+    Each config toggles specific pipeline components on/off.
+    Running the standard set of configs and comparing metrics
+    reveals each component's individual contribution.
+
+    Toggles:
+        use_lexical: Include BM25 results in hybrid fusion
+        use_vector: Include FAISS results in hybrid fusion
+        use_mmr: Apply MMR diversification after retrieval
+        mmr_lambda: Relevance vs diversity trade-off (0=diversity, 1=relevance)
+    """
+
+    label: str
+    use_lexical: bool = True
+    use_vector: bool = True
+    use_mmr: bool = True
+    mmr_lambda: float = 0.6
+
+    def __post_init__(self) -> None:
+        if not self.label or not self.label.strip():
+            raise ValueError("AblationConfig label cannot be empty")
+        if not self.use_lexical and not self.use_vector:
+            raise ValueError(
+                "At least one of use_lexical or use_vector must be True"
+            )
+        if not (0.0 <= self.mmr_lambda <= 1.0):
+            raise ValueError(
+                f"mmr_lambda must be in [0, 1], got {self.mmr_lambda}"
+            )
+
+
+def get_standard_ablation_configs() -> List["AblationConfig"]:
+    """
+    Generate the standard set of ablation configurations.
+
+    Returns a baseline (full pipeline) plus variants where one
+    component is changed, enabling isolation of each component's
+    contribution to the final metrics.
+
+    Configs:
+        full_pipeline  - Baseline: hybrid RRF + MMR (lambda=0.6)
+        no_mmr         - Remove diversification
+        no_vector      - BM25 only (no semantic search)
+        no_lexical     - FAISS only (no keyword search)
+        high_diversity - MMR with lambda=0.3 (more diversity)
+        low_diversity  - MMR with lambda=0.8 (more relevance)
+    """
+    return [
+        AblationConfig(label="full_pipeline"),
+        AblationConfig(label="no_mmr", use_mmr=False),
+        AblationConfig(label="no_vector", use_vector=False, use_mmr=False),
+        AblationConfig(label="no_lexical", use_lexical=False, use_mmr=False),
+        AblationConfig(label="high_diversity", mmr_lambda=0.3),
+        AblationConfig(label="low_diversity", mmr_lambda=0.8),
+    ]
