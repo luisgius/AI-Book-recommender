@@ -1,0 +1,48 @@
+# Version control
+.git/
+.gitignore
+
+# Secrets and credentials
+.env
+.env.local
+*.key
+*.pem
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# IDE / editor
+.vscode/
+.idea/
+.pytest_cache/
+
+# Tests and coverage
+tests/
+conftest.py
+.coverage
+htmlcov/
+
+# Test data
+data/catalog_test.db
+data/indexes_test/
+data/evaluation/
+
+# Documentation and scripts
+docs/
+*.md
+scripts/
+
+# Docker (prevent recursive copy)
+Dockerfile
+.dockerignore
+
+# Project tooling
+.claude/
+CLAUDE*.md
+AGENTS.md
+nul
+opencode.json
+.vincent/
