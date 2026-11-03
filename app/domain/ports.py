@@ -12,7 +12,7 @@ on these abstract protocols, never on concrete implementations.
 from typing import Protocol, List, Optional, Dict, Any, TYPE_CHECKING
 from uuid import UUID
 
-from .entities import Book, SearchResult, Explanation
+from .entities import AgentAnswer, Book, SearchResult, Explanation
 from .value_objects import SearchQuery, SearchFilters, QueryIntent
 
 if TYPE_CHECKING:
@@ -677,3 +677,33 @@ class LLMClient(Protocol):
         """
         ...
 
+
+class SearchAgent(Protocol):
+    """
+    Port for agentic search (Phase 4: tool use, ReAct, self-reflection).
+
+    An agent answers a natural-language request by deciding which catalog
+    tools to call (search, book details, similar books), observing the
+    results, and composing recommendations. The implementation (LangGraph,
+    LLM provider) is an infrastructure detail.
+
+    Implementations MUST only recommend books returned by their tools during
+    the run, so every recommendation is traceable to retrieved evidence.
+    """
+
+    def answer(self, question: str) -> AgentAnswer:
+        """
+        Answer a book request using the catalog tools.
+
+        Args:
+            question: The user's request in natural language
+
+        Returns:
+            AgentAnswer with the answer text, verified recommendations and the
+            trace of tool calls
+
+        Raises:
+            ValueError: If question is empty
+            RuntimeError: If the LLM cannot be reached
+        """
+        ...

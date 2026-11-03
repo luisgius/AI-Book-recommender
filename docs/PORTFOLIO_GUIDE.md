@@ -141,7 +141,24 @@ Other endpoints:
   returns nDCG@k, Recall@k, Precision@k, MRR and ILD@k per mode. It computes
   the same numbers as the CLI job; LLM-based evaluation (query understanding,
   LLM-as-judge) stays in the CLI job because it takes minutes.
+- `POST /api/v1/agent/ask` with `{"question": "..."}`: agentic search (Phase 4).
+  A LangGraph ReAct graph lets the LLM call catalog tools (`search_books`,
+  `get_book_details`, `find_similar_books`) several times, then a `finalize`
+  node writes recommendations from the tool observations and a deterministic
+  `verify` node drops any book no tool returned; if nothing valid remains the
+  agent is sent back once to search again (self-reflection). The response
+  includes the tool-call trace. Needs an LLM with tool calling.
 - `GET /api/v1/books/{book_id}` and `GET /api/v1/health`.
+
+### Ingesting from Open Library
+
+`python -m scripts.ingest_and_build --provider openlibrary --query "novela guerra civil" --language es --max-items 50`
+uses the Open Library search and works APIs (no API key). Open Library
+publishes no Creative Commons licence for its catalog data, so use it for
+small academic ingestions with attribution (every book keeps
+`source="open_library"`); see `review/06-research-improvements-2026-11.md`.
+Adding books changes the evaluation baseline: new books have no relevance
+judgments.
 
 ## Usage
 
@@ -233,9 +250,9 @@ explanation = chain.invoke({"query": query, "book": book_info})
 - [x] Phase 1: Retrieval Foundation (BM25, FAISS, hybrid search)
 - [x] Phase 2: Basic RAG Pipeline (LangChain client, grounded explanations, citation guardrails)
 - [x] Phase 3: Query Understanding (intent extraction, filter extraction, LangGraph)
-- [ ] Phase 4: Agentic Patterns (tool use, ReAct)
+- [x] Phase 4: Agentic Patterns (tool use, ReAct, self-reflection via verification; LangGraph)
 - [x] Phase 5: Evaluation Pipeline (IR metrics, LLM-as-judge, citation metrics)
-- [~] Phase 6: API and Integration (FastAPI endpoints done, UI and Docker pending)
+- [x] Phase 6: API and Integration (FastAPI endpoints, web UI at /ui, Dockerfile)
 
 ## Author
 

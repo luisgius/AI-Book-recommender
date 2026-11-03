@@ -21,6 +21,7 @@ from app.domain.ports import (
     VectorSearchRepository,
     EmbeddingsStore,
     LLMClient,
+    SearchAgent,
 )
 from app.domain.services import SearchService
 from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
@@ -44,6 +45,8 @@ _search_service: Optional[SearchService] = None
 _llm_settings: Optional[LLMSettings] = None
 _llm_client: Optional[LLMClient] = None
 _llm_initialized: bool = False
+_search_agent: Optional[SearchAgent] = None
+_agent_initialized: bool = False
 
 
 def get_catalog_repository() -> BookCatalogRepository:
@@ -143,6 +146,36 @@ def get_llm_client() -> Optional[LLMClient]:
     return _llm_client
 
 
+def get_search_agent() -> Optional[SearchAgent]:
+    """
+    Provide the agentic search (LangGraph ReAct agent), or None without an LLM.
+
+    The agent reuses the chat model of the LLM client and the same search
+    service and catalog as the rest of the API.
+    """
+    global _search_agent, _agent_initialized
+    if _agent_initialized:
+        return _search_agent
+    _agent_initialized = True
+
+    model = getattr(get_llm_client(), "model", None)
+    if model is None:
+        return None
+    try:
+        from app.infrastructure.llm.agents.search_agent import LangGraphSearchAgent
+
+        _search_agent = LangGraphSearchAgent(
+            model=model,
+            search_service=get_search_service(),
+            catalog_repo=get_catalog_repository(),
+            model_name=get_llm_settings().model,
+        )
+    except Exception as e:
+        logger.warning(f"Search agent unavailable: {e}")
+        _search_agent = None
+    return _search_agent
+
+
 def get_search_service() -> SearchService:
     """Provide the Search Service with all dependencies wired."""
     global _search_service
@@ -167,6 +200,7 @@ def reset_dependencies() -> None:
     global _catalog_repository, _bm25_repository, _embeddings_store
     global _vector_repository, _search_service
     global _llm_settings, _llm_client, _llm_initialized
+    global _search_agent, _agent_initialized
 
     _catalog_repository = None
     _bm25_repository = None
@@ -176,3 +210,5 @@ def reset_dependencies() -> None:
     _llm_settings = None
     _llm_client = None
     _llm_initialized = False
+    _search_agent = None
+    _agent_initialized = False

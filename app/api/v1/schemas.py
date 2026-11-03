@@ -217,3 +217,40 @@ class SimilarBooksResponse(BaseModel):
     """Books similar to a given book (item-to-item vector similarity)."""
     book_id: UUID = Field(description="The book the recommendations are for")
     results: list[SearchResult] = Field(description="Similar books, most similar first")
+
+
+# ---------------------------------------------------------------------------
+# Agentic search (Phase 4)
+# ---------------------------------------------------------------------------
+
+
+class AgentAskRequest(BaseModel):
+    """Request body for POST /agent/ask."""
+    question: str = Field(min_length=3, max_length=500, description="Book request in natural language")
+
+
+class AgentStep(BaseModel):
+    """One tool call made by the agent."""
+    tool: str
+    arguments: dict
+    result_count: int = Field(ge=0, description="Books returned by the tool")
+
+
+class AgentRecommendation(BaseModel):
+    """A recommended book (always one returned by a tool) and the agent's reason."""
+    book: Book
+    reason: str
+
+
+class AgentAskResponse(BaseModel):
+    """Answer of the agentic search with its verified recommendations and trace."""
+    question: str
+    answer: str
+    recommendations: list[AgentRecommendation]
+    steps: list[AgentStep] = Field(description="Tool calls in order (ReAct trace)")
+    model: str
+    dropped_recommendations: int = Field(
+        ge=0, description="Recommendations removed because no tool had returned that book"
+    )
+    reflections: int = Field(ge=0, description="Re-searches after a failed verification")
+    latency_ms: float

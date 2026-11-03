@@ -402,3 +402,54 @@ class Explanation:
 
         return self.text[: max_length - 3].strip() + "..."
 
+
+
+# =============================================================================
+# Agentic search results (Phase 4: tool use / ReAct)
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class AgentStep:
+    """One tool call made by the search agent (for transparency and evaluation)."""
+
+    tool: str
+    """Name of the tool the agent called (e.g. 'search_books')"""
+
+    arguments: dict
+    """Arguments the agent passed to the tool"""
+
+    result_count: int
+    """How many books the tool returned (0 on error)"""
+
+
+@dataclass(frozen=True)
+class AgentRecommendation:
+    """A book recommended by the agent, with the agent's reason."""
+
+    book: Book
+    """The recommended book (always one returned by a tool call)"""
+
+    reason: str
+    """Why the agent recommends it for the question"""
+
+
+@dataclass(frozen=True)
+class AgentAnswer:
+    """
+    Result of an agentic search: answer, verified recommendations and trace.
+
+    Every recommendation refers to a book that a tool actually returned during
+    the run; recommendations the LLM invented are dropped and counted.
+    """
+
+    question: str
+    answer: str
+    recommendations: List[AgentRecommendation]
+    steps: List[AgentStep]
+    model: str
+    dropped_recommendations: int = 0
+    """Recommendations removed because no tool had returned that book"""
+
+    reflections: int = 0
+    """Times the agent was sent back to search after a failed verification"""
