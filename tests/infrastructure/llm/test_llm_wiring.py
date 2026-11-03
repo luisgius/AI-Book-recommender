@@ -171,15 +171,16 @@ class TestSanitizeFilters:
         assert self.client._sanitize_filters(extracted(language="Spanish"), query).language is None
 
     @pytest.mark.parametrize("query", [
-        "libros de python en español", "novelas españolas", "Spanish novels", "libros en castellano",
+        "libros de python en español", "novels in Spanish", "libros en castellano",
     ])
-    def test_language_kept_when_the_query_names_it(self, query):
+    def test_language_kept_when_the_query_asks_for_it(self, query):
         assert self.client._sanitize_filters(extracted(language="es"), query).language == "es"
 
     @pytest.mark.parametrize("query", [
         "libros para aprender machine learning con python", "recetas de cocina rumana",
+        "novelas españolas", "cocina española",
     ])
-    def test_language_dropped_when_only_inferred_from_the_query_wording(self, query):
+    def test_language_dropped_when_only_inferred_from_wording_or_nationality(self, query):
         assert self.client._sanitize_filters(extracted(language="es"), query).language is None
 
     def test_category_must_be_able_to_match_the_catalog(self):
@@ -194,11 +195,13 @@ class TestSanitizeFilters:
         client, _ = build_client(apply_extracted_category=True)
         assert client._sanitize_filters(extracted(category="History")).category == "History"
 
-    def test_years_must_be_plausible_and_ordered(self):
-        assert self.client._sanitize_filters(extracted(min_year=1950)).min_year == 1950
-        assert self.client._sanitize_filters(extracted(min_year=50)).min_year is None
-        inverted = self.client._sanitize_filters(extracted(min_year=2000, max_year=1990))
+    def test_years_must_be_plausible_ordered_and_stated(self):
+        query = "novelas de 1950 a 2000"
+        assert self.client._sanitize_filters(extracted(min_year=1950), query).min_year == 1950
+        assert self.client._sanitize_filters(extracted(min_year=50), query).min_year is None
+        inverted = self.client._sanitize_filters(extracted(min_year=2000, max_year=1990), query)
         assert (inverted.min_year, inverted.max_year) == (None, None)
+        assert self.client._sanitize_filters(extracted(min_year=1800), "novela del siglo XIX").min_year is None
 
     def test_result_is_a_valid_domain_value_object(self):
         filters = self.client._sanitize_filters(extracted(language="spa", category="History", min_year=3000))

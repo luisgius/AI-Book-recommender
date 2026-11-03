@@ -5,7 +5,6 @@ LangChain implementation of the LLMClient port.
 import logging
 import time
 import random
-import unicodedata
 
 import httpx
 from datetime import datetime, UTC
@@ -18,6 +17,7 @@ from app.domain.entities import Book, Explanation
 from app.domain.value_objects import QueryIntent, SearchFilters
 
 from .chains import create_grounded_explanation_chain, create_llm_judge_chain
+from .filter_guards import guard_filters
 from .guardrails import validate_grounded_explanation
 from .schemas import GroundedExplanationLLM
 from .schemas_judge import ExplanationJudgmentLLM
@@ -43,24 +43,6 @@ NON_RETRYABLE_ERRORS = (ConnectionError, ValueError, TimeoutError, httpx.Timeout
 MIN_PLAUSIBLE_YEAR = 1000
 MAX_PLAUSIBLE_YEAR = 2100
 
-# Words (accent-folded stems) that must appear in a query for an extracted
-# language filter to be kept. LLMs tend to infer the filter from the language
-# the query is WRITTEN in ("libros de python" -> es), which is not a request.
-LANGUAGE_MENTIONS = {
-    "es": ("espanol", "castellan", "spanish"),
-    "en": ("ingles", "english"),
-    "ca": ("catalan", "valencian"),
-    "fr": ("frances", "french"),
-    "de": ("aleman", "german"),
-    "it": ("italian",),
-    "pt": ("portugu",),
-}
-
-
-def _fold(text: str) -> str:
-    """Lowercase and strip accents, for accent-insensitive matching."""
-    decomposed = unicodedata.normalize("NFKD", text.lower())
-    return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
 
 
 class LangChainLLMClient(LLMClient):
@@ -447,14 +429,14 @@ class LangChainLLMClient(LLMClient):
         LLM output is a suggestion, not a fact, so each value is checked
         deterministically before it can restrict the results:
         - language: kept only if it is a 2-letter ISO 639-1 code AND the query
-          mentions that language ("en español", "in English", "novelas
-          españolas"). Writing a query in Spanish is not a request for
-          Spanish books.
+          explicitly asks for it ("en español", "in English"); see
+          filter_guards.py. A nationality ("cocina española") is not a
+          language request.
         - category: not applied unless apply_extracted_category is set; then
           kept only if it can match a catalog category (same case-insensitive
           substring rule as Book.matches_filters).
-        - years: kept only within a plausible range; an inverted range is
-          dropped entirely.
+        - years: kept only within a plausible range, only if the query states
+          a year ("1950", "90s"), and an inverted range is dropped entirely.
 
         Args:
             filters_llm: ExtractedFiltersLLM produced by the LangGraph flow
@@ -468,9 +450,6 @@ class LangChainLLMClient(LLMClient):
             language = language.strip().lower()
             if len(language) != 2 or not language.isalpha():
                 logger.info(f"Dropping extracted language '{filters_llm.language}' (not ISO 639-1)")
-                language = None
-            elif not self._query_mentions_language(query_text, language):
-                logger.info(f"Dropping extracted language '{language}' (not mentioned in the query)")
                 language = None
 
         category = filters_llm.category
@@ -494,18 +473,16 @@ class LangChainLLMClient(LLMClient):
             logger.info(f"Dropping inverted year range {min_year}-{max_year}")
             min_year = max_year = None
 
-        return SearchFilters(
+        validated = SearchFilters(
             language=language,
             category=category,
             min_year=min_year,
             max_year=max_year,
         )
-
-    @staticmethod
-    def _query_mentions_language(query_text: str, language: str) -> bool:
-        """True if the query names the language (accent-insensitive stems)."""
-        folded = _fold(query_text)
-        return any(stem in folded for stem in LANGUAGE_MENTIONS.get(language, ()))
+        guarded = guard_filters(validated, query_text)
+        if guarded != validated:
+            logger.info(f"Filters not stated in the query dropped: {validated} -> {guarded}")
+        return guarded
 
     def _create_fallback_query_intent(self, query_text: str) -> QueryIntent:
         """

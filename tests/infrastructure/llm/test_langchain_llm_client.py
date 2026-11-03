@@ -453,7 +453,7 @@ class TestInternalMethods:
         )
 
         result_dict = {
-            "original_query": "libros de ciencia ficcion recientes en español",
+            "original_query": "libros de ciencia ficcion en español desde 2020",
             "intent": mock_query_intent_llm,
             "filters": partial_filters,
             "reformulated": None,

@@ -119,3 +119,11 @@ def mock_reformulated_query() -> ReformulatedQueryLLM:
         optimized_query="software development programming best practices",
         keywords=["software", "development", "programming"]
     )
+
+
+@pytest.fixture(autouse=True)
+def no_retry_backoff_sleep(monkeypatch):
+    """Retry back-off is real time.sleep in the client; tests should not wait for it."""
+    import app.infrastructure.llm.langchain_llm_client as client_module
+
+    monkeypatch.setattr(client_module.time, "sleep", lambda seconds: None)

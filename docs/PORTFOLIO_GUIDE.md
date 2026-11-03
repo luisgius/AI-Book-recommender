@@ -184,6 +184,20 @@ python -m app.evaluation.evaluation_job \
   --pool-per-mode-limit 50
 ```
 
+### Evaluating the LLM path
+
+```bash
+python -m app.evaluation.llm_path_evaluation --output data/evaluation/results_llm_path.json
+```
+
+The LLM interprets each test query once (intent, filters, reformulation,
+variations); the intents are cached in `data/evaluation/llm_intents_<model>.json`
+so the run is reproducible and resumable. Five variants are then evaluated
+without further LLM calls (`routing_only`, `filters`, `reformulation`,
+`reformulation_multi_query`, `full`) and compared with plain hybrid search
+(`hybrid_rrf`) using a paired permutation test on per-query nDCG@10 with Holm
+correction (`app/evaluation/statistics.py`).
+
 ### Evaluation artifacts (evidence)
 
 - **results_v2.json**: `data/evaluation/results_v2.json`

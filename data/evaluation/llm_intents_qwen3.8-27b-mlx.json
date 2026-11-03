@@ -1,0 +1,794 @@
+{
+  "intents": {
+    "q01": {
+      "intent_type": "exploratory",
+      "original_query": "machine learning python",
+      "reformulated_query": "machine learning python programming tutorial data science",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of two topic keywords ('machine learning' and 'python') without any comparison language (like 'similar to') or specific factual questions (like 'who wrote'), indicating a broad wish",
+      "query_variations": [
+        "machine learning python programming tutorial data science",
+        "AI scikit-learn tensorflow pytorch code"
+      ]
+    },
+    "q02": {
+      "intent_type": "exploratory",
+      "original_query": "Novela historica espana",
+      "reformulated_query": "historical novel Spain Spanish history fiction",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of genre and topic keywords ('historical novel', 'Spain') without referencing a specific book or author for comparison, nor asking a specific factual question. This indicates a user",
+      "query_variations": [
+        "historical novel Spain Spanish history fiction",
+        "historical novel Spain Spanish",
+        "history fiction novela histórica España"
+      ]
+    },
+    "q03": {
+      "intent_type": "exploratory",
+      "original_query": "recetas cocina rumana",
+      "reformulated_query": "recetas cocina rumana gastronomía tradicional Romanian cuisine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'recetas cocina rumana' (Romanian cooking recipes) is a broad topic search without reference to a specific book, author, or factual question, indicating the user wants to discover books on a",
+      "query_variations": [
+        "recetas cocina rumana gastronomía tradicional Romanian cuisine",
+        "recetas cocina rumana gastronomía",
+        "tradicional Romanian cuisine food cooking"
+      ]
+    },
+    "q04": {
+      "intent_type": "exploratory",
+      "original_query": "deep learning neural networks for image recognition",
+      "reformulated_query": "deep learning neural networks image recognition computer vision convolutional neural networks CNN",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('deep learning', 'neural networks', 'image recognition') without any comparison language (like 'similar to') or specific factual questions (like 'who'), ",
+      "query_variations": [
+        "deep learning neural networks image recognition computer vision convolutional neural networks CNN",
+        "deep learning neural networks image recognition computer vision",
+        "CNN convolutional neural networks pattern recognition machine learning"
+      ]
+    },
+    "q05": {
+      "intent_type": "exploratory",
+      "original_query": "introduccion a la inteligencia artificial para principiantes",
+      "reformulated_query": "introducción a la inteligencia artificial para principiantes AI machine learning beginner",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('introduccion a la inteligencia artificial') and a target audience ('para principiantes') without referencing a specific book or author to compare against, indicating a b",
+      "query_variations": [
+        "introducción a la inteligencia artificial para principiantes AI machine learning beginner",
+        "inteligencia artificial AI principiantes beginner",
+        "machine learning fundamentos introducción aprendizaje automático"
+      ]
+    },
+    "q06": {
+      "intent_type": "exploratory",
+      "original_query": "natural language processing with transformers",
+      "reformulated_query": "natural language processing NLP transformers deep learning attention mechanism",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific technical keywords ('natural language processing', 'transformers') without comparison language (like 'similar to') or specific factual questions (like 'who wrote'). It旨在",
+      "query_variations": [
+        "natural language processing NLP transformers deep learning attention mechanism",
+        "natural language processing NLP transformers deep learning",
+        "attention mechanism machine learning AI neural networks"
+      ]
+    },
+    "q07": {
+      "intent_type": "exploratory",
+      "original_query": "algoritmos de aprendizaje automatico sin matematicas avanzadas",
+      "reformulated_query": "machine learning algorithms beginner friendly no advanced mathematics introductory math",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('machine learning algorithms') and a constraint ('without advanced mathematics') to discover books in that category, which fits the definition of exploratory intent rather",
+      "query_variations": [
+        "machine learning algorithms beginner friendly no advanced mathematics introductory math",
+        "machine learning algorithms beginner introductory no advanced math",
+        "aprendizaje automático algoritmos sin matemáticas fundamentals conceptual"
+      ]
+    },
+    "q08": {
+      "intent_type": "exploratory",
+      "original_query": "reinforcement learning robotics applications",
+      "reformulated_query": "reinforcement learning robotics applications autonomous control machine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('reinforcement learning', 'robotics', 'applications') without specific book titles, authors, or comparison language, indicating a desire to discover books within ",
+      "query_variations": [
+        "reinforcement learning robotics applications autonomous control machine",
+        "reinforcement learning robotics applications autonomous control",
+        "machine learning robot control RL automation"
+      ]
+    },
+    "q09": {
+      "intent_type": "exploratory",
+      "original_query": "data science pandas numpy tutorial",
+      "reformulated_query": "data science pandas numpy tutorial programming Python",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('data science', 'pandas', 'numpy') and a format ('tutorial') without referencing a specific book title or author for comparison, nor asking a specific bi",
+      "query_variations": [
+        "data science pandas numpy tutorial programming Python",
+        "data science pandas numpy tutorial",
+        "Python programming data analysis libraries"
+      ]
+    },
+    "q10": {
+      "intent_type": "exploratory",
+      "original_query": "programacion en python para analisis de datos",
+      "reformulated_query": "Python programming data analysis data science pandas numpy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('data analysis') and a subject ('Python programming') without referencing a specific book, author, or using comparison language, indicating a desire to discover books in a",
+      "query_variations": [
+        "Python programming data analysis data science pandas numpy",
+        "Python data analysis data science programming",
+        "pandas numpy machine learning statistics"
+      ]
+    },
+    "q11": {
+      "intent_type": "exploratory",
+      "original_query": "computer vision opencv beginner guide",
+      "reformulated_query": "computer vision OpenCV beginner guide tutorial",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('computer vision', 'opencv') and a category descriptor ('beginner guide') without referencing a specific book or author for comparison, indicating a desire to dis",
+      "query_variations": [
+        "computer vision OpenCV beginner guide tutorial",
+        "computer vision OpenCV beginner guide",
+        "tutorial image processing Python machine learning"
+      ]
+    },
+    "q12": {
+      "intent_type": "exploratory",
+      "original_query": "redes neuronales convolucionales ejemplos practicos",
+      "reformulated_query": "redes neuronales convolucionales CNN ejemplos prácticos aplicaciones convolutional neural networks",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('convolutional neural networks', 'practical examples') without any reference to a specific book, author, or comparison language, indicating a desire to发现",
+      "query_variations": [
+        "redes neuronales convolucionales CNN ejemplos prácticos aplicaciones convolutional neural networks",
+        "redes neuronales convolucionales CNN convolutional neural networks ejemplos prácticos",
+        "aplicaciones machine learning deep learning visión por computador"
+      ]
+    },
+    "q13": {
+      "intent_type": "exploratory",
+      "original_query": "tensorflow keras deep learning projects",
+      "reformulated_query": "TensorFlow Keras deep learning projects practical implementation neural networks machine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific technical keywords ('tensorflow', 'keras', 'deep learning', 'projects') without comparison language or specific questions, indicating a desire to discover books within a",
+      "query_variations": [
+        "TensorFlow Keras deep learning projects practical implementation neural networks machine",
+        "TensorFlow Keras deep learning neural networks",
+        "machine learning Python practical projects implementation"
+      ]
+    },
+    "q14": {
+      "intent_type": "exploratory",
+      "original_query": "GPT large language models explained",
+      "reformulated_query": "GPT large language models LLM explained artificial intelligence",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('GPT large language models') and a format ('explained'), indicating a desire to discover books on this subject rather than seeking specific facts or similar titles to a 'G",
+      "query_variations": [
+        "GPT large language models LLM explained artificial intelligence",
+        "machine learning deep learning NLP transformer OpenAI"
+      ]
+    },
+    "q15": {
+      "intent_type": "exploratory",
+      "original_query": "novela guerra civil espanola",
+      "reformulated_query": "novela guerra civil española Spanish Civil War fiction historical literature",
+      "extracted_filters": {
+        "language": "es",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('novela') and a specific topic ('guerra civil espanola' / Spanish Civil War) without referencing a specific book or author to compare against, indicating a desire to find/",
+      "query_variations": [
+        "novela guerra civil española Spanish Civil War fiction historical literature",
+        "novela guerra civil española Spanish Civil War",
+        "historical fiction war literature Spain 1936-1939"
+      ]
+    },
+    "q16": {
+      "intent_type": "exploratory",
+      "original_query": "historical fiction medieval Europe kings and queens",
+      "reformulated_query": "historical fiction medieval Europe kings queens royalty monarchy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('historical fiction', 'medieval Europe', 'kings and queens') without referencing a specific book or author for comparison, nor asking a specific factual question.",
+      "query_variations": [
+        "historical fiction medieval Europe kings queens royalty monarchy",
+        "historical fiction medieval Europe kings",
+        "queens royalty monarchy medieval history"
+      ]
+    },
+    "q17": {
+      "intent_type": "exploratory",
+      "original_query": "literatura espanola siglo XIX realismo",
+      "reformulated_query": "literatura española siglo XIX realismo novela realista Benedicto Pérez Galdós",
+      "extracted_filters": {
+        "language": "es",
+        "category": null,
+        "min_year": 1800,
+        "max_year": 1899
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a broad literary category (Spanish literature), a time period (19th century), and a genre (realism) without referencing a specific book or author for comparison, indicating a wishy",
+      "query_variations": [
+        "literatura española siglo XIX realismo novela realista Benedicto Pérez Galdós",
+        "literatura española siglo XIX realismo novela realista",
+        "Benedicto Pérez Galdós Leopoldo Alas Clarín español 19th century realism"
+      ]
+    },
+    "q18": {
+      "intent_type": "exploratory",
+      "original_query": "Spanish civil war novels in English translation",
+      "reformulated_query": "Spanish Civil War novels English translation historical fiction literature",
+      "extracted_filters": {
+        "language": "en",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('Spanish civil war') and a format constraint ('novels in English translation') without referencing a specific book or author to compare against, indicating a desire to see",
+      "query_variations": [
+        "Spanish Civil War novels English translation historical fiction literature",
+        "Spanish Civil War novels English translation",
+        "historical fiction war literature Spain 1936-1939"
+      ]
+    },
+    "q19": {
+      "intent_type": "exploratory",
+      "original_query": "novelas sobre la inquisicion espanola",
+      "reformulated_query": "novelas inquisición española historia ficción histórica España",
+      "extracted_filters": {
+        "language": "es",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'novelas sobre la inquisicion espanola' (novels about the Spanish Inquisition) uses the keyword 'sobre' (about) to specify a topic, indicating a desire to discover books within a specific题材/",
+      "query_variations": [
+        "novelas inquisición española historia ficción histórica España",
+        "novelas inquisición española historia ficción histórica",
+        "España religión siglo XVI siglo XVII"
+      ]
+    },
+    "q20": {
+      "intent_type": "exploratory",
+      "original_query": "roman empire historical novels",
+      "reformulated_query": "Roman Empire historical fiction ancient Rome history novels",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a broad topic ('roman empire') and a genre ('historical novels') without referencing a specific book or author for comparison, indicating a desire to discover books within that sub",
+      "query_variations": [
+        "Roman Empire historical fiction ancient Rome history novels",
+        "Roman Empire historical fiction",
+        "ancient Rome history novels"
+      ]
+    },
+    "q21": {
+      "intent_type": "exploratory",
+      "original_query": "ficcion historica conquista de america",
+      "reformulated_query": "historical fiction conquest of America colonization Spanish Empire Columbus",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('fiction historica') and a topic ('conquista de america') without referencing a specific book or author to compare against, indicating a desire to discover books within a ",
+      "query_variations": [
+        "historical fiction conquest of America colonization Spanish Empire Columbus",
+        "historical fiction conquest of America colonization Spanish Empire",
+        "Columbus pre-Columbian history narrative non-fiction"
+      ]
+    },
+    "q22": {
+      "intent_type": "exploratory",
+      "original_query": "Victorian era mystery novels detective stories",
+      "reformulated_query": "Victorian era mystery detective fiction crime historical",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": 1837,
+        "max_year": 1901
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Victorian era', 'mystery', 'detective stories') without referencing a specific book or author for comparison, nor asking a specific factual question. It is a b",
+      "query_variations": [
+        "Victorian era mystery detective fiction crime historical",
+        "Victorian era mystery detective",
+        "crime historical fiction police procedural 19th century"
+      ]
+    },
+    "q23": {
+      "intent_type": "exploratory",
+      "original_query": "novelas ambientadas en el Camino de Santiago",
+      "reformulated_query": "novelas Camino de Santiago peregrinación literatura española ficción",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('novelas') and a specific setting/topic ('Camino de Santiago') without referencing a specific book or author to compare against, indicating a desire to discover works in a",
+      "query_variations": [
+        "novelas Camino de Santiago peregrinación literatura española ficción",
+        "Camino de Santiago novelas peregrinación",
+        "literatura española ficción viaje espiritualidad"
+      ]
+    },
+    "q24": {
+      "intent_type": "exploratory",
+      "original_query": "World War II fiction resistance fighters",
+      "reformulated_query": "World War II fiction resistance fighters WWII historical fiction espionage",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('World War II', 'resistance fighters') and a genre ('fiction') without referencing a specific book or author for comparison, nor asking a specific factual 'who/wh",
+      "query_variations": [
+        "World War II fiction resistance fighters WWII historical fiction espionage",
+        "World War II WWII resistance fighters historical fiction",
+        "espionage war military partisans"
+      ]
+    },
+    "q25": {
+      "intent_type": "exploratory",
+      "original_query": "recetas tradicionales cocina mediterranea",
+      "reformulated_query": "recetas tradicionales cocina mediterránea español italiano griego dieta española italiana",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('traditional recipes', 'Mediterranean cuisine') without any comparison language or specific questions, indicating a desire to discover books within this category.",
+      "query_variations": [
+        "recetas tradicionales cocina mediterránea español italiano griego dieta española italiana",
+        "recetas tradicionales cocina mediterránea dieta mediterránea cocina española",
+        "cocina italiana cocina griega libro de cocina recetario"
+      ]
+    },
+    "q26": {
+      "intent_type": "exploratory",
+      "original_query": "vegetarian cookbook healthy meals no meat",
+      "reformulated_query": "vegetarian cookbook healthy meals no meat plant-based",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('vegetarian', 'healthy meals', 'no meat') without referencing a specific book or author, nor asking a specific factual question. It indicates a desire to discover",
+      "query_variations": [
+        "vegetarian cookbook healthy meals no meat plant-based",
+        "vegetarian cookbook healthy meals",
+        "no meat plant-based cuisine recipes"
+      ]
+    },
+    "q27": {
+      "intent_type": "exploratory",
+      "original_query": "postres caseros faciles sin horno",
+      "reformulated_query": "postres caseros fáciles sin horno recetas rápidas",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query is a topic-based search for 'easy homemade desserts without an oven' (in Spanish), which fits the pattern of discovering books on a specific subject or category without referencing a similar",
+      "query_variations": [
+        "postres caseros fáciles sin horno recetas rápidas",
+        "postres caseros fáciles sin horno",
+        "recetas cocina dulces rápidas"
+      ]
+    },
+    "q28": {
+      "intent_type": "exploratory",
+      "original_query": "Italian pasta recipes homemade sauce",
+      "reformulated_query": "Italian pasta recipes homemade sauce cooking",
+      "extracted_filters": {
+        "language": "it",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Italian pasta', 'homemade sauce') without any comparison language or specific questions, indicating a desire to discover books within this specific category.",
+      "query_variations": [
+        "Italian pasta recipes homemade sauce cooking",
+        "Italian pasta recipes homemade",
+        "sauce cooking cuisine Italian food"
+      ]
+    },
+    "q29": {
+      "intent_type": "exploratory",
+      "original_query": "cocina espanola tapas y pinchos",
+      "reformulated_query": "Spanish cuisine tapas pinchos recipes food",
+      "extracted_filters": {
+        "language": "es",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('Spanish cooking', 'tapas', 'pinchos') without any comparison language (like 'similar to') or specific factual questions (like 'who wrote'), indicating a",
+      "query_variations": [
+        "Spanish cuisine tapas pinchos recipes food",
+        "Spanish cuisine tapas pinchos",
+        "Spanish food recipes cooking español"
+      ]
+    },
+    "q30": {
+      "intent_type": "exploratory",
+      "original_query": "baking bread sourdough beginner friendly",
+      "reformulated_query": "sourdough bread baking beginner guide easy recipes home",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('baking bread', 'sourdough') and a specific constraint ('beginner friendly') without referencing a specific book or author to compare against, nor asking a direct",
+      "query_variations": [
+        "sourdough bread baking beginner guide easy recipes home",
+        "sourdough bread baking beginner",
+        "easy recipes home baking starter no-knead"
+      ]
+    },
+    "q31": {
+      "intent_type": "exploratory",
+      "original_query": "recetas de mariscos y pescados frescos",
+      "reformulated_query": "recetas mariscos pescados frescos cocina marítima",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query is a topic-based search for a specific category of books (recipes for seafood and fresh fish) without referencing a specific title, author, or asking for factual details, which aligns with '",
+      "query_variations": [
+        "recetas mariscos pescados frescos cocina marítima",
+        "recetas mariscos pescados frescos",
+        "cocina marítima seafood fish shellfish culinary"
+      ]
+    },
+    "q32": {
+      "intent_type": "exploratory",
+      "original_query": "Asian cuisine wok stir fry techniques",
+      "reformulated_query": "Asian cuisine wok stir fry techniques cooking methods Chinese",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Asian cuisine', 'wok', 'stir fry techniques') without any comparison language or specific questions, indicating a desire to discover books within this specific题材",
+      "query_variations": [
+        "Asian cuisine wok stir fry techniques cooking methods Chinese",
+        "Asian cuisine wok stir fry",
+        "cooking techniques Chinese cooking high heat quick cooking"
+      ]
+    },
+    "q33": {
+      "intent_type": "exploratory",
+      "original_query": "comida mexicana autentica tacos enchiladas",
+      "reformulated_query": "authentic Mexican food tacos enchiladas traditional recipes",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('comida mexicana', 'tacos', 'enchiladas') without specific book titles, authors, or comparison language, indicating a desire to discover books on this subject.",
+      "query_variations": [
+        "authentic Mexican food tacos enchiladas traditional recipes",
+        "Mexican food authentic tacos enchiladas",
+        "traditional cuisine recipes Mexican cuisine"
+      ]
+    },
+    "q34": {
+      "intent_type": "exploratory",
+      "original_query": "French pastry desserts professional techniques",
+      "reformulated_query": "French pastry desserts professional techniques patisserie baking methods",
+      "extracted_filters": {
+        "language": "fr",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('French pastry', 'desserts', 'professional techniques') without any reference to a specific book, author, or comparison language, indicating a desire to ",
+      "query_variations": [
+        "French pastry desserts professional techniques patisserie baking methods",
+        "French pastry desserts professional techniques",
+        "patisserie baking culinary arts confectionery"
+      ]
+    },
+    "q35": {
+      "intent_type": "exploratory",
+      "original_query": "python",
+      "reformulated_query": "python programming language code software development",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword representing a topic/subject. According to the guidelines, very short queries (1-2 words) are usually classified as exploratory, indicating the user wants to discover or ",
+      "query_variations": [
+        "python programming language code software development",
+        "python programming",
+        "language code software development"
+      ]
+    },
+    "q36": {
+      "intent_type": "exploratory",
+      "original_query": "historia",
+      "reformulated_query": "historical fiction history historia non-fiction biography",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single word ('historia', meaning history in Spanish/Italian) which acts as a broad topic keyword. According to the guidelines, very short queries are usually exploratory, and this fits,",
+      "query_variations": [
+        "historical fiction history historia non-fiction biography",
+        "historical fiction history",
+        "historia non-fiction biography"
+      ]
+    },
+    "q37": {
+      "intent_type": "exploratory",
+      "original_query": "recetas faciles",
+      "reformulated_query": "recetas fáciles cocina sencilla paso a paso rápidas comida casera",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'recetas faciles' (easy recipes) is a broad topic search without reference to a specific book, author, or factual question, indicating the user wants to discover books within this category.",
+      "query_variations": [
+        "recetas fáciles cocina sencilla paso a paso rápidas comida casera",
+        "recetas fáciles cocina sencilla",
+        "recetas rápidas paso a paso comida casera"
+      ]
+    },
+    "q38": {
+      "intent_type": "exploratory",
+      "original_query": "java",
+      "reformulated_query": "Java programming language JVM software development",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword ('java'), which according to the guidelines for short queries (1-2 words) is typically classified as exploratory, indicating a broad search for books on the topic of Java",
+      "query_variations": [
+        "Java programming language JVM software development",
+        "Java programming",
+        "language JVM software development"
+      ]
+    },
+    "q39": {
+      "intent_type": "exploratory",
+      "original_query": "apple",
+      "reformulated_query": "apple fruit Inc technology iPhone",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.6,
+      "reasoning": "The query is a single word, which typically indicates a broad search for books related to that keyword (e.g., the company Apple, the fruit, or a specific title). Without additional context like 'like'",
+      "query_variations": [
+        "apple fruit Inc technology iPhone",
+        "apple fruit Apple Inc technology",
+        "iPhone Mac Steve Jobs biography history"
+      ]
+    },
+    "q40": {
+      "intent_type": "exploratory",
+      "original_query": "networks",
+      "reformulated_query": "networks computer networking social networks neural graph theory",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword ('networks') without specific book titles, authors, or comparative language, indicating a broad search for books on this topic rather than a specific fact or similarity.",
+      "query_variations": [
+        "networks computer networking social networks neural graph theory",
+        "networks computer networking social networks",
+        "neural networks graph theory connectivity infrastructure"
+      ]
+    },
+    "q41": {
+      "intent_type": "exploratory",
+      "original_query": "learning",
+      "reformulated_query": "learning education study skills pedagogy cognitive science",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single broad topic keyword without specific book titles, authors, or comparative language, indicating a desire to discover books within that general category.",
+      "query_variations": [
+        "learning education study skills pedagogy cognitive science",
+        "learning education",
+        "study pedagogy cognitive science"
+      ]
+    },
+    "q42": {
+      "intent_type": "exploratory",
+      "original_query": "cocina moderna",
+      "reformulated_query": "modern cooking contemporary cuisine recipes culinary arts gastronomy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a short topic-based search ('modern cooking') without specific book titles, authors, or comparison language, indicating a desire to discover books within this category.",
+      "query_variations": [
+        "modern cooking contemporary cuisine recipes culinary arts gastronomy",
+        "modern cooking contemporary cuisine",
+        "recipes culinary arts gastronomy"
+      ]
+    },
+    "q43": {
+      "intent_type": "exploratory",
+      "original_query": "classic",
+      "reformulated_query": "classic literature timeless bestsellers canonical",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single word representing a broad genre or category. According to the guidelines, very short queries (1-2 words) are usually classified as exploratory, indicating a desire to discover or",
+      "query_variations": [
+        "classic literature timeless bestsellers canonical",
+        "classic literature timeless",
+        "bestsellers canonical old heritage"
+      ]
+    },
+    "q44": {
+      "intent_type": "exploratory",
+      "original_query": "guerra",
+      "reformulated_query": "guerra war conflict battle military history fiction",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.8,
+      "reasoning": "The query is a single word ('guerra', meaning 'war' in Spanish/Portuguese), which fits the criteria for a very short query indicating a broad topic search rather than a specific factual question or a ",
+      "query_variations": [
+        "guerra war conflict battle military history fiction",
+        "guerra war conflict battle",
+        "military history fiction strategy"
+      ]
+    }
+  }
+}

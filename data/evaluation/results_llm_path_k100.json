@@ -1,0 +1,1430 @@
+{
+  "modes": {
+    "hybrid_rrf": {
+      "ndcg_at_5": 0.5103533509396315,
+      "ndcg_at_10": 0.542375475274384,
+      "ndcg_at_20": 0.6066687872882988,
+      "recall_at_10": 0.5307041484480922,
+      "recall_at_20": 0.7455415144024549,
+      "recall_at_100": 0.9090909090909091,
+      "precision_at_5": 0.5227272727272725,
+      "precision_at_10": 0.425,
+      "mrr": 0.68000333000333,
+      "ild_at_10": 0.8938257575757574,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.9010077751196172,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.5431818181818181
+    },
+    "routing_only": {
+      "ndcg_at_5": 0.3685621009954408,
+      "ndcg_at_10": 0.4422873568853749,
+      "ndcg_at_20": 0.5273501851436525,
+      "recall_at_10": 0.43219561829430525,
+      "recall_at_20": 0.6771555606532838,
+      "recall_at_100": 0.9083333333333333,
+      "precision_at_5": 0.35454545454545444,
+      "precision_at_10": 0.3409090909090908,
+      "mrr": 0.6913690476190475,
+      "ild_at_10": 0.9373106060606059,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.9299372009569379,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.475
+    },
+    "filters": {
+      "ndcg_at_5": 0.3685621009954408,
+      "ndcg_at_10": 0.43552160200202455,
+      "ndcg_at_20": 0.5205844302603021,
+      "recall_at_10": 0.41704410314279006,
+      "recall_at_20": 0.6620040455017686,
+      "recall_at_100": 0.8856060606060606,
+      "precision_at_5": 0.35454545454545444,
+      "precision_at_10": 0.33636363636363625,
+      "mrr": 0.6881222943722943,
+      "ild_at_10": 0.9388257575757575,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.929040071770335,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.47045454545454546
+    },
+    "reformulation": {
+      "ndcg_at_5": 0.3783507729053756,
+      "ndcg_at_10": 0.44621840542363417,
+      "ndcg_at_20": 0.5159942069383248,
+      "recall_at_10": 0.43286719291888515,
+      "recall_at_20": 0.6601748477784976,
+      "recall_at_100": 0.8968954248366013,
+      "precision_at_5": 0.3454545454545453,
+      "precision_at_10": 0.33181818181818173,
+      "mrr": 0.711055611055611,
+      "ild_at_10": 0.9093434343434343,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.9161782296650717,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.41818181818181815
+    },
+    "reformulation_multi_query": {
+      "ndcg_at_5": 0.34774032060410137,
+      "ndcg_at_10": 0.4229873124676514,
+      "ndcg_at_20": 0.49205470938182966,
+      "recall_at_10": 0.42764812870917907,
+      "recall_at_20": 0.6628754527743035,
+      "recall_at_100": 0.89969516133199,
+      "precision_at_5": 0.35454545454545444,
+      "precision_at_10": 0.318181818181818,
+      "mrr": 0.7065295815295816,
+      "ild_at_10": 0.9258838383838381,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.9206190191387559,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.3977272727272727
+    },
+    "full": {
+      "ndcg_at_5": 0.3370748950126751,
+      "ndcg_at_10": 0.40911127385668367,
+      "ndcg_at_20": 0.47566793452179146,
+      "recall_at_10": 0.412496613557664,
+      "recall_at_20": 0.6401481800470307,
+      "recall_at_100": 0.8769678886047173,
+      "precision_at_5": 0.3499999999999999,
+      "precision_at_10": 0.3136363636363635,
+      "mrr": 0.6838023088023089,
+      "ild_at_10": 0.9236111111111108,
+      "ild_coverage_at_10": 1.0,
+      "ild_at_20": 0.9164324162679425,
+      "ild_coverage_at_20": 1.0,
+      "judged_at_10": 0.3931818181818182
+    }
+  },
+  "significance_vs_baseline": {
+    "routing_only": {
+      "metric": "ndcg_at_10",
+      "mean_difference": -0.10008811838900926,
+      "p_value": 0.00019998000199980003,
+      "p_value_holm": 0.000999900009999
+    },
+    "filters": {
+      "metric": "ndcg_at_10",
+      "mean_difference": -0.1068538732723596,
+      "p_value": 0.00019998000199980003,
+      "p_value_holm": 0.000999900009999
+    },
+    "reformulation": {
+      "metric": "ndcg_at_10",
+      "mean_difference": -0.0961570698507501,
+      "p_value": 0.0552944705529447,
+      "p_value_holm": 0.0552944705529447
+    },
+    "reformulation_multi_query": {
+      "metric": "ndcg_at_10",
+      "mean_difference": -0.11938816280673269,
+      "p_value": 0.012098790120987902,
+      "p_value_holm": 0.024197580241975804
+    },
+    "full": {
+      "metric": "ndcg_at_10",
+      "mean_difference": -0.13326420141770054,
+      "p_value": 0.0053994600539946005,
+      "p_value_holm": 0.0161983801619838
+    }
+  },
+  "per_query": [
+    {
+      "query_id": "q01",
+      "text": "machine learning python",
+      "intent_type": "exploratory",
+      "original_query": "machine learning python",
+      "reformulated_query": "machine learning python programming tutorial data science",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of two topic keywords ('machine learning' and 'python') without any comparison language (like 'similar to') or specific factual questions (like 'who wrote'), indicating a broad wish",
+      "query_variations": [
+        "machine learning python programming tutorial data science",
+        "AI scikit-learn tensorflow pytorch code"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.38611457389898773,
+        "routing_only": 0.46807606597836554,
+        "filters": 0.46807606597836554,
+        "reformulation": 0.27541155237618664,
+        "reformulation_multi_query": 0.13770577618809332,
+        "full": 0.13770577618809332
+      }
+    },
+    {
+      "query_id": "q02",
+      "text": "Novela historica espana",
+      "intent_type": "exploratory",
+      "original_query": "Novela historica espana",
+      "reformulated_query": "historical novel Spain Spanish history fiction",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of genre and topic keywords ('historical novel', 'Spain') without referencing a specific book or author for comparison, nor asking a specific factual question. This indicates a user",
+      "query_variations": [
+        "historical novel Spain Spanish history fiction",
+        "historical novel Spain Spanish",
+        "history fiction novela histórica España"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9988238460376512,
+        "routing_only": 0.544791321012455,
+        "filters": 0.544791321012455,
+        "reformulation": 0.5263481163721636,
+        "reformulation_multi_query": 0.3599340022690725,
+        "full": 0.3599340022690725
+      }
+    },
+    {
+      "query_id": "q03",
+      "text": "recetas cocina rumana",
+      "intent_type": "exploratory",
+      "original_query": "recetas cocina rumana",
+      "reformulated_query": "recetas cocina rumana gastronomía tradicional Romanian cuisine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'recetas cocina rumana' (Romanian cooking recipes) is a broad topic search without reference to a specific book, author, or factual question, indicating the user wants to discover books on a",
+      "query_variations": [
+        "recetas cocina rumana gastronomía tradicional Romanian cuisine",
+        "recetas cocina rumana gastronomía",
+        "tradicional Romanian cuisine food cooking"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9899048708410192,
+        "routing_only": 0.7803279611729368,
+        "filters": 0.7803279611729368,
+        "reformulation": 0.8068152439568443,
+        "reformulation_multi_query": 0.7832944821181481,
+        "full": 0.7832944821181481
+      }
+    },
+    {
+      "query_id": "q04",
+      "text": "deep learning neural networks for image recognition",
+      "intent_type": "exploratory",
+      "original_query": "deep learning neural networks for image recognition",
+      "reformulated_query": "deep learning neural networks image recognition computer vision convolutional neural networks CNN",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('deep learning', 'neural networks', 'image recognition') without any comparison language (like 'similar to') or specific factual questions (like 'who'), ",
+      "query_variations": [
+        "deep learning neural networks image recognition computer vision convolutional neural networks CNN",
+        "deep learning neural networks image recognition computer vision",
+        "CNN convolutional neural networks pattern recognition machine learning"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.8159684412709226,
+        "routing_only": 0.9010630846397508,
+        "filters": 0.9010630846397508,
+        "reformulation": 0.903350795506027,
+        "reformulation_multi_query": 0.9142858323267679,
+        "full": 0.9142858323267679
+      }
+    },
+    {
+      "query_id": "q05",
+      "text": "introduccion a la inteligencia artificial para principiantes",
+      "intent_type": "exploratory",
+      "original_query": "introduccion a la inteligencia artificial para principiantes",
+      "reformulated_query": "introducción a la inteligencia artificial para principiantes AI machine learning beginner",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('introduccion a la inteligencia artificial') and a target audience ('para principiantes') without referencing a specific book or author to compare against, indicating a b",
+      "query_variations": [
+        "introducción a la inteligencia artificial para principiantes AI machine learning beginner",
+        "inteligencia artificial AI principiantes beginner",
+        "machine learning fundamentos introducción aprendizaje automático"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.33756154891550133,
+        "routing_only": 0.23790635788541323,
+        "filters": 0.23790635788541323,
+        "reformulation": 0.22585818195796983,
+        "reformulation_multi_query": 0.15776418213852528,
+        "full": 0.15776418213852528
+      }
+    },
+    {
+      "query_id": "q06",
+      "text": "natural language processing with transformers",
+      "intent_type": "exploratory",
+      "original_query": "natural language processing with transformers",
+      "reformulated_query": "natural language processing NLP transformers deep learning attention mechanism",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific technical keywords ('natural language processing', 'transformers') without comparison language (like 'similar to') or specific factual questions (like 'who wrote'). It旨在",
+      "query_variations": [
+        "natural language processing NLP transformers deep learning attention mechanism",
+        "natural language processing NLP transformers deep learning",
+        "attention mechanism machine learning AI neural networks"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 1.0,
+        "routing_only": 0.8482378089219645,
+        "filters": 0.8482378089219645,
+        "reformulation": 0.6578986223737446,
+        "reformulation_multi_query": 0.6929852696575347,
+        "full": 0.6929852696575347
+      }
+    },
+    {
+      "query_id": "q07",
+      "text": "algoritmos de aprendizaje automatico sin matematicas avanzadas",
+      "intent_type": "exploratory",
+      "original_query": "algoritmos de aprendizaje automatico sin matematicas avanzadas",
+      "reformulated_query": "machine learning algorithms beginner friendly no advanced mathematics introductory math",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('machine learning algorithms') and a constraint ('without advanced mathematics') to discover books in that category, which fits the definition of exploratory intent rather",
+      "query_variations": [
+        "machine learning algorithms beginner friendly no advanced mathematics introductory math",
+        "machine learning algorithms beginner introductory no advanced math",
+        "aprendizaje automático algoritmos sin matemáticas fundamentals conceptual"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.059730953196541973,
+        "routing_only": 0.08217832039575346,
+        "filters": 0.08217832039575346,
+        "reformulation": 0.07236086455528765,
+        "reformulation_multi_query": 0.20123811420713905,
+        "full": 0.20123811420713905
+      }
+    },
+    {
+      "query_id": "q08",
+      "text": "reinforcement learning robotics applications",
+      "intent_type": "exploratory",
+      "original_query": "reinforcement learning robotics applications",
+      "reformulated_query": "reinforcement learning robotics applications autonomous control machine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('reinforcement learning', 'robotics', 'applications') without specific book titles, authors, or comparison language, indicating a desire to discover books within ",
+      "query_variations": [
+        "reinforcement learning robotics applications autonomous control machine",
+        "reinforcement learning robotics applications autonomous control",
+        "machine learning robot control RL automation"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9053817946501617,
+        "routing_only": 0.7993890283376698,
+        "filters": 0.7993890283376698,
+        "reformulation": 0.7785427651803156,
+        "reformulation_multi_query": 0.7793713506120125,
+        "full": 0.7793713506120125
+      }
+    },
+    {
+      "query_id": "q09",
+      "text": "data science pandas numpy tutorial",
+      "intent_type": "exploratory",
+      "original_query": "data science pandas numpy tutorial",
+      "reformulated_query": "data science pandas numpy tutorial programming Python",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('data science', 'pandas', 'numpy') and a format ('tutorial') without referencing a specific book title or author for comparison, nor asking a specific bi",
+      "query_variations": [
+        "data science pandas numpy tutorial programming Python",
+        "data science pandas numpy tutorial",
+        "Python programming data analysis libraries"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.4362858798766656,
+        "routing_only": 0.47915176369471424,
+        "filters": 0.47915176369471424,
+        "reformulation": 0.425885213916003,
+        "reformulation_multi_query": 0.5389685498185901,
+        "full": 0.5389685498185901
+      }
+    },
+    {
+      "query_id": "q10",
+      "text": "programacion en python para analisis de datos",
+      "intent_type": "exploratory",
+      "original_query": "programacion en python para analisis de datos",
+      "reformulated_query": "Python programming data analysis data science pandas numpy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('data analysis') and a subject ('Python programming') without referencing a specific book, author, or using comparison language, indicating a desire to discover books in a",
+      "query_variations": [
+        "Python programming data analysis data science pandas numpy",
+        "Python data analysis data science programming",
+        "pandas numpy machine learning statistics"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.5767294990961203,
+        "routing_only": 0.3697103879993524,
+        "filters": 0.3697103879993524,
+        "reformulation": 0.3748302166635238,
+        "reformulation_multi_query": 0.4443589303414189,
+        "full": 0.4443589303414189
+      }
+    },
+    {
+      "query_id": "q11",
+      "text": "computer vision opencv beginner guide",
+      "intent_type": "exploratory",
+      "original_query": "computer vision opencv beginner guide",
+      "reformulated_query": "computer vision OpenCV beginner guide tutorial",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('computer vision', 'opencv') and a category descriptor ('beginner guide') without referencing a specific book or author for comparison, indicating a desire to dis",
+      "query_variations": [
+        "computer vision OpenCV beginner guide tutorial",
+        "computer vision OpenCV beginner guide",
+        "tutorial image processing Python machine learning"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.7357912562331818,
+        "routing_only": 0.7192996893952838,
+        "filters": 0.7192996893952838,
+        "reformulation": 0.576407899690421,
+        "reformulation_multi_query": 0.7339292457832188,
+        "full": 0.7339292457832188
+      }
+    },
+    {
+      "query_id": "q12",
+      "text": "redes neuronales convolucionales ejemplos practicos",
+      "intent_type": "exploratory",
+      "original_query": "redes neuronales convolucionales ejemplos practicos",
+      "reformulated_query": "redes neuronales convolucionales CNN ejemplos prácticos aplicaciones convolutional neural networks",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('convolutional neural networks', 'practical examples') without any reference to a specific book, author, or comparison language, indicating a desire to发现",
+      "query_variations": [
+        "redes neuronales convolucionales CNN ejemplos prácticos aplicaciones convolutional neural networks",
+        "redes neuronales convolucionales CNN convolutional neural networks ejemplos prácticos",
+        "aplicaciones machine learning deep learning visión por computador"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.2538259261804864,
+        "filters": 0.2538259261804864,
+        "reformulation": 0.8735302447051209,
+        "reformulation_multi_query": 0.3562897316043093,
+        "full": 0.3562897316043093
+      }
+    },
+    {
+      "query_id": "q13",
+      "text": "tensorflow keras deep learning projects",
+      "intent_type": "exploratory",
+      "original_query": "tensorflow keras deep learning projects",
+      "reformulated_query": "TensorFlow Keras deep learning projects practical implementation neural networks machine",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific technical keywords ('tensorflow', 'keras', 'deep learning', 'projects') without comparison language or specific questions, indicating a desire to discover books within a",
+      "query_variations": [
+        "TensorFlow Keras deep learning projects practical implementation neural networks machine",
+        "TensorFlow Keras deep learning neural networks",
+        "machine learning Python practical projects implementation"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.8284501686271104,
+        "routing_only": 0.7682091250875736,
+        "filters": 0.7682091250875736,
+        "reformulation": 0.8695166673426232,
+        "reformulation_multi_query": 0.7945131186785841,
+        "full": 0.7945131186785841
+      }
+    },
+    {
+      "query_id": "q14",
+      "text": "GPT large language models explained",
+      "intent_type": "exploratory",
+      "original_query": "GPT large language models explained",
+      "reformulated_query": "GPT large language models LLM explained artificial intelligence",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('GPT large language models') and a format ('explained'), indicating a desire to discover books on this subject rather than seeking specific facts or similar titles to a 'G",
+      "query_variations": [
+        "GPT large language models LLM explained artificial intelligence",
+        "machine learning deep learning NLP transformer OpenAI"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.43042149375026456,
+        "routing_only": 0.45184593602045525,
+        "filters": 0.45184593602045525,
+        "reformulation": 0.5900490851534655,
+        "reformulation_multi_query": 0.8512360941594274,
+        "full": 0.8512360941594274
+      }
+    },
+    {
+      "query_id": "q15",
+      "text": "novela guerra civil espanola",
+      "intent_type": "exploratory",
+      "original_query": "novela guerra civil espanola",
+      "reformulated_query": "novela guerra civil española Spanish Civil War fiction historical literature",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('novela') and a specific topic ('guerra civil espanola' / Spanish Civil War) without referencing a specific book or author to compare against, indicating a desire to find/",
+      "query_variations": [
+        "novela guerra civil española Spanish Civil War fiction historical literature",
+        "novela guerra civil española Spanish Civil War",
+        "historical fiction war literature Spain 1936-1939"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.8631945942404273,
+        "routing_only": 0.47769550153444285,
+        "filters": 0.47769550153444285,
+        "reformulation": 0.45854974551521116,
+        "reformulation_multi_query": 0.4524999366257495,
+        "full": 0.4524999366257495
+      }
+    },
+    {
+      "query_id": "q16",
+      "text": "historical fiction medieval Europe kings and queens",
+      "intent_type": "exploratory",
+      "original_query": "historical fiction medieval Europe kings and queens",
+      "reformulated_query": "historical fiction medieval Europe kings queens royalty monarchy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('historical fiction', 'medieval Europe', 'kings and queens') without referencing a specific book or author for comparison, nor asking a specific factual question.",
+      "query_variations": [
+        "historical fiction medieval Europe kings queens royalty monarchy",
+        "historical fiction medieval Europe kings",
+        "queens royalty monarchy medieval history"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.6284498769522006,
+        "routing_only": 0.46806559623682953,
+        "filters": 0.46806559623682953,
+        "reformulation": 0.46367483941983395,
+        "reformulation_multi_query": 0.23721994800876467,
+        "full": 0.23721994800876467
+      }
+    },
+    {
+      "query_id": "q17",
+      "text": "literatura espanola siglo XIX realismo",
+      "intent_type": "exploratory",
+      "original_query": "literatura espanola siglo XIX realismo",
+      "reformulated_query": "literatura española siglo XIX realismo novela realista Benedicto Pérez Galdós",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a broad literary category (Spanish literature), a time period (19th century), and a genre (realism) without referencing a specific book or author for comparison, indicating a wishy",
+      "query_variations": [
+        "literatura española siglo XIX realismo novela realista Benedicto Pérez Galdós",
+        "literatura española siglo XIX realismo novela realista",
+        "Benedicto Pérez Galdós Leopoldo Alas Clarín español 19th century realism"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.7995454912605746,
+        "routing_only": 0.4292865441447741,
+        "filters": 0.4292865441447741,
+        "reformulation": 0.5435710478444354,
+        "reformulation_multi_query": 0.27913249897793946,
+        "full": 0.27913249897793946
+      }
+    },
+    {
+      "query_id": "q18",
+      "text": "Spanish civil war novels in English translation",
+      "intent_type": "exploratory",
+      "original_query": "Spanish civil war novels in English translation",
+      "reformulated_query": "Spanish Civil War novels English translation historical fiction literature",
+      "extracted_filters": {
+        "language": "en",
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a topic ('Spanish civil war') and a format constraint ('novels in English translation') without referencing a specific book or author to compare against, indicating a desire to see",
+      "query_variations": [
+        "Spanish Civil War novels English translation historical fiction literature",
+        "Spanish Civil War novels English translation",
+        "historical fiction war literature Spain 1936-1939"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.38268031849431083,
+        "routing_only": 0.29769321486741446,
+        "filters": 0.0,
+        "reformulation": 0.6713860725233041,
+        "reformulation_multi_query": 0.6105456988825855,
+        "full": 0.0
+      }
+    },
+    {
+      "query_id": "q19",
+      "text": "novelas sobre la inquisicion espanola",
+      "intent_type": "exploratory",
+      "original_query": "novelas sobre la inquisicion espanola",
+      "reformulated_query": "novelas inquisición española historia ficción histórica España",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'novelas sobre la inquisicion espanola' (novels about the Spanish Inquisition) uses the keyword 'sobre' (about) to specify a topic, indicating a desire to discover books within a specific题材/",
+      "query_variations": [
+        "novelas inquisición española historia ficción histórica España",
+        "novelas inquisición española historia ficción histórica",
+        "España religión siglo XVI siglo XVII"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.27250758895711696,
+        "routing_only": 0.36413303326188057,
+        "filters": 0.36413303326188057,
+        "reformulation": 0.5827974955243852,
+        "reformulation_multi_query": 0.3932591258696538,
+        "full": 0.3932591258696538
+      }
+    },
+    {
+      "query_id": "q20",
+      "text": "roman empire historical novels",
+      "intent_type": "exploratory",
+      "original_query": "roman empire historical novels",
+      "reformulated_query": "Roman Empire historical fiction ancient Rome history novels",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a broad topic ('roman empire') and a genre ('historical novels') without referencing a specific book or author for comparison, indicating a desire to discover books within that sub",
+      "query_variations": [
+        "Roman Empire historical fiction ancient Rome history novels",
+        "Roman Empire historical fiction",
+        "ancient Rome history novels"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 1.0,
+        "routing_only": 1.0,
+        "filters": 1.0,
+        "reformulation": 1.0,
+        "reformulation_multi_query": 0.3562071871080222,
+        "full": 0.3562071871080222
+      }
+    },
+    {
+      "query_id": "q21",
+      "text": "ficcion historica conquista de america",
+      "intent_type": "exploratory",
+      "original_query": "ficcion historica conquista de america",
+      "reformulated_query": "historical fiction conquest of America colonization Spanish Empire Columbus",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('fiction historica') and a topic ('conquista de america') without referencing a specific book or author to compare against, indicating a desire to discover books within a ",
+      "query_variations": [
+        "historical fiction conquest of America colonization Spanish Empire Columbus",
+        "historical fiction conquest of America colonization Spanish Empire",
+        "Columbus pre-Columbian history narrative non-fiction"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.6511857558395008,
+        "routing_only": 0.4599715079731103,
+        "filters": 0.4599715079731103,
+        "reformulation": 0.5773584151532217,
+        "reformulation_multi_query": 0.3391602052736161,
+        "full": 0.3391602052736161
+      }
+    },
+    {
+      "query_id": "q22",
+      "text": "Victorian era mystery novels detective stories",
+      "intent_type": "exploratory",
+      "original_query": "Victorian era mystery novels detective stories",
+      "reformulated_query": "Victorian era mystery detective fiction crime historical",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Victorian era', 'mystery', 'detective stories') without referencing a specific book or author for comparison, nor asking a specific factual question. It is a b",
+      "query_variations": [
+        "Victorian era mystery detective fiction crime historical",
+        "Victorian era mystery detective",
+        "crime historical fiction police procedural 19th century"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.0,
+        "reformulation_multi_query": 0.0,
+        "full": 0.0
+      }
+    },
+    {
+      "query_id": "q23",
+      "text": "novelas ambientadas en el Camino de Santiago",
+      "intent_type": "exploratory",
+      "original_query": "novelas ambientadas en el Camino de Santiago",
+      "reformulated_query": "novelas Camino de Santiago peregrinación literatura española ficción",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query specifies a genre ('novelas') and a specific setting/topic ('Camino de Santiago') without referencing a specific book or author to compare against, indicating a desire to discover works in a",
+      "query_variations": [
+        "novelas Camino de Santiago peregrinación literatura española ficción",
+        "Camino de Santiago novelas peregrinación",
+        "literatura española ficción viaje espiritualidad"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.44149241373678083,
+        "routing_only": 0.369453583111095,
+        "filters": 0.369453583111095,
+        "reformulation": 0.15101961822780524,
+        "reformulation_multi_query": 0.11751610475642714,
+        "full": 0.11751610475642714
+      }
+    },
+    {
+      "query_id": "q24",
+      "text": "World War II fiction resistance fighters",
+      "intent_type": "exploratory",
+      "original_query": "World War II fiction resistance fighters",
+      "reformulated_query": "World War II fiction resistance fighters WWII historical fiction espionage",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('World War II', 'resistance fighters') and a genre ('fiction') without referencing a specific book or author for comparison, nor asking a specific factual 'who/wh",
+      "query_variations": [
+        "World War II fiction resistance fighters WWII historical fiction espionage",
+        "World War II WWII resistance fighters historical fiction",
+        "espionage war military partisans"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.43067655807339306,
+        "routing_only": 0.31546487678572877,
+        "filters": 0.31546487678572877,
+        "reformulation": 1.0,
+        "reformulation_multi_query": 0.2890648263178879,
+        "full": 0.2890648263178879
+      }
+    },
+    {
+      "query_id": "q25",
+      "text": "recetas tradicionales cocina mediterranea",
+      "intent_type": "exploratory",
+      "original_query": "recetas tradicionales cocina mediterranea",
+      "reformulated_query": "recetas tradicionales cocina mediterránea español italiano griego dieta española italiana",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('traditional recipes', 'Mediterranean cuisine') without any comparison language or specific questions, indicating a desire to discover books within this category.",
+      "query_variations": [
+        "recetas tradicionales cocina mediterránea español italiano griego dieta española italiana",
+        "recetas tradicionales cocina mediterránea dieta mediterránea cocina española",
+        "cocina italiana cocina griega libro de cocina recetario"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.7287350113961748,
+        "routing_only": 0.6384387988206552,
+        "filters": 0.6384387988206552,
+        "reformulation": 0.708212546600568,
+        "reformulation_multi_query": 0.7270902451140836,
+        "full": 0.7270902451140836
+      }
+    },
+    {
+      "query_id": "q26",
+      "text": "vegetarian cookbook healthy meals no meat",
+      "intent_type": "exploratory",
+      "original_query": "vegetarian cookbook healthy meals no meat",
+      "reformulated_query": "vegetarian cookbook healthy meals no meat plant-based",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('vegetarian', 'healthy meals', 'no meat') without referencing a specific book or author, nor asking a specific factual question. It indicates a desire to discover",
+      "query_variations": [
+        "vegetarian cookbook healthy meals no meat plant-based",
+        "vegetarian cookbook healthy meals",
+        "no meat plant-based cuisine recipes"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.4293692811004629,
+        "routing_only": 0.19356201893076433,
+        "filters": 0.19356201893076433,
+        "reformulation": 0.37867599636087157,
+        "reformulation_multi_query": 0.4017489290092959,
+        "full": 0.4017489290092959
+      }
+    },
+    {
+      "query_id": "q27",
+      "text": "postres caseros faciles sin horno",
+      "intent_type": "exploratory",
+      "original_query": "postres caseros faciles sin horno",
+      "reformulated_query": "postres caseros fáciles sin horno recetas rápidas",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query is a topic-based search for 'easy homemade desserts without an oven' (in Spanish), which fits the pattern of discovering books on a specific subject or category without referencing a similar",
+      "query_variations": [
+        "postres caseros fáciles sin horno recetas rápidas",
+        "postres caseros fáciles sin horno",
+        "recetas cocina dulces rápidas"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.5873259502392343,
+        "routing_only": 0.3391602052736161,
+        "filters": 0.3391602052736161,
+        "reformulation": 0.5087403079104241,
+        "reformulation_multi_query": 0.5087403079104241,
+        "full": 0.5087403079104241
+      }
+    },
+    {
+      "query_id": "q28",
+      "text": "Italian pasta recipes homemade sauce",
+      "intent_type": "exploratory",
+      "original_query": "Italian pasta recipes homemade sauce",
+      "reformulated_query": "Italian pasta recipes homemade sauce cooking",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Italian pasta', 'homemade sauce') without any comparison language or specific questions, indicating a desire to discover books within this specific category.",
+      "query_variations": [
+        "Italian pasta recipes homemade sauce cooking",
+        "Italian pasta recipes homemade",
+        "sauce cooking cuisine Italian food"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.7365896932159578,
+        "routing_only": 0.5205067333228022,
+        "filters": 0.5205067333228022,
+        "reformulation": 0.7597974756082397,
+        "reformulation_multi_query": 0.5205067333228022,
+        "full": 0.5205067333228022
+      }
+    },
+    {
+      "query_id": "q29",
+      "text": "cocina espanola tapas y pinchos",
+      "intent_type": "exploratory",
+      "original_query": "cocina espanola tapas y pinchos",
+      "reformulated_query": "Spanish cuisine tapas pinchos recipes food",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('Spanish cooking', 'tapas', 'pinchos') without any comparison language (like 'similar to') or specific factual questions (like 'who wrote'), indicating a",
+      "query_variations": [
+        "Spanish cuisine tapas pinchos recipes food",
+        "Spanish cuisine tapas pinchos",
+        "Spanish food recipes cooking español"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.5012658353418871,
+        "routing_only": 0.38685280723454163,
+        "filters": 0.38685280723454163,
+        "reformulation": 0.23719771276929622,
+        "reformulation_multi_query": 0.21840743681816419,
+        "full": 0.21840743681816419
+      }
+    },
+    {
+      "query_id": "q30",
+      "text": "baking bread sourdough beginner friendly",
+      "intent_type": "exploratory",
+      "original_query": "baking bread sourdough beginner friendly",
+      "reformulated_query": "sourdough bread baking beginner guide easy recipes home",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('baking bread', 'sourdough') and a specific constraint ('beginner friendly') without referencing a specific book or author to compare against, nor asking a direct",
+      "query_variations": [
+        "sourdough bread baking beginner guide easy recipes home",
+        "sourdough bread baking beginner",
+        "easy recipes home baking starter no-knead"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.39106560501896365,
+        "routing_only": 0.2960819109658652,
+        "filters": 0.2960819109658652,
+        "reformulation": 0.2960819109658652,
+        "reformulation_multi_query": 0.2960819109658652,
+        "full": 0.2960819109658652
+      }
+    },
+    {
+      "query_id": "q31",
+      "text": "recetas de mariscos y pescados frescos",
+      "intent_type": "exploratory",
+      "original_query": "recetas de mariscos y pescados frescos",
+      "reformulated_query": "recetas mariscos pescados frescos cocina marítima",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query is a topic-based search for a specific category of books (recipes for seafood and fresh fish) without referencing a specific title, author, or asking for factual details, which aligns with '",
+      "query_variations": [
+        "recetas mariscos pescados frescos cocina marítima",
+        "recetas mariscos pescados frescos",
+        "cocina marítima seafood fish shellfish culinary"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.3187501287726863,
+        "routing_only": 0.5342957957695391,
+        "filters": 0.5342957957695391,
+        "reformulation": 0.5738268454858865,
+        "reformulation_multi_query": 0.6090015616325245,
+        "full": 0.6090015616325245
+      }
+    },
+    {
+      "query_id": "q32",
+      "text": "Asian cuisine wok stir fry techniques",
+      "intent_type": "exploratory",
+      "original_query": "Asian cuisine wok stir fry techniques",
+      "reformulated_query": "Asian cuisine wok stir fry techniques cooking methods Chinese",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('Asian cuisine', 'wok', 'stir fry techniques') without any comparison language or specific questions, indicating a desire to discover books within this specific题材",
+      "query_variations": [
+        "Asian cuisine wok stir fry techniques cooking methods Chinese",
+        "Asian cuisine wok stir fry",
+        "cooking techniques Chinese cooking high heat quick cooking"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.0,
+        "reformulation_multi_query": 0.0,
+        "full": 0.0
+      }
+    },
+    {
+      "query_id": "q33",
+      "text": "comida mexicana autentica tacos enchiladas",
+      "intent_type": "exploratory",
+      "original_query": "comida mexicana autentica tacos enchiladas",
+      "reformulated_query": "authentic Mexican food tacos enchiladas traditional recipes",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of topic keywords ('comida mexicana', 'tacos', 'enchiladas') without specific book titles, authors, or comparison language, indicating a desire to discover books on this subject.",
+      "query_variations": [
+        "authentic Mexican food tacos enchiladas traditional recipes",
+        "Mexican food authentic tacos enchiladas",
+        "traditional cuisine recipes Mexican cuisine"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9522969978853248,
+        "routing_only": 0.8997082865674074,
+        "filters": 0.8997082865674074,
+        "reformulation": 0.047577930071849295,
+        "reformulation_multi_query": 0.30673771050437487,
+        "full": 0.30673771050437487
+      }
+    },
+    {
+      "query_id": "q34",
+      "text": "French pastry desserts professional techniques",
+      "intent_type": "exploratory",
+      "original_query": "French pastry desserts professional techniques",
+      "reformulated_query": "French pastry desserts professional techniques patisserie baking methods",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query consists of specific topic keywords ('French pastry', 'desserts', 'professional techniques') without any reference to a specific book, author, or comparison language, indicating a desire to ",
+      "query_variations": [
+        "French pastry desserts professional techniques patisserie baking methods",
+        "French pastry desserts professional techniques",
+        "patisserie baking culinary arts confectionery"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 1.0,
+        "routing_only": 0.7977228895450266,
+        "filters": 0.7977228895450266,
+        "reformulation": 0.17723928678404774,
+        "reformulation_multi_query": 0.7977228895450266,
+        "full": 0.7977228895450266
+      }
+    },
+    {
+      "query_id": "q35",
+      "text": "python",
+      "intent_type": "exploratory",
+      "original_query": "python",
+      "reformulated_query": "python programming language code software development",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword representing a topic/subject. According to the guidelines, very short queries (1-2 words) are usually classified as exploratory, indicating the user wants to discover or ",
+      "query_variations": [
+        "python programming language code software development",
+        "python programming",
+        "language code software development"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.8783032654107725,
+        "routing_only": 0.6121338263049285,
+        "filters": 0.6121338263049285,
+        "reformulation": 0.4315420454124845,
+        "reformulation_multi_query": 0.44803002797583846,
+        "full": 0.44803002797583846
+      }
+    },
+    {
+      "query_id": "q36",
+      "text": "historia",
+      "intent_type": "exploratory",
+      "original_query": "historia",
+      "reformulated_query": "historical fiction history historia non-fiction biography",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single word ('historia', meaning history in Spanish/Italian) which acts as a broad topic keyword. According to the guidelines, very short queries are usually exploratory, and this fits,",
+      "query_variations": [
+        "historical fiction history historia non-fiction biography",
+        "historical fiction history",
+        "historia non-fiction biography"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9025971841291335,
+        "routing_only": 0.2298401750281299,
+        "filters": 0.2298401750281299,
+        "reformulation": 0.0947265841174744,
+        "reformulation_multi_query": 0.2540090091933497,
+        "full": 0.2540090091933497
+      }
+    },
+    {
+      "query_id": "q37",
+      "text": "recetas faciles",
+      "intent_type": "exploratory",
+      "original_query": "recetas faciles",
+      "reformulated_query": "recetas fáciles cocina sencilla paso a paso rápidas comida casera",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.95,
+      "reasoning": "The query 'recetas faciles' (easy recipes) is a broad topic search without reference to a specific book, author, or factual question, indicating the user wants to discover books within this category.",
+      "query_variations": [
+        "recetas fáciles cocina sencilla paso a paso rápidas comida casera",
+        "recetas fáciles cocina sencilla",
+        "recetas rápidas paso a paso comida casera"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.659318979848312,
+        "routing_only": 0.5865267152450974,
+        "filters": 0.5865267152450974,
+        "reformulation": 0.6094102767375764,
+        "reformulation_multi_query": 0.4883505467692416,
+        "full": 0.4883505467692416
+      }
+    },
+    {
+      "query_id": "q38",
+      "text": "java",
+      "intent_type": "exploratory",
+      "original_query": "java",
+      "reformulated_query": "Java programming language JVM software development",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword ('java'), which according to the guidelines for short queries (1-2 words) is typically classified as exploratory, indicating a broad search for books on the topic of Java",
+      "query_variations": [
+        "Java programming language JVM software development",
+        "Java programming",
+        "language JVM software development"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.0,
+        "reformulation_multi_query": 0.0,
+        "full": 0.0
+      }
+    },
+    {
+      "query_id": "q39",
+      "text": "apple",
+      "intent_type": "exploratory",
+      "original_query": "apple",
+      "reformulated_query": "apple fruit Inc technology iPhone",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.6,
+      "reasoning": "The query is a single word, which typically indicates a broad search for books related to that keyword (e.g., the company Apple, the fruit, or a specific title). Without additional context like 'like'",
+      "query_variations": [
+        "apple fruit Inc technology iPhone",
+        "apple fruit Apple Inc technology",
+        "iPhone Mac Steve Jobs biography history"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.0,
+        "reformulation_multi_query": 0.0,
+        "full": 0.0
+      }
+    },
+    {
+      "query_id": "q40",
+      "text": "networks",
+      "intent_type": "exploratory",
+      "original_query": "networks",
+      "reformulated_query": "networks computer networking social networks neural graph theory",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single keyword ('networks') without specific book titles, authors, or comparative language, indicating a broad search for books on this topic rather than a specific fact or similarity.",
+      "query_variations": [
+        "networks computer networking social networks neural graph theory",
+        "networks computer networking social networks",
+        "neural networks graph theory connectivity infrastructure"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.7140874734074661,
+        "routing_only": 0.7651209183601728,
+        "filters": 0.7651209183601728,
+        "reformulation": 0.5716764345012055,
+        "reformulation_multi_query": 0.7430582011044374,
+        "full": 0.7430582011044374
+      }
+    },
+    {
+      "query_id": "q41",
+      "text": "learning",
+      "intent_type": "exploratory",
+      "original_query": "learning",
+      "reformulated_query": "learning education study skills pedagogy cognitive science",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single broad topic keyword without specific book titles, authors, or comparative language, indicating a desire to discover books within that general category.",
+      "query_variations": [
+        "learning education study skills pedagogy cognitive science",
+        "learning education",
+        "study pedagogy cognitive science"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.1494648642589621,
+        "routing_only": 0.12299919157856744,
+        "filters": 0.12299919157856744,
+        "reformulation": 0.13216105048695953,
+        "reformulation_multi_query": 0.1703641615919621,
+        "full": 0.1703641615919621
+      }
+    },
+    {
+      "query_id": "q42",
+      "text": "cocina moderna",
+      "intent_type": "exploratory",
+      "original_query": "cocina moderna",
+      "reformulated_query": "modern cooking contemporary cuisine recipes culinary arts gastronomy",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a short topic-based search ('modern cooking') without specific book titles, authors, or comparison language, indicating a desire to discover books within this category.",
+      "query_variations": [
+        "modern cooking contemporary cuisine recipes culinary arts gastronomy",
+        "modern cooking contemporary cuisine",
+        "recipes culinary arts gastronomy"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.9444537180991301,
+        "routing_only": 0.6519167953719296,
+        "filters": 0.6519167953719296,
+        "reformulation": 0.4643830180999587,
+        "reformulation_multi_query": 0.465799714235841,
+        "full": 0.465799714235841
+      }
+    },
+    {
+      "query_id": "q43",
+      "text": "classic",
+      "intent_type": "exploratory",
+      "original_query": "classic",
+      "reformulated_query": "classic literature timeless bestsellers canonical",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.9,
+      "reasoning": "The query is a single word representing a broad genre or category. According to the guidelines, very short queries (1-2 words) are usually classified as exploratory, indicating a desire to discover or",
+      "query_variations": [
+        "classic literature timeless bestsellers canonical",
+        "classic literature timeless",
+        "bestsellers canonical old heritage"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.23719771276929622,
+        "reformulation_multi_query": 0.20438239758848611,
+        "full": 0.20438239758848611
+      }
+    },
+    {
+      "query_id": "q44",
+      "text": "guerra",
+      "intent_type": "exploratory",
+      "original_query": "guerra",
+      "reformulated_query": "guerra war conflict battle military history fiction",
+      "extracted_filters": {
+        "language": null,
+        "category": null,
+        "min_year": null,
+        "max_year": null
+      },
+      "confidence": 0.8,
+      "reasoning": "The query is a single word ('guerra', meaning 'war' in Spanish/Portuguese), which fits the criteria for a very short query indicating a broad topic search rather than a specific factual question or a ",
+      "query_variations": [
+        "guerra war conflict battle military history fiction",
+        "guerra war conflict battle",
+        "military history fiction strategy"
+      ],
+      "n_results_full": 100,
+      "ndcg_at_10": {
+        "hybrid_rrf": 0.0,
+        "routing_only": 0.0,
+        "filters": 0.0,
+        "reformulation": 0.0,
+        "reformulation_multi_query": 0.6309297535714575,
+        "full": 0.6309297535714575
+      }
+    }
+  ],
+  "config": {
+    "date": "2026-11-03T19:50:51.892851+00:00",
+    "git_commit": "e6dd76d",
+    "llm_provider": "ollama",
+    "llm_model": "qwen3.8:27b-mlx",
+    "temperature": 0.0,
+    "apply_extracted_category": false,
+    "filter_guards_version": "v2",
+    "query_prompts_version": "1.0",
+    "explanation_prompt_version": "v1.1",
+    "intents_cache": "data/evaluation/llm_intents_qwen3.8-27b-mlx.json",
+    "max_results": 100,
+    "baseline": "hybrid_rrf",
+    "variants": [
+      "routing_only",
+      "filters",
+      "reformulation",
+      "reformulation_multi_query",
+      "full"
+    ],
+    "significance": "paired permutation test on per-query nDCG@10, 10000 resamples, Holm correction"
+  }
+}

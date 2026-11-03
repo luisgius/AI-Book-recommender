@@ -1029,9 +1029,16 @@ class SearchService:
         def normalize_score(score: float) -> float:
             return (score - min_score) / score_range
 
-        # Greedy MMR selection
+        # Greedy MMR selection.
+        # max_similarity[book_id] holds the highest similarity between that
+        # candidate and any book selected so far. It is updated once per
+        # selection (k * n similarity computations) instead of being recomputed
+        # against every selected book at every step (k^2 * n), which made the
+        # evaluation with k=100 take minutes per query. Same formula, same
+        # tie-breaking (first candidate with the strictly highest score).
         selected: List[SearchResult] = []
         candidates = list(results)
+        max_similarity: Dict[UUID, float] = {}
 
         while len(selected) < top_k and candidates:
             best_mmr_score = float('-inf')
@@ -1042,31 +1049,27 @@ class SearchService:
                 if candidate.book.id not in book_embeddings:
                     continue
 
-                # Relevance term (normalized RRF score)
                 relevance = normalize_score(candidate.final_score)
-
-                # Diversity term: max similarity to any already-selected document
-                if selected:
-                    max_similarity = max(
-                        self._cosine_similarity(
-                            book_embeddings[candidate.book.id],
-                            book_embeddings[s.book.id]
-                        )
-                        for s in selected
-                        if s.book.id in book_embeddings
-                    ) if any(s.book.id in book_embeddings for s in selected) else 0.0
-                else:
-                    max_similarity = 0.0
-
-                # MMR score: balance relevance and diversity
-                mmr_score = lambda_param * relevance - (1 - lambda_param) * max_similarity
+                similarity = max_similarity.get(candidate.book.id, 0.0)
+                mmr_score = lambda_param * relevance - (1 - lambda_param) * similarity
 
                 if mmr_score > best_mmr_score:
                     best_mmr_score = mmr_score
                     best_idx = i
 
-            # Add best candidate to selected
-            selected.append(candidates.pop(best_idx))
+            chosen = candidates.pop(best_idx)
+            selected.append(chosen)
+
+            # Update the running maximum similarity of the remaining candidates
+            chosen_embedding = book_embeddings.get(chosen.book.id)
+            if chosen_embedding is not None:
+                for candidate in candidates:
+                    embedding = book_embeddings.get(candidate.book.id)
+                    if embedding is None:
+                        continue
+                    similarity = self._cosine_similarity(embedding, chosen_embedding)
+                    if similarity > max_similarity.get(candidate.book.id, float('-inf')):
+                        max_similarity[candidate.book.id] = similarity
 
         # Reassign ranks (1-indexed)
         for i, result in enumerate(selected, start=1):
