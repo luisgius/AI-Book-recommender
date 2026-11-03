@@ -56,3 +56,8 @@ data/indices/*.index
 # Misc artifacts
 nul
 opencode.json
+
+# TFG reference documents (third-party; the rule files .tfg-reference/*.md stay tracked)
+/.tfg-reference/originals/
+/.tfg-reference/unzipped/
+/.tfg-reference/text/

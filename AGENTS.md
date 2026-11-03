@@ -183,3 +183,9 @@ mypy app
 - No emojis.
 
 ## End
+
+<!-- tfg-writing-rules:start -->
+## Thesis writing rules (TFG, ETSINF-UPV)
+
+**Thesis writing** (memoria chapters in LaTeX or Word, `.bib` entries, abstracts, the ODS annex, defence slides): write to `.tfg-reference/REGLAS.md`, then run its verification (section 0) before delivering and include the per-rule report. LaTeX source also follows `.tfg-reference/latex.md`; the defence follows `.tfg-reference/defensa.md`.
+<!-- tfg-writing-rules:end -->

@@ -330,3 +330,9 @@ When you introduce a new external library (for example, a new package from PyPI)
 In summary: whenever a new external dependency is introduced, make it explicit, ensure it is reflected in `requirements.txt`, and, if you actually install it via terminal, strictly run `pip freeze > requirements.txt` right after validation.
 
 NEVER USE EMOJIS.
+
+<!-- tfg-writing-rules:start -->
+## Thesis writing rules (TFG, ETSINF-UPV)
+
+**Thesis writing** (memoria chapters in LaTeX or Word, `.bib` entries, abstracts, the ODS annex, defence slides): write to `.tfg-reference/REGLAS.md`, then run its verification (section 0) before delivering and include the per-rule report. LaTeX source also follows `.tfg-reference/latex.md`; the defence follows `.tfg-reference/defensa.md`.
+<!-- tfg-writing-rules:end -->
