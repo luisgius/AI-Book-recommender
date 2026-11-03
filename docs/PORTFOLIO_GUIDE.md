@@ -109,6 +109,15 @@ To use a hosted model instead, set `LLM_PROVIDER=openai` (needs
 `OPENAI_API_KEY`) or `LLM_PROVIDER=anthropic` (needs `ANTHROPIC_API_KEY` and
 `pip install langchain-anthropic`). Never commit `.env`.
 
+### Web UI
+
+Start the API (`python -m app.main` or `uvicorn app.main:app`) and open
+`http://localhost:8000/ui/`: a single static page (no build step, no external
+assets) with the search box, the LLM options, explicit filters, the understood
+query intent, explanations with their verified citations, and "similar books".
+With a local 27B model, a search with understanding and three explanations
+takes around a minute and a half.
+
 ### Search API options
 
 `POST /api/v1/search` accepts, besides `text`, `filters` and `max_results`:

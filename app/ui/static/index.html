@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buscador de libros: BM25 + embeddings + LLM</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Buscador híbrido de libros</h1>
+      <p class="subtitle">BM25 + embeddings (FAISS) fusionados con RRF, con comprensión de la consulta y explicaciones mediante LLM</p>
+    </div>
+    <div id="health" class="health" aria-live="polite">Comprobando estado…</div>
+  </header>
+
+  <main>
+    <form id="search-form" class="panel" autocomplete="off">
+      <label class="query">
+        <span class="sr-only">Consulta</span>
+        <input id="query" name="query" type="search" required
+               placeholder="p. ej. novelas españolas sobre la guerra civil">
+      </label>
+      <button type="submit" id="search-button">Buscar</button>
+
+      <fieldset class="options">
+        <legend>Opciones</legend>
+        <label><input type="checkbox" id="use-understanding"> Interpretar la consulta (LLM)</label>
+        <label><input type="checkbox" id="use-explanations"> Explicar los primeros resultados (LLM)</label>
+        <label><input type="checkbox" id="use-diversification"> Diversificar (MMR)</label>
+        <label class="inline">Resultados
+          <input type="number" id="max-results" min="1" max="50" value="10">
+        </label>
+      </fieldset>
+
+      <fieldset class="options">
+        <legend>Filtros explícitos</legend>
+        <label class="inline">Idioma
+          <select id="language">
+            <option value="">cualquiera</option>
+            <option value="es">español</option>
+            <option value="en">inglés</option>
+          </select>
+        </label>
+        <label class="inline">Categoría <input type="text" id="category" placeholder="p. ej. fiction"></label>
+        <label class="inline">Desde <input type="number" id="min-year" min="1000" max="2100" placeholder="año"></label>
+        <label class="inline">Hasta <input type="number" id="max-year" min="1000" max="2100" placeholder="año"></label>
+      </fieldset>
+    </form>
+
+    <p id="status" class="status" aria-live="polite"></p>
+    <section id="intent" class="panel intent" hidden></section>
+    <section id="similar-banner" class="panel banner" hidden></section>
+    <ol id="results" class="results"></ol>
+  </main>
+
+  <template id="result-template">
+    <li class="result">
+      <div class="result-head">
+        <span class="rank"></span>
+        <div>
+          <h2 class="title"></h2>
+          <p class="meta"></p>
+        </div>
+      </div>
+      <p class="description"></p>
+      <p class="scores"></p>
+      <div class="explanation" hidden>
+        <p class="explanation-text"></p>
+        <ul class="citations"></ul>
+        <p class="explanation-model"></p>
+      </div>
+      <button type="button" class="similar">Libros similares</button>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
