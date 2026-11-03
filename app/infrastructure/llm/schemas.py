@@ -11,7 +11,7 @@ Architecture separation:
 The LangChainLLMClient converts from these Pydantic schemas to domain entities.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
 
@@ -49,17 +49,14 @@ class CitationLLM(BaseModel):
         description="How relevant this citation is to supporting the explanation (0.0 to 1.0)"
     )
 
-    class Config:
-        """Pydantic configuration."""
-        # Allow JSON schema generation for LLM structured output
-        json_schema_extra = {
-            "example": {
-                "book_id": "123e4567-e89b-12d3-a456-426614174000",
-                "chunk_id": "title",
-                "snippet": "Artificial Intelligence: A Modern Approach",
-                "relevance_score": 0.9
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "book_id": "123e4567-e89b-12d3-a456-426614174000",
+            "chunk_id": "title",
+            "snippet": "Artificial Intelligence: A Modern Approach",
+            "relevance_score": 0.9
         }
+    })
 
 
 class GroundedExplanationLLM(BaseModel):
@@ -113,33 +110,31 @@ class GroundedExplanationLLM(BaseModel):
         )
     )
 
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
-            "example": {
-                "summary": "This book covers AI fundamentals and modern techniques.",
-                "reasoning": (
-                    "The book is highly relevant because [CITE: title] it explicitly focuses on "
-                    "artificial intelligence, and [CITE: description] the description mentions "
-                    "machine learning and neural networks."
-                ),
-                "citations": [
-                    {
-                        "book_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "chunk_id": "title",
-                        "snippet": "Artificial Intelligence: A Modern Approach",
-                        "relevance_score": 0.95
-                    },
-                    {
-                        "book_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "chunk_id": "description",
-                        "snippet": "comprehensive introduction to machine learning and neural networks",
-                        "relevance_score": 0.85
-                    }
-                ],
-                "confidence": 0.9
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "summary": "This book covers AI fundamentals and modern techniques.",
+            "reasoning": (
+                "The book is highly relevant because [CITE: title] it explicitly focuses on "
+                "artificial intelligence, and [CITE: description] the description mentions "
+                "machine learning and neural networks."
+            ),
+            "citations": [
+                {
+                    "book_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "chunk_id": "title",
+                    "snippet": "Artificial Intelligence: A Modern Approach",
+                    "relevance_score": 0.95
+                },
+                {
+                    "book_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "chunk_id": "description",
+                    "snippet": "comprehensive introduction to machine learning and neural networks",
+                    "relevance_score": 0.85
+                }
+            ],
+            "confidence": 0.9
         }
+    })
 
 
 # Type alias for code readability

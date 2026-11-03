@@ -8,8 +8,6 @@ import random
 from datetime import datetime, UTC
 from typing import Callable, TypeVar
 
-from langchain_openai import ChatOpenAI
-from langchain_anthropic import ChatAnthropic
 from langchain.chat_models import init_chat_model
 
 from app.domain.ports import LLMClient

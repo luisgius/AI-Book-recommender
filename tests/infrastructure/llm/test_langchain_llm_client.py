@@ -9,12 +9,12 @@ including all three main methods:
 
 All LLM calls are mocked to avoid actual API usage and ensure deterministic tests.
 
-Note: These tests mock LangChain imports to avoid version compatibility issues
-and API key requirements.
+The chat model factory (init_chat_model) and the chain/graph builders are
+patched per test, so no API key or running LLM is needed. The real LangChain
+modules are imported, so a broken import fails these tests.
 """
 
 import pytest
-import sys
 from uuid import uuid4
 from datetime import datetime, UTC
 from unittest.mock import Mock, MagicMock, patch
@@ -26,21 +26,6 @@ from app.infrastructure.llm.schemas_judge import ExplanationJudgmentLLM, Judgmen
 from app.infrastructure.llm.schemas_query import QueryIntentLLM, ExtractedFiltersLLM, ReformulatedQueryLLM
 
 
-# ================================================================================
-# MOCK SETUP: Mock LangChain imports before importing the client module
-# ================================================================================
-
-# Create mock modules for LangChain dependencies
-mock_langchain_openai = MagicMock()
-mock_langchain_anthropic = MagicMock()
-mock_langchain_chat_models = MagicMock()
-
-# Patch sys.modules to use mocks
-sys.modules['langchain_openai'] = mock_langchain_openai
-sys.modules['langchain_anthropic'] = mock_langchain_anthropic
-sys.modules['langchain.chat_models'] = mock_langchain_chat_models
-
-# Now we can safely import the module
 import app.infrastructure.llm.langchain_llm_client as llm_client_module
 
 

@@ -12,7 +12,7 @@ Architecture separation:
 The LangChainLLMClient converts from these Pydantic schemas to domain value objects.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
 
@@ -54,15 +54,13 @@ class QueryIntentLLM(BaseModel):
         )
     )
 
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
-            "example": {
-                "intent_type": "recommendation",
-                "confidence": 0.9,
-                "reasoning": "User explicitly asks for 'books like 1984', indicating a recommendation intent based on similarity."
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "intent_type": "recommendation",
+            "confidence": 0.9,
+            "reasoning": "User explicitly asks for 'books like 1984', indicating a recommendation intent based on similarity."
         }
+    })
 
 
 class ExtractedFiltersLLM(BaseModel):
@@ -120,17 +118,15 @@ class ExtractedFiltersLLM(BaseModel):
         )
     )
 
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
-            "example": {
-                "language": "es",
-                "category": "Fiction",
-                "min_year": 2020,
-                "max_year": None,
-                "author_hint": None
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "language": "es",
+            "category": "Fiction",
+            "min_year": 2020,
+            "max_year": None,
+            "author_hint": None
         }
+    })
 
 
 class ReformulatedQueryLLM(BaseModel):
@@ -173,15 +169,13 @@ class ReformulatedQueryLLM(BaseModel):
         )
     )
 
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
-            "example": {
-                "optimized_query": "science fiction artificial intelligence ethics",
-                "keywords": ["science fiction", "AI", "artificial intelligence", "ethics", "technology"],
-                "removed_noise": ["I'm looking for", "books about", "please"]
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "optimized_query": "science fiction artificial intelligence ethics",
+            "keywords": ["science fiction", "AI", "artificial intelligence", "ethics", "technology"],
+            "removed_noise": ["I'm looking for", "books about", "please"]
         }
+    })
 
 
 # Type alias for code readability
