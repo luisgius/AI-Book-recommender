@@ -157,6 +157,13 @@ def build_catalog_tools(search_service: SearchService, catalog_repo: BookCatalog
     return [search_books, get_book_details, find_similar_books]
 
 
+def _tool_text(message: ToolMessage) -> str:
+    """Tool output as text (ToolNode returns strings; content blocks are joined)."""
+    if isinstance(message.content, str):
+        return message.content
+    return "".join(part if isinstance(part, str) else str(part.get("text", "")) for part in message.content)
+
+
 def _observed_books(messages: List[AnyMessage]) -> Dict[str, Dict[str, Any]]:
     """Collect every book returned by a tool call, keyed by book_id."""
     observed: Dict[str, Dict[str, Any]] = {}
@@ -164,7 +171,7 @@ def _observed_books(messages: List[AnyMessage]) -> Dict[str, Dict[str, Any]]:
         if not isinstance(message, ToolMessage):
             continue
         try:
-            payload = json.loads(message.content)
+            payload = json.loads(_tool_text(message))
         except (TypeError, json.JSONDecodeError):
             continue
         items = payload if isinstance(payload, list) else [payload]
@@ -180,7 +187,7 @@ def _tool_steps(messages: List[AnyMessage]) -> List[AgentStep]:
     for message in messages:
         if isinstance(message, ToolMessage):
             try:
-                payload = json.loads(message.content)
+                payload = json.loads(_tool_text(message))
                 count = len(payload) if isinstance(payload, list) else int("book_id" in payload)
             except (TypeError, json.JSONDecodeError):
                 count = 0
@@ -190,7 +197,7 @@ def _tool_steps(messages: List[AnyMessage]) -> List[AgentStep]:
         if isinstance(message, AIMessage):
             for call in message.tool_calls:
                 steps.append(AgentStep(tool=call["name"], arguments=dict(call["args"]),
-                                       result_count=results_by_call.get(call["id"], 0)))
+                                       result_count=results_by_call.get(call.get("id") or "", 0)))
     return steps
 
 
@@ -258,6 +265,8 @@ class LangGraphSearchAgent:
     def _verify_node(self, state: AgentState) -> dict:
         observed_ids = set(_observed_books(state["messages"]))
         final = state["final"]
+        if final is None:
+            raise RuntimeError("verify reached without a finalized answer")
         valid, seen = [], set()
         for rec in final.recommendations:
             if rec.book_id in observed_ids and rec.book_id not in seen:
@@ -314,15 +323,18 @@ class LangGraphSearchAgent:
         except ConnectionError as e:
             raise RuntimeError(f"LLM unreachable: {e}") from e
 
+        final = state["final"]
+        if final is None:  # the graph always ends after verify sets a final answer
+            raise RuntimeError("Agent graph ended without a final answer")
         recommendations = []
-        for rec in state["final"].recommendations:
+        for rec in final.recommendations:
             book = self._catalog.get_by_id(UUID(rec.book_id))
             if book is not None:
                 recommendations.append(AgentRecommendation(book=book, reason=rec.reason))
 
         return AgentAnswer(
             question=question,
-            answer=state["final"].answer,
+            answer=final.answer,
             recommendations=recommendations,
             steps=_tool_steps(state["messages"]),
             model=self._model_name,
