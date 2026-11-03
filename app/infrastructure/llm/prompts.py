@@ -13,10 +13,12 @@ Versioning format: "vX.Y"
 # GROUNDED EXPLANATION GENERATION
 # =============================================================================
 
-GROUNDED_EXPLANATION_PROMPT_VERSION = "v1.0"
+GROUNDED_EXPLANATION_PROMPT_VERSION = "v1.1"
 """
 Version history:
 - v1.0 (2024-12-15): Initial implementation with JSON context, citation rules, and few-shot example
+- v1.1 (2026-11-03): Answer in the language of the user's query; citation snippets
+  stay verbatim in the book's language (they are checked as substrings)
 """
 
 
@@ -60,6 +62,7 @@ STRICT RULES:
 4. Do NOT invent, assume, or paraphrase information not explicitly present
 5. If you cannot find sufficient evidence to support a claim, do not make that claim
 6. Provide at least ONE citation - explanations without citations will be rejected
+7. Write "summary" and "reasoning" in the SAME LANGUAGE as the User Query (a Spanish query gets a Spanish explanation). Citation snippets are the exception: copy them verbatim in the language of the book data, never translated
 
 === BOOK CONTEXT (JSON) ===
 {{
@@ -127,6 +130,7 @@ Instructions:
 3. Construct your explanation with proper citations
 4. Use ONLY information from the book context provided
 5. Return JSON following the exact structure shown
+6. Write the summary and reasoning in the language of the User Query; keep snippets verbatim
 
 IMPORTANT: The example above is ONLY to show you the format. Do NOT use any content from the example in your response. Base your answer entirely on the actual book context provided.
 

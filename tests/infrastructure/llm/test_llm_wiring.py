@@ -228,3 +228,25 @@ class TestAppendNewTerms:
         words = final.lower().split()
         assert len(words) == len(set(words))
         assert final == "novelas españolas guerra civil literatura histórica"
+
+
+# =============================================================================
+# Explanation prompt
+# =============================================================================
+
+
+def test_explanation_prompt_asks_for_the_query_language_and_verbatim_snippets():
+    from app.infrastructure.llm.prompts import (
+        GROUNDED_EXPLANATION_PROMPT_VERSION,
+        build_grounded_explanation_prompt,
+    )
+
+    prompt = build_grounded_explanation_prompt(
+        query_text="novelas sobre la guerra civil", book_id="b1", title="T", authors="A",
+        categories="Fiction", description="D",
+    )
+
+    assert GROUNDED_EXPLANATION_PROMPT_VERSION == "v1.1"
+    assert "SAME LANGUAGE as the User Query" in prompt
+    assert "never translated" in prompt
+    assert 'User Query: "novelas sobre la guerra civil"' in prompt
