@@ -7,7 +7,46 @@ of the domain with no conceptual identity.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from enum import Enum
+from typing import Optional, Literal
+
+
+class RetrievalStrategy(Enum):
+    """
+    Retrieval strategy that controls the balance between lexical and vector search.
+
+    The strategy determines candidate pool sizes for each retrieval method before
+    RRF fusion. Since RRF is rank-based, we influence the final ranking by adjusting
+    how many candidates come from each source.
+
+    Mapping from intent:
+    - recommendation -> VECTOR_HEAVY (similarity is semantic)
+    - factual -> LEXICAL_HEAVY (exact keyword matches matter)
+    - exploratory -> BALANCED (cast a wide net)
+    """
+    LEXICAL_HEAVY = "lexical_heavy"
+    VECTOR_HEAVY = "vector_heavy"
+    BALANCED = "balanced"
+
+
+# Strategy-to-pool-size mapping.
+# Factors are multiplied by max_results to get candidate counts.
+# Example with max_results=10:
+#   LEXICAL_HEAVY -> BM25 gets 40 candidates, FAISS gets 10
+#   VECTOR_HEAVY  -> BM25 gets 10, FAISS gets 40
+#   BALANCED      -> both get 20 (same as current behavior)
+STRATEGY_POOL_SIZES = {
+    RetrievalStrategy.LEXICAL_HEAVY: {"bm25_factor": 4, "vector_factor": 1},
+    RetrievalStrategy.VECTOR_HEAVY: {"bm25_factor": 1, "vector_factor": 4},
+    RetrievalStrategy.BALANCED: {"bm25_factor": 2, "vector_factor": 2},
+}
+
+# Maps intent type to retrieval strategy
+INTENT_TO_STRATEGY = {
+    "recommendation": RetrievalStrategy.VECTOR_HEAVY,
+    "factual": RetrievalStrategy.LEXICAL_HEAVY,
+    "exploratory": RetrievalStrategy.BALANCED,
+}
 
 
 @dataclass(frozen=True)
@@ -72,6 +111,12 @@ class SearchQuery:
     use_explanations: bool = False
     """Whether to generate LLM explanations for results"""
 
+    use_diversification: bool = False
+    """Whether to apply MMR diversification to reduce redundancy in results"""
+
+    diversity_lambda: float = 0.6
+    """Trade-off between relevance and diversity (0.0 = max diversity, 1.0 = max relevance)"""
+
     def __post_init__(self) -> None:
         """Validate query constraints."""
         if not self.text or not self.text.strip():
@@ -82,6 +127,11 @@ class SearchQuery:
 
         if self.max_results > 100:
             raise ValueError(f"max_results cannot exceed 100, got {self.max_results}")
+
+        if not (0.0 <= self.diversity_lambda <= 1.0):
+            raise ValueError(
+                f"diversity_lambda must be between 0.0 and 1.0, got {self.diversity_lambda}"
+            )
 
 
 @dataclass(frozen=True)
@@ -132,3 +182,198 @@ class BookMetadata:
             raise ValueError(
                 f"ratings_count cannot be negative, got {self.ratings_count}"
             )
+
+
+@dataclass(frozen=True)
+class SearchMetadata:
+    """
+    Debug/telemetry metadata for search operations.
+
+    This value object captures internal details about how a search was executed,
+    useful for debugging, evaluation, and transparency in the TFG.
+    """
+
+    fusion_method: str
+    """The fusion method used: 'rrf' (Reciprocal Rank Fusion) or 'none'"""
+
+    rrf_k: Optional[int] = None
+    """The k parameter used in RRF formula (typically 60), None if fusion_method='none'"""
+
+    diversification_enabled: bool = False
+    """Whether MMR diversification was applied"""
+
+    candidates_lexical: int = 0
+    """Number of candidates retrieved from lexical (BM25) search"""
+
+    candidates_vector: int = 0
+    """Number of candidates retrieved from vector search"""
+
+    def __post_init__(self) -> None:
+        """Validate metadata constraints."""
+        valid_fusion_methods = {"rrf", "none"}
+        if self.fusion_method not in valid_fusion_methods:
+            raise ValueError(
+                f"fusion_method must be one of {valid_fusion_methods}, "
+                f"got '{self.fusion_method}'"
+            )
+
+        if self.fusion_method == "rrf" and self.rrf_k is None:
+            raise ValueError("rrf_k is required when fusion_method='rrf'")
+
+        if self.candidates_lexical < 0:
+            raise ValueError(f"candidates_lexical cannot be negative, got {self.candidates_lexical}")
+
+        if self.candidates_vector < 0:
+            raise ValueError(f"candidates_vector cannot be negative, got {self.candidates_vector}")
+
+
+@dataclass(frozen=True)
+class SearchResponse:
+    """
+    Response wrapper for search operations with degradation metadata (RNF-08).
+
+    This value object wraps search results and includes metadata about
+    the search execution, particularly for graceful degradation scenarios.
+    """
+
+    results: list
+    """List of SearchResult entities"""
+
+    degraded: bool = False
+    """True if the search was performed in degraded mode (e.g., FAISS unavailable)"""
+
+    degradation_reason: Optional[str] = None
+    """Human-readable explanation of why degradation occurred"""
+
+    search_mode: str = "hybrid"
+    """The search mode used: 'hybrid', 'lexical_only', or 'vector_only'"""
+
+    latency_ms: Optional[float] = None
+    """Search execution time in milliseconds"""
+
+    metadata: Optional[SearchMetadata] = None
+    """Optional debug/telemetry metadata about the search execution"""
+
+    def __post_init__(self) -> None:
+        """Validate response constraints."""
+        if self.degraded and self.degradation_reason is None:
+            raise ValueError("degradation_reason is required when degraded=True")
+
+        valid_modes = {"hybrid", "lexical_only", "vector_only"}
+        if self.search_mode not in valid_modes:
+            raise ValueError(
+                f"search_mode must be one of {valid_modes}, got '{self.search_mode}'"
+            )
+
+
+@dataclass(frozen=True)
+class IngestionSummary:
+    """
+    Summary of an ingestion operation.
+
+    This value object captures the outcome of ingesting books from
+    an external provider into the catalog repository.
+    """
+
+    n_fetched: int
+    """Number of books fetched from the external provider"""
+
+    n_inserted: int
+    """Number of books successfully inserted into the catalog"""
+
+    n_skipped: int
+    """Number of books skipped (e.g., duplicates)"""
+
+    n_errors: int
+    """Number of books that failed to insert due to errors"""
+
+    query: str
+    """The query used to fetch books"""
+
+    language: Optional[str] = None
+    """Language filter applied (ISO 639-1 code)"""
+
+    errors: list[str] = field(default_factory=list)
+    """List of error messages (optional, for debugging)"""
+
+    def __post_init__(self) -> None:
+        """Validate summary constraints."""
+        if self.n_fetched < 0:
+            raise ValueError(f"n_fetched cannot be negative, got {self.n_fetched}")
+        if self.n_inserted < 0:
+            raise ValueError(f"n_inserted cannot be negative, got {self.n_inserted}")
+        if self.n_skipped < 0:
+            raise ValueError(f"n_skipped cannot be negative, got {self.n_skipped}")
+        if self.n_errors < 0:
+            raise ValueError(f"n_errors cannot be negative, got {self.n_errors}")
+
+        # Invariant: fetched = inserted + skipped + errors
+        expected_fetched = self.n_inserted + self.n_skipped + self.n_errors
+        if self.n_fetched != expected_fetched:
+            raise ValueError(
+                f"Invariant violated: n_fetched ({self.n_fetched}) must equal "
+                f"n_inserted + n_skipped + n_errors ({expected_fetched})"
+            )
+
+@dataclass(frozen=True)
+class QueryIntent:
+    """
+    Value object representing the understood intent of a user query.
+
+    This is the result of the query understanding LangGraph flow (Block 2),
+    containing the classified intent, extracted filters, and optimized query.
+
+    The intent classification helps the system choose the best search strategy:
+    - recommendation: Focus on similarity, use vector search heavily
+    - factual: Direct lookup, prioritize exact matches
+    - exploratory: Diverse results, balance precision and discovery
+    """
+
+    intent_type: Literal["recommendation", "factual", "exploratory"]
+    """The classified intent type"""
+
+    original_query: str
+    """The raw query text as entered by the user"""
+
+    reformulated_query: str
+    """Optimized query for better retrieval (cleaned, expanded, or focused)"""
+
+    extracted_filters: SearchFilters
+    """Filters extracted from natural language (language, year, category)"""
+
+    confidence: float
+    """LLM's confidence in the classification (0.0 to 1.0)"""
+
+    reasoning: str
+    """Explanation of why the LLM classified the query this way"""
+
+    query_variations: list = field(default_factory=list)
+    """Alternative query formulations for multi-query retrieval.
+
+    Each variation is searched independently (in parallel), then results are
+    fused with RRF across all variations. Books appearing in multiple variation
+    rankings get boosted scores.
+
+    If empty, only reformulated_query is used (single-query mode).
+    The reformulated_query is always included as the primary variation
+    by the SearchService - these are ADDITIONAL variations.
+    """
+
+    def __post_init__(self) -> None:
+        """Validate query intent constraints."""
+        if not self.original_query or not self.original_query.strip():
+            raise ValueError("original_query cannot be empty")
+
+        if not self.reformulated_query or not self.reformulated_query.strip():
+            raise ValueError("reformulated_query cannot be empty")
+
+        if not (0.0 <= self.confidence <= 1.0):
+            raise ValueError(
+                f"confidence must be between 0.0 and 1.0, got {self.confidence}"
+            )
+
+        if not self.reasoning or not self.reasoning.strip():
+            raise ValueError("reasoning cannot be empty")
+
+        # Note: intent_type is validated by Literal type hint at runtime
+        # extracted_filters is validated by SearchFilters.__post_init__

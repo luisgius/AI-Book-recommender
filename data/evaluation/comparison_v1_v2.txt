@@ -1,0 +1,98 @@
+================================================================================
+COMPARISON: results.json (v1) vs results_v2.json (v2)
+================================================================================
+
+MODE: HYBRID RRF
+--------------------------------------------------------------------------------
+Metric                                   v1           v2        Delta
+--------------------------------------------------------------------------------
+recall_at_10                         0.5838       0.5307      -0.0531
+recall_at_100                        1.0000       0.9091      -0.0909
+ndcg_at_10                           0.6168       0.5424      -0.0744
+mrr                                  0.7480       0.6800      -0.0680
+ild_at_10                            0.8871       0.8938      +0.0067
+ild_coverage_at_10                      N/A       1.0000          NEW
+
+MODE: LEXICAL ONLY
+--------------------------------------------------------------------------------
+Metric                                   v1           v2        Delta
+--------------------------------------------------------------------------------
+recall_at_10                         0.4846       0.4406      -0.0441
+recall_at_100                        0.9233       0.8394      -0.0839
+ndcg_at_10                           0.5191       0.4603      -0.0588
+mrr                                  0.6380       0.5800      -0.0580
+ild_at_10                            0.8997       0.9017      +0.0021
+ild_coverage_at_10                      N/A       1.0000          NEW
+
+MODE: VECTOR ONLY
+--------------------------------------------------------------------------------
+Metric                                   v1           v2        Delta
+--------------------------------------------------------------------------------
+recall_at_10                         0.5474       0.4977      -0.0498
+recall_at_100                        0.9961       0.9055      -0.0906
+ndcg_at_10                           0.6022       0.5301      -0.0721
+mrr                                  0.7876       0.7160      -0.0716
+ild_at_10                            0.8728       0.8760      +0.0032
+ild_coverage_at_10                      N/A       1.0000          NEW
+
+MODE: HYBRID RRF + MMR
+--------------------------------------------------------------------------------
+Metric                                   v1           v2        Delta
+--------------------------------------------------------------------------------
+recall_at_10                         0.5816       0.5288      -0.0529
+recall_at_100                        1.0000       0.9091      -0.0909
+ndcg_at_10                           0.5933       0.5274      -0.0659
+mrr                                  0.7662       0.6965      -0.0697
+ild_at_10                            0.9072       0.9136      +0.0064
+ild_coverage_at_10                      N/A       1.0000          NEW
+
+================================================================================
+METHODOLOGICAL DIFFERENCES
+================================================================================
+
+Aspect                                                     v1              v2
+--------------------------------------------------------------------------------
+Total queries processed                                    40              44
+Queries with no judged relevant docs                         4               4
+Skipped queries                                             4               0
+NDCG gain function                                 rel(lineal)    exp2_minus_1
+ILD coverage metric                                        NO             YES
+Pooling limit per mode                                    N/A              50
+
+================================================================================
+SUMMARY FOR TFG (copy-paste ready)
+================================================================================
+
+CAMBIOS METODOLOGICOS EN v2:
+
+1. INCLUSION DE QUERIES SIN RELEVANTES:
+   - v1: 40 queries evaluadas (solo con al menos un documento juzgado relevante)
+   - v2: 44 queries evaluadas (4 sin documentos juzgados relevantes)
+   - Impacto: Las metricas v2 son mas bajas pero defendibles.
+     Se evita sesgo de seleccion al incluir queries dificiles con score = 0.
+
+2. NDCG GAIN FUNCTION EXPLICITA:
+   - v1: gain = rel (lineal), no explicitada en config
+   - v2: gain = 2^rel - 1 (estandar TREC, campo exp2_minus_1 en config)
+   - Impacto: Trazabilidad y reproducibilidad garantizadas.
+
+3. METRICAS DE DIVERSIDAD AMPLIADAS:
+   - v1: ILD basado en distancia Jaccard sobre autores/categorias (sin medir cobertura)
+   - v2: ILD + ild_coverage_at_k (misma proxy autores/categorias, pero excluye pares sin metadata del promedio y reporta cobertura)
+   - Impacto: Evita sesgos cuando faltan metadatos y hace la diversidad interpretable.
+
+4. POOLING LIMIT CONFIGURABLE:
+   - v2: pool_per_mode_limit = 50 (control de profundidad de juicios)
+   - Impacto: Reproducibilidad y control de costes de anotacion.
+
+5. CAMBIOS OBSERVADOS EN METRICAS (modo hybrid_rrf):
+   - NDCG@10:       0.6168 -> 0.5424 (Delta = -0.0744)
+   - Recall@10:     0.5838 -> 0.5307 (Delta = -0.0531)
+   - MRR:           0.7480 -> 0.6800 (Delta = -0.0680)
+   - ILD@10:        0.8871 -> 0.8938 (Delta = +0.0067)
+   - ILD_cov@10:    N/A -> 1.0000 (NEW)
+
+CONCLUSION:
+La evaluacion v2 es mas rigurosa y defendible academicamente.
+Las metricas son ligeramente inferiores debido a la inclusion de queries
+sin documentos juzgados relevantes, lo cual refleja un escenario de uso real.

@@ -349,3 +349,24 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         """
         self._book_map = {str(book.id): book for book in books}
         logger.info(f"Updated book mapping with {len(self._book_map)} books")
+
+    def is_ready(self) -> bool:
+        """
+        Check if the FAISS index is loaded and ready for search operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if the index is loaded and searchable, False otherwise
+        """
+        try:
+            index = self._index_provider.get_index()
+            id_mapping = self._index_provider.get_id_mapping()
+            return (
+                index is not None
+                and id_mapping is not None
+                and index.ntotal > 0
+                and len(self._book_map) > 0
+            )
+        except Exception:
+            return False

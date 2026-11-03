@@ -1,96 +1,96 @@
 """
-Integration tests for SqliteBookCatalogRepository.
+Tests for SqliteBookCatalogRepository.
 
-These tests use a real in-memory SQLite database (no mocks) to verify
-the repository correctly implements the BookCatalogRepository protocol.
+Validates the SQLite implementation of the BookCatalogRepository protocol,
+including CRUD operations, constraint handling, and data serialization.
 
-Test categories:
-1. Basic CRUD operations (save, get, delete)
-2. Upsert semantics (deduplication by source+source_id)
-3. UUID preservation on upsert
-4. Edge cases (empty lists, None values, special characters)
-5. Batch operations (save_many transactionality)
+Test Pattern: AAA (Arrange-Act-Assert)
+- Arrange: Set up test data and preconditions
+- Act: Execute the operation being tested
+- Assert: Verify the expected outcomes
 """
-
 import pytest
-from datetime import datetime, timezone
-from uuid import UUID
-
-from app.domain.utils.uuid7 import uuid7
+from uuid import uuid4
 
 from app.domain.entities import Book
-from app.domain.value_objects import BookMetadata
-from app.infrastructure.db.sqlite_book_catalog_repository import (
-    SqliteBookCatalogRepository,
-)
+from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
 
 
-# -----------------------------------------------------------------------------
-# Fixtures
-# -----------------------------------------------------------------------------
+# Arrange (preparar datos prueba) Act (ejecutar accion a probar) Assert (verificar resultado es bueno)
+
+# ============================================================================
+# FIXTURES
+# ============================================================================
+
+@pytest.fixture
+def repo(tmp_path):
+    """
+    Create a repository with a temporary database for each test.
+    
+    Uses pytest's tmp_path fixture to ensure isolation between tests.
+    The database is automatically cleaned up after each test.
+    """
+    db_path = tmp_path / "test_catalog.db"
+    return SqliteBookCatalogRepository(db_path)
 
 
 @pytest.fixture
-def repo() -> SqliteBookCatalogRepository:
+def sample_book():
     """
-    Create a fresh in-memory SQLite repository for each test.
-
-    Using :memory: ensures tests are isolated and fast.
+    Create a sample book entity for testing.
+    
+    Returns a fully populated Book with all fields set,
+    useful for testing serialization/deserialization.
     """
-    return SqliteBookCatalogRepository("sqlite:///:memory:")
-
-
-@pytest.fixture
-def sample_book() -> Book:
-    """Create a sample book for testing."""
-    return Book(
-        id=uuid7(),
-        title="Don Quijote de la Mancha",
+    return Book.create_new(
+        title="El Quijote",
         authors=["Miguel de Cervantes"],
-        description="La historia del ingenioso hidalgo.",
+        description="Novela clásica española",
         language="es",
         categories=["Fiction", "Classic"],
-        published_date=datetime(1605, 1, 16, tzinfo=timezone.utc),
         source="google_books",
-        source_id="abc123",
-        metadata=BookMetadata(
-            isbn="1234567890",
-            page_count=1000,
-            average_rating=4.8,
-        ),
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        source_id="quijote_123"
     )
 
 
-@pytest.fixture
-def sample_book_without_metadata() -> Book:
-    """Create a sample book without optional metadata."""
-    return Book(
-        id=uuid7(),
-        title="Simple Book",
-        authors=["Author One"],
-        source="open_library",
-        source_id="ol12345",
-    )
+# ============================================================================
+# INITIALIZATION TESTS
+# ============================================================================
+
+class TestRepositoryInitialization:
+    """Tests for repository initialization and schema creation."""
+
+    def test_creates_table_on_init(self, repo):
+        """Repository should create the books table automatically on initialization."""
+        # Assert: New repo should be empty but functional
+        assert repo.count() == 0
 
 
-# -----------------------------------------------------------------------------
-# Basic CRUD Tests
-# -----------------------------------------------------------------------------
+# ============================================================================
+# SAVE OPERATION TESTS
+# ============================================================================
 
+class TestSaveOperation:
+    """Tests for the save() method."""
 
-class TestSaveAndRetrieve:
-    """Tests for save() and get_by_id() operations."""
-
-    def test_save_and_get_by_id(
-        self, repo: SqliteBookCatalogRepository, sample_book: Book
-    ) -> None:
-        """A saved book should be retrievable by its UUID."""
+    def test_save_increments_count(self, repo, sample_book):
+        """Saving a book should increment the total count by one."""
+        # Arrange
+        assert repo.count() == 0
+        
+        # Act
         repo.save(sample_book)
+        
+        # Assert
+        assert repo.count() == 1
 
+    def test_save_persists_all_fields(self, repo, sample_book):
+        """Saved book should retain all its fields when retrieved."""
+        # Act
+        repo.save(sample_book)
         retrieved = repo.get_by_id(sample_book.id)
-
+        
+        # Assert: All fields should match
         assert retrieved is not None
         assert retrieved.id == sample_book.id
         assert retrieved.title == sample_book.title
@@ -101,452 +101,486 @@ class TestSaveAndRetrieve:
         assert retrieved.source == sample_book.source
         assert retrieved.source_id == sample_book.source_id
 
-    def test_get_by_id_not_found(self, repo: SqliteBookCatalogRepository) -> None:
-        """Getting a non-existent UUID should return None."""
-        result = repo.get_by_id(uuid7())
-        assert result is None
 
-    def test_save_preserves_metadata(
-        self, repo: SqliteBookCatalogRepository, sample_book: Book
-    ) -> None:
-        """BookMetadata should round-trip through save/get."""
+# ============================================================================
+# GET BY ID TESTS
+# ============================================================================
+
+class TestGetById:
+    """Tests for the get_by_id() method."""
+
+    def test_returns_book_when_exists(self, repo, sample_book):
+        """Should return the book when it exists in the database."""
+        # Arrange
         repo.save(sample_book)
+        
+        # Act
         retrieved = repo.get_by_id(sample_book.id)
-
-        assert retrieved is not None
-        assert retrieved.metadata is not None
-        assert retrieved.metadata.isbn == "1234567890"
-        assert retrieved.metadata.page_count == 1000
-        assert retrieved.metadata.average_rating == 4.8
-
-    def test_save_without_metadata(
-        self, repo: SqliteBookCatalogRepository, sample_book_without_metadata: Book
-    ) -> None:
-        """Books without metadata should save and load correctly."""
-        repo.save(sample_book_without_metadata)
-        retrieved = repo.get_by_id(sample_book_without_metadata.id)
-
-        assert retrieved is not None
-        assert retrieved.metadata is None
-
-    def test_save_with_unicode_authors(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """Authors with non-ASCII characters should be preserved."""
-        book = Book(
-            id=uuid7(),
-            title="Test Book",
-            authors=["José García Márquez", "Müller", "João Silva"],
-            source="test",
-            source_id="unicode_test",
-        )
-        repo.save(book)
-        retrieved = repo.get_by_id(book.id)
-
-        assert retrieved is not None
-        assert retrieved.authors == book.authors
-
-
-class TestGetBySourceId:
-    """Tests for get_by_source_id() operation."""
-
-    def test_get_by_source_id_found(
-        self, repo: SqliteBookCatalogRepository, sample_book: Book
-    ) -> None:
-        """A saved book should be retrievable by source+source_id."""
-        repo.save(sample_book)
-
-        retrieved = repo.get_by_source_id(sample_book.source, sample_book.source_id)
-
+        
+        # Assert
         assert retrieved is not None
         assert retrieved.id == sample_book.id
 
-    def test_get_by_source_id_not_found(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """Non-existent source+source_id should return None."""
-        result = repo.get_by_source_id("nonexistent", "xyz")
-        assert result is None
-
-    def test_get_by_source_id_different_source_same_id(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """Same source_id from different sources should be distinct."""
-        book1 = Book(
-            id=uuid7(),
-            title="Book from Google",
-            authors=["Author A"],
-            source="google_books",
-            source_id="shared_id",
-        )
-        book2 = Book(
-            id=uuid7(),
-            title="Book from Open Library",
-            authors=["Author B"],
-            source="open_library",
-            source_id="shared_id",
-        )
-
-        repo.save(book1)
-        repo.save(book2)
-
-        google_book = repo.get_by_source_id("google_books", "shared_id")
-        ol_book = repo.get_by_source_id("open_library", "shared_id")
-
-        assert google_book is not None
-        assert ol_book is not None
-        assert google_book.id != ol_book.id
-        assert google_book.title == "Book from Google"
-        assert ol_book.title == "Book from Open Library"
+    def test_returns_none_when_not_found(self, repo):
+        """Should return None for non-existent book IDs."""
+        # Arrange
+        random_uuid = uuid4()
+        
+        # Act
+        retrieved = repo.get_by_id(random_uuid)
+        
+        # Assert
+        assert retrieved is None
 
 
-# -----------------------------------------------------------------------------
-# Upsert & Deduplication Tests
-# -----------------------------------------------------------------------------
+# ============================================================================
+# DELETE OPERATION TESTS
+# ============================================================================
 
+class TestDeleteOperation:
+    """Tests for the delete() method."""
 
-class TestUpsertBehavior:
-    """Tests for upsert semantics based on (source, source_id)."""
-
-    def test_upsert_updates_existing_book(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """
-        Saving a book with same (source, source_id) should update, not insert.
-        """
-        original = Book(
-            id=uuid7(),
-            title="Original Title",
-            authors=["Original Author"],
-            source="google_books",
-            source_id="upsert_test",
-        )
-        repo.save(original)
-
-        updated = Book(
-            id=uuid7(),  # Different UUID!
-            title="Updated Title",
-            authors=["Updated Author", "Second Author"],
-            source="google_books",
-            source_id="upsert_test",  # Same source+source_id
-            description="New description",
-        )
-        repo.save(updated)
-
-        # Should have exactly 1 book
-        assert repo.count() == 1
-
-        # Retrieve by original UUID (should still work)
-        retrieved = repo.get_by_id(original.id)
-        assert retrieved is not None
-        assert retrieved.title == "Updated Title"
-        assert retrieved.authors == ["Updated Author", "Second Author"]
-        assert retrieved.description == "New description"
-
-    def test_upsert_preserves_original_uuid(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """
-        On upsert, the original UUID should be preserved, not replaced.
-
-        This is critical because other systems (BM25 index, vector index)
-        may reference books by UUID.
-        """
-        original_uuid = uuid7()
-        original = Book(
-            id=original_uuid,
-            title="Original",
-            authors=["Author"],
-            source="test_source",
-            source_id="preserve_uuid_test",
-        )
-        repo.save(original)
-
-        new_uuid = uuid7()
-        updated = Book(
-            id=new_uuid,  # Different UUID
-            title="Updated",
-            authors=["Author"],
-            source="test_source",
-            source_id="preserve_uuid_test",
-        )
-        repo.save(updated)
-
-        # Book should still have original UUID
-        retrieved = repo.get_by_source_id("test_source", "preserve_uuid_test")
-        assert retrieved is not None
-        assert retrieved.id == original_uuid
-        assert retrieved.id != new_uuid
-
-        # New UUID should not exist
-        by_new_uuid = repo.get_by_id(new_uuid)
-        assert by_new_uuid is None
-
-
-# -----------------------------------------------------------------------------
-# get_all and count Tests
-# -----------------------------------------------------------------------------
-
-
-class TestGetAllAndCount:
-    """Tests for get_all() and count() operations."""
-
-    def test_get_all_empty(self, repo: SqliteBookCatalogRepository) -> None:
-        """Empty catalog should return empty list."""
-        assert repo.get_all() == []
-        assert repo.count() == 0
-
-    def test_get_all_with_books(
-        self, repo: SqliteBookCatalogRepository, sample_book: Book
-    ) -> None:
-        """get_all should return all saved books."""
-        book2 = Book(
-            id=uuid7(),
-            title="Second Book",
-            authors=["Author Two"],
-            source="test",
-            source_id="second",
-        )
-
-        repo.save(sample_book)
-        repo.save(book2)
-
-        all_books = repo.get_all()
-        assert len(all_books) == 2
-        assert repo.count() == 2
-
-    def test_get_all_with_limit(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """get_all(limit=N) should return at most N books in deterministic order."""
-        for i in range(5):
-            book = Book(
-                id=uuid7(),
-                title=f"Book {i}",
-                authors=["Author"],
-                source="test",
-                source_id=f"book_{i}",
-            )
-            repo.save(book)
-
-        # Verify limit is respected
-        limited = repo.get_all(limit=3)
-        assert len(limited) == 3
-        assert repo.count() == 5
-
-        # Verify deterministic ordering (by insertion order via id asc)
-        all_books = repo.get_all()
-        assert [b.title for b in all_books] == ["Book 0", "Book 1", "Book 2", "Book 3", "Book 4"]
-
-
-# -----------------------------------------------------------------------------
-# Delete Tests
-# -----------------------------------------------------------------------------
-
-
-class TestDelete:
-    """Tests for delete() operation."""
-
-    def test_delete_existing_book(
-        self, repo: SqliteBookCatalogRepository, sample_book: Book
-    ) -> None:
+    def test_delete_existing_returns_true(self, repo, sample_book):
         """Deleting an existing book should return True and remove it."""
+        # Arrange
         repo.save(sample_book)
-        assert repo.count() == 1
-
+        
+        # Act
         result = repo.delete(sample_book.id)
-
+        
+        # Assert
         assert result is True
         assert repo.count() == 0
         assert repo.get_by_id(sample_book.id) is None
 
-    def test_delete_nonexistent_book(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
+    def test_delete_nonexistent_returns_false(self, repo):
         """Deleting a non-existent book should return False."""
-        result = repo.delete(uuid7())
+        # Arrange
+        random_uuid = uuid4()
+        
+        # Act
+        result = repo.delete(random_uuid)
+        
+        # Assert
         assert result is False
 
 
-# -----------------------------------------------------------------------------
-# Batch Operations Tests
-# -----------------------------------------------------------------------------
+# ============================================================================
+# GET ALL TESTS
+# ============================================================================
 
+class TestGetAll:
+    """Tests for the get_all() method."""
+
+    def test_returns_empty_list_when_no_books(self, repo):
+        """Should return an empty list when the catalog is empty."""
+        # Act
+        result = repo.get_all()
+        
+        # Assert
+        assert result == []
+
+    def test_returns_all_saved_books(self, repo, sample_book):
+        """Should return all books that have been saved."""
+        # Arrange: Save 4 books total (1 sample + 3 generated)
+        repo.save(sample_book)
+        for i in range(3):
+            book = Book.create_new(
+                title=f"Book {i}",
+                authors=["Author"],
+                source="test",
+                source_id=f"id_{i}"
+            )
+            repo.save(book)
+        
+        # Act
+        result = repo.get_all()
+        
+        # Assert
+        assert len(result) == 4
+        assert all(isinstance(book, Book) for book in result)
+
+    def test_get_all_with_limit(self, repo, sample_book):
+        """Should return only the specified number of books when limit is set."""
+        
+        for i in range(3):
+            book = Book.create_new(
+                title=f"Book {i}",
+                authors=["Author"],
+                source="test",
+                source_id=f"id_{i}"
+            )
+            repo.save(book)
+        
+        # Act
+        result = repo.get_all(limit = 2)
+
+        assert len(result) == 2
+        assert all(isinstance(book, Book) for book in result)
+        
+        
+
+    def test_get_all_ordered_by_created_at_desc(self, repo):
+        """Should return books ordered by created_at in descending order (newest first)."""
+        # Arrange: Create books with explicit timestamps to ensure different created_at
+        from datetime import datetime, timedelta, UTC
+        
+        base_time = datetime.now(UTC)
+        books = []
+        for i in range(3):
+            book = Book(
+                id=uuid4(),
+                title=f"Book {i}",
+                authors=["Author"],
+                source="test",
+                source_id=f"id_{i}",
+                created_at=base_time + timedelta(hours=i),  # Book 0 oldest, Book 2 newest
+                updated_at=base_time + timedelta(hours=i),
+            )
+            books.append(book)
+            repo.save(book)
+        
+        # Act
+        result = repo.get_all()
+
+        # Assert: DESC order means newest (Book 2) comes first
+        assert result[0].title == "Book 2"  # Newest
+        assert result[1].title == "Book 1"
+        assert result[2].title == "Book 0"  # Oldest
+        assert result[0].created_at > result[1].created_at > result[2].created_at  # DESC = primero es más nuevo
+
+
+# ============================================================================
+# SAVE MANY TESTS
+# ============================================================================
 
 class TestSaveMany:
-    """Tests for save_many() batch operation."""
+    """Tests for the save_many() batch operation."""
 
-    def test_save_many_basic(self, repo: SqliteBookCatalogRepository) -> None:
-        """save_many should insert multiple books efficiently."""
+    def test_save_many_empty_list(self, repo):
+        """Saving an empty list should not fail and not change the count."""
+        value_before = repo.count()
+        books = []
+        repo.save_many(books)
+        value_after = repo.count()
+
+        assert value_before == value_after
+
+
+
+    def test_save_many_multiple_books(self, repo):
+        """Should save multiple books in a single transaction."""
+        # Arrange
+        value_before = repo.count()
         books = [
-            Book(
-                id=uuid7(),
-                title=f"Book {i}",
-                authors=[f"Author {i}"],
-                source="batch_test",
-                source_id=f"batch_{i}",
+            Book.create_new(title=f"Book {i}", authors=["Author"], source="test", source_id=f"id_{i}")
+            for i in range(3)
+        ]
+        
+        # Act
+        repo.save_many(books)
+        
+        # Assert
+        assert repo.count() == value_before + 3
+
+
+    def test_save_many_duplicate_source_id_raises_error(self, repo, sample_book):
+        """Should raise ValueError when batch contains duplicate (source, source_id) with different ID."""
+        # Arrange: First save a book
+        repo.save(sample_book)
+        
+        # Create a new book with SAME (source, source_id) but DIFFERENT UUID
+        duplicate_book = Book.create_new(
+            title="Different Book",
+            authors=["Other Author"],
+            source=sample_book.source,        # Same source
+            source_id=sample_book.source_id,  # Same source_id
+        )
+        
+        # Act & Assert: Should raise ValueError
+        with pytest.raises(ValueError):
+            repo.save_many([duplicate_book])
+
+    def test_save_many_is_atomic(self, repo):
+        """If one book fails validation, none should be saved (transaction rollback)."""
+        # Arrange: Create a valid book and one that will cause a constraint violation
+        repo.save(Book.create_new(title="Existing", authors=["A"], source="test", source_id="existing_id"))
+        initial_count = repo.count()
+        
+        books = [
+            Book.create_new(title="Valid Book", authors=["Author"], source="test", source_id="new_id"),
+            Book.create_new(title="Duplicate", authors=["Author"], source="test", source_id="existing_id"),  # Will fail
+        ]
+        
+        # Act: Try to save batch (should fail)
+        try:
+            repo.save_many(books)
+        except ValueError:
+            pass  # Expected
+        
+        # Assert: Count should remain unchanged (atomic = all or nothing)
+        # Note: This test may fail if save_many doesn't rollback on error
+        assert repo.count() == initial_count
+
+
+# ============================================================================
+# GET BY SOURCE ID TESTS
+# ============================================================================
+
+class TestGetBySourceId:
+    """Tests for the get_by_source_id() method."""
+
+    def test_returns_book_when_exists(self, repo, sample_book):
+        """Should return the book when source and source_id match."""
+        repo.save(sample_book)
+        source_id = sample_book.source_id
+        source = sample_book.source
+
+        book = repo.get_by_source_id(source, source_id)
+
+        assert book.id == sample_book.id
+
+    def test_returns_none_when_not_found(self, repo):
+        """Should return None when no book matches the source and source_id."""
+        # Arrange: Use non-existent source/source_id
+        source = "nonexistent_source"
+        source_id = "nonexistent_id"
+
+        # Act
+        book = repo.get_by_source_id(source, source_id)
+
+        # Assert
+        assert book is None
+
+
+
+# ============================================================================
+# CONSTRAINT TESTS
+# ============================================================================
+
+class TestUniqueConstraints:
+    """Tests for database constraint enforcement."""
+
+    def test_save_updates_existing_book_same_id(self, repo, sample_book):
+        """Saving a book with the same ID should update it, not create duplicate."""
+        repo.save(sample_book)
+        original_id = sample_book.id
+
+        new_book = Book(
+            id=original_id,  # Same ID
+            title="Title updated",  # Different title
+            authors=sample_book.authors,
+            source=sample_book.source,
+            source_id=sample_book.source_id,
             )
-            for i in range(10)
-        ]
+         
+        repo.save(new_book)
 
-        repo.save_many(books)
+        assert repo.count() ==1
+        retrieved = repo.get_by_id(original_id)
+        assert retrieved.title == "Title updated"
+    
 
-        assert repo.count() == 10
-        for book in books:
-            retrieved = repo.get_by_id(book.id)
-            assert retrieved is not None
 
-    def test_save_many_empty_list(self, repo: SqliteBookCatalogRepository) -> None:
-        """save_many with empty list should not error."""
-        repo.save_many([])
-        assert repo.count() == 0
+    def test_save_duplicate_source_id_different_id_raises_error(self, repo, sample_book):
+        """Should raise ValueError when (source, source_id) exists with different UUID."""
+        repo.save(sample_book)
 
-    def test_save_many_with_upserts(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """save_many should handle mixed inserts and upserts."""
-        # Insert initial book
-        existing = Book(
-            id=uuid7(),
-            title="Existing Book",
-            authors=["Existing Author"],
-            source="batch_upsert",
-            source_id="existing",
+        new_book = Book(
+            id=uuid4(),  # Different ID
+            title=sample_book.title,  
+            authors=sample_book.authors,
+            source=sample_book.source,
+            source_id=sample_book.source_id,
+            )
+        
+        with pytest.raises(ValueError):
+            repo.save_many([new_book])
+        
+
+
+
+
+# ============================================================================
+# SERIALIZATION TESTS
+# ============================================================================
+
+class TestSerialization:
+    """Tests for data serialization/deserialization to SQLite."""
+
+    def test_save_and_retrieve_with_metadata(self, repo):
+        """Book with full BookMetadata should serialize and deserialize correctly."""
+        # Arrange
+        from app.domain.value_objects import BookMetadata
+        
+        metadata = BookMetadata(
+            isbn="1234567890",
+            isbn13="1234567890123",
+            publisher="Editorial Planeta",
+            page_count=500,
+            average_rating=4.5,
+            ratings_count=1000,
+            thumbnail_url="https://example.com/cover.jpg",
+            preview_link="https://example.com/preview",
         )
-        repo.save(existing)
-
-        # Batch with one upsert and one insert
-        books = [
-            Book(
-                id=uuid7(),  # Different UUID, but same source+source_id
-                title="Updated Existing",
-                authors=["Updated Author"],
-                source="batch_upsert",
-                source_id="existing",
-            ),
-            Book(
-                id=uuid7(),
-                title="New Book",
-                authors=["New Author"],
-                source="batch_upsert",
-                source_id="new",
-            ),
-        ]
-
-        repo.save_many(books)
-
-        # Should have 2 books total (1 updated + 1 new)
-        assert repo.count() == 2
-
-        # Existing book should be updated but keep original UUID
-        retrieved = repo.get_by_id(existing.id)
-        assert retrieved is not None
-        assert retrieved.title == "Updated Existing"
-
-
-# -----------------------------------------------------------------------------
-# Edge Cases & Data Integrity Tests
-# -----------------------------------------------------------------------------
-
-
-class TestEdgeCases:
-    """Tests for edge cases and data integrity."""
-
-    def test_empty_categories_list(self, repo: SqliteBookCatalogRepository) -> None:
-        """Empty categories list should be preserved."""
-        book = Book(
-            id=uuid7(),
-            title="No Categories",
+        book = Book.create_new(
+            title="Book with Metadata",
             authors=["Author"],
-            categories=[],
             source="test",
-            source_id="no_cats",
+            source_id="meta_1",
+            metadata=metadata,
         )
+        
+        # Act
         repo.save(book)
         retrieved = repo.get_by_id(book.id)
+        
+        # Assert
+        assert retrieved.metadata is not None
+        assert retrieved.metadata.isbn == "1234567890"
+        assert retrieved.metadata.isbn13 == "1234567890123"
+        assert retrieved.metadata.publisher == "Editorial Planeta"
+        assert retrieved.metadata.page_count == 500
+        assert retrieved.metadata.average_rating == 4.5
+        assert retrieved.metadata.ratings_count == 1000
+        assert retrieved.metadata.thumbnail_url == "https://example.com/cover.jpg"
+        assert retrieved.metadata.preview_link == "https://example.com/preview"
 
-        assert retrieved is not None
-        assert retrieved.categories == []
-
-    def test_none_description(self, repo: SqliteBookCatalogRepository) -> None:
-        """None description should be preserved."""
-        book = Book(
-            id=uuid7(),
-            title="No Description",
+    def test_save_and_retrieve_with_null_optional_fields(self, repo):
+        """Book with None optional fields should save and load correctly."""
+        # Arrange: Book with minimal required fields only
+        book = Book.create_new(
+            title="Minimal Book",
             authors=["Author"],
-            description=None,
             source="test",
-            source_id="no_desc",
+            # No description, language, categories, metadata, etc.
         )
+        
+        # Act
         repo.save(book)
         retrieved = repo.get_by_id(book.id)
-
+        
+        # Assert
         assert retrieved is not None
+        assert retrieved.title == "Minimal Book"
         assert retrieved.description is None
+        assert retrieved.language is None
+        assert retrieved.metadata is None
 
-    def test_datetime_with_timezone(self, repo: SqliteBookCatalogRepository) -> None:
-        """Timezone-aware datetimes should round-trip correctly."""
-        published = datetime(2024, 6, 15, 10, 30, 0, tzinfo=timezone.utc)
-        book = Book(
-            id=uuid7(),
-            title="Dated Book",
-            authors=["Author"],
-            published_date=published,
-            source="test",
-            source_id="dated",
-        )
-        repo.save(book)
-        retrieved = repo.get_by_id(book.id)
-
-        assert retrieved is not None
-        assert retrieved.published_date is not None
-        assert retrieved.published_date.year == 2024
-        assert retrieved.published_date.month == 6
-        assert retrieved.published_date.day == 15
-
-    def test_multiple_authors(self, repo: SqliteBookCatalogRepository) -> None:
-        """Multiple authors should be preserved in order."""
-        book = Book(
-            id=uuid7(),
-            title="Multi-Author Book",
-            authors=["First Author", "Second Author", "Third Author"],
+    def test_authors_list_serialization(self, repo):
+        """Authors list should be serialized to JSON and back."""
+        # Arrange: Book with multiple authors
+        book = Book.create_new(
+            title="Collaborative Work",
+            authors=["Author One", "Author Two", "Author Three"],
             source="test",
             source_id="multi_author",
         )
+        
+        # Act
         repo.save(book)
         retrieved = repo.get_by_id(book.id)
+        
+        # Assert
+        assert retrieved.authors == ["Author One", "Author Two", "Author Three"]
+        assert len(retrieved.authors) == 3
 
-        assert retrieved is not None
-        assert retrieved.authors == ["First Author", "Second Author", "Third Author"]
-
-    def test_special_characters_in_title(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """Titles with special characters should be preserved."""
-        book = Book(
-            id=uuid7(),
-            title="Book: A 'Special' Title with \"Quotes\" & Symbols!",
+    def test_categories_list_serialization(self, repo):
+        """Categories list should be serialized to JSON and back."""
+        # Arrange: Book with multiple categories
+        book = Book.create_new(
+            title="Multi-genre Book",
             authors=["Author"],
+            categories=["Fiction", "Mystery", "Thriller", "Bestseller"],
             source="test",
-            source_id="special_chars",
+            source_id="multi_cat",
         )
+        
+        # Act
         repo.save(book)
         retrieved = repo.get_by_id(book.id)
+        
+        # Assert
+        assert retrieved.categories == ["Fiction", "Mystery", "Thriller", "Bestseller"]
+        assert len(retrieved.categories) == 4
 
-        assert retrieved is not None
-        assert retrieved.title == book.title
 
-    def test_save_without_source_id_raises_error(
-        self, repo: SqliteBookCatalogRepository
-    ) -> None:
-        """Saving a book without source_id should raise ValueError."""
-        book = Book(
-            id=uuid7(),
-            title="Book Without Source ID",
-            authors=["Author"],
-            source="test",
-            source_id=None,
-        )
+# ============================================================================
+# DATE PARSING TESTS
+# ============================================================================
 
-        with pytest.raises(ValueError, match="source_id is required"):
-            repo.save(book)
+class TestDateParsing:
+    """Tests for the _parse_date_safe() helper method."""
+
+    def test_parse_full_iso_date(self, repo):
+        """Should parse full ISO format like '2023-05-15T10:30:00'."""
+        # Act
+        result = repo._parse_date_safe("2023-05-15T10:30:00")
+        
+        # Assert
+        assert result is not None
+        assert result.year == 2023
+        assert result.month == 5
+        assert result.day == 15
+
+    def test_parse_year_month_date(self, repo):
+        """Should parse year-month format like '2023-05'."""
+        # Act
+        result = repo._parse_date_safe("2023-05")
+        
+        # Assert
+        assert result is not None
+        assert result.year == 2023
+        assert result.month == 5
+
+    def test_parse_year_only_date(self, repo):
+        """Should parse year-only format like '2023'."""
+        # Act
+        result = repo._parse_date_safe("2023")
+        
+        # Assert
+        assert result is not None
+        assert result.year == 2023
+
+    def test_parse_invalid_date_returns_none(self, repo):
+        """Should return None for invalid date strings without crashing."""
+        # Act & Assert: Various invalid formats should return None, not crash
+        assert repo._parse_date_safe("not-a-date") is None
+        assert repo._parse_date_safe("2023/05/15") is None
+        assert repo._parse_date_safe("") is None
+        assert repo._parse_date_safe(None) is None
+
+
+# ============================================================================
+# COUNT TESTS
+# ============================================================================
+
+class TestCount:
+    """Tests for the count() method."""
+
+    def test_count_empty_catalog(self, repo):
+        """Should return 0 for an empty catalog."""
+        # Assert
+        assert repo.count() == 0
+
+    def test_count_reflects_saves_and_deletes(self, repo, sample_book):
+        """Count should accurately reflect saves and deletions."""
+        # Assert initial state
+        assert repo.count() == 0
+        
+        # Act: Save a book
+        repo.save(sample_book)
+        assert repo.count() == 1
+        
+        # Act: Save another book
+        another_book = Book.create_new(title="Another", authors=["A"], source="test", source_id="x")
+        repo.save(another_book)
+        assert repo.count() == 2
+        
+        # Act: Delete one
+        repo.delete(sample_book.id)
+        assert repo.count() == 1
+        
+        # Act: Delete the other
+        repo.delete(another_book.id)
+        assert repo.count() == 0

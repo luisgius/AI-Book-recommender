@@ -24,16 +24,14 @@ The test demonstrates the value of hybrid search:
 
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
-from uuid import UUID
-
-from app.domain.utils.uuid7 import uuid7
+from uuid import uuid4, UUID
 
 import pytest
 
 from app.domain.entities import Book, SearchResult, Explanation
 from app.domain.value_objects import SearchQuery, SearchFilters
 from app.domain.ports import LLMClient
-from app.domain.services import SearchService  # Now from services package
+from app.domain.services import SearchService
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository

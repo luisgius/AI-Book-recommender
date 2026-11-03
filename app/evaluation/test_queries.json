@@ -1,0 +1,222 @@
+[
+  {
+    "query_id": "q01",
+    "text": "machine learning python",
+    "category": "ai"
+  },
+  {
+    "query_id": "q02",
+    "text": "Novela historica espana",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q03",
+    "text": "recetas cocina rumana",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q04",
+    "text": "deep learning neural networks for image recognition",
+    "category": "ai"
+  },
+  {
+    "query_id": "q05",
+    "text": "introduccion a la inteligencia artificial para principiantes",
+    "category": "ai"
+  },
+  {
+    "query_id": "q06",
+    "text": "natural language processing with transformers",
+    "category": "ai"
+  },
+  {
+    "query_id": "q07",
+    "text": "algoritmos de aprendizaje automatico sin matematicas avanzadas",
+    "category": "ai"
+  },
+  {
+    "query_id": "q08",
+    "text": "reinforcement learning robotics applications",
+    "category": "ai"
+  },
+  {
+    "query_id": "q09",
+    "text": "data science pandas numpy tutorial",
+    "category": "ai"
+  },
+  {
+    "query_id": "q10",
+    "text": "programacion en python para analisis de datos",
+    "category": "ai"
+  },
+  {
+    "query_id": "q11",
+    "text": "computer vision opencv beginner guide",
+    "category": "ai"
+  },
+  {
+    "query_id": "q12",
+    "text": "redes neuronales convolucionales ejemplos practicos",
+    "category": "ai"
+  },
+  {
+    "query_id": "q13",
+    "text": "tensorflow keras deep learning projects",
+    "category": "ai"
+  },
+  {
+    "query_id": "q14",
+    "text": "GPT large language models explained",
+    "category": "ai"
+  },
+  {
+    "query_id": "q15",
+    "text": "novela guerra civil espanola",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q16",
+    "text": "historical fiction medieval Europe kings and queens",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q17",
+    "text": "literatura espanola siglo XIX realismo",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q18",
+    "text": "Spanish civil war novels in English translation",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q19",
+    "text": "novelas sobre la inquisicion espanola",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q20",
+    "text": "roman empire historical novels",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q21",
+    "text": "ficcion historica conquista de america",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q22",
+    "text": "Victorian era mystery novels detective stories",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q23",
+    "text": "novelas ambientadas en el Camino de Santiago",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q24",
+    "text": "World War II fiction resistance fighters",
+    "category": "fiction"
+  },
+  {
+    "query_id": "q25",
+    "text": "recetas tradicionales cocina mediterranea",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q26",
+    "text": "vegetarian cookbook healthy meals no meat",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q27",
+    "text": "postres caseros faciles sin horno",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q28",
+    "text": "Italian pasta recipes homemade sauce",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q29",
+    "text": "cocina espanola tapas y pinchos",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q30",
+    "text": "baking bread sourdough beginner friendly",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q31",
+    "text": "recetas de mariscos y pescados frescos",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q32",
+    "text": "Asian cuisine wok stir fry techniques",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q33",
+    "text": "comida mexicana autentica tacos enchiladas",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q34",
+    "text": "French pastry desserts professional techniques",
+    "category": "cooking"
+  },
+  {
+    "query_id": "q35",
+    "text": "python",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q36",
+    "text": "historia",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q37",
+    "text": "recetas faciles",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q38",
+    "text": "java",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q39",
+    "text": "apple",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q40",
+    "text": "networks",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q41",
+    "text": "learning",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q42",
+    "text": "cocina moderna",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q43",
+    "text": "classic",
+    "category": "ambiguous"
+  },
+  {
+    "query_id": "q44",
+    "text": "guerra",
+    "category": "ambiguous"
+  }
+]

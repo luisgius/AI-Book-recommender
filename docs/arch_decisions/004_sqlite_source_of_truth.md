@@ -54,13 +54,18 @@ We use a single `books` table with JSON-encoded arrays instead of normalized tab
 
 ```sql
 CREATE TABLE books (
-    id INTEGER PRIMARY KEY,
-    uuid TEXT NOT NULL UNIQUE,
+    id TEXT PRIMARY KEY,          -- domain UUID of the Book, as text
     title TEXT NOT NULL,
     authors TEXT NOT NULL,        -- JSON array: ["Author 1", "Author 2"]
+    description TEXT,
+    language TEXT,
     categories TEXT,              -- JSON array: ["Fiction", "Classic"]
-    metadata_json TEXT,           -- JSON object: BookMetadata fields
-    ...
+    published_date TEXT,          -- ISO 8601
+    source TEXT NOT NULL,
+    source_id TEXT,
+    metadata TEXT,                -- JSON object: BookMetadata fields
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
     UNIQUE(source, source_id)
 );
 ```
@@ -104,16 +109,15 @@ This prevents:
 **Critical invariant:** The domain UUID must never change for an existing book.
 
 ```python
-# In _upsert_book():
-if existing is not None:
-    # UPDATE: preserve existing uuid, update other fields
-    existing.title = book.title
-    existing.authors = ...
-    # NOTE: uuid is NOT updated
-else:
-    # INSERT: use the book's uuid
-    row = BookRow(uuid=str(book.id), ...)
+# In SqliteBookCatalogRepository.save():
+existing = SELECT id FROM books WHERE source = ? AND source_id = ?
+if existing and existing.id != str(book.id):
+    raise ValueError("already exists with different ID")   # never replace a UUID
+INSERT ... ON CONFLICT(id) DO UPDATE SET ...                # same UUID: update fields
 ```
+
+`IngestionService` checks `get_by_source_id()` before saving and skips books that
+are already in the catalog, so a re-import never reaches the error path.
 
 **Why preserve UUID?**
 

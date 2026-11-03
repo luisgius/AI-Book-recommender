@@ -1,0 +1,305 @@
+"""
+Evaluation service for computing IR metrics.
+"""
+
+import math
+from itertools import combinations
+from typing import List
+
+from app.domain.entities import SearchResult
+from app.evaluation.types import RelevanceJudgment
+
+from app.domain.entities import Book, Explanation
+from app.domain.citation_validation import get_book_field_text, is_valid_snippet
+
+
+class EvaluationService:
+    """
+    Service for computing Information Retrieval metrics.
+    
+    This service implements standard IR evaluation metrics:
+    - nDCG@k (Normalized Discounted Cumulative Gain)
+    - Recall@k
+    - MRR (Mean Reciprocal Rank)
+    - ILD@k (Intra-List Diversity)
+    """
+
+    @staticmethod
+    def _jaccard_distance(a: set, b: set) -> float | None:
+        union = a | b
+        if not union:
+            return None
+        inter = a & b
+        return 1.0 - (len(inter) / len(union))
+
+    @classmethod
+    def _pair_distance(
+        cls,
+        *,
+        authors_i: set,
+        authors_j: set,
+        cats_i: set,
+        cats_j: set,
+    ) -> float | None:
+        distances: List[float] = []
+
+        author_distance = cls._jaccard_distance(authors_i, authors_j)
+        if author_distance is not None:
+            distances.append(author_distance)
+
+        cat_distance = cls._jaccard_distance(cats_i, cats_j)
+        if cat_distance is not None:
+            distances.append(cat_distance)
+
+        if not distances:
+            return None
+
+        return sum(distances) / len(distances)
+
+    def compute_ndcg(
+        self,
+        results: List[SearchResult],
+        judgment: RelevanceJudgment,
+        k: int = 10
+    ) -> float:
+        """
+        Compute nDCG@k for a query.
+        
+        Args:
+            results: Search results (already ranked)
+            judgment: Ground truth relevance judgments
+            k: Cutoff position (default 10)
+            
+        Returns:
+            nDCG@k score in [0, 1], where 1 is perfect ranking
+        """
+        # Limit to top-k results
+        top_k = results[:k]
+        
+        # Compute DCG
+        dcg = 0.0
+        for i, result in enumerate(top_k, start=1):
+            book_id = result.book.id
+            relevance = judgment.judgments.get(book_id, 0)
+            gain = (2 ** relevance) - 1
+            dcg += gain / math.log2(i + 1)
+        
+        # Compute IDCG (ideal DCG)
+        ideal_relevances = sorted(judgment.judgments.values(), reverse=True)[:k]
+        idcg = 0.0
+        for i, rel in enumerate(ideal_relevances, start=1):
+            gain = (2 ** rel) - 1
+            idcg += gain / math.log2(i + 1)
+        
+        # Handle edge case: no relevant documents
+        if idcg == 0:
+            return 0.0
+        
+        return dcg / idcg
+
+    def compute_recall_at_k(
+        self,
+        results: List[SearchResult],
+        judgment: RelevanceJudgment,
+        k: int = 100
+    ) -> float:
+        """
+        Compute Recall@k.
+        
+        Recall@k = (# relevant docs in top-k) / (# total relevant docs)
+        
+        Args:
+            results: Search results
+            judgment: Ground truth relevance judgments
+            k: Cutoff position (default 100)
+            
+        Returns:
+            Recall@k score in [0, 1]
+        """
+        # Count relevant documents in top-k (relevance >= 1)
+        top_k = results[:k]
+        retrieved_relevant_ids = {
+            r.book.id for r in top_k
+            if judgment.judgments.get(r.book.id, 0) >= 1
+        }
+        
+        # Count total relevant documents
+        total_relevant_ids = {
+            book_id for book_id, rel in judgment.judgments.items()
+            if rel >= 1
+        }
+        
+        if len(total_relevant_ids) == 0:
+            return 0.0
+        
+        return len(retrieved_relevant_ids) / len(total_relevant_ids)
+
+    def compute_mrr(
+        self,
+        results: List[SearchResult],
+        judgment: RelevanceJudgment
+    ) -> float:
+        """
+        Compute Mean Reciprocal Rank (MRR).
+        
+        MRR = 1 / rank_of_first_relevant_doc
+        
+        Args:
+            results: Search results
+            judgment: Ground truth relevance judgments
+            
+        Returns:
+            MRR score, or 0.0 if no relevant docs found
+        """
+        for i, result in enumerate(results, start=1):
+            book_id = result.book.id
+            relevance = judgment.judgments.get(book_id, 0)
+            if relevance >= 1:  # First relevant document
+                return 1.0 / i
+        
+        # No relevant documents found
+        return 0.0
+
+    def compute_ild(
+        self,
+        results: List[SearchResult],
+        k: int = 10
+    ) -> float:
+        """
+        Compute Intra-List Diversity (ILD@k).
+        
+        ILD measures diversity by computing average pairwise distance
+        between documents in the result list.
+        
+        We use a simple proxy: diversity based on unique authors and categories.
+        
+        Args:
+            results: Search results
+            k: Cutoff position (default 10)
+            
+        Returns:
+            ILD score in [0, 1], higher is more diverse
+        """
+        ild, _coverage = self.compute_ild_with_coverage(results, k=k)
+        return ild
+
+    def compute_ild_with_coverage(
+        self,
+        results: List[SearchResult],
+        k: int = 10
+    ) -> tuple[float, float]:
+        top_k = results[:k]
+        
+        if len(top_k) < 2:
+            return 0.0, 0.0
+        
+        # Collect features for diversity computation
+        authors_sets = []
+        categories_sets = []
+        
+        for result in top_k:
+            authors_sets.append(set(result.book.authors))
+            categories_sets.append(set(result.book.categories))
+        
+        # Compute pairwise diversity
+        total_distance = 0.0
+        used_pairs = 0
+        total_pairs = (len(top_k) * (len(top_k) - 1)) // 2
+
+        items = list(zip(authors_sets, categories_sets))
+        for (authors_i, cats_i), (authors_j, cats_j) in combinations(items, 2):
+            pair_distance = self._pair_distance(
+                authors_i=authors_i,
+                authors_j=authors_j,
+                cats_i=cats_i,
+                cats_j=cats_j,
+            )
+            if pair_distance is None:
+                continue
+
+            total_distance += pair_distance
+            used_pairs += 1
+        
+        if used_pairs == 0:
+            return 0.0, 0.0
+        
+        return (total_distance / used_pairs), (used_pairs / total_pairs if total_pairs else 0.0)
+
+
+    def compute_citation_precision(
+        self,
+        explanation: Explanation,
+        book: Book
+    ) -> float:
+        """
+        
+        Compute citation precision: % of citations that are valid.
+        
+        Citation precision measures what percentage of the LLM's citations
+        are actually grounded in the book data (snippet exists in field).
+        
+        Args:
+            explanation: The explanation with citations to validate
+            book: The book entity being cited
+            
+        Returns:
+            Precision in [0.0, 1.0], or 0.0 if no citations
+            
+        Example:
+            >>> # 4 out of 5 citations are valid
+            >>> precision = service.compute_citation_precision(explanation, book)
+            >>> precision
+            0.8  # 80% precision
+        """
+        if not explanation.citations:
+            return 0.0 # no citations -> no precision
+
+        # 2. For each citation, validate using is_valid_snippet()
+        valid_count = 0
+        total_count = len(explanation.citations)
+
+        for citation in explanation.citations:
+            # Get the actual field text from the book
+            field_text = get_book_field_text(book, citation.chunk_id)
+            
+            # Check if the snippet actually exists in that field
+            if is_valid_snippet(citation.snippet, field_text):
+                valid_count += 1
+
+        # 3. Return valid_count / total_count
+        return valid_count / total_count
+
+    def compute_citation_recall(
+        self,
+        explanation: Explanation,
+        book: Book
+    ) -> float:
+        
+        # 1. Identify which fields have content
+        fields_with_content = set()
+
+        
+        if book.title:
+            fields_with_content.add("title")
+
+        if book.description:
+            fields_with_content.add("description")
+
+        if book.authors:  # Non-empty list
+            fields_with_content.add("authors")
+
+        if book.categories:  # Non-empty list
+            fields_with_content.add("categories")
+
+        # 2. Check which fields are referenced in citations
+        cited_fields = set()
+    
+        for citation in explanation.citations:
+            cited_fields.add(citation.chunk_id)
+    
+        # 3. Return cited_fields / total_fields_with_content
+        if not fields_with_content:
+            return 0.0  # Edge case: book has no content
+            
+        # Recall = fields cited / fields with content
+        return len(cited_fields & fields_with_content) / len(fields_with_content)

@@ -186,16 +186,7 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         self, book_ids: List[UUID], embeddings: List[List[float]]
     ) -> None:
         """
-        Store multiple embeddings in a batch (FULL REFRESH - clears existing).
-
-        WARNING: This method performs a FULL REFRESH, not an incremental update.
-        All previously stored embeddings are cleared before the new batch is stored.
-
-        This semantic is intentional for use with CatalogIngestionService, which
-        rebuilds from the complete SQLite catalog (source of truth). Without clearing,
-        embeddings from deleted books would remain as stale data in the FAISS index.
-
-        For incremental updates (adding one book at a time), use store_embedding().
+        Store multiple embeddings in a batch.
 
         Args:
             book_ids: List of book UUIDs.
@@ -209,15 +200,6 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
                 f"Mismatched lengths: {len(book_ids)} book_ids vs "
                 f"{len(embeddings)} embeddings"
             )
-
-        # Log before clearing to make the full-refresh behavior explicit
-        if self._embeddings:
-            logger.info(
-                f"store_embeddings_batch: clearing {len(self._embeddings)} existing "
-                f"embeddings (full refresh)"
-            )
-
-        self._embeddings.clear()
 
         for book_id, embedding in zip(book_ids, embeddings):
             self.store_embedding(book_id, embedding)
@@ -443,6 +425,24 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         if self._index is None:
             return 0
         return self._index.ntotal
+
+    def is_ready(self) -> bool:
+        """
+        Check if the embeddings store and FAISS index are ready for operations.
+
+        Used for health checks and graceful degradation (RNF-08).
+
+        Returns:
+            True if embeddings can be generated and index is searchable, False otherwise
+        """
+        try:
+            return (
+                self._model is not None
+                and self._index is not None
+                and self._index.ntotal > 0
+            )
+        except Exception:
+            return False
 
     def clear(self) -> None:
         """Clear the index and all stored embeddings."""
