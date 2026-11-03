@@ -4,6 +4,7 @@ Main application entry point.
 
 from fastapi import FastAPI
 from app.api.v1.search_endpoints import router as search_router
+from app.api.v1.evaluation_endpoints import router as evaluation_router
 
 app = FastAPI(
     title="AI Book Recommender API",
@@ -15,6 +16,7 @@ app = FastAPI(
 
 # Include API routers
 app.include_router(search_router, prefix="/api/v1", tags=["search"])
+app.include_router(evaluation_router, prefix="/api/v1", tags=["evaluation", "recommendation"])
 
 @app.get("/")
 def read_root():

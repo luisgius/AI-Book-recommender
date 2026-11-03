@@ -38,6 +38,12 @@ from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFais
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
 
 # Domain imports
+from app.domain.ports import (
+    BookCatalogRepository,
+    EmbeddingsStore,
+    LexicalSearchRepository,
+    VectorSearchRepository,
+)
 from app.domain.services import SearchService
 from app.domain.value_objects import SearchQuery
 from app.domain.entities import SearchResult
@@ -527,7 +533,7 @@ def load_relevance_judgments(path: str) -> Dict[str, List[dict]]:
 
 def resolve_judgments_to_uuids(
     raw_judgments: Dict[str, List[dict]],
-    catalog_repo: SqliteBookCatalogRepository
+    catalog_repo: BookCatalogRepository
 ) -> Dict[str, RelevanceJudgment]:
     """Convert (source, source_id) judgments to UUID-based RelevanceJudgment objects."""
     result = {}
@@ -550,7 +556,7 @@ def resolve_judgments_to_uuids(
 
 def run_lexical_search(
     query_text: str,
-    bm25_repo: BM25SearchRepository,
+    bm25_repo: LexicalSearchRepository,
     max_results: int = 100,
 ):
     """Mode 1: Lexical-only search (BM25)."""
@@ -560,8 +566,8 @@ def run_lexical_search(
 
 def run_vector_search(
     query_text: str,
-    vector_repo: FaissVectorSearchRepository,
-    embeddings_store: EmbeddingsStoreFaiss,
+    vector_repo: VectorSearchRepository,
+    embeddings_store: EmbeddingsStore,
     max_results: int = 100
 ):
     """Mode 2: Vector-only search (FAISS)."""
@@ -583,7 +589,7 @@ def _cosine_similarity(vec_a: List[float], vec_b: List[float]) -> float:
 def _build_book_embeddings(
     results: list,
     *,
-    embeddings_store: EmbeddingsStoreFaiss,
+    embeddings_store: EmbeddingsStore,
 ) -> Dict[str, List[float]]:
     book_embeddings: Dict[str, List[float]] = {}
     for r in results:
@@ -649,7 +655,7 @@ def _pick_best_candidate_index(
 def _mmr_rerank(
     results: list,
     *,
-    embeddings_store: EmbeddingsStoreFaiss,
+    embeddings_store: EmbeddingsStore,
     lambda_param: float,
     mmr_top_k: int,
 ) -> list:
@@ -691,7 +697,7 @@ def _mmr_rerank(
 def run_hybrid_search(
     query_text: str,
     search_service: SearchService,
-    embeddings_store: EmbeddingsStoreFaiss,
+    embeddings_store: EmbeddingsStore,
     max_results: int = 100,
     use_diversification: bool = False,
     diversity_lambda: float = 0.6,

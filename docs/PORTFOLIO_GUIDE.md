@@ -123,6 +123,17 @@ To use a hosted model instead, set `LLM_PROVIDER=openai` (needs
 - `use_diversification` / `diversity_lambda`: MMR re-ranking.
 - `include_metadata`: fusion details and candidate counts.
 
+Other endpoints:
+
+- `GET /api/v1/books/{book_id}/similar?max_results=10&language=es`: item-to-item
+  recommendations by vector similarity.
+- `POST /api/v1/evaluate` with `{"modes": ["hybrid_rrf"], "max_results": 100}`:
+  runs the retrieval evaluation on the bundled test collection (44 queries) and
+  returns nDCG@k, Recall@k, Precision@k, MRR and ILD@k per mode. It computes
+  the same numbers as the CLI job; LLM-based evaluation (query understanding,
+  LLM-as-judge) stays in the CLI job because it takes minutes.
+- `GET /api/v1/books/{book_id}` and `GET /api/v1/health`.
+
 ## Usage
 
 ```bash

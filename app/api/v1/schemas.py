@@ -182,3 +182,38 @@ class SearchResponse(BaseModel):
         default=None,
         description="Query understanding result (use_understanding=true)"
     )
+
+# ---------------------------------------------------------------------------
+# Evaluation and item-to-item recommendation
+# ---------------------------------------------------------------------------
+
+EvaluationMode = Literal['lexical_only', 'vector_only', 'hybrid_rrf', 'hybrid_rrf_mmr']
+
+
+class EvaluationRequest(BaseModel):
+    """Request body for POST /evaluate."""
+    modes: list[EvaluationMode] = Field(
+        default_factory=lambda: ['lexical_only', 'vector_only', 'hybrid_rrf', 'hybrid_rrf_mmr'],
+        min_length=1,
+        description="Retrieval modes to evaluate",
+    )
+    max_results: int = Field(default=100, ge=10, le=100, description="Ranked list depth per query")
+    mmr_lambda: float = Field(default=0.6, ge=0.0, le=1.0, description="MMR trade-off for hybrid_rrf_mmr")
+
+
+class EvaluationResponse(BaseModel):
+    """Aggregate IR metrics per retrieval mode on the bundled test collection."""
+    num_queries: int = Field(description="Test queries evaluated")
+    num_queries_with_relevant: int = Field(
+        description="Queries with at least one judged-relevant book (the others score 0)"
+    )
+    latency_ms: float = Field(description="Time to run the evaluation")
+    modes: dict[str, dict[str, float]] = Field(
+        description="Per mode: ndcg_at_k, recall_at_k, precision_at_k, mrr, ild_at_k, ild_coverage_at_k"
+    )
+
+
+class SimilarBooksResponse(BaseModel):
+    """Books similar to a given book (item-to-item vector similarity)."""
+    book_id: UUID = Field(description="The book the recommendations are for")
+    results: list[SearchResult] = Field(description="Similar books, most similar first")
