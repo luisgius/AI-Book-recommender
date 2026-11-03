@@ -3,7 +3,7 @@
 Book Ingestion and Index Building Script (End-to-End MVP).
 
 This script orchestrates the complete ingestion and indexing pipeline:
-1. Fetch books from Google Books API
+1. Fetch books from Google Books or Open Library (--provider)
 2. Save them to the catalog (SQLite)
 3. Build and persist BM25 index (lexical search)
 4. Generate embeddings and build FAISS index (vector search)
@@ -13,7 +13,8 @@ Usage:
     python -m scripts.ingest_and_build --query "science fiction" --max-items 50
 
 Args:
-    --query: Search query for Google Books API (required unless --rebuild)
+    --query: Search query for the external provider (required unless --rebuild)
+    --provider: google (default) or openlibrary
     --max-items: Maximum number of books to fetch (default: 100)
     --db-path: Path to SQLite database (default: data/catalog.db)
     --out-dir: Directory for storing indices (default: data/indexes)
@@ -34,6 +35,7 @@ if str(project_root) not in sys.path:
 
 from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
 from app.infrastructure.external.google_books_provider import GoogleBooksProvider
+from app.infrastructure.external.open_library_provider import OpenLibraryProvider
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
@@ -65,27 +67,32 @@ def ingest_books(
     max_items: int,
     catalog_repo: SqliteBookCatalogRepository,
     language: Optional[str] = None,
+    provider_name: str = "google",
 ) -> int:
     """
-    Step 1: Ingest books from Google Books API.
+    Step 1: Ingest books from an external provider (Google Books or Open Library).
 
     Args:
         query: Search query
         max_items: Maximum number of books to fetch
         catalog_repo: Catalog repository
         language: Optional language filter
+        provider_name: "google" (Google Books) or "openlibrary" (Open Library)
 
     Returns:
         Number of books inserted into catalog
     """
     logger.info("=" * 70)
-    logger.info("STEP 1: INGESTING BOOKS FROM GOOGLE BOOKS API")
+    logger.info(f"STEP 1: INGESTING BOOKS FROM {provider_name.upper()}")
     logger.info("=" * 70)
 
     catalog_before = catalog_repo.count()
 
-    api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
-    provider = GoogleBooksProvider(api_key=api_key if api_key else None)
+    if provider_name == "openlibrary":
+        provider = OpenLibraryProvider()
+    else:
+        api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
+        provider = GoogleBooksProvider(api_key=api_key if api_key else None)
     ingestion_service = IngestionService(
         books_provider=provider,
         catalog_repo=catalog_repo,
@@ -294,6 +301,7 @@ def main(
     language: Optional[str] = None,
     rebuild: bool = False,
     smoke_test_query: Optional[str] = None,
+    provider_name: str = "google",
 ) -> None:
     """
     Main entry point for the ingestion and build script.
@@ -333,7 +341,7 @@ def main(
         # Step 1: Ingest books
         if query is None:
             raise ValueError("--query is required unless --rebuild is set")
-        n_inserted = ingest_books(query, max_items, catalog_repo, language)
+        n_inserted = ingest_books(query, max_items, catalog_repo, language, provider_name)
 
         if n_inserted == 0 and not catalog_repo.get_all():
             logger.error("No books in catalog after ingestion. Cannot build indices.")
@@ -395,6 +403,12 @@ if __name__ == "__main__":
         help=f"Directory for storing indices (default: {DEFAULT_OUT_DIR})",
     )
     parser.add_argument(
+        "--provider",
+        choices=["google", "openlibrary"],
+        default="google",
+        help="External source: Google Books (default) or Open Library",
+    )
+    parser.add_argument(
         "--language", "-l",
         type=str,
         default=None,
@@ -431,6 +445,7 @@ if __name__ == "__main__":
             language=args.language,
             rebuild=args.rebuild,
             smoke_test_query=args.smoke_test_query,
+            provider_name=args.provider,
         )
     except KeyboardInterrupt:
         logger.info("\nPipeline interrupted by user")
