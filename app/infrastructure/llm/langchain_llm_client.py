@@ -5,8 +5,11 @@ LangChain implementation of the LLMClient port.
 import logging
 import time
 import random
+import unicodedata
+
+import httpx
 from datetime import datetime, UTC
-from typing import Callable, TypeVar
+from typing import Callable, List, Optional, TypeVar
 
 from langchain.chat_models import init_chat_model
 
@@ -32,6 +35,32 @@ T = TypeVar('T')
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_BASE_DELAY = 1.0  # seconds
 DEFAULT_MAX_DELAY = 60.0  # seconds
+
+# Errors that retrying cannot fix (see _invoke_with_retry)
+NON_RETRYABLE_ERRORS = (ConnectionError, ValueError, TimeoutError, httpx.TimeoutException)
+
+# Year range accepted from LLM filter extraction
+MIN_PLAUSIBLE_YEAR = 1000
+MAX_PLAUSIBLE_YEAR = 2100
+
+# Words (accent-folded stems) that must appear in a query for an extracted
+# language filter to be kept. LLMs tend to infer the filter from the language
+# the query is WRITTEN in ("libros de python" -> es), which is not a request.
+LANGUAGE_MENTIONS = {
+    "es": ("espanol", "castellan", "spanish"),
+    "en": ("ingles", "english"),
+    "ca": ("catalan", "valencian"),
+    "fr": ("frances", "french"),
+    "de": ("aleman", "german"),
+    "it": ("italian",),
+    "pt": ("portugu",),
+}
+
+
+def _fold(text: str) -> str:
+    """Lowercase and strip accents, for accent-insensitive matching."""
+    decomposed = unicodedata.normalize("NFKD", text.lower())
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
 
 
 class LangChainLLMClient(LLMClient):
@@ -64,6 +93,13 @@ class LangChainLLMClient(LLMClient):
         max_retries: int = DEFAULT_MAX_RETRIES,
         base_delay: float = DEFAULT_BASE_DELAY,
         max_delay: float = DEFAULT_MAX_DELAY,
+        base_url: Optional[str] = None,
+        num_ctx: Optional[int] = None,
+        reasoning: Optional[bool] = None,
+        known_categories: Optional[List[str]] = None,
+        apply_extracted_category: bool = False,
+        max_tokens: Optional[int] = None,
+        timeout_s: Optional[float] = None,
     ):
         """
         Initialize the LLM client.
@@ -81,6 +117,22 @@ class LangChainLLMClient(LLMClient):
             max_retries: Maximum number of retry attempts for transient failures (default: 3)
             base_delay: Initial delay in seconds for exponential backoff (default: 1.0)
             max_delay: Maximum delay in seconds between retries (default: 60.0)
+            base_url: Optional server URL (e.g. the local Ollama server)
+            num_ctx: Optional context window size (Ollama only)
+            reasoning: Ollama thinking mode: False disables thinking tokens
+                (faster structured output), True enables it, None keeps the
+                model default
+            known_categories: Catalog categories. When given, a category
+                extracted from a query is kept only if it can match at least
+                one of them; otherwise it is dropped instead of emptying the
+                results
+            max_tokens: Cap on generated tokens per call. Without it a model
+                stuck in a repetition loop can generate for minutes
+            timeout_s: HTTP timeout per LLM call, in seconds
+            apply_extracted_category: Use the category inferred by the LLM as
+                a hard filter. Off by default: the topic already shapes the
+                reformulated query, and an inferred category that merely
+                exists in the catalog can still wipe out relevant results
 
         Raises:
             RuntimeError: If the LLM cannot be initialized (e.g., missing API key)
@@ -93,15 +145,34 @@ class LangChainLLMClient(LLMClient):
         self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
+        self.known_categories = [c.lower() for c in known_categories] if known_categories else None
+        self.apply_extracted_category = apply_extracted_category
 
         # Log initialization (without exposing API key)
         logger.info(f"Initializing {provider} LLM with model {model_name} (temp={temperature})")
 
         try:
+            model_kwargs: dict = {"temperature": self.temperature}
+            if base_url:
+                model_kwargs["base_url"] = base_url
+            if self.provider == "ollama":
+                if num_ctx:
+                    model_kwargs["num_ctx"] = num_ctx
+                if reasoning is not None:
+                    model_kwargs["reasoning"] = reasoning
+                if max_tokens:
+                    model_kwargs["num_predict"] = max_tokens
+                if timeout_s:
+                    model_kwargs["client_kwargs"] = {"timeout": timeout_s}
+            else:
+                if max_tokens:
+                    model_kwargs["max_tokens"] = max_tokens
+                if timeout_s:
+                    model_kwargs["timeout"] = timeout_s
             self.model = init_chat_model(
                 model=self.model_name,
                 model_provider=self.provider,
-                temperature=self.temperature
+                **model_kwargs,
             )
         except Exception as e:
             logger.error(f"Failed to initialize {provider} model {model_name}: {e}")
@@ -138,6 +209,14 @@ class LangChainLLMClient(LLMClient):
         Returns:
             The result of the operation if successful
 
+        Errors that a retry cannot fix are raised immediately:
+        - ConnectionError: the LLM server is unreachable (e.g. Ollama not
+          running), so the caller can degrade gracefully without waiting.
+        - ValueError: invalid or unparseable model output (includes Pydantic
+          ValidationError and LangChain OutputParserException); with
+          temperature 0 the same prompt gives the same output.
+        - Timeouts: at temperature 0 a retry repeats the same long generation.
+
         Raises:
             Exception: The last exception if all retries are exhausted
         """
@@ -146,6 +225,10 @@ class LangChainLLMClient(LLMClient):
         for attempt in range(self.max_retries + 1):
             try:
                 return operation()
+
+            except NON_RETRYABLE_ERRORS as e:
+                logger.error(f"{operation_name} failed with a non-retryable error: {e}")
+                raise
 
             except Exception as e:
                 last_exception = e
@@ -334,15 +417,10 @@ class LangChainLLMClient(LLMClient):
             confidence = 0.5
             reasoning = "Default classification (intent extraction failed)"
 
-        # Extract filters and convert to domain SearchFilters
+        # Extract filters and convert to domain SearchFilters (invalid values
+        # are dropped one by one instead of discarding the whole intent)
         if result.get("filters") is not None:
-            filters = result["filters"]
-            extracted_filters = SearchFilters(
-                language=filters.language,
-                category=filters.category,
-                min_year=filters.min_year,
-                max_year=filters.max_year
-            )
+            extracted_filters = self._sanitize_filters(result["filters"], result["original_query"])
         else:
             extracted_filters = SearchFilters()
 
@@ -361,6 +439,73 @@ class LangChainLLMClient(LLMClient):
             reasoning=reasoning,
             query_variations=query_variations,
         )
+
+    def _sanitize_filters(self, filters_llm, query_text: str = "") -> SearchFilters:
+        """
+        Turn LLM-extracted filters into valid domain SearchFilters.
+
+        LLM output is a suggestion, not a fact, so each value is checked
+        deterministically before it can restrict the results:
+        - language: kept only if it is a 2-letter ISO 639-1 code AND the query
+          mentions that language ("en español", "in English", "novelas
+          españolas"). Writing a query in Spanish is not a request for
+          Spanish books.
+        - category: not applied unless apply_extracted_category is set; then
+          kept only if it can match a catalog category (same case-insensitive
+          substring rule as Book.matches_filters).
+        - years: kept only within a plausible range; an inverted range is
+          dropped entirely.
+
+        Args:
+            filters_llm: ExtractedFiltersLLM produced by the LangGraph flow
+            query_text: The user's original query, used to check mentions
+
+        Returns:
+            SearchFilters with only the values that passed validation
+        """
+        language = filters_llm.language
+        if language is not None:
+            language = language.strip().lower()
+            if len(language) != 2 or not language.isalpha():
+                logger.info(f"Dropping extracted language '{filters_llm.language}' (not ISO 639-1)")
+                language = None
+            elif not self._query_mentions_language(query_text, language):
+                logger.info(f"Dropping extracted language '{language}' (not mentioned in the query)")
+                language = None
+
+        category = filters_llm.category
+        if category is not None and not self.apply_extracted_category:
+            logger.info(f"Not applying extracted category '{category}' (soft signal only)")
+            category = None
+        if category is not None and self.known_categories is not None:
+            wanted = category.strip().lower()
+            if not any(wanted in known for known in self.known_categories):
+                logger.info(f"Dropping extracted category '{category}' (not in the catalog)")
+                category = None
+
+        def plausible(year: Optional[int]) -> Optional[int]:
+            if year is not None and MIN_PLAUSIBLE_YEAR <= year <= MAX_PLAUSIBLE_YEAR:
+                return year
+            return None
+
+        min_year = plausible(filters_llm.min_year)
+        max_year = plausible(filters_llm.max_year)
+        if min_year is not None and max_year is not None and min_year > max_year:
+            logger.info(f"Dropping inverted year range {min_year}-{max_year}")
+            min_year = max_year = None
+
+        return SearchFilters(
+            language=language,
+            category=category,
+            min_year=min_year,
+            max_year=max_year,
+        )
+
+    @staticmethod
+    def _query_mentions_language(query_text: str, language: str) -> bool:
+        """True if the query names the language (accent-insensitive stems)."""
+        folded = _fold(query_text)
+        return any(stem in folded for stem in LANGUAGE_MENTIONS.get(language, ()))
 
     def _create_fallback_query_intent(self, query_text: str) -> QueryIntent:
         """

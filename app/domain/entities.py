@@ -10,7 +10,7 @@ from datetime import datetime, UTC
 from typing import Optional, List, Literal
 from uuid import UUID, uuid4
 
-from .value_objects import BookMetadata
+from .value_objects import BookMetadata, SearchFilters
 
 
 # Type alias for allowed book fields that can be cited
@@ -95,6 +95,45 @@ class Book:
     def has_description(self) -> bool:
         """Check if book has a non-empty description."""
         return bool(self.description and self.description.strip())
+
+    def matches_filters(self, filters: Optional[SearchFilters]) -> bool:
+        """
+        Check whether this book satisfies every set filter (AND semantics).
+
+        This is the single definition of filter matching used by the search
+        service and by every search repository, so all retrieval paths agree:
+
+        - language: exact ISO code, case-insensitive.
+        - category: case-insensitive substring of any category, so "fiction"
+          matches "Spanish fiction" and "Historical fiction".
+        - min_year / max_year: inclusive; a book without a publication year
+          does not satisfy a year filter.
+
+        Args:
+            filters: Filters to check; None or empty filters match every book.
+
+        Returns:
+            True if the book matches all non-None filters.
+        """
+        if filters is None or filters.is_empty():
+            return True
+
+        if filters.language is not None:
+            if self.language is None or self.language.lower() != filters.language.lower():
+                return False
+
+        if filters.category is not None:
+            wanted = filters.category.lower()
+            if not any(wanted in category.lower() for category in self.categories):
+                return False
+
+        year = self.get_published_year()
+        if filters.min_year is not None and (year is None or year < filters.min_year):
+            return False
+        if filters.max_year is not None and (year is None or year > filters.max_year):
+            return False
+
+        return True
 
     def get_searchable_text(self) -> str:
         """

@@ -16,7 +16,11 @@ from app.api.v1.converters import (
     domain_response_to_api,
     domain_book_to_api,
 )
-from app.api.v1.dependencies import get_search_service, get_catalog_repository
+from app.api.v1.dependencies import (
+    get_search_service,
+    get_catalog_repository,
+    get_llm_settings,
+)
 
 router = APIRouter()
 
@@ -33,21 +37,40 @@ def search_books(
     with semantic vector search, using Reciprocal Rank Fusion (RRF) to
     merge results.
 
+    With use_understanding=true the LLM first interprets the query (intent,
+    filters, reformulation) and the search runs over several query
+    variations (RAG retrieval step). With use_explanations=true the top
+    results get grounded explanations (RAG generation step). Without a
+    configured LLM both options degrade to plain hybrid search.
+
     Args:
         request: Search request with query text, filters, and options
 
     Returns:
-        SearchResponse with ranked results and optional metadata
+        SearchResponse with ranked results, optional metadata and, when the
+        LLM path is used, the understood query intent
     """
     try:
         include_metadata = bool(request.include_metadata)
 
         domain_query = api_request_to_domain(request)
-        domain_response = service.search_with_fallback(domain_query)
+        query_intent = None
+        if request.use_understanding:
+            domain_response, query_intent = service.search_with_understanding(
+                query_text=domain_query.text,
+                max_results=domain_query.max_results,
+                use_explanations=domain_query.use_explanations,
+                use_diversification=domain_query.use_diversification,
+                diversity_lambda=domain_query.diversity_lambda,
+                filters=domain_query.filters,
+            )
+        else:
+            domain_response = service.search_with_fallback(domain_query)
 
         return domain_response_to_api(
             domain_response,
             include_metadata=include_metadata,
+            query_intent=query_intent,
         )
     except ValueError as e:
         raise HTTPException(
@@ -100,8 +123,12 @@ def health_check(
     - vector_search: FAISS index availability
     - embeddings_store: Embedding model availability
     - overall: True only if all components are ready
+
+    The LLM is reported separately because it is optional: without it the
+    search still works, only understanding and explanations are skipped.
     """
     health_status = service.get_health_status()
+    llm_settings = get_llm_settings()
 
     return {
         "status": "ok" if health_status["overall"] else "degraded",
@@ -109,6 +136,11 @@ def health_check(
             "lexical_search": health_status["lexical_search"],
             "vector_search": health_status["vector_search"],
             "embeddings_store": health_status["embeddings_store"],
+        },
+        "llm": {
+            "configured": service.has_llm(),
+            "provider": llm_settings.provider,
+            "model": llm_settings.model if llm_settings.enabled else None,
         },
         "overall": health_status["overall"],
     }

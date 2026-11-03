@@ -199,9 +199,10 @@ class TestExtractQueryIntent:
         mock_extracted_filters, mock_reformulated_query
     ):
         """Test successful query intent extraction."""
+        query = f"{sample_query_text} in English"
         mock_graph = Mock()
         mock_graph.invoke.return_value = {
-            "original_query": sample_query_text,
+            "original_query": query,
             "intent": mock_query_intent_llm,
             "filters": mock_extracted_filters,
             "reformulated": mock_reformulated_query,
@@ -210,11 +211,12 @@ class TestExtractQueryIntent:
         }
 
         client = create_mock_client(graph_mock=mock_graph)
-        result = client.extract_query_intent(sample_query_text)
+        client.apply_extracted_category = True
+        result = client.extract_query_intent(query)
 
         assert isinstance(result, QueryIntent)
         assert result.intent_type == "recommendation"
-        assert result.original_query == sample_query_text
+        assert result.original_query == query
         assert result.confidence == 0.9
         assert result.extracted_filters.language == "en"
         assert result.extracted_filters.category == "Programming"
@@ -372,7 +374,7 @@ class TestInternalMethods:
         client = create_mock_client()
 
         result_dict = {
-            "original_query": "books about Python",
+            "original_query": "books about Python written in English",
             "intent": mock_query_intent_llm,
             "filters": mock_extracted_filters,
             "reformulated": mock_reformulated_query,
@@ -383,10 +385,28 @@ class TestInternalMethods:
         query_intent = client._convert_graph_result_to_query_intent(result_dict)
 
         assert query_intent.intent_type == "recommendation"
-        assert query_intent.original_query == "books about Python"
+        assert query_intent.original_query == "books about Python written in English"
         assert query_intent.reformulated_query == "Python programming books tutorials"
         assert query_intent.confidence == 0.9
         assert query_intent.extracted_filters.language == "en"
+
+    def test_language_not_mentioned_in_query_is_dropped(
+        self, mock_query_intent_llm, mock_extracted_filters
+    ):
+        """An LLM-inferred language the user never asked for must not filter results."""
+        client = create_mock_client()
+
+        query_intent = client._convert_graph_result_to_query_intent({
+            "original_query": "books about Python",
+            "intent": mock_query_intent_llm,
+            "filters": mock_extracted_filters,
+            "reformulated": None,
+            "final_query": None,
+            "error": None,
+        })
+
+        assert query_intent.extracted_filters.language is None
+        assert query_intent.extracted_filters.category is None  # soft signal by default
 
     def test_create_fallback_query_intent(self):
         """Test creation of fallback QueryIntent."""
@@ -433,7 +453,7 @@ class TestInternalMethods:
         )
 
         result_dict = {
-            "original_query": "libros de ciencia ficcion recientes",
+            "original_query": "libros de ciencia ficcion recientes en español",
             "intent": mock_query_intent_llm,
             "filters": partial_filters,
             "reformulated": None,

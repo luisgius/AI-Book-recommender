@@ -856,3 +856,36 @@ class TestIntegrationWithRealStore:
 
         assert len(results) > 0
         assert all(r.book.language == "es" for r in results)
+
+
+# =============================================================================
+# Filtered search scans the whole index (no post-filter starvation)
+# =============================================================================
+
+
+def test_filtered_search_finds_matches_beyond_the_over_fetch_window():
+    """
+    Regression: with a fixed 3x over-fetch, a filter could discard every
+    fetched neighbour (e.g. an English query with language=es) and return 0
+    results even though matching books exist further down the index.
+    """
+    from unittest.mock import Mock
+
+    import faiss as faiss_lib
+
+    dim = 4
+    english = [create_test_book(title=f"EN {i}", language="en") for i in range(20)]
+    spanish = [create_test_book(title="ES far", language="es")]
+    books = english + spanish
+    vectors = np.array([[1.0, 0.0, 0.0, 0.0]] * 20 + [[0.0, 0.0, 0.0, 1.0]], dtype=np.float32)
+    index = faiss_lib.IndexFlatL2(dim)
+    index.add(vectors)
+    provider = Mock()
+    provider.get_index.return_value = index
+    provider.get_id_mapping.return_value = [str(b.id) for b in books]
+    provider.get_dimension.return_value = dim
+    repo = FaissVectorSearchRepository(provider, books)
+
+    results = repo.search([1.0, 0.0, 0.0, 0.0], max_results=2, filters=SearchFilters(language="es"))
+
+    assert [r.book.title for r in results] == ["ES far"]

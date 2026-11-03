@@ -134,6 +134,35 @@ class EvaluationService:
         
         return len(retrieved_relevant_ids) / len(total_relevant_ids)
 
+    def compute_precision_at_k(
+        self,
+        results: List[SearchResult],
+        judgment: RelevanceJudgment,
+        k: int = 5
+    ) -> float:
+        """
+        Compute Precision@k.
+
+        Precision@k = (# relevant docs in top-k) / k
+
+        The denominator is k even when fewer than k results are returned, so a
+        short result list is penalised (standard trec_eval behaviour).
+
+        Args:
+            results: Search results (already ranked)
+            judgment: Ground truth relevance judgments
+            k: Cutoff position (default 5)
+
+        Returns:
+            Precision@k score in [0, 1]
+        """
+        if k <= 0:
+            raise ValueError(f"k must be positive, got {k}")
+        relevant_in_top_k = sum(
+            1 for r in results[:k] if judgment.judgments.get(r.book.id, 0) >= 1
+        )
+        return relevant_in_top_k / k
+
     def compute_mrr(
         self,
         results: List[SearchResult],

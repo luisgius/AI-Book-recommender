@@ -103,6 +103,7 @@ DEFAULT_POOL_PER_MODE_LIMIT = 50
 
 NDCG_KS = (5, 10, 20)
 RECALL_KS = (10, 20, 100)
+PRECISION_KS = (5, 10)
 ILD_KS = (10, 20)
 
 
@@ -959,6 +960,7 @@ def evaluate_mode(
     per_query: Dict[str, Dict[str, float]] = {}
     ndcg_sums: Dict[int, float] = dict.fromkeys(NDCG_KS, 0.0)
     recall_sums: Dict[int, float] = dict.fromkeys(RECALL_KS, 0.0)
+    precision_sums: Dict[int, float] = dict.fromkeys(PRECISION_KS, 0.0)
     ild_sums: Dict[int, float] = dict.fromkeys(ILD_KS, 0.0)
     ild_coverage_sums: Dict[int, float] = dict.fromkeys(ILD_KS, 0.0)
     mrr_sum = 0.0
@@ -999,6 +1001,11 @@ def evaluate_mode(
             recall_sums[k] += val
             metrics[f"recall_at_{k}"] = val
 
+        for k in PRECISION_KS:
+            val = eval_service.compute_precision_at_k(results, judgment, k=k)
+            precision_sums[k] += val
+            metrics[f"precision_at_{k}"] = val
+
         mrr = eval_service.compute_mrr(results, judgment)
         mrr_sum += mrr
         metrics["mrr"] = mrr
@@ -1030,6 +1037,8 @@ def evaluate_mode(
             out[f"ndcg_at_{k}"] = 0.0
         for k in RECALL_KS:
             out[f"recall_at_{k}"] = 0.0
+        for k in PRECISION_KS:
+            out[f"precision_at_{k}"] = 0.0
         out["mrr"] = 0.0
         for k in ILD_KS:
             out[f"ild_at_{k}"] = 0.0
@@ -1051,6 +1060,8 @@ def evaluate_mode(
         out2[f"ndcg_at_{k}"] = ndcg_sums[k] / used
     for k in RECALL_KS:
         out2[f"recall_at_{k}"] = recall_sums[k] / used
+    for k in PRECISION_KS:
+        out2[f"precision_at_{k}"] = precision_sums[k] / used
     out2["mrr"] = mrr_sum / used
     for k in ILD_KS:
         out2[f"ild_at_{k}"] = ild_sums[k] / used
@@ -1249,6 +1260,7 @@ def main(
             "ndcg_gain": "exp2_minus_1",
             "ndcg_ks": list(NDCG_KS),
             "recall_ks": list(RECALL_KS),
+            "precision_ks": list(PRECISION_KS),
             "ild_ks": list(ILD_KS),
             "max_results": max_results,
             "mmr_top_k": mmr_top_k,
@@ -1431,7 +1443,7 @@ def main(
                     (q.text for q in queries if q.query_id == query_id), ""
                 ),
                 ndcg_at_10=metrics.get("ndcg_at_10", 0.0),
-                precision_at_5=metrics.get("ndcg_at_5", 0.0),
+                precision_at_5=metrics.get("precision_at_5", 0.0),
                 recall_at_10=metrics.get("recall_at_10", 0.0),
                 mrr=metrics.get("mrr", 0.0),
                 ild=metrics.get("ild_at_10", 0.0),

@@ -1,18 +1,15 @@
 """
+Pydantic models for the v1 HTTP API (request and response bodies).
+
+These are boundary types: converters.py maps them to and from the domain
+entities and value objects.
 """
 
-
-
-from pydantic import BaseModel, Field, AwareDatetime
 from datetime import datetime, timezone
-from uuid import UUID
-import uuid
 from typing import Literal
+from uuid import UUID
 
-
-
-
-
+from pydantic import AwareDatetime, BaseModel, Field
 
 
 class SearchFilters(BaseModel):
@@ -38,6 +35,13 @@ class SearchRequest(BaseModel):
     use_diversification: bool | None = Field(default=None, description="Apply MMR diversification")
     diversity_lambda: float | None = Field(default=None, ge=0.0, le=1.0, description="Diversity trade-off")
     include_metadata: bool | None = Field(default=None, description="Include debug metadata in response")
+    use_understanding: bool | None = Field(
+        default=None,
+        description=(
+            "Interpret the query with the LLM first (intent, filters, reformulation, "
+            "multi-query retrieval). Explicit filters still take precedence."
+        ),
+    )
 
 
 
@@ -80,6 +84,26 @@ class Book(BaseModel):
     )
 
 
+class Citation(BaseModel):
+    """A verified piece of evidence from the book data that supports an explanation."""
+    field: Literal['title', 'description', 'categories', 'authors'] = Field(
+        description="Book field the snippet was taken from"
+    )
+    snippet: str = Field(description="Verbatim text from that field")
+    relevance_score: float = Field(ge=0.0, le=1.0, description="Relevance of the evidence (0-1)")
+
+
+class Explanation(BaseModel):
+    """Grounded LLM explanation of why a book matches the query (RAG)."""
+    text: str = Field(description="Natural language explanation")
+    citations: list[Citation] = Field(
+        default_factory=list,
+        description="Citations that passed verification against the book data",
+    )
+    grounded: bool = Field(description="True if at least one citation was verified")
+    model: str = Field(description="LLM that generated the explanation")
+
+
 class SearchResult(BaseModel):
     """
     Represents a single search result linking a book to its relevance scores.
@@ -106,9 +130,9 @@ class SearchResult(BaseModel):
         description="Cosine similarity score from vector search."
     )
     
-    explanation: str | None = Field(
+    explanation: Explanation | None = Field(
         default=None,
-        description="Optional natural language explanation of relevance."
+        description="Optional grounded explanation of relevance (use_explanations=true)."
     )
 
 class SearchMetadata(BaseModel):
@@ -122,6 +146,17 @@ class SearchMetadata(BaseModel):
     diversification_enabled: bool = Field(default=False, description="Whether MMR was applied")
     candidates_lexical: int = Field(default=0, ge=0, description="Candidates from BM25")
     candidates_vector: int = Field(default=0, ge=0, description="Candidates from vector search")
+
+
+class QueryIntent(BaseModel):
+    """How the LLM understood the query (returned when use_understanding=true)."""
+    intent_type: Literal['recommendation', 'factual', 'exploratory']
+    original_query: str
+    reformulated_query: str
+    extracted_filters: SearchFilters
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasoning: str
+    query_variations: list[str] = Field(default_factory=list)
 
 
 class SearchResponse(BaseModel):
@@ -142,4 +177,8 @@ class SearchResponse(BaseModel):
     metadata: SearchMetadata | None = Field(
         default=None,
         description="Optional debug/telemetry metadata (include_metadata=true)"
+    )
+    query_intent: QueryIntent | None = Field(
+        default=None,
+        description="Query understanding result (use_understanding=true)"
     )

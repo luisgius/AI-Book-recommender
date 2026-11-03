@@ -26,6 +26,31 @@ def domain_book_to_api(book: domain.Book) -> api.Book:
     return api.Book(**book_dict)
 
 
+def domain_explanation_to_api(explanation: domain.Explanation) -> api.Explanation:
+    """
+    Convert a domain Explanation (with its verified citations) to the API model.
+
+    Args:
+        explanation: Domain Explanation entity
+
+    Returns:
+        API Explanation model
+    """
+    return api.Explanation(
+        text=explanation.text,
+        citations=[
+            api.Citation(
+                field=citation.chunk_id,
+                snippet=citation.snippet,
+                relevance_score=citation.relevance_score,
+            )
+            for citation in explanation.citations
+        ],
+        grounded=explanation.is_grounded(),
+        model=explanation.model,
+    )
+
+
 def domain_search_result_to_api(result: domain.SearchResult) -> api.SearchResult:
     """
     Convert a domain SearchResult entity to an API SearchResult model.
@@ -43,7 +68,11 @@ def domain_search_result_to_api(result: domain.SearchResult) -> api.SearchResult
         source=result.source,
         lexical_score=result.lexical_score,
         vector_score=result.vector_score,
-        explanation=result.explanation,
+        explanation=(
+            domain_explanation_to_api(result.explanation)
+            if result.explanation is not None
+            else None
+        ),
     )
 
 
@@ -66,10 +95,38 @@ def domain_metadata_to_api(metadata: domain_vo.SearchMetadata) -> api.SearchMeta
     )
 
 
+def domain_query_intent_to_api(intent: domain_vo.QueryIntent) -> api.QueryIntent:
+    """
+    Convert a domain QueryIntent to the API model.
+
+    Args:
+        intent: Domain QueryIntent value object
+
+    Returns:
+        API QueryIntent model
+    """
+    filters = intent.extracted_filters
+    return api.QueryIntent(
+        intent_type=intent.intent_type,
+        original_query=intent.original_query,
+        reformulated_query=intent.reformulated_query,
+        extracted_filters=api.SearchFilters(
+            language=filters.language,
+            category=filters.category,
+            min_year=filters.min_year,
+            max_year=filters.max_year,
+        ),
+        confidence=intent.confidence,
+        reasoning=intent.reasoning,
+        query_variations=list(intent.query_variations),
+    )
+
+
 def domain_response_to_api(
     response: domain_vo.SearchResponse,
     *,
     include_metadata: bool = False,
+    query_intent: domain_vo.QueryIntent | None = None,
 ) -> api.SearchResponse:
     """
     Convert a domain SearchResponse value object to an API SearchResponse model.
@@ -77,6 +134,7 @@ def domain_response_to_api(
     Args:
         response: Domain SearchResponse value object
         include_metadata: Whether to include debug metadata in the response
+        query_intent: Query understanding result, if the LLM path was used
 
     Returns:
         API SearchResponse model
@@ -94,6 +152,9 @@ def domain_response_to_api(
         search_mode=response.search_mode,
         latency_ms=response.latency_ms,
         metadata=api_metadata,
+        query_intent=(
+            domain_query_intent_to_api(query_intent) if query_intent is not None else None
+        ),
     )
 
 

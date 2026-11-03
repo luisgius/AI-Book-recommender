@@ -21,7 +21,7 @@ pip install -r requirements.txt
 python -m app.main
 
 # Run ingestion job
-python -m app.ingestion.ingest_books_job --query "machine learning" --max-results 50
+python -m scripts.ingest_and_build --query "machine learning" --max-items 50
 
 # Run evaluation (v1)
 python -m app.evaluation.evaluation_job --output data/evaluation/results.json
@@ -60,9 +60,9 @@ mypy app
 ```
 
 ## Docker
-- `Dockerfile` is currently a stub (commented TODO).
-- If you need containers, confirm the Dockerfile is implemented first.
-- Typical build command when ready: `docker build -t ai-book-recommender -f Dockerfile .`
+- `Dockerfile` builds a production image (python:3.12-slim, non-root user, healthcheck on `/api/v1/health`).
+- Build: `docker build -t ai-book-recommender -f Dockerfile .`
+- The LLM is optional; inside a container point `LLM_BASE_URL` at a reachable Ollama server or set `LLM_PROVIDER=none`.
 
 ## Editor Rules
 - No `.cursor/rules`, `.cursorrules`, or `.github/copilot-instructions.md` were found.

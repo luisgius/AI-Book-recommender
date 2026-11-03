@@ -83,47 +83,45 @@ pip install -r requirements.txt
 
 ## Configuration
 
-### API Keys (Required for LLM features)
+### LLM (optional; local by default)
 
-This project uses LLMs for generating grounded explanations. You need to configure at least one LLM provider:
-
-1. **Create your environment file**:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Add your API key** to `.env`:
-
-   **For OpenAI** (recommended for development):
-   ```bash
-   OPENAI_API_KEY=sk-your-actual-key-here
-   ```
-   - Get your key at: https://platform.openai.com/api-keys
-   - Default model: `gpt-4o-mini` (fast and cost-effective)
-
-   **For Anthropic** (alternative):
-   ```bash
-   ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
-   ```
-   - Get your key at: https://console.anthropic.com/settings/keys
-   - Models: `claude-3-haiku-20240307`, `claude-3-sonnet-20240229`
-
-3. **Security notes**:
-   - Never commit your `.env` file to git (already in `.gitignore`)
-   - Never hardcode API keys in source code
-   - API keys are loaded automatically via `python-dotenv`
-
-### Optional Configuration
-
-In `.env`, you can also configure:
+Query understanding and grounded explanations use an LLM through LangChain.
+By default the app uses a local [Ollama](https://ollama.com) server, so no API
+key is needed:
 
 ```bash
-# Logging level
-LOG_LEVEL=INFO
-
-# Environment
-ENVIRONMENT=development
+ollama pull qwen3.8:27b-mlx        # or any model that supports structured output
+cp .env.example .env               # optional: change model, limits, provider
 ```
+
+All settings are environment variables (see `.env.example` and
+`app/infrastructure/config/settings.py`): `LLM_PROVIDER` (`ollama`, `openai`,
+`anthropic` or `none`), `LLM_MODEL`, `LLM_BASE_URL`, `LLM_MAX_TOKENS`,
+`LLM_TIMEOUT_S`, `LLM_MAX_EXPLANATIONS`, among others.
+
+If the LLM is disabled (`LLM_PROVIDER=none`) or unreachable, the API keeps
+serving plain hybrid search: understanding falls back to the original query
+and explanations are skipped or replaced by a fallback message.
+`GET /api/v1/health` reports the LLM status separately from the search
+components.
+
+To use a hosted model instead, set `LLM_PROVIDER=openai` (needs
+`OPENAI_API_KEY`) or `LLM_PROVIDER=anthropic` (needs `ANTHROPIC_API_KEY` and
+`pip install langchain-anthropic`). Never commit `.env`.
+
+### Search API options
+
+`POST /api/v1/search` accepts, besides `text`, `filters` and `max_results`:
+
+- `use_understanding`: the LLM classifies the intent, extracts filters and
+  reformulates the query; retrieval then fuses several query variations.
+  Filters set explicitly in `filters` take precedence over extracted ones. An
+  extracted language is kept only if the query names it, and an extracted
+  category is a soft signal unless `LLM_APPLY_CATEGORY_FILTER=true`.
+- `use_explanations`: the top `LLM_MAX_EXPLANATIONS` results get a grounded
+  explanation with citations verified against the book data.
+- `use_diversification` / `diversity_lambda`: MMR re-ranking.
+- `include_metadata`: fusion details and candidate counts.
 
 ## Usage
 
@@ -135,7 +133,7 @@ pytest
 python -m app.main
 
 # Ingest books from Google Books
-python -m app.ingestion.ingest_books_job --query "machine learning" --max-results 50
+python -m scripts.ingest_and_build --query "machine learning" --max-items 50
 
 # Run evaluation
 python -m app.evaluation.evaluation_job --output data/evaluation/results.json

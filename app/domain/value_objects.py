@@ -90,6 +90,38 @@ class SearchFilters:
             for field_name in ["language", "category", "min_year", "max_year"]
         )
 
+    def overridden_by(self, explicit: Optional["SearchFilters"]) -> "SearchFilters":
+        """
+        Combine these filters with explicit ones; explicit values win.
+
+        Used when the LLM extracts filters from the query text and the user
+        also set filters in the request: what the user chose explicitly takes
+        precedence, field by field. If the combination is contradictory
+        (min_year > max_year), the explicit filters are returned unchanged.
+
+        Args:
+            explicit: Filters set explicitly by the user (may be None)
+
+        Returns:
+            A new SearchFilters instance
+        """
+        if explicit is None or explicit.is_empty():
+            return self
+
+        def pick(field_name: str):
+            value = getattr(explicit, field_name)
+            return value if value is not None else getattr(self, field_name)
+
+        try:
+            return SearchFilters(
+                language=pick("language"),
+                category=pick("category"),
+                min_year=pick("min_year"),
+                max_year=pick("max_year"),
+            )
+        except ValueError:
+            return explicit
+
 
 @dataclass(frozen=True)
 class SearchQuery:

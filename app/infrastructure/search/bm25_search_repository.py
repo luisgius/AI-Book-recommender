@@ -307,44 +307,10 @@ class BM25SearchRepository(LexicalSearchRepository):
         """
         Check if a book matches the given filters.
 
-        Filters are applied as AND conditions:
-        - language: exact match (case-insensitive)
-        - category: case-insensitive substring match in any category
-        - min_year/max_year: inclusive range check
-
-        Args:
-            book: The book to check
-            filters: The filters to apply
-
-        Returns:
-            True if book matches all non-None filters, False otherwise
+        Delegates to Book.matches_filters, the single definition shared by
+        the search service and every repository.
         """
-        # Language filter
-        if filters.language is not None:
-            if book.language is None:
-                return False
-            if book.language.lower() != filters.language.lower():
-                return False
-
-        # Category filter (substring match, case-insensitive)
-        if filters.category is not None:
-            if not book.categories:
-                return False
-            category_lower = filters.category.lower()
-            if not any(category_lower in cat.lower() for cat in book.categories):
-                return False
-
-        # Year range filters
-        book_year = book.get_published_year()
-        if filters.min_year is not None:
-            if book_year is None or book_year < filters.min_year:
-                return False
-
-        if filters.max_year is not None:
-            if book_year is None or book_year > filters.max_year:
-                return False
-
-        return True
+        return book.matches_filters(filters)
 
     def is_ready(self) -> bool:
         """

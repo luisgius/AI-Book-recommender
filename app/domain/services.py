@@ -9,6 +9,7 @@ entities, value objects, and port protocols (never on concrete implementations).
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import replace
 from typing import List, Optional, Dict
 from uuid import UUID
 import logging
@@ -47,6 +48,7 @@ class SearchService:
         vector_search: VectorSearchRepository,
         embeddings_store: EmbeddingsStore,
         llm_client: LLMClient | None = None,
+        max_explanations: int = 5,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -56,11 +58,21 @@ class SearchService:
             vector_search: Repository for semantic vector search
             embeddings_store: Store for generating query embeddings
             llm_client: Optional client for generating explanations (RAG)
+            max_explanations: How many top results get an LLM explanation
+                when explanations are requested (each one is an LLM call)
         """
+        if max_explanations < 0:
+            raise ValueError(f"max_explanations must be >= 0, got {max_explanations}")
+
         self._lexical_search = lexical_search
         self._vector_search = vector_search
         self._embeddings_store = embeddings_store
         self._llm_client = llm_client
+        self._max_explanations = max_explanations
+
+    def has_llm(self) -> bool:
+        """True if an LLM client is wired (query understanding and explanations available)."""
+        return self._llm_client is not None
 
     def get_health_status(self) -> Dict[str, bool]:
         """
@@ -170,6 +182,7 @@ class SearchService:
         use_explanations: bool = False,
         use_diversification: bool = False,
         diversity_lambda: float = 0.6,
+        filters: Optional[SearchFilters] = None,
     ) -> tuple[SearchResponse, QueryIntent]:
         """
         Execute search with LLM-powered query understanding (Block 2).
@@ -191,6 +204,8 @@ class SearchService:
             use_explanations: Whether to generate LLM explanations for results
             use_diversification: Whether to apply MMR diversification
             diversity_lambda: Trade-off between relevance and diversity
+            filters: Filters set explicitly by the user. They are combined
+                with the filters the LLM extracted; explicit values win.
 
         Returns:
             Tuple of (SearchResponse, QueryIntent):
@@ -277,7 +292,7 @@ class SearchService:
         # 6. Build a SearchQuery (used for filters/max_results/explanations)
         search_query = SearchQuery(
             text=query_intent.reformulated_query,
-            filters=query_intent.extracted_filters,
+            filters=query_intent.extracted_filters.overridden_by(filters),
             max_results=max_results,
             use_explanations=use_explanations,
             use_diversification=adjusted_diversification,
@@ -298,10 +313,12 @@ class SearchService:
                     query=search_query,
                 )
 
-                # Apply filters (may already be partially applied by repos)
+                # Apply filters to the full fused pool (repositories already
+                # filtered, this keeps the guarantee for every path)
                 results = self._apply_filters(results, search_query.filters)
 
-                # Apply diversification if requested
+                # Select the final top-k: MMR chooses among the whole pool,
+                # otherwise keep the best-ranked results
                 if adjusted_diversification and len(results) > 1:
                     results = self._apply_mmr_diversification(
                         results=results,
@@ -313,7 +330,7 @@ class SearchService:
                     for i, r in enumerate(results, start=1):
                         r.rank = i
 
-                # Generate explanations if requested
+                # Explanations are generated against the user's original wording
                 if use_explanations and self._llm_client is not None:
                     results = self._add_explanations(query_text, results)
 
@@ -322,8 +339,8 @@ class SearchService:
                     fusion_method="rrf",
                     rrf_k=60,
                     diversification_enabled=adjusted_diversification,
-                    candidates_lexical=meta.get("variations_succeeded", 0),
-                    candidates_vector=meta.get("variations_succeeded", 0),
+                    candidates_lexical=meta.get("candidates_lexical", 0),
+                    candidates_vector=meta.get("candidates_vector", 0),
                 )
                 response = SearchResponse(
                     results=results,
@@ -334,11 +351,11 @@ class SearchService:
                 )
             except Exception as e:
                 logger.warning(f"Multi-query search failed, falling back: {e}")
-                response = self.search_with_fallback(search_query)
+                response = self._fallback_with_original_explanations(search_query, query_text)
         else:
             # Graceful degradation: vector unavailable, use lexical fallback
             logger.warning("Vector search unavailable, using fallback for understanding search")
-            response = self.search_with_fallback(search_query)
+            response = self._fallback_with_original_explanations(search_query, query_text)
 
         # 8. Log timing
         total_time_ms = (time.time() - start_time) * 1000
@@ -348,6 +365,21 @@ class SearchService:
         )
 
         return response, query_intent
+
+    def _fallback_with_original_explanations(
+        self, search_query: SearchQuery, original_query_text: str
+    ) -> SearchResponse:
+        """
+        Run search_with_fallback for the understanding path.
+
+        The fallback searches with the reformulated query, but explanations
+        must answer the user's original wording, so they are generated here
+        instead of inside the fallback search.
+        """
+        response = self.search_with_fallback(replace(search_query, use_explanations=False))
+        if search_query.use_explanations and self._llm_client is not None:
+            self._add_explanations(original_query_text, response.results)
+        return response
 
     def _search_lexical_only_with_debug(self, query: SearchQuery) -> tuple[List[SearchResult], Dict]:
         results = self._search_lexical_only(query)
@@ -450,6 +482,10 @@ class SearchService:
         for i, result in enumerate(results, start=1):
             result.rank = i
 
+        # Degraded mode still honours explanation requests (RAG over BM25 results)
+        if query.use_explanations and self._llm_client is not None:
+            results = self._add_explanations(query.text, results)
+
         return results
 
     def search(self, query: SearchQuery) -> list[SearchResult]:
@@ -503,68 +539,8 @@ class SearchService:
             ...     print(f"{result.rank}. {result.book.title} (score: {result.final_score:.3f})")
         """
 
-        logger.info(f"Executing hybrid search for query: '{query.text}'")
-
-        # Step 1: Sequential retrieval
-        # Retrieve more candidates than needed to improve fusion quality
-        candidate_limit = query.max_results * 2
-
-        logger.debug("Executing lexical (BM25) search")
-        lexical_results = self._lexical_search.search(
-            query_text=query.text,
-            max_results=candidate_limit,
-            filters=query.filters
-        )
-
-        logger.debug("Generating query embedding and executing vector search")
-        query_embedding = self._embeddings_store.generate_embedding(query.text)
-        vector_results = self._vector_search.search(
-            query_embedding=query_embedding,
-            max_results=candidate_limit,
-            filters=query.filters,
-        )
-
-        logger.debug(
-            f"Retrieved {len(lexical_results)} lexical results, "
-            f"{len(vector_results)} vector results"
-        )
-
-        # Step 2: Fusion via Reciprocal Rank Fusion
-        fused_results = self._fuse_results_rrf(
-            lexical_results=lexical_results,
-            vector_results=vector_results,
-            k=60,
-        )
-
-        logger.debug(f"Fused into {len(fused_results)} unique results")
-
-        # Step 3: Post-processing
-        # Apply filters (may already be applied by repositories, but ensure here)
-        filtered_results = self._apply_filters(fused_results, query.filters)
-
-        # Step 4: Optional MMR diversification
-        if query.use_diversification:
-            logger.debug(f"Applying MMR diversification with lambda={query.diversity_lambda}")
-            final_results = self._apply_mmr_diversification(
-                results=filtered_results,
-                top_k=query.max_results,
-                lambda_param=query.diversity_lambda,
-            )
-        else:
-            # Limit to requested number of results
-            final_results = filtered_results[: query.max_results]
-            # Re-assign ranks
-            for i, result in enumerate(final_results, start=1):
-                result.rank = i
-
-        logger.info(f"Returning {len(final_results)} results")
-
-        # Step 5: Optional explanation generation
-        if query.use_explanations and self._llm_client is not None:
-            logger.debug("Generating explanations for top results")
-            final_results = self._add_explanations(query.text, final_results)
-
-        return final_results
+        results, _debug = self._search_hybrid_with_debug(query)
+        return results
 
     def find_similar_books(
         self,
@@ -703,7 +679,7 @@ class SearchService:
     def _fuse_multi_query_results(
         self,
         all_results: List[List[SearchResult]],
-        max_results: int,
+        max_results: Optional[int] = None,
     ) -> List[SearchResult]:
         """
         Fuse results from multiple query variations using RRF.
@@ -714,17 +690,22 @@ class SearchService:
 
         Books appearing in multiple variation rankings get boosted scores,
         which naturally surfaces results that are relevant from multiple
-        perspectives.
+        perspectives. Each fused result keeps the best lexical and vector
+        component scores seen across variations, for transparency.
 
         Args:
-            all_results: List of ranked results, one per query variation
-            max_results: Maximum number of final results
+            all_results: List of ranked results, one per query variation,
+                in variation order (the order breaks RRF ties)
+            max_results: Optional cut-off. Callers that still filter or
+                diversify must pass None so they work on the whole pool.
 
         Returns:
             Fused and deduplicated list of SearchResult
         """
         rrf_scores: Dict[UUID, float] = {}
         books_map: Dict[UUID, Book] = {}
+        lexical_scores: Dict[UUID, float] = {}
+        vector_scores: Dict[UUID, float] = {}
         k = 60
 
         for variation_results in all_results:
@@ -734,8 +715,19 @@ class SearchService:
                     rrf_scores.get(book_id, 0.0) + (1.0 / (k + result.rank))
                 )
                 books_map[book_id] = result.book
+                if result.lexical_score is not None:
+                    lexical_scores[book_id] = max(
+                        result.lexical_score, lexical_scores.get(book_id, float("-inf"))
+                    )
+                if result.vector_score is not None:
+                    vector_scores[book_id] = max(
+                        result.vector_score, vector_scores.get(book_id, float("-inf"))
+                    )
 
+        # sorted() is stable: ties keep first-seen order, which follows variation order
         sorted_ids = sorted(rrf_scores, key=lambda bid: rrf_scores[bid], reverse=True)
+        if max_results is not None:
+            sorted_ids = sorted_ids[:max_results]
 
         return [
             SearchResult(
@@ -743,8 +735,10 @@ class SearchService:
                 final_score=rrf_scores[bid],
                 rank=i + 1,
                 source="hybrid",
+                lexical_score=lexical_scores.get(bid),
+                vector_score=vector_scores.get(bid),
             )
-            for i, bid in enumerate(sorted_ids[:max_results])
+            for i, bid in enumerate(sorted_ids)
         ]
 
     def _multi_query_search(
@@ -761,6 +755,10 @@ class SearchService:
         - Each variation is fully independent (no shared mutable state)
         - 2-3 threads is lightweight; no global pool needed
 
+        Results are fused in variation order (not completion order), so the
+        ranking is deterministic. The fused pool is returned whole: filtering,
+        diversification and the final top-k cut happen afterwards.
+
         If a variation fails, results from other variations are still used
         (graceful degradation). If ALL fail, falls back to single balanced search.
 
@@ -770,38 +768,42 @@ class SearchService:
             query: Original SearchQuery (for filters and max_results)
 
         Returns:
-            Tuple of (fused results, debug metadata dict)
+            Tuple of (fused results, debug metadata dict). The metadata counts
+            the unique books contributed by lexical and by vector search.
         """
         logger.info(
             f"Multi-query search: {len(variations)} variations, "
             f"strategy={strategy.value}"
         )
 
-        all_variation_results: List[List[SearchResult]] = []
+        results_by_index: Dict[int, List[SearchResult]] = {}
 
         # Run all variations in parallel
         with ThreadPoolExecutor(max_workers=len(variations)) as executor:
-            future_to_variation = {
+            future_to_index = {
                 executor.submit(
                     self._search_hybrid_with_strategy,
                     variation_text=variation,
                     strategy=strategy,
                     filters=query.filters,
                     max_results=query.max_results,
-                ): variation
-                for variation in variations
+                ): index
+                for index, variation in enumerate(variations)
             }
 
-            for future in as_completed(future_to_variation):
-                variation = future_to_variation[future]
+            for future in as_completed(future_to_index):
+                index = future_to_index[future]
+                variation = variations[index]
                 try:
                     results = future.result()
-                    all_variation_results.append(results)
+                    results_by_index[index] = results
                     logger.debug(
                         f"Variation '{variation[:30]}...' returned {len(results)} results"
                     )
                 except Exception as e:
                     logger.warning(f"Variation '{variation[:30]}...' failed: {e}")
+
+        all_variation_results = [results_by_index[i] for i in sorted(results_by_index)]
 
         if not all_variation_results:
             # All variations failed - fall back to single balanced search
@@ -814,8 +816,8 @@ class SearchService:
             )
             all_variation_results = [fallback]
 
-        # Fuse results across all variations
-        fused = self._fuse_multi_query_results(all_variation_results, query.max_results)
+        # Fuse results across all variations (whole pool, no cut-off here)
+        fused = self._fuse_multi_query_results(all_variation_results)
 
         metadata = {
             "fusion_method": "rrf",
@@ -823,6 +825,8 @@ class SearchService:
             "strategy": strategy.value,
             "variations_attempted": len(variations),
             "variations_succeeded": len(all_variation_results),
+            "candidates_lexical": sum(1 for r in fused if r.lexical_score is not None),
+            "candidates_vector": sum(1 for r in fused if r.vector_score is not None),
         }
 
         return fused, metadata
@@ -928,36 +932,12 @@ class SearchService:
             Filtered list of results
         """
 
-        # SearchQuery.filters always provides a SearchFilters instance (never None)
-        # due to default_factory, but check is_empty() for efficiency
         if filters.is_empty():
             return results
 
-        filtered = []
-        for result in results:
-            book = result.book
-
-            # Language filter
-            if filters.language is not None:
-                if book.language != filters.language:
-                    continue
-
-            # Category filter
-            if filters.category is not None:
-                if filters.category not in book.categories:
-                    continue
-
-            # Year range filter
-            pub_year = book.get_published_year()
-            if pub_year is not None:
-                if filters.min_year is not None and pub_year < filters.min_year:
-                    continue
-                if filters.max_year is not None and pub_year > filters.max_year:
-                    continue
-
-            filtered.append(result)
-
-        return filtered
+        # Book.matches_filters is the single filter definition shared with the
+        # repositories, so this pass can never discard what they accepted
+        return [result for result in results if result.book.matches_filters(filters)]
 
     def _add_explanations(
         self,
@@ -971,8 +951,11 @@ class SearchService:
         - Context (books) has already been retrieved
         - For each result, generate an explanation via LLM
 
+        Only the top `max_explanations` results are explained, because each
+        explanation is one LLM call.
+
         Args:
-            query: The original search query
+            query_text: The user's query the explanations must answer
             results: List of search results
 
         Returns:
@@ -982,7 +965,7 @@ class SearchService:
             logger.warning("LLM Client not available, skipping explanations")
             return results
 
-        for result in results[:5]:
+        for result in results[: self._max_explanations]:
             try:
                 explanation = self._llm_client.generate_grounded_explanation(
                     query_text=query_text,

@@ -177,8 +177,15 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         # Step 5: Determine how many candidates to fetch
         # -----------------------------------------------------------------------
         # Over-fetch to compensate for post-retrieval filtering.
+        # With filters, a fixed over-fetch can starve: the nearest neighbours of
+        # an English query may all fail a language=es filter. IndexFlatL2 scans
+        # every vector anyway, so with filters we rank the whole index and let
+        # the filter pick the best matching books.
         # We can't fetch more than the index contains.
-        k_fetch = min(max_results * OVER_FETCH_FACTOR, faiss_index.ntotal)
+        if filters is not None and not filters.is_empty():
+            k_fetch = faiss_index.ntotal
+        else:
+            k_fetch = min(max_results * OVER_FETCH_FACTOR, faiss_index.ntotal)
 
         # -----------------------------------------------------------------------
         # Step 6: Execute FAISS search
@@ -286,48 +293,10 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         """
         Check if a book matches the given filters.
 
-        This method is identical to BM25SearchRepository._matches_filters
-        to ensure consistent filtering behavior across search methods.
-
-        Filters are applied as AND conditions:
-        - language: exact match (case-insensitive)
-        - category: case-insensitive substring match in any category
-        - min_year/max_year: inclusive range check
-
-        Args:
-            book: The book to check
-            filters: The filters to apply
-
-        Returns:
-            True if book matches all non-None filters, False otherwise
+        Delegates to Book.matches_filters, the single definition shared by
+        the search service and every repository.
         """
-        # Language filter: exact match, case-insensitive
-        if filters.language is not None:
-            if book.language is None:
-                return False
-            if book.language.lower() != filters.language.lower():
-                return False
-
-        # Category filter: substring match in any category, case-insensitive
-        if filters.category is not None:
-            if not book.categories:
-                return False
-            category_lower = filters.category.lower()
-            if not any(category_lower in cat.lower() for cat in book.categories):
-                return False
-
-        # Year range filters: inclusive bounds
-        book_year = book.get_published_year()
-
-        if filters.min_year is not None:
-            if book_year is None or book_year < filters.min_year:
-                return False
-
-        if filters.max_year is not None:
-            if book_year is None or book_year > filters.max_year:
-                return False
-
-        return True
+        return book.matches_filters(filters)
 
     # -------------------------------------------------------------------------
     # Helper methods (not part of VectorSearchRepository port)

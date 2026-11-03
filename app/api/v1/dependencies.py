@@ -8,21 +8,28 @@ Note: We use module-level singletons instead of @lru_cache with Depends()
 parameters, which is an antipattern that can cause unexpected behavior.
 """
 
+import logging
 import os
 from pathlib import Path
 from typing import Optional
+
+from dotenv import load_dotenv
 
 from app.domain.ports import (
     BookCatalogRepository,
     LexicalSearchRepository,
     VectorSearchRepository,
     EmbeddingsStore,
+    LLMClient,
 )
 from app.domain.services import SearchService
 from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
+from app.infrastructure.config.settings import LLMSettings
+
+logger = logging.getLogger(__name__)
 
 # Configuration from environment
 DB_PATH = Path(os.getenv("DB_PATH", "data/catalog.db"))
@@ -34,6 +41,9 @@ _bm25_repository: Optional[LexicalSearchRepository] = None
 _embeddings_store: Optional[EmbeddingsStore] = None
 _vector_repository: Optional[VectorSearchRepository] = None
 _search_service: Optional[SearchService] = None
+_llm_settings: Optional[LLMSettings] = None
+_llm_client: Optional[LLMClient] = None
+_llm_initialized: bool = False
 
 
 def get_catalog_repository() -> BookCatalogRepository:
@@ -79,6 +89,60 @@ def get_vector_repository() -> VectorSearchRepository:
     return _vector_repository
 
 
+def get_llm_settings() -> LLMSettings:
+    """Provide the LLM settings, read once from the environment (and .env)."""
+    global _llm_settings
+    if _llm_settings is None:
+        load_dotenv()
+        _llm_settings = LLMSettings.from_env()
+    return _llm_settings
+
+
+def get_llm_client() -> Optional[LLMClient]:
+    """
+    Provide the LLM client, or None when the LLM is disabled or cannot be built.
+
+    The LLM is optional: if LLM_PROVIDER=none or the client fails to
+    initialise, the API keeps serving plain hybrid search and logs why.
+    The catalog categories are passed so filters extracted from queries are
+    validated against real categories.
+    """
+    global _llm_client, _llm_initialized
+    if _llm_initialized:
+        return _llm_client
+    _llm_initialized = True
+
+    settings = get_llm_settings()
+    if not settings.enabled:
+        logger.info("LLM disabled (LLM_PROVIDER=none): understanding and explanations off")
+        return None
+
+    try:
+        # Imported here so the API can start without LangChain when the LLM is off
+        from app.infrastructure.llm.langchain_llm_client import LangChainLLMClient
+
+        categories = sorted(
+            {category for book in get_catalog_repository().get_all() for category in book.categories}
+        )
+        _llm_client = LangChainLLMClient(
+            provider=settings.provider,
+            model_name=settings.model,
+            temperature=settings.temperature,
+            max_retries=settings.max_retries,
+            base_url=settings.base_url,
+            num_ctx=settings.num_ctx,
+            reasoning=settings.reasoning,
+            known_categories=categories,
+            apply_extracted_category=settings.apply_extracted_category,
+            max_tokens=settings.max_tokens,
+            timeout_s=settings.timeout_s,
+        )
+    except Exception as e:
+        logger.warning(f"LLM client unavailable ({settings.provider}/{settings.model}): {e}")
+        _llm_client = None
+    return _llm_client
+
+
 def get_search_service() -> SearchService:
     """Provide the Search Service with all dependencies wired."""
     global _search_service
@@ -87,6 +151,8 @@ def get_search_service() -> SearchService:
             lexical_search=get_bm25_repository(),
             vector_search=get_vector_repository(),
             embeddings_store=get_embeddings_store(),
+            llm_client=get_llm_client(),
+            max_explanations=get_llm_settings().max_explanations,
         )
     return _search_service
 
@@ -100,9 +166,13 @@ def reset_dependencies() -> None:
     """
     global _catalog_repository, _bm25_repository, _embeddings_store
     global _vector_repository, _search_service
+    global _llm_settings, _llm_client, _llm_initialized
 
     _catalog_repository = None
     _bm25_repository = None
     _embeddings_store = None
     _vector_repository = None
     _search_service = None
+    _llm_settings = None
+    _llm_client = None
+    _llm_initialized = False

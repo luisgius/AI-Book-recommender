@@ -134,6 +134,35 @@ def reformulate_query_node(state: QueryUnderstandingState, llm) -> dict:
 
 
 # ==============================================================================
+# Helpers
+# ==============================================================================
+
+def append_new_terms(base_query: str, keywords: list[str]) -> str:
+    """
+    Expand a query with keywords, skipping words it already contains.
+
+    The reformulation step often returns keywords that repeat the optimized
+    query; concatenating them blindly duplicates every term, which inflates
+    BM25 term frequencies and the embedding input for no benefit.
+
+    Args:
+        base_query: The optimized query
+        keywords: Candidate expansion keywords (single words or phrases)
+
+    Returns:
+        The base query followed by the keyword words not yet present
+    """
+    seen = {word.lower() for word in base_query.split()}
+    extra: list[str] = []
+    for keyword in keywords:
+        for word in keyword.split():
+            if word.lower() not in seen:
+                seen.add(word.lower())
+                extra.append(word)
+    return " ".join([base_query, *extra]) if extra else base_query
+
+
+# ==============================================================================
 # Intent-Specific Handler Nodes
 # ==============================================================================
 
@@ -219,8 +248,7 @@ def handle_exploratory_node(state: QueryUnderstandingState) -> dict:
     if state["reformulated"] is not None and state["reformulated"].keywords:
         base_query = state["reformulated"].optimized_query
         keywords = state["reformulated"].keywords
-        top_keywords = " ".join(keywords[:5])
-        final = f"{base_query} {top_keywords}"
+        final = append_new_terms(base_query, keywords[:5])
 
         # Split keywords into two groups for different perspectives
         variations = [final]
