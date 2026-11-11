@@ -8,6 +8,11 @@ BM25 (Best Match 25) is a probabilistic ranking function that scores documents
 based on query term frequency, inverse document frequency, and document length
 normalization. It is widely used for lexical search and forms one half of our
 hybrid search approach.
+
+Tokenization is pluggable by name (see text_normalization.py): "normalized"
+for new indexes, "whitespace" for the legacy behaviour. The tokenizer name is
+saved with the index so documents and queries are always tokenized the same
+way.
 """
 
 import pickle
@@ -20,6 +25,12 @@ from rank_bm25 import BM25Okapi
 from app.domain.entities import Book, SearchResult
 from app.domain.value_objects import SearchFilters
 from app.domain.ports import LexicalSearchRepository
+from app.infrastructure.search.text_normalization import (
+    NORMALIZED_TOKENIZER,
+    WHITESPACE_TOKENIZER,
+    Tokenizer,
+    get_tokenizer,
+)
 
 
 class BM25SearchRepository(LexicalSearchRepository):
@@ -28,6 +39,7 @@ class BM25SearchRepository(LexicalSearchRepository):
 
     This implementation:
     - Builds an in-memory BM25 index from Book.get_searchable_text()
+    - Tokenizes documents and queries with the same named tokenizer
     - Maintains a book_id -> Book mapping for duplicate detection
     - Returns SearchResult with complete Book entities (no DB lookups needed)
     - Supports index persistence via pickle (controlled environment only)
@@ -38,7 +50,20 @@ class BM25SearchRepository(LexicalSearchRepository):
     search operations fast.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, tokenizer: str = NORMALIZED_TOKENIZER) -> None:
+        """
+        Create an empty repository.
+
+        Args:
+            tokenizer: Name of the tokenizer used to build new indexes and to
+                tokenize queries ("normalized" or "whitespace"). load_index
+                replaces it with the name stored in the index file.
+
+        Raises:
+            ValueError: If the tokenizer name is unknown.
+        """
+        self._tokenizer_name: str = tokenizer
+        self._tokenizer: Tokenizer = get_tokenizer(tokenizer)
         self._index: Optional[BM25Okapi] = None
         self._books: List[Book] = []
         self._book_map: Dict[UUID, Book] = {}
@@ -70,8 +95,7 @@ class BM25SearchRepository(LexicalSearchRepository):
             self._books = list(books)
             self._book_map = {book.id: book for book in self._books}
 
-            # Tokenize corpus: simple whitespace + lowercase tokenization
-            # For a production system, you might use nltk, spaCy, or language-specific tokenizers
+            # Tokenize corpus with the configured tokenizer (same one used for queries)
             self._tokenized_corpus = [
                 self._tokenize(book.get_searchable_text()) for book in books
             ]
@@ -215,6 +239,7 @@ class BM25SearchRepository(LexicalSearchRepository):
         - The list of books
         - The book_id -> Book mapping
         - The tokenized corpus
+        - The tokenizer name (so queries are tokenized like the documents)
 
         SECURITY WARNING: This uses pickle serialization, which is only safe
         in controlled environments. Never load pickle files from untrusted sources.
@@ -232,6 +257,7 @@ class BM25SearchRepository(LexicalSearchRepository):
                 "books": self._books,
                 "book_map": self._book_map,
                 "tokenized_corpus": self._tokenized_corpus,
+                "tokenizer": self._tokenizer_name,
             }
 
             # Ensure parent directory exists
@@ -247,6 +273,11 @@ class BM25SearchRepository(LexicalSearchRepository):
     def load_index(self, path: str) -> None:
         """
         Load a previously saved index from disk.
+
+        The tokenizer stored with the index replaces the one given to the
+        constructor. Indexes saved before the tokenizer name was persisted
+        were built with the whitespace tokenizer, so a file without that
+        entry loads as "whitespace".
 
         SECURITY WARNING: This uses pickle deserialization. Only load files
         from trusted sources in controlled environments.
@@ -270,6 +301,12 @@ class BM25SearchRepository(LexicalSearchRepository):
                     f"Expected {required_keys}, got {set(index_data.keys())}"
                 )
             
+            # Resolve the tokenizer before changing any state
+            tokenizer_name = index_data.get("tokenizer", WHITESPACE_TOKENIZER)
+            tokenizer = get_tokenizer(tokenizer_name)
+
+            self._tokenizer_name = tokenizer_name
+            self._tokenizer = tokenizer
             self._index = index_data["index"]
             self._books = index_data["books"]
             self._book_map = index_data["book_map"]
@@ -282,25 +319,25 @@ class BM25SearchRepository(LexicalSearchRepository):
         except Exception as e:
             raise IOError(f"Failed to load BM25 index from {path}: {e}") from e
 
-    @staticmethod
-    def _tokenize(text: str) -> List[str]:
+    @property
+    def tokenizer_name(self) -> str:
+        """Name of the active tokenizer ("normalized" or "whitespace")."""
+        return self._tokenizer_name
+
+    def _tokenize(self, text: str) -> List[str]:
         """
         Tokenize text for BM25 indexing and search.
 
-        This is a simple whitespace + lowercase tokenizer.
-        For production, consider:
-        - Language-specific tokenizers
-        - Stemming/lemmatization
-        - Stop word removal
-        - Handling punctuation more carefully
+        Delegates to the active named tokenizer, so documents and queries
+        always go through the same function.
 
         Args:
             text: Text to tokenize
 
         Returns:
-            List of lowercase tokens
+            List of tokens
         """
-        return text.lower().split()
+        return self._tokenizer(text)
 
     @staticmethod
     def _matches_filters(book: Book, filters: SearchFilters) -> bool:

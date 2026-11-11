@@ -8,7 +8,7 @@ Estado: `[ ]` pendiente, `[x]` hecha y validada, `[-]` aplazada.
 
 ## Tareas de esta tanda
 
-- [ ] **V01** Normalización léxica para BM25 (acentos, puntuación, palabras vacías)
+- [x] **V01** Normalización léxica para BM25 (acentos, puntuación, palabras vacías)
 - [ ] **V02** Embeddings configurables, índice normalizado y control modelo-índice
 - [ ] **V03** Higiene de evaluación (bootstrap, idioma, `Judged@k`, ficha de juicios)
 - [ ] **V04** Puerto `Reranker` y adaptador cross-encoder

@@ -5,6 +5,7 @@ These are real integration tests (no mocks) that verify the BM25 search
 functionality with actual Book entities and the rank-bm25 library.
 """
 
+import pickle
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -278,11 +279,18 @@ class TestBM25SearchRepository:
             repo.load_index(str(nonexistent_path))
 
     def test_tokenization(self):
-        """Test the tokenization logic."""
+        """Test the legacy whitespace tokenization logic."""
         text = "Hello World, This is a TEST!"
-        tokens = BM25SearchRepository._tokenize(text)
+        tokens = BM25SearchRepository(tokenizer="whitespace")._tokenize(text)
 
         assert tokens == ["hello", "world,", "this", "is", "a", "test!"]
+
+    def test_normalized_tokenization(self):
+        """Test the default normalized tokenization logic."""
+        text = "Hello World, This is a TEST of Programación!"
+        tokens = BM25SearchRepository()._tokenize(text)
+
+        assert tokens == ["hello", "world", "test", "programacion"]
 
     def test_matches_filters_with_all_filters(self, sample_books):
         """Test filter matching with all filter types."""
@@ -313,3 +321,177 @@ class TestBM25SearchRepository:
         filters = SearchFilters(min_year=2020)
 
         assert not BM25SearchRepository._matches_filters(book, filters)
+
+
+def _spanish_programming_book() -> Book:
+    """A Spanish book whose key words carry accents."""
+    return Book(
+        id=uuid4(),
+        title="Programación en Python",
+        authors=["Lucía Martínez"],
+        description="Aprende programación y análisis de datos desde cero.",
+        language="es",
+        categories=["Programación"],
+        published_date=datetime(2021, 2, 1, tzinfo=timezone.utc),
+        source="test",
+        source_id="test_es_006",
+    )
+
+
+class TestBM25Tokenizers:
+    """Tests for the pluggable tokenizer and its persistence with the index."""
+
+    def test_default_tokenizer_is_normalized(self):
+        assert BM25SearchRepository().tokenizer_name == "normalized"
+
+    def test_constructor_accepts_whitespace_tokenizer(self):
+        assert BM25SearchRepository(tokenizer="whitespace").tokenizer_name == "whitespace"
+
+    def test_unknown_tokenizer_raises_value_error(self):
+        with pytest.raises(ValueError, match="Unknown tokenizer"):
+            BM25SearchRepository(tokenizer="stemmed")
+
+    def test_tokenizer_name_is_read_only(self):
+        repo = BM25SearchRepository()
+        with pytest.raises(AttributeError):
+            repo.tokenizer_name = "whitespace"  # type: ignore[misc]
+
+    @pytest.mark.parametrize("query", ["programacion", "analisis de datos"])
+    def test_unaccented_query_matches_accented_document_when_normalized(
+        self, sample_books, query
+    ):
+        book = _spanish_programming_book()
+        repo = BM25SearchRepository(tokenizer="normalized")
+        repo.build_index(sample_books + [book])
+
+        results = repo.search(query, max_results=3)
+
+        assert results[0].book.id == book.id
+        assert results[0].lexical_score > 0
+
+    @pytest.mark.parametrize("query", ["programacion", "analisis"])
+    def test_unaccented_query_does_not_match_accented_document_when_whitespace(
+        self, sample_books, query
+    ):
+        book = _spanish_programming_book()
+        repo = BM25SearchRepository(tokenizer="whitespace")
+        repo.build_index(sample_books + [book])
+
+        results = repo.search(query, max_results=10)
+
+        # No document shares a token with the query: every score is zero
+        assert all(result.lexical_score == 0 for result in results)
+
+    def test_query_without_enye_matches_document_with_enye_when_normalized(
+        self, sample_books
+    ):
+        spain_book = sample_books[3]  # Historia de España
+
+        normalized_repo = BM25SearchRepository(tokenizer="normalized")
+        normalized_repo.build_index(sample_books)
+        whitespace_repo = BM25SearchRepository(tokenizer="whitespace")
+        whitespace_repo.build_index(sample_books)
+
+        normalized_results = normalized_repo.search("espana", max_results=1)
+        whitespace_results = whitespace_repo.search("espana", max_results=1)
+
+        assert normalized_results[0].book.id == spain_book.id
+        assert normalized_results[0].lexical_score > 0
+        assert whitespace_results[0].lexical_score == 0
+
+    def test_save_index_persists_tokenizer_name(self, sample_books, tmp_path):
+        index_path = tmp_path / "index.pkl"
+        repo = BM25SearchRepository(tokenizer="whitespace")
+        repo.build_index(sample_books)
+
+        repo.save_index(str(index_path))
+
+        with open(index_path, "rb") as f:
+            index_data = pickle.load(f)
+        assert index_data["tokenizer"] == "whitespace"
+
+    @pytest.mark.parametrize(
+        "saved_tokenizer, loading_tokenizer",
+        [("normalized", "whitespace"), ("whitespace", "normalized")],
+    )
+    def test_load_index_restores_saved_tokenizer(
+        self, sample_books, tmp_path, saved_tokenizer, loading_tokenizer
+    ):
+        """The tokenizer stored in the file wins over the constructor argument."""
+        index_path = tmp_path / "index.pkl"
+        original = BM25SearchRepository(tokenizer=saved_tokenizer)
+        original.build_index(sample_books)
+        original.save_index(str(index_path))
+
+        loaded = BM25SearchRepository(tokenizer=loading_tokenizer)
+        loaded.load_index(str(index_path))
+
+        assert loaded.tokenizer_name == saved_tokenizer
+        for query in ["espana", "Historia de España.", "deep learning"]:
+            original_results = original.search(query, max_results=5)
+            loaded_results = loaded.search(query, max_results=5)
+            assert [r.book.id for r in loaded_results] == [
+                r.book.id for r in original_results
+            ]
+            assert [r.lexical_score for r in loaded_results] == [
+                r.lexical_score for r in original_results
+            ]
+
+    def test_add_to_index_after_load_uses_restored_tokenizer(self, sample_books, tmp_path):
+        index_path = tmp_path / "index.pkl"
+        original = BM25SearchRepository(tokenizer="normalized")
+        original.build_index(sample_books)
+        original.save_index(str(index_path))
+
+        loaded = BM25SearchRepository(tokenizer="whitespace")
+        loaded.load_index(str(index_path))
+        book = _spanish_programming_book()
+        loaded.add_to_index(book)
+
+        results = loaded.search("programacion", max_results=1)
+        assert results[0].book.id == book.id
+        assert results[0].lexical_score > 0
+
+    def test_legacy_pickle_without_tokenizer_loads_as_whitespace(
+        self, sample_books, tmp_path
+    ):
+        """Indexes saved before this change have no tokenizer entry."""
+        index_path = tmp_path / "legacy_index.pkl"
+        legacy_repo = BM25SearchRepository(tokenizer="whitespace")
+        legacy_repo.build_index(sample_books)
+        legacy_data = {
+            "index": legacy_repo._index,
+            "books": legacy_repo._books,
+            "book_map": legacy_repo._book_map,
+            "tokenized_corpus": legacy_repo._tokenized_corpus,
+        }
+        with open(index_path, "wb") as f:
+            pickle.dump(legacy_data, f)
+
+        repo = BM25SearchRepository()  # default "normalized"
+        repo.load_index(str(index_path))
+
+        assert repo.tokenizer_name == "whitespace"
+        # Queries are tokenized like the legacy documents: "españa." keeps its period
+        assert repo._tokenize("Historia de España.") == ["historia", "de", "españa."]
+        assert repo.search("espana", max_results=1)[0].lexical_score == 0
+
+    def test_load_index_with_unknown_tokenizer_fails_without_changing_state(
+        self, sample_books, tmp_path
+    ):
+        index_path = tmp_path / "bad_index.pkl"
+        source = BM25SearchRepository()
+        source.build_index(sample_books)
+        source.save_index(str(index_path))
+        with open(index_path, "rb") as f:
+            index_data = pickle.load(f)
+        index_data["tokenizer"] = "stemmed"
+        with open(index_path, "wb") as f:
+            pickle.dump(index_data, f)
+
+        repo = BM25SearchRepository(tokenizer="whitespace")
+        with pytest.raises(IOError, match="Unknown tokenizer"):
+            repo.load_index(str(index_path))
+
+        assert repo.tokenizer_name == "whitespace"
+        assert not repo.is_ready()
