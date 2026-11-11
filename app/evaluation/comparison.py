@@ -40,7 +40,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from statistics import median
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from app.evaluation.evaluation_service import (
     RELEVANT_GRADE,
@@ -118,7 +118,7 @@ def compare_systems(
     runs: Mapping[str, Mapping[str, Sequence[BookId]]],
     judgments: Mapping[str, Mapping[BookId, int]],
     queries: Sequence[TestQuery],
-    baseline: str,
+    baseline: Optional[str],
     *,
     n_resamples: int = 10000,
     confidence: float = 0.95,
@@ -131,7 +131,9 @@ def compare_systems(
         runs: System name -> query id -> ranked book ids
         judgments: Query id -> book id -> grade (0-3)
         queries: Test queries (order, ids and language labels)
-        baseline: Name of the system the others are compared with
+        baseline: Name of the system the others are compared with, or None
+            to only score the systems (vs_baseline is then empty; use
+            compare_pairs for an explicit list of contrasts)
         n_resamples: Bootstrap and permutation resamples
         confidence: Confidence level of the intervals
         seed: Random seed for the bootstrap and the permutation test
@@ -145,7 +147,7 @@ def compare_systems(
         ValueError: If the baseline is not among the runs, no query has
             judgments, or a run lacks a ranking for an evaluated query
     """
-    if baseline not in runs:
+    if baseline is not None and baseline not in runs:
         raise ValueError(f"Baseline '{baseline}' is not among the systems {list(runs)}")
 
     evaluated = [q for q in queries if judgments.get(q.query_id)]
@@ -184,7 +186,7 @@ def compare_systems(
     vs_baseline: Dict[str, Dict[str, Any]] = {}
     raw_p: Dict[str, float] = {}
     for system in runs:
-        if system == baseline:
+        if baseline is None or system == baseline:
             continue
         diff, low, high = paired_bootstrap_ci(
             primary_scores(system), primary_scores(baseline),
@@ -219,6 +221,8 @@ def compare_systems(
                 f"two-sided paired permutation test (sign flips) on per-query {PRIMARY_METRIC}, "
                 f"{n_resamples} resamples, seed {seed}; Holm correction across all systems "
                 f"compared with the baseline"
+                if baseline is not None
+                else "none (no baseline; see compare_pairs for explicit contrasts)"
             ),
             "n_resamples": n_resamples,
             "confidence": confidence,
@@ -237,6 +241,71 @@ def compare_systems(
         "systems": systems,
         "vs_baseline": vs_baseline,
     }
+
+
+def compare_pairs(
+    report: Mapping[str, Any],
+    pairs: Sequence[Tuple[str, str, str]],
+    *,
+    metric: str = PRIMARY_METRIC,
+    n_resamples: int = 10000,
+    confidence: float = 0.95,
+    seed: int = 0,
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Paired tests for an explicit list of contrasts declared in advance.
+
+    Unlike the baseline comparison of compare_systems, each contrast names
+    its own reference system, and the Holm correction runs across exactly
+    the contrasts given (the pre-declared family), not across every system.
+
+    Args:
+        report: Output of compare_systems (its per-query scores are used)
+        pairs: (contrast name, system, reference system) triples
+        metric: Per-query metric to compare (default nDCG@10)
+        n_resamples: Bootstrap and permutation resamples
+        confidence: Confidence level of the paired bootstrap interval
+        seed: Random seed for the bootstrap and the permutation test
+
+    Returns:
+        Contrast name -> {system, reference, metric, mean_system,
+        mean_reference, mean_difference (system - reference), ci_low,
+        ci_high, p_value, p_value_holm}
+
+    Raises:
+        ValueError: If a contrast name repeats or a system is not in the report
+    """
+    names = [name for name, _, _ in pairs]
+    if len(set(names)) != len(names):
+        raise ValueError(f"Contrast names must be unique, got {names}")
+    query_ids = report["query_ids"]
+
+    def scores(system: str) -> List[float]:
+        if system not in report["systems"]:
+            raise ValueError(f"System '{system}' is not in the report {list(report['systems'])}")
+        per_query = report["systems"][system]["per_query"]
+        return [per_query[query_id][metric] for query_id in query_ids]
+
+    results: Dict[str, Dict[str, Any]] = {}
+    raw_p: Dict[str, float] = {}
+    for name, system, reference in pairs:
+        a, b = scores(system), scores(reference)
+        diff, low, high = paired_bootstrap_ci(a, b, n_resamples=n_resamples, confidence=confidence, seed=seed)
+        _, raw_p[name] = paired_permutation_test(a, b, n_resamples=n_resamples, seed=seed)
+        results[name] = {
+            "system": system,
+            "reference": reference,
+            "metric": metric,
+            "mean_system": sum(a) / len(a),
+            "mean_reference": sum(b) / len(b),
+            "mean_difference": diff,
+            "ci_low": low,
+            "ci_high": high,
+            "p_value": raw_p[name],
+        }
+    for name, adjusted in holm_correction(raw_p).items():
+        results[name]["p_value_holm"] = adjusted
+    return results
 
 
 def describe_judgments(
@@ -331,13 +400,13 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     Render a compare_systems report as two Markdown tables (three decimals).
 
     The first table has the aggregate metrics and the comparison with the
-    baseline; the second, nDCG@10 by query language.
+    baseline (no comparison columns when the report has no baseline); the
+    second, nDCG@10 by query language.
     """
     baseline = report["config"]["baseline"]
-    header = [
-        "System", "nDCG@10 [95% CI]", "Recall@10", "P@5", "MRR", "Judged@10", "Condensed nDCG@10",
-        f"Diff. nDCG@10 vs {baseline} [95% CI]", "p", "p (Holm)",
-    ]
+    header = ["System", "nDCG@10 [95% CI]", "Recall@10", "P@5", "MRR", "Judged@10", "Condensed nDCG@10"]
+    if baseline is not None:
+        header += [f"Diff. nDCG@10 vs {baseline} [95% CI]", "p", "p (Holm)"]
     lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
     for system, data in report["systems"].items():
         m = data["metrics"]
@@ -350,9 +419,9 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             _fmt(m["judged_at_10"]["mean"]),
             _fmt(m["condensed_ndcg_at_10"]["mean"]),
         ]
-        if system == baseline:
+        if baseline is not None and system == baseline:
             row += ["", "", ""]
-        else:
+        elif baseline is not None:
             c = report["vs_baseline"][system]
             row += [
                 _fmt_ci(c["mean_difference"], c["ci_low"], c["ci_high"], signed=True),

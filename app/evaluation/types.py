@@ -21,18 +21,27 @@ class TestQuery:
 
     language is the language the query text is written in ("es" or "en"),
     used to break results down by language; None when not labelled.
+
+    text_accented is the same query written with its Spanish diacritics
+    ("programación" for the stored "programacion"), used only to measure how
+    robust a system is to accents. The information need is the same, so the
+    judgments of the query apply to it. None when the stored text needs no
+    accent.
     """
     query_id: str
     text: str
     category: str | None = None
     language: str | None = None
+    text_accented: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate the language label."""
+        """Validate the language label and the accented variant."""
         if self.language is not None and self.language not in QUERY_LANGUAGES:
             raise ValueError(
                 f"language must be one of {sorted(QUERY_LANGUAGES)} or None, got {self.language!r}"
             )
+        if self.text_accented is not None and not self.text_accented.strip():
+            raise ValueError("text_accented must be None or a non-empty text")
 
 
 @dataclass(frozen=True)

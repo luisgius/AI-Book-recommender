@@ -9,7 +9,8 @@
     "query_id": "q02",
     "text": "Novela historica espana",
     "category": "fiction",
-    "language": "es"
+    "language": "es",
+    "text_accented": "Novela histórica españa"
   },
   {
     "query_id": "q03",
@@ -27,7 +28,8 @@
     "query_id": "q05",
     "text": "introduccion a la inteligencia artificial para principiantes",
     "category": "ai",
-    "language": "es"
+    "language": "es",
+    "text_accented": "introducción a la inteligencia artificial para principiantes"
   },
   {
     "query_id": "q06",
@@ -39,7 +41,8 @@
     "query_id": "q07",
     "text": "algoritmos de aprendizaje automatico sin matematicas avanzadas",
     "category": "ai",
-    "language": "es"
+    "language": "es",
+    "text_accented": "algoritmos de aprendizaje automático sin matemáticas avanzadas"
   },
   {
     "query_id": "q08",
@@ -57,7 +60,8 @@
     "query_id": "q10",
     "text": "programacion en python para analisis de datos",
     "category": "ai",
-    "language": "es"
+    "language": "es",
+    "text_accented": "programación en python para análisis de datos"
   },
   {
     "query_id": "q11",
@@ -69,7 +73,8 @@
     "query_id": "q12",
     "text": "redes neuronales convolucionales ejemplos practicos",
     "category": "ai",
-    "language": "es"
+    "language": "es",
+    "text_accented": "redes neuronales convolucionales ejemplos prácticos"
   },
   {
     "query_id": "q13",
@@ -87,7 +92,8 @@
     "query_id": "q15",
     "text": "novela guerra civil espanola",
     "category": "fiction",
-    "language": "es"
+    "language": "es",
+    "text_accented": "novela guerra civil española"
   },
   {
     "query_id": "q16",
@@ -99,7 +105,8 @@
     "query_id": "q17",
     "text": "literatura espanola siglo XIX realismo",
     "category": "fiction",
-    "language": "es"
+    "language": "es",
+    "text_accented": "literatura española siglo XIX realismo"
   },
   {
     "query_id": "q18",
@@ -111,7 +118,8 @@
     "query_id": "q19",
     "text": "novelas sobre la inquisicion espanola",
     "category": "fiction",
-    "language": "es"
+    "language": "es",
+    "text_accented": "novelas sobre la inquisición española"
   },
   {
     "query_id": "q20",
@@ -123,7 +131,8 @@
     "query_id": "q21",
     "text": "ficcion historica conquista de america",
     "category": "fiction",
-    "language": "es"
+    "language": "es",
+    "text_accented": "ficción histórica conquista de américa"
   },
   {
     "query_id": "q22",
@@ -147,7 +156,8 @@
     "query_id": "q25",
     "text": "recetas tradicionales cocina mediterranea",
     "category": "cooking",
-    "language": "es"
+    "language": "es",
+    "text_accented": "recetas tradicionales cocina mediterránea"
   },
   {
     "query_id": "q26",
@@ -159,7 +169,8 @@
     "query_id": "q27",
     "text": "postres caseros faciles sin horno",
     "category": "cooking",
-    "language": "es"
+    "language": "es",
+    "text_accented": "postres caseros fáciles sin horno"
   },
   {
     "query_id": "q28",
@@ -171,7 +182,8 @@
     "query_id": "q29",
     "text": "cocina espanola tapas y pinchos",
     "category": "cooking",
-    "language": "es"
+    "language": "es",
+    "text_accented": "cocina española tapas y pinchos"
   },
   {
     "query_id": "q30",
@@ -195,7 +207,8 @@
     "query_id": "q33",
     "text": "comida mexicana autentica tacos enchiladas",
     "category": "cooking",
-    "language": "es"
+    "language": "es",
+    "text_accented": "comida mexicana auténtica tacos enchiladas"
   },
   {
     "query_id": "q34",
@@ -219,7 +232,8 @@
     "query_id": "q37",
     "text": "recetas faciles",
     "category": "ambiguous",
-    "language": "es"
+    "language": "es",
+    "text_accented": "recetas fáciles"
   },
   {
     "query_id": "q38",

@@ -503,8 +503,8 @@ def run_ablation_evaluation(
 
 
 def load_test_queries(path: str) -> List[TestQuery]:
-    """Load test queries from JSON file (category and language are optional)."""
-    with open(path, "r") as f:
+    """Load test queries from JSON file (category, language and text_accented are optional)."""
+    with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     queries = []
@@ -514,6 +514,7 @@ def load_test_queries(path: str) -> List[TestQuery]:
             text=item["text"],
             category=item.get("category"),
             language=item.get("language"),
+            text_accented=item.get("text_accented"),
         )
         queries.append(query)
 
