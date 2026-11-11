@@ -20,11 +20,11 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V08** Proveedor OpenRouter, modelos por defecto y coste por llamada
 - [x] **V10** Selección de los modelos LLM (OpenRouter) sobre las tareas del proyecto
 - [x] **V11** Catálogo nuevo, multilingüe y de varias fuentes (Wikidata/Wikipedia, Gutenberg, DOAB, Open Library); pendiente completar los resúmenes de Wikipedia
+- [x] **V12** Perfil nube: catálogo y búsqueda en Postgres (Neon) y paridad con el perfil local
 - [x] **V15** Servidor MCP de solo lectura sobre el buscador
 
 ## En curso
 
-- [~] **V12** Perfil nube: catálogo y búsqueda en Postgres (Neon, pgvector) y medida de paridad con el perfil local
 - [~] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
 
 ## Pendientes

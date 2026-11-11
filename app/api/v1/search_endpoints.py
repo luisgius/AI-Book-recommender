@@ -20,6 +20,7 @@ from app.api.v1.dependencies import (
     get_search_service,
     get_catalog_repository,
     get_llm_settings,
+    get_search_profile_settings,
 )
 
 router = APIRouter()
@@ -129,12 +130,16 @@ def health_check(
     explanations are skipped; without the reranker (or if it fails) the
     fused order is returned. The reranker model loads on the first search,
     so "ready" only turns false after a failed load.
+
+    "profile" names the adapters in use: "local" (SQLite, BM25, FAISS) or
+    "cloud" (Postgres schema, lexical ranking and vector search mode).
     """
     health_status = service.get_health_status()
     llm_settings = get_llm_settings()
 
     return {
         "status": "ok" if health_status["overall"] else "degraded",
+        "profile": get_search_profile_settings().describe(),
         "components": {
             "lexical_search": health_status["lexical_search"],
             "vector_search": health_status["vector_search"],

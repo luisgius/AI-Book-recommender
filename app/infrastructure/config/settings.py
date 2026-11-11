@@ -44,19 +44,36 @@ Cost estimate of recorded LLM calls (optional, both or neither):
     LLM_PRICE_OUTPUT_PER_MTOK  USD per million output tokens
 
 Embedding environment variables (all optional):
-    EMBEDDING_MODEL       sentence-transformers model (default all-MiniLM-L6-v2).
+    EMBEDDING_PROVIDER    "local" (default: a sentence-transformers model in this
+                          process) or "openrouter" (OpenRouter's embeddings API;
+                          no model is loaded)
+    EMBEDDING_MODEL       local: sentence-transformers model (default
+                          all-MiniLM-L6-v2); openrouter: OpenRouter model id
+                          (required, e.g. qwen/qwen3-embedding-8b).
                           The FAISS index must be built with the same model.
     EMBEDDING_DEVICE      "cpu", "mps" or "cuda" (default: picked automatically)
+    EMBEDDING_DIMENSIONS  openrouter only: output dimension, for models trained
+                          to be truncated (Matryoshka, the Qwen3 embeddings);
+                          default: the model's native dimension
+    EMBEDDING_OPENROUTER_PROVIDER  openrouter only: upstream provider to pin
+                          (e.g. deepinfra), so every vector comes from the same
+                          endpoint; default: OpenRouter's routing
 
 Re-ranking environment variables (all optional):
-    RERANKER_MODEL        cross-encoder model for the third retrieval stage,
-                          e.g. BAAI/bge-reranker-v2-m3. Empty, unset or "none"
-                          (default) disables re-ranking.
+    RERANKER_PROVIDER     "local" (default: cross-encoder in this process) or
+                          "openrouter" (OpenRouter's rerank API)
+    RERANKER_MODEL        reranker model for the third retrieval stage, e.g.
+                          BAAI/bge-reranker-v2-m3 (local) or
+                          qwen/qwen3-reranker-8b (openrouter). Empty, unset or
+                          "none" (default) disables re-ranking.
     RERANK_DEPTH          top fused results the reranker scores (default 30)
     RERANKER_DEVICE       "cpu", "mps" or "cuda" (default: picked automatically)
+    RERANKER_OPENROUTER_PROVIDER  openrouter only: upstream provider to pin
+                          (e.g. primeintellect); default: OpenRouter's routing
 """
 
 import os
+import re
 from dataclasses import dataclass
 from typing import Mapping, Optional, Union
 
@@ -68,7 +85,10 @@ DEFAULT_OPENROUTER_URL = "https://openrouter.ai/api/v1"
 
 DEFAULT_MODELS = {
     "ollama": "qwen3.8:27b-mlx",
-    "openrouter": "qwen/qwen3.8-flash",
+    # Chosen with the speed-quality rule of 2026-11-11 (V16), which superseded
+    # the quality-only V10 choice (qwen/qwen3.8-flash, the slowest candidate):
+    # data/evaluation/LLM_MODEL_SELECTION.md. Thinking off (THINKING_OFF_BY_DEFAULT).
+    "openrouter": "deepseek/deepseek-v4.1-flash",
     "openai": "gpt-6-luna",  # gpt-4o-mini-2024-07-18 is retired on 2027-01-14
     "anthropic": "claude-haiku-5-5",
 }
@@ -98,11 +118,11 @@ REASONING_EFFORTS = ("minimal", "low", "medium", "high", "xhigh", "max")
 Reasoning = Union[bool, str, None]
 
 # Default judge per provider when JUDGE_MODEL is not set. On OpenRouter it is
-# GLM-5.3 Flash (Z.ai), another vendor than the default system LLM (Qwen3.8
-# Flash, Alibaba): the literature recommends a judge from a different family
+# GLM-5.3 Flash (Z.ai), another vendor than the default system LLM (DeepSeek
+# V4.1 Flash): the literature recommends a judge from a different family
 # than the system it judges. Both were chosen on the project's own tasks
-# (data/evaluation/LLM_MODEL_SELECTION.md, 2026-11-11). Other providers fall
-# back to the system model.
+# (data/evaluation/LLM_MODEL_SELECTION.md, 2026-11-11; the speed-quality
+# rule kept this judge). Other providers fall back to the system model.
 DEFAULT_JUDGE_MODELS = {"openrouter": "z-ai/glm-5.3-flash"}
 
 # Thinking mode of those default judges when JUDGE_REASONING is not set.
@@ -358,29 +378,73 @@ class TokenPrices:
         return cls(input_per_mtok=float(raw_input), output_per_mtok=float(raw_output))
 
 
+# Where embeddings and re-ranking scores are computed: "local" runs an open
+# model in this process (the evaluated profile); "openrouter" calls
+# OpenRouter's API and loads no model (the cloud profile).
+SUPPORTED_MODEL_PROVIDERS = ("local", "openrouter")
+
+
+def _optional_int(raw: str, variable: str) -> Optional[int]:
+    """An optional integer environment value ("" gives None)."""
+    raw = raw.strip()
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except ValueError:
+        raise ValueError(f"{variable} must be an integer, got '{raw}'") from None
+
+
 @dataclass(frozen=True)
 class EmbeddingSettings:
     """Settings needed to build the embeddings store (vector side)."""
 
     model: str = DEFAULT_EMBEDDING_MODEL
     device: Optional[str] = None  # None: sentence-transformers picks the device
+    provider: str = "local"  # EMBEDDING_PROVIDER: "local" or "openrouter"
+    dimensions: Optional[int] = None  # openrouter only: output dimension (MRL models)
+    openrouter_provider: Optional[str] = None  # openrouter only: upstream provider to pin
 
     def __post_init__(self) -> None:
+        if self.provider not in SUPPORTED_MODEL_PROVIDERS:
+            raise ValueError(
+                f"EMBEDDING_PROVIDER must be one of {SUPPORTED_MODEL_PROVIDERS}, got '{self.provider}'"
+            )
         if not self.model.strip():
-            raise ValueError("EMBEDDING_MODEL must not be empty")
+            raise ValueError(
+                "EMBEDDING_MODEL must not be empty"
+                + (" (with EMBEDDING_PROVIDER=openrouter it must name an OpenRouter embedding model, "
+                   "e.g. qwen/qwen3-embedding-8b)" if self.provider == "openrouter" else "")
+            )
         if self.device is not None and self.device.split(":")[0] not in SUPPORTED_EMBEDDING_DEVICES:
             raise ValueError(
                 f"EMBEDDING_DEVICE must be one of {SUPPORTED_EMBEDDING_DEVICES} "
                 f"(optionally with an index, e.g. cuda:0), got '{self.device}'"
             )
+        if self.provider == "local" and (self.dimensions is not None or self.openrouter_provider):
+            raise ValueError(
+                "EMBEDDING_DIMENSIONS and EMBEDDING_OPENROUTER_PROVIDER apply only to EMBEDDING_PROVIDER=openrouter"
+            )
+        if self.dimensions is not None and self.dimensions < 1:
+            raise ValueError(f"EMBEDDING_DIMENSIONS must be >= 1, got {self.dimensions}")
 
     @classmethod
     def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "EmbeddingSettings":
         """Build settings from environment variables (see module docstring)."""
         env = os.environ if env is None else env
-        model = env.get("EMBEDDING_MODEL", "").strip() or DEFAULT_EMBEDDING_MODEL
+        provider = env.get("EMBEDDING_PROVIDER", "").strip().lower() or "local"
+        # The local default model is not served by OpenRouter, so an API model
+        # must always be named explicitly.
+        default_model = DEFAULT_EMBEDDING_MODEL if provider == "local" else ""
+        model = env.get("EMBEDDING_MODEL", "").strip() or default_model
         device = env.get("EMBEDDING_DEVICE", "").strip().lower() or None
-        return cls(model=model, device=device)
+        return cls(
+            model=model,
+            device=device,
+            provider=provider,
+            dimensions=_optional_int(env.get("EMBEDDING_DIMENSIONS", ""), "EMBEDDING_DIMENSIONS"),
+            openrouter_provider=env.get("EMBEDDING_OPENROUTER_PROVIDER", "").strip().lower() or None,
+        )
 
 
 # Top fused results scored by the reranker when RERANK_DEPTH is not set.
@@ -389,13 +453,21 @@ DEFAULT_RERANK_DEPTH = 30
 
 @dataclass(frozen=True)
 class RerankerSettings:
-    """Settings of the optional cross-encoder reranker (third retrieval stage)."""
+    """Settings of the optional reranker (third retrieval stage): local cross-encoder or API."""
 
     model: Optional[str] = None  # None: re-ranking disabled (default)
     depth: int = DEFAULT_RERANK_DEPTH
     device: Optional[str] = None  # None: sentence-transformers picks the device
+    provider: str = "local"  # RERANKER_PROVIDER: "local" (cross-encoder) or "openrouter"
+    openrouter_provider: Optional[str] = None  # openrouter only: upstream provider to pin
 
     def __post_init__(self) -> None:
+        if self.provider not in SUPPORTED_MODEL_PROVIDERS:
+            raise ValueError(
+                f"RERANKER_PROVIDER must be one of {SUPPORTED_MODEL_PROVIDERS}, got '{self.provider}'"
+            )
+        if self.provider == "local" and self.openrouter_provider:
+            raise ValueError("RERANKER_OPENROUTER_PROVIDER applies only to RERANKER_PROVIDER=openrouter")
         if self.model is not None and not self.model.strip():
             raise ValueError("RERANKER_MODEL must be a model name or unset")
         if self.depth < 1:
@@ -421,6 +493,8 @@ class RerankerSettings:
             model=None if model.lower() in ("", "none") else model,
             depth=int(depth) if depth else DEFAULT_RERANK_DEPTH,
             device=env.get("RERANKER_DEVICE", "").strip().lower() or None,
+            provider=env.get("RERANKER_PROVIDER", "").strip().lower() or "local",
+            openrouter_provider=env.get("RERANKER_OPENROUTER_PROVIDER", "").strip().lower() or None,
         )
 
 
@@ -499,4 +573,118 @@ class MCPSettings:
             allowed_origins=_split_list(env.get("MCP_ALLOWED_ORIGINS", "")) or DEFAULT_MCP_ALLOWED_ORIGINS,
             rate_limit_per_minute=int(rate_limit) if rate_limit else DEFAULT_MCP_RATE_LIMIT_PER_MINUTE,
             max_response_bytes=int(max_bytes) if max_bytes else DEFAULT_MCP_MAX_RESPONSE_BYTES,
+        )
+
+
+# --- Search profile: local (SQLite, BM25, FAISS) or cloud (Postgres) ----------
+
+SEARCH_PROFILES = ("local", "cloud")
+LEXICAL_RANKINGS = ("bm25", "ts_rank_cd")
+VECTOR_SEARCH_MODES = ("approximate", "exact")
+DEFAULT_DATABASE_SCHEMA = "catalog"
+
+# Postgres schema names used for catalogs: a plain lower-case identifier, so it
+# can be written into SQL without quoting and cannot inject anything.
+SCHEMA_NAME_PATTERN = r"^[a-z_][a-z0-9_]{0,62}$"
+
+DATABASE_URL_VAR = "DATABASE_URL"
+DATABASE_URL_UNPOOLED_VAR = "DATABASE_URL_UNPOOLED"
+
+
+def database_url(env: Optional[Mapping[str, str]] = None, *, direct: bool = False) -> str:
+    """
+    The Postgres connection string of the cloud profile.
+
+    Neon's rule: the pooled string (DATABASE_URL, "-pooler" host) for the
+    application's queries; the direct one (DATABASE_URL_UNPOOLED) for schema
+    migrations, bulk loads and index builds. Without DATABASE_URL_UNPOOLED
+    the direct use falls back to DATABASE_URL. Like the API keys, the value is
+    read only where a connection is built and never stored in a settings
+    object, so settings can be printed without leaking it.
+
+    Args:
+        env: Environment (default os.environ)
+        direct: True for the direct (unpooled) connection string
+
+    Raises:
+        ValueError: If the needed variable is unset or empty
+    """
+    env = os.environ if env is None else env
+    if direct:
+        url = env.get(DATABASE_URL_UNPOOLED_VAR, "").strip() or env.get(DATABASE_URL_VAR, "").strip()
+    else:
+        url = env.get(DATABASE_URL_VAR, "").strip()
+    if not url:
+        raise ValueError(
+            f"{DATABASE_URL_VAR} is not set: the cloud search profile (SEARCH_PROFILE=cloud) and "
+            f"scripts.load_postgres need a Postgres connection string. Set {DATABASE_URL_VAR} "
+            f"(pooled) and optionally {DATABASE_URL_UNPOOLED_VAR} (direct) in the environment or in .env."
+        )
+    return url
+
+
+@dataclass(frozen=True)
+class SearchProfileSettings:
+    """
+    Which adapters serve the search (V12).
+
+    Environment variables (all optional):
+        SEARCH_PROFILE       "local" (default: SQLite catalog, BM25 and FAISS
+                             indexes on disk, the evaluated system) or "cloud"
+                             (catalog, lexical and vector search in Postgres)
+        DATABASE_SCHEMA      Postgres schema of the catalog (default "catalog");
+                             one schema per catalog, several can share a database
+        PG_LEXICAL_RANKING   "bm25" (default: lakebase_text BM25 index) or
+                             "ts_rank_cd" (Postgres full-text ranking)
+        PG_VECTOR_SEARCH     "approximate" (default: ANN index) or "exact"
+                             (index scans disabled, as in the evaluation)
+        DATABASE_URL, DATABASE_URL_UNPOOLED: see database_url()
+    """
+
+    profile: str = "local"
+    schema: str = DEFAULT_DATABASE_SCHEMA
+    lexical_ranking: str = "bm25"
+    vector_search: str = "approximate"
+
+    def __post_init__(self) -> None:
+        if self.profile not in SEARCH_PROFILES:
+            raise ValueError(f"SEARCH_PROFILE must be one of {SEARCH_PROFILES}, got '{self.profile}'")
+        if not re.match(SCHEMA_NAME_PATTERN, self.schema):
+            raise ValueError(
+                f"DATABASE_SCHEMA must be a lower-case identifier (letters, digits, _), got '{self.schema}'"
+            )
+        if self.lexical_ranking not in LEXICAL_RANKINGS:
+            raise ValueError(
+                f"PG_LEXICAL_RANKING must be one of {LEXICAL_RANKINGS}, got '{self.lexical_ranking}'"
+            )
+        if self.vector_search not in VECTOR_SEARCH_MODES:
+            raise ValueError(
+                f"PG_VECTOR_SEARCH must be one of {VECTOR_SEARCH_MODES}, got '{self.vector_search}'"
+            )
+
+    @property
+    def is_cloud(self) -> bool:
+        """True when search is served from Postgres."""
+        return self.profile == "cloud"
+
+    def describe(self) -> dict:
+        """Public description for /health (no connection string)."""
+        if not self.is_cloud:
+            return {"name": self.profile}
+        return {
+            "name": self.profile,
+            "schema": self.schema,
+            "lexical_ranking": self.lexical_ranking,
+            "vector_search": self.vector_search,
+        }
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "SearchProfileSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        return cls(
+            profile=env.get("SEARCH_PROFILE", "").strip().lower() or "local",
+            schema=env.get("DATABASE_SCHEMA", "").strip() or DEFAULT_DATABASE_SCHEMA,
+            lexical_ranking=env.get("PG_LEXICAL_RANKING", "").strip().lower() or "bm25",
+            vector_search=env.get("PG_VECTOR_SEARCH", "").strip().lower() or "approximate",
         )

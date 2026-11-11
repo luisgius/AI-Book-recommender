@@ -30,7 +30,13 @@ from app.infrastructure.search.bm25_search_repository import BM25SearchRepositor
 from app.infrastructure.search.cross_encoder_reranker import CrossEncoderReranker
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
-from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings, RerankerSettings
+from app.infrastructure.config.settings import (
+    EmbeddingSettings,
+    LLMSettings,
+    RerankerSettings,
+    SearchProfileSettings,
+    database_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +45,8 @@ DB_PATH = Path(os.getenv("DB_PATH", "data/catalog.db"))
 INDEXES_DIR = Path(os.getenv("INDEXES_DIR", "data/indexes"))
 
 # Module-level singletons (initialized lazily)
+_profile_settings: Optional[SearchProfileSettings] = None
+_postgres_database = None  # PostgresDatabase of the cloud profile (imported lazily)
 _catalog_repository: Optional[BookCatalogRepository] = None
 _bm25_repository: Optional[LexicalSearchRepository] = None
 _embeddings_store: Optional[EmbeddingsStore] = None
@@ -55,18 +63,69 @@ _reranker: Optional[Reranker] = None
 _reranker_initialized: bool = False
 
 
+def get_search_profile_settings() -> SearchProfileSettings:
+    """
+    Provide the search profile, read once from the environment (and .env).
+
+    SEARCH_PROFILE=local (default) keeps the evaluated system: SQLite
+    catalog, BM25 and FAISS indexes on disk. SEARCH_PROFILE=cloud serves the
+    catalog, lexical and vector search from Postgres (DATABASE_SCHEMA). In
+    both profiles the query embedding comes from the configured embedding
+    model and the reranker and LLM wiring are the same.
+    """
+    global _profile_settings
+    if _profile_settings is None:
+        load_dotenv()
+        _profile_settings = SearchProfileSettings.from_env()
+    return _profile_settings
+
+
+def get_postgres_database():
+    """
+    Provide the Postgres database of the cloud profile (pooled connection string).
+
+    Imported lazily so the local profile does not need a database driver.
+
+    Raises:
+        ValueError: If DATABASE_URL is not set
+    """
+    global _postgres_database
+    if _postgres_database is None:
+        from app.infrastructure.db.postgres_connection import PostgresDatabase
+
+        load_dotenv()
+        _postgres_database = PostgresDatabase(database_url())
+    return _postgres_database
+
+
 def get_catalog_repository() -> BookCatalogRepository:
     """Provide a singleton instance of the catalog repository."""
     global _catalog_repository
     if _catalog_repository is None:
-        _catalog_repository = SqliteBookCatalogRepository(DB_PATH)
+        profile = get_search_profile_settings()
+        if profile.is_cloud:
+            from app.infrastructure.db.postgres_book_catalog_repository import PostgresBookCatalogRepository
+
+            _catalog_repository = PostgresBookCatalogRepository(get_postgres_database(), profile.schema)
+        else:
+            _catalog_repository = SqliteBookCatalogRepository(DB_PATH)
     return _catalog_repository
 
 
 def get_bm25_repository() -> LexicalSearchRepository:
-    """Provide a singleton instance of the BM25 repository."""
+    """Provide a singleton instance of the lexical (BM25) repository."""
     global _bm25_repository
     if _bm25_repository is None:
+        profile = get_search_profile_settings()
+        if profile.is_cloud:
+            from app.infrastructure.search.postgres_lexical_search_repository import (
+                PostgresLexicalSearchRepository,
+            )
+
+            _bm25_repository = PostgresLexicalSearchRepository(
+                get_postgres_database(), profile.schema, ranking=profile.lexical_ranking
+            )
+            return _bm25_repository
         bm25_path = INDEXES_DIR / "bm25_index.pkl"
         repo = BM25SearchRepository()
         if bm25_path.exists():
@@ -84,6 +143,25 @@ def get_embedding_settings() -> EmbeddingSettings:
     return _embedding_settings
 
 
+def build_embeddings_store(settings: EmbeddingSettings) -> EmbeddingsStoreFaiss:
+    """
+    The FAISS store with the encoder that EMBEDDING_PROVIDER selects.
+
+    "local" (default) loads the sentence-transformers model EMBEDDING_MODEL in
+    this process, as before. "openrouter" encodes through OpenRouter's
+    embeddings API (OpenRouterEmbeddingEncoder: EMBEDDING_MODEL,
+    EMBEDDING_DIMENSIONS, EMBEDDING_OPENROUTER_PROVIDER) and loads no model;
+    the index must have been built with the same API model, provider and
+    dimension, or loading it raises IndexModelMismatchError.
+    """
+    if settings.provider == "openrouter":
+        # Imported here so the local profile never needs the API adapter
+        from app.infrastructure.search.openrouter_embedding_encoder import OpenRouterEmbeddingEncoder
+
+        return EmbeddingsStoreFaiss(encoder=OpenRouterEmbeddingEncoder.from_settings(settings))
+    return EmbeddingsStoreFaiss(model_name=settings.model, device=settings.device)
+
+
 def get_embeddings_store() -> EmbeddingsStore:
     """
     Provide a singleton instance of the embeddings store.
@@ -94,8 +172,15 @@ def get_embeddings_store() -> EmbeddingsStore:
     global _embeddings_store
     if _embeddings_store is None:
         settings = get_embedding_settings()
+        store = build_embeddings_store(settings)
+        profile = get_search_profile_settings()
+        if profile.is_cloud:
+            # The model only encodes; document vectors live in Postgres.
+            from app.infrastructure.search.postgres_embeddings_store import PostgresEmbeddingsStore
+
+            _embeddings_store = PostgresEmbeddingsStore(store, get_postgres_database(), profile.schema)
+            return _embeddings_store
         faiss_path = INDEXES_DIR / "faiss_index"
-        store = EmbeddingsStoreFaiss(model_name=settings.model, device=settings.device)
         if faiss_path.exists():
             store.load_index(str(faiss_path))
         _embeddings_store = store
@@ -106,6 +191,17 @@ def get_vector_repository() -> VectorSearchRepository:
     """Provide a singleton instance of the vector search repository."""
     global _vector_repository
     if _vector_repository is None:
+        profile = get_search_profile_settings()
+        if profile.is_cloud:
+            from app.infrastructure.search.pgvector_search_repository import PgVectorSearchRepository
+
+            _vector_repository = PgVectorSearchRepository(
+                get_postgres_database(),
+                profile.schema,
+                mode=profile.vector_search,
+                expected_model=get_embedding_settings().model,
+            )
+            return _vector_repository
         catalog_repo = get_catalog_repository()
         embeddings_store = get_embeddings_store()
         books = catalog_repo.get_all()
@@ -208,11 +304,15 @@ def get_reranker_settings() -> RerankerSettings:
 
 def get_reranker() -> Optional[Reranker]:
     """
-    Provide the cross-encoder reranker, or None when re-ranking is disabled.
+    Provide the reranker, or None when re-ranking is disabled.
 
-    Re-ranking is off unless RERANKER_MODEL is set. The model itself is
-    loaded on the first search, so a wrong model name shows up then (logged
-    by the search service, which keeps the fused order) and in /health.
+    Re-ranking is off unless RERANKER_MODEL is set. RERANKER_PROVIDER=local
+    (default) gives the cross-encoder, whose model is loaded on the first
+    search, so a wrong model name shows up then (logged by the search
+    service, which keeps the fused order) and in /health.
+    RERANKER_PROVIDER=openrouter gives ApiReranker (OpenRouter's rerank API,
+    RERANKER_OPENROUTER_PROVIDER to pin a provider); a missing
+    OPENROUTER_API_KEY disables re-ranking with a warning.
     """
     global _reranker, _reranker_initialized
     if _reranker_initialized:
@@ -223,6 +323,12 @@ def get_reranker() -> Optional[Reranker]:
     if not settings.enabled:
         return None
     try:
+        if settings.provider == "openrouter":
+            # OpenRouter's rerank API: no model in this process
+            from app.infrastructure.search.api_reranker import ApiReranker
+
+            _reranker = ApiReranker.from_settings(settings)
+            return _reranker
         _reranker = CrossEncoderReranker(model_name=settings.model, device=settings.device)
     except Exception as e:
         logger.warning(f"Reranker unavailable ({settings.model}): {e}")
@@ -258,7 +364,12 @@ def reset_dependencies() -> None:
     global _llm_settings, _llm_client, _llm_initialized
     global _search_agent, _agent_initialized, _embedding_settings
     global _reranker_settings, _reranker, _reranker_initialized
+    global _profile_settings, _postgres_database
 
+    if _postgres_database is not None:
+        _postgres_database.close()
+    _profile_settings = None
+    _postgres_database = None
     _catalog_repository = None
     _bm25_repository = None
     _embeddings_store = None
