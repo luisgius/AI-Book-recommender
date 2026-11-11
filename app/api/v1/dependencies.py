@@ -21,14 +21,16 @@ from app.domain.ports import (
     VectorSearchRepository,
     EmbeddingsStore,
     LLMClient,
+    Reranker,
     SearchAgent,
 )
 from app.domain.services import SearchService
 from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
+from app.infrastructure.search.cross_encoder_reranker import CrossEncoderReranker
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
-from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings
+from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings, RerankerSettings
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +50,9 @@ _llm_client: Optional[LLMClient] = None
 _llm_initialized: bool = False
 _search_agent: Optional[SearchAgent] = None
 _agent_initialized: bool = False
+_reranker_settings: Optional[RerankerSettings] = None
+_reranker: Optional[Reranker] = None
+_reranker_initialized: bool = False
 
 
 def get_catalog_repository() -> BookCatalogRepository:
@@ -192,6 +197,39 @@ def get_search_agent() -> Optional[SearchAgent]:
     return _search_agent
 
 
+def get_reranker_settings() -> RerankerSettings:
+    """Provide the reranker settings, read once from the environment (and .env)."""
+    global _reranker_settings
+    if _reranker_settings is None:
+        load_dotenv()
+        _reranker_settings = RerankerSettings.from_env()
+    return _reranker_settings
+
+
+def get_reranker() -> Optional[Reranker]:
+    """
+    Provide the cross-encoder reranker, or None when re-ranking is disabled.
+
+    Re-ranking is off unless RERANKER_MODEL is set. The model itself is
+    loaded on the first search, so a wrong model name shows up then (logged
+    by the search service, which keeps the fused order) and in /health.
+    """
+    global _reranker, _reranker_initialized
+    if _reranker_initialized:
+        return _reranker
+    _reranker_initialized = True
+
+    settings = get_reranker_settings()
+    if not settings.enabled:
+        return None
+    try:
+        _reranker = CrossEncoderReranker(model_name=settings.model, device=settings.device)
+    except Exception as e:
+        logger.warning(f"Reranker unavailable ({settings.model}): {e}")
+        _reranker = None
+    return _reranker
+
+
 def get_search_service() -> SearchService:
     """Provide the Search Service with all dependencies wired."""
     global _search_service
@@ -202,6 +240,8 @@ def get_search_service() -> SearchService:
             embeddings_store=get_embeddings_store(),
             llm_client=get_llm_client(),
             max_explanations=get_llm_settings().max_explanations,
+            reranker=get_reranker(),
+            rerank_depth=get_reranker_settings().depth,
         )
     return _search_service
 
@@ -217,6 +257,7 @@ def reset_dependencies() -> None:
     global _vector_repository, _search_service
     global _llm_settings, _llm_client, _llm_initialized
     global _search_agent, _agent_initialized, _embedding_settings
+    global _reranker_settings, _reranker, _reranker_initialized
 
     _catalog_repository = None
     _bm25_repository = None
@@ -229,3 +270,6 @@ def reset_dependencies() -> None:
     _llm_initialized = False
     _search_agent = None
     _agent_initialized = False
+    _reranker_settings = None
+    _reranker = None
+    _reranker_initialized = False

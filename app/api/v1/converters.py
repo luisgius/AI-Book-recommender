@@ -73,6 +73,7 @@ def domain_search_result_to_api(result: domain.SearchResult) -> api.SearchResult
             if result.explanation is not None
             else None
         ),
+        rerank_score=result.rerank_score,
     )
 
 

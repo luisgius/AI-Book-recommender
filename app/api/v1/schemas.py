@@ -135,6 +135,15 @@ class SearchResult(BaseModel):
         description="Optional grounded explanation of relevance (use_explanations=true)."
     )
 
+    rerank_score: float | None = Field(
+        default=None,
+        description=(
+            "Cross-encoder relevance score (raw model output, higher is better) when "
+            "the optional re-ranking stage scored this result; final_score keeps the "
+            "fusion score. Null without a reranker or beyond the re-ranking depth."
+        ),
+    )
+
 class SearchMetadata(BaseModel):
     """
     Debug/telemetry metadata for search operations.

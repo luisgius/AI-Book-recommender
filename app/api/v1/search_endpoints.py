@@ -124,8 +124,11 @@ def health_check(
     - embeddings_store: Embedding model availability
     - overall: True only if all components are ready
 
-    The LLM is reported separately because it is optional: without it the
-    search still works, only understanding and explanations are skipped.
+    The LLM and the reranker are reported separately because they are
+    optional: without the LLM the search still works, only understanding and
+    explanations are skipped; without the reranker (or if it fails) the
+    fused order is returned. The reranker model loads on the first search,
+    so "ready" only turns false after a failed load.
     """
     health_status = service.get_health_status()
     llm_settings = get_llm_settings()
@@ -141,6 +144,11 @@ def health_check(
             "configured": service.has_llm(),
             "provider": llm_settings.provider,
             "model": llm_settings.model if llm_settings.enabled else None,
+        },
+        "reranker": {
+            "configured": service.has_reranker(),
+            "model": service.get_reranker_model_name(),
+            "ready": health_status["reranker"],
         },
         "overall": health_status["overall"],
     }

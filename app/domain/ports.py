@@ -307,6 +307,66 @@ class VectorSearchRepository(Protocol):
         ...
 
 
+class Reranker(Protocol):
+    """
+    Port for the optional third retrieval stage: re-ranking.
+
+    After retrieval (BM25 + vector) and fusion (RRF), a reranker re-orders
+    the top candidates by reading the query and each book together (a
+    cross-encoder), which is more accurate than comparing independent
+    representations but too slow to run over the whole catalog. The search
+    service only sends it the top `rerank_depth` fused candidates.
+
+    The model and library (e.g. sentence-transformers CrossEncoder) are an
+    infrastructure detail.
+    """
+
+    def rerank(self, query_text: str, results: List[SearchResult]) -> List[SearchResult]:
+        """
+        Re-order search results by relevance to the query.
+
+        Args:
+            query_text: The user's original query text
+            results: Fused candidates to re-order (already filtered)
+
+        Returns:
+            The same results (same books, same count), ordered by relevance
+            (descending). Each returned result MUST have:
+            - rerank_score: the reranker's relevance score (higher = better)
+            - rank: its new 1-indexed position (1, 2, 3, ...)
+            - final_score, lexical_score, vector_score: unchanged, so the
+              fusion scores stay visible next to the rerank score
+
+            Implementations should return new SearchResult objects instead of
+            mutating the inputs, so a failure leaves the fused list intact.
+
+        Raises:
+            RuntimeError: If the model cannot be loaded or scoring fails
+        """
+        ...
+
+    def get_model_name(self) -> str:
+        """
+        Get the identifier of the reranking model.
+
+        Returns:
+            Model name (e.g., 'BAAI/bge-reranker-v2-m3')
+        """
+        ...
+
+    def is_ready(self) -> bool:
+        """
+        Check if the reranker can be used.
+
+        Implementations may load their model lazily on the first call to
+        rerank(); they report True until a load attempt has failed.
+
+        Returns:
+            False if the model failed to load, True otherwise
+        """
+        ...
+
+
 class EmbeddingsStore(Protocol):
     """
     Port for managing and storing vector embeddings.

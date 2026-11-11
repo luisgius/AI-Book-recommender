@@ -33,6 +33,13 @@ from typing import Mapping, Optional
 # Ollama listens on IPv4; "localhost" can resolve to ::1 first on macOS.
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 
+Re-ranking environment variables (all optional):
+    RERANKER_MODEL        cross-encoder model for the third retrieval stage,
+                          e.g. BAAI/bge-reranker-v2-m3. Empty, unset or "none"
+                          (default) disables re-ranking.
+    RERANK_DEPTH          top fused results the reranker scores (default 30)
+    RERANKER_DEVICE       "cpu", "mps" or "cuda" (default: picked automatically)
+
 DEFAULT_MODELS = {
     "ollama": "qwen3.8:27b-mlx",
     "openai": "gpt-4o-mini",
@@ -130,3 +137,44 @@ class EmbeddingSettings:
         model = env.get("EMBEDDING_MODEL", "").strip() or DEFAULT_EMBEDDING_MODEL
         device = env.get("EMBEDDING_DEVICE", "").strip().lower() or None
         return cls(model=model, device=device)
+
+
+# Top fused results scored by the reranker when RERANK_DEPTH is not set.
+DEFAULT_RERANK_DEPTH = 30
+
+
+@dataclass(frozen=True)
+class RerankerSettings:
+    """Settings of the optional cross-encoder reranker (third retrieval stage)."""
+
+    model: Optional[str] = None  # None: re-ranking disabled (default)
+    depth: int = DEFAULT_RERANK_DEPTH
+    device: Optional[str] = None  # None: sentence-transformers picks the device
+
+    def __post_init__(self) -> None:
+        if self.model is not None and not self.model.strip():
+            raise ValueError("RERANKER_MODEL must be a model name or unset")
+        if self.depth < 1:
+            raise ValueError(f"RERANK_DEPTH must be >= 1, got {self.depth}")
+        if self.device is not None and self.device.split(":")[0] not in SUPPORTED_EMBEDDING_DEVICES:
+            raise ValueError(
+                f"RERANKER_DEVICE must be one of {SUPPORTED_EMBEDDING_DEVICES} "
+                f"(optionally with an index, e.g. cuda:0), got '{self.device}'"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """True when a reranker model is configured."""
+        return self.model is not None
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "RerankerSettings":
+        """Build settings from environment variables (see module docstring)."""
+        env = os.environ if env is None else env
+        model = env.get("RERANKER_MODEL", "").strip()
+        depth = env.get("RERANK_DEPTH", "").strip()
+        return cls(
+            model=None if model.lower() in ("", "none") else model,
+            depth=int(depth) if depth else DEFAULT_RERANK_DEPTH,
+            device=env.get("RERANKER_DEVICE", "").strip().lower() or None,
+        )

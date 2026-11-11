@@ -25,9 +25,14 @@ from .ports import (
     VectorSearchRepository,
     EmbeddingsStore,
     LLMClient,
+    Reranker,
 )
 
 logger = logging.getLogger(__name__)
+
+# Default number of fused candidates sent to the optional reranker.
+DEFAULT_RERANK_DEPTH = 30
+
 
 class SearchService:
     """
@@ -37,7 +42,10 @@ class SearchService:
     1. Execute both BM25 and vector searches sequentially
     2. Fuse results using Reciprocal Rank Fusion (RRF)
     3. Apply filters to final results
-    4. Optionally generate explanations via LLM
+    4. Optionally re-rank the top `rerank_depth` results with a Reranker
+       (cross-encoder), always against the user's original query text
+    5. Optionally diversify (MMR) and cut to max_results
+    6. Optionally generate explanations via LLM
 
     The service is technology-agnostic and depends only on port protocols.
     """
@@ -49,6 +57,8 @@ class SearchService:
         embeddings_store: EmbeddingsStore,
         llm_client: LLMClient | None = None,
         max_explanations: int = 5,
+        reranker: Reranker | None = None,
+        rerank_depth: int = DEFAULT_RERANK_DEPTH,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -60,23 +70,43 @@ class SearchService:
             llm_client: Optional client for generating explanations (RAG)
             max_explanations: How many top results get an LLM explanation
                 when explanations are requested (each one is an LLM call)
+            reranker: Optional third stage that re-orders the top fused
+                results. None (default) keeps the fused order.
+            rerank_depth: How many top fused results the reranker scores.
+                Retrieval then supplies at least this many candidates, even
+                when fewer results are requested.
         """
         if max_explanations < 0:
             raise ValueError(f"max_explanations must be >= 0, got {max_explanations}")
+        if rerank_depth < 1:
+            raise ValueError(f"rerank_depth must be >= 1, got {rerank_depth}")
 
         self._lexical_search = lexical_search
         self._vector_search = vector_search
         self._embeddings_store = embeddings_store
         self._llm_client = llm_client
         self._max_explanations = max_explanations
+        self._reranker = reranker
+        self._rerank_depth = rerank_depth
 
     def has_llm(self) -> bool:
         """True if an LLM client is wired (query understanding and explanations available)."""
         return self._llm_client is not None
 
+    def has_reranker(self) -> bool:
+        """True if a reranker is wired (third retrieval stage enabled)."""
+        return self._reranker is not None
+
+    def get_reranker_model_name(self) -> Optional[str]:
+        """Model name of the wired reranker, or None without one."""
+        return self._reranker.get_model_name() if self._reranker is not None else None
+
     def get_health_status(self) -> Dict[str, bool]:
         """
         Check the health status of all search components (RNF-06).
+
+        The reranker is reported but does not count toward "overall": it is
+        optional and, if it fails, the search returns the fused order.
 
         Returns:
             Dictionary with component names and their ready status:
@@ -84,21 +114,29 @@ class SearchService:
                 "lexical_search": True/False,
                 "vector_search": True/False,
                 "embeddings_store": True/False,
+                "reranker": True/False (False when none is configured),
                 "overall": True/False
             }
         """
         lexical_ready = self._lexical_search.is_ready()
         vector_ready = self._vector_search.is_ready()
         embeddings_ready = self._embeddings_store.is_ready()
+        reranker_ready = self._reranker is not None and self._reranker.is_ready()
 
         return {
             "lexical_search": lexical_ready,
             "vector_search": vector_ready,
             "embeddings_store": embeddings_ready,
+            "reranker": reranker_ready,
             "overall": lexical_ready and vector_ready and embeddings_ready,
         }
 
-    def search_with_fallback(self, query: SearchQuery) -> SearchResponse:
+    def search_with_fallback(
+        self,
+        query: SearchQuery,
+        *,
+        rerank_query_text: Optional[str] = None,
+    ) -> SearchResponse:
         """
         Execute search with graceful degradation (RNF-08).
 
@@ -107,6 +145,10 @@ class SearchService:
 
         Args:
             query: The search query
+            rerank_query_text: Text the reranker compares the books with.
+                Defaults to query.text; the understanding path passes the
+                user's original wording because query.text holds the LLM
+                reformulation.
 
         Returns:
             SearchResponse with results and degradation metadata
@@ -116,6 +158,7 @@ class SearchService:
         degradation_reason = None
         search_mode = "hybrid"
         metadata: Optional[SearchMetadata] = None
+        rerank_text = rerank_query_text or query.text
 
         # Check if vector search is available
         vector_available = self._vector_search.is_ready() and self._embeddings_store.is_ready()
@@ -128,7 +171,7 @@ class SearchService:
             search_mode = "lexical_only"
 
             try:
-                results, meta = self._search_lexical_only_with_debug(query)
+                results, meta = self._search_lexical_only_with_debug(query, rerank_text)
                 metadata = SearchMetadata(
                     fusion_method="none",
                     rrf_k=None,
@@ -142,7 +185,7 @@ class SearchService:
         else:
             # Try hybrid search, fallback to lexical if vector fails
             try:
-                results, meta = self._search_hybrid_with_debug(query)
+                results, meta = self._search_hybrid_with_debug(query, rerank_text)
                 metadata = SearchMetadata(
                     fusion_method="rrf",
                     rrf_k=meta.get("rrf_k", 60),
@@ -155,7 +198,7 @@ class SearchService:
                 degraded = True
                 degradation_reason = f"Vector search failed ({str(e)}) - using lexical search only"
                 search_mode = "lexical_only"
-                results, meta = self._search_lexical_only_with_debug(query)
+                results, meta = self._search_lexical_only_with_debug(query, rerank_text)
                 metadata = SearchMetadata(
                     fusion_method="none",
                     rrf_k=None,
@@ -317,6 +360,10 @@ class SearchService:
                 # filtered, this keeps the guarantee for every path)
                 results = self._apply_filters(results, search_query.filters)
 
+                # Optional third stage: re-rank against the user's own words,
+                # not the LLM reformulation or the query variations
+                results = self._rerank(query_text, results)
+
                 # Select the final top-k: MMR chooses among the whole pool,
                 # otherwise keep the best-ranked results
                 if adjusted_diversification and len(results) > 1:
@@ -372,23 +419,39 @@ class SearchService:
         """
         Run search_with_fallback for the understanding path.
 
-        The fallback searches with the reformulated query, but explanations
-        must answer the user's original wording, so they are generated here
+        The fallback searches with the reformulated query, but re-ranking and
+        explanations must answer the user's original wording: the original
+        text is passed to the reranker, and explanations are generated here
         instead of inside the fallback search.
         """
-        response = self.search_with_fallback(replace(search_query, use_explanations=False))
+        response = self.search_with_fallback(
+            replace(search_query, use_explanations=False),
+            rerank_query_text=original_query_text,
+        )
         if search_query.use_explanations and self._llm_client is not None:
             self._add_explanations(original_query_text, response.results)
         return response
 
-    def _search_lexical_only_with_debug(self, query: SearchQuery) -> tuple[List[SearchResult], Dict]:
-        results = self._search_lexical_only(query)
+    def _search_lexical_only_with_debug(
+        self, query: SearchQuery, rerank_text: Optional[str] = None
+    ) -> tuple[List[SearchResult], Dict]:
+        results = self._search_lexical_only(query, rerank_text)
         return results, {"candidates_lexical": len(results)}
 
-    def _search_hybrid_with_debug(self, query: SearchQuery) -> tuple[list[SearchResult], Dict]:
+    def _search_hybrid_with_debug(
+        self, query: SearchQuery, rerank_text: Optional[str] = None
+    ) -> tuple[list[SearchResult], Dict]:
+        """
+        Hybrid search pipeline: retrieve -> fuse (RRF) -> filter ->
+        optional re-rank -> optional MMR -> top-k -> optional explanations.
+
+        Args:
+            query: The search query
+            rerank_text: Text for the reranker (defaults to query.text)
+        """
         logger.info(f"Executing hybrid search for query: '{query.text}'")
 
-        candidate_limit = query.max_results * 2
+        candidate_limit = self._retrieval_size(query.max_results) * 2
 
         logger.debug("Executing lexical (BM25) search")
         lexical_results = self._lexical_search.search(
@@ -421,6 +484,8 @@ class SearchService:
 
         filtered_results = self._apply_filters(fused_results, query.filters)
 
+        filtered_results = self._rerank(rerank_text or query.text, filtered_results)
+
         if query.use_diversification:
             logger.debug(f"Applying MMR diversification with lambda={query.diversity_lambda}")
             final_results = self._apply_mmr_diversification(
@@ -446,14 +511,18 @@ class SearchService:
             "candidates_vector": len(vector_results),
         }
 
-    def _search_lexical_only(self, query: SearchQuery) -> List[SearchResult]:
+    def _search_lexical_only(
+        self, query: SearchQuery, rerank_text: Optional[str] = None
+    ) -> List[SearchResult]:
         """
         Execute lexical-only search (fallback mode).
 
         Used when vector search is unavailable for graceful degradation.
+        The reranker does not depend on the vector index, so it still runs.
 
         Args:
             query: The search query
+            rerank_text: Text for the reranker (defaults to query.text)
 
         Returns:
             List of SearchResult from BM25 search only
@@ -462,9 +531,11 @@ class SearchService:
 
         results = self._lexical_search.search(
             query_text=query.text,
-            max_results=query.max_results,
+            max_results=self._retrieval_size(query.max_results),
             filters=query.filters,
         )
+
+        results = self._rerank(rerank_text or query.text, results)
 
         # Apply diversification if requested (uses embeddings if available)
         if query.use_diversification and len(results) > 1:
@@ -477,6 +548,9 @@ class SearchService:
                     )
             except Exception as e:
                 logger.warning(f"MMR diversification failed in degraded mode: {e}")
+
+        # Cut to max_results (retrieval fetched rerank_depth when re-ranking)
+        results = results[: query.max_results]
 
         # Re-assign ranks
         for i, result in enumerate(results, start=1):
@@ -498,6 +572,7 @@ class SearchService:
            - Execute BM25 search over book text (title, authors, description, categories)
            - Generate query embedding and execute vector similarity search
            - Both searches retrieve up to `query.max_results * 2` candidates
+             (with a reranker, as if max_results were at least rerank_depth)
 
         2. **Fusion via Reciprocal Rank Fusion (RRF):**
            - RRF is a rank-based fusion method that combines rankings without
@@ -510,7 +585,9 @@ class SearchService:
         3. **Post-processing:**
            - Remove duplicates (same book from both systems)
            - Apply filters from SearchQuery (language, category, year range)
-           - Limit results to query.max_results
+           - Optionally re-rank the top `rerank_depth` results with the
+             reranker (cross-encoder) against query.text
+           - Limit results to query.max_results (or select them with MMR)
            - Re-assign ranks (1-indexed)
 
         4. **Optional explanation generation:**
@@ -778,6 +855,9 @@ class SearchService:
 
         results_by_index: Dict[int, List[SearchResult]] = {}
 
+        # Pool sizes scale with this; a reranker needs at least rerank_depth
+        retrieval_size = self._retrieval_size(query.max_results)
+
         # Run all variations in parallel
         with ThreadPoolExecutor(max_workers=len(variations)) as executor:
             future_to_index = {
@@ -786,7 +866,7 @@ class SearchService:
                     variation_text=variation,
                     strategy=strategy,
                     filters=query.filters,
-                    max_results=query.max_results,
+                    max_results=retrieval_size,
                 ): index
                 for index, variation in enumerate(variations)
             }
@@ -812,7 +892,7 @@ class SearchService:
                 variation_text=variations[0],
                 strategy=RetrievalStrategy.BALANCED,
                 filters=query.filters,
-                max_results=query.max_results,
+                max_results=retrieval_size,
             )
             all_variation_results = [fallback]
 
@@ -939,6 +1019,64 @@ class SearchService:
         # repositories, so this pass can never discard what they accepted
         return [result for result in results if result.book.matches_filters(filters)]
 
+    # ==========================================================================
+    # Optional re-ranking stage (cross-encoder)
+    # ==========================================================================
+
+    def _retrieval_size(self, max_results: int) -> int:
+        """
+        How many results the retrieval stages work for.
+
+        Without a reranker this is max_results, as before. With one, the
+        retrieval runs as if at least `rerank_depth` results were requested,
+        so the reranker always has enough candidates to choose from.
+        """
+        if self._reranker is None:
+            return max_results
+        return max(max_results, self._rerank_depth)
+
+    def _rerank(self, query_text: str, results: List[SearchResult]) -> List[SearchResult]:
+        """
+        Re-order the top `rerank_depth` results with the reranker.
+
+        Runs after fusion and filtering, before MMR and the final cut. The
+        results beyond the depth keep their fused order after the re-ranked
+        head. If no reranker is configured, the list is returned unchanged;
+        if the reranker fails, a warning is logged and the fused order is
+        returned (graceful degradation, the search never fails because of
+        this stage).
+
+        Args:
+            query_text: The user's original query text
+            results: Fused and filtered results, best first
+
+        Returns:
+            Results with the head re-ordered, rerank_score set on the head
+            and ranks renumbered 1..n over the whole list
+        """
+        if self._reranker is None or not results:
+            return results
+
+        head = results[: self._rerank_depth]
+        tail = results[self._rerank_depth :]
+
+        try:
+            reranked_head = self._reranker.rerank(query_text, head)
+            # The port promises the same results back; anything else is a bug
+            # in the adapter and is treated like a failure
+            if len(reranked_head) != len(head) or (
+                {r.book.id for r in reranked_head} != {r.book.id for r in head}
+            ):
+                raise ValueError("reranker must return exactly the results it received")
+        except Exception as e:
+            logger.warning(f"Re-ranking failed, keeping the fused order: {e}")
+            return results
+
+        reranked = list(reranked_head) + tail
+        for i, result in enumerate(reranked, start=1):
+            result.rank = i
+        return reranked
+
     def _add_explanations(
         self,
         query_text: str,
@@ -995,11 +1133,17 @@ class SearchService:
 
         Where:
         - lambda: trade-off between relevance (1.0) and diversity (0.0)
-        - Relevance(d): the RRF score from hybrid search
+        - Relevance(d): the RRF score from hybrid search, or the reranker
+          score (rerank_score) when the results were re-ranked
         - Similarity: cosine similarity between book embeddings
 
+        After re-ranking only the head of the list has a rerank_score, and
+        it is not on the same scale as the fused scores of the tail. MMR then
+        diversifies the re-ranked head; the tail only fills the slots left
+        when top_k is larger than the head, in its fused order.
+
         Args:
-            results: List of search results (already ranked by RRF)
+            results: List of search results (already ranked by RRF or the reranker)
             top_k: Number of results to select
             lambda_param: Trade-off parameter (default: 0.6, slight preference for relevance)
 
@@ -1008,6 +1152,21 @@ class SearchService:
         """
         if len(results) <= 1:
             return results
+
+        reranked_head = [r for r in results if r.has_rerank_score()]
+        if reranked_head and len(reranked_head) < len(results):
+            tail = [r for r in results if not r.has_rerank_score()]
+            selected = self._apply_mmr_diversification(
+                reranked_head, min(top_k, len(reranked_head)), lambda_param
+            )
+            selected = selected + tail[: max(0, top_k - len(selected))]
+            for i, result in enumerate(selected, start=1):
+                result.rank = i
+            return selected
+
+        def relevance_of(result: SearchResult) -> float:
+            # Without re-ranking rerank_score is None and this is final_score
+            return result.rerank_score if result.has_rerank_score() else result.final_score
 
         # Get embeddings for all candidate books
         book_embeddings: Dict[UUID, List[float]] = {}
@@ -1021,9 +1180,9 @@ class SearchService:
             logger.warning("No embeddings available for MMR diversification, skipping")
             return results[:top_k]
 
-        # Normalize RRF scores to [0, 1] for fair comparison with similarity
-        max_score = max(r.final_score for r in results) if results else 1.0
-        min_score = min(r.final_score for r in results) if results else 0.0
+        # Normalize relevance scores to [0, 1] for fair comparison with similarity
+        max_score = max(relevance_of(r) for r in results) if results else 1.0
+        min_score = min(relevance_of(r) for r in results) if results else 0.0
         score_range = max_score - min_score if max_score != min_score else 1.0
 
         def normalize_score(score: float) -> float:
@@ -1049,7 +1208,7 @@ class SearchService:
                 if candidate.book.id not in book_embeddings:
                     continue
 
-                relevance = normalize_score(candidate.final_score)
+                relevance = normalize_score(relevance_of(candidate))
                 similarity = max_similarity.get(candidate.book.id, 0.0)
                 mmr_score = lambda_param * relevance - (1 - lambda_param) * similarity
 
