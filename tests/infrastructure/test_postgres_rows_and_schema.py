@@ -203,6 +203,14 @@ def test_database_needs_a_url_and_does_not_connect_when_built():
     assert no_timeout._script("VACUUM x", {}) == "VACUUM x"
 
 
+def test_connections_detect_a_dead_network_path_with_tcp_keepalives():
+    db = PostgresDatabase("postgresql://u:p@127.0.0.1:1/none")
+    options = db._pool.kwargs
+    assert options["keepalives"] == 1
+    assert options["keepalives_idle"] + options["keepalives_interval"] * options["keepalives_count"] <= 30
+    assert options["tcp_user_timeout"] <= 30000
+
+
 # --- schema file ---------------------------------------------------------------
 
 

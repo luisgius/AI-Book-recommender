@@ -889,3 +889,56 @@ def test_filtered_search_finds_matches_beyond_the_over_fetch_window():
     results = repo.search([1.0, 0.0, 0.0, 0.0], max_results=2, filters=SearchFilters(language="es"))
 
     assert [r.book.title for r in results] == ["ES far"]
+
+
+# =============================================================================
+# No padding (V13): the vector side never fills its list with extra items
+# =============================================================================
+
+
+def _real_repo(books, vectors):
+    from unittest.mock import Mock
+
+    import faiss as faiss_lib
+
+    matrix = np.array(vectors, dtype=np.float32)
+    faiss_lib.normalize_L2(matrix)
+    index = faiss_lib.IndexFlatIP(matrix.shape[1])
+    index.add(matrix)
+    provider = Mock()
+    provider.get_index.return_value = index
+    provider.get_id_mapping.return_value = [str(b.id) for b in books]
+    provider.get_dimension.return_value = matrix.shape[1]
+    return FaissVectorSearchRepository(provider, books)
+
+
+def test_asking_for_more_results_than_indexed_books_returns_each_book_once():
+    books = [create_test_book(title=f"B{i}") for i in range(3)]
+    repo = _real_repo(books, [[1.0, 0.0], [0.6, 0.8], [0.0, 1.0]])
+
+    results = repo.search([1.0, 0.0], max_results=10)
+
+    assert [r.book.title for r in results] == ["B0", "B1", "B2"]
+    assert [r.rank for r in results] == [1, 2, 3]
+    assert len({r.book.id for r in results}) == 3
+
+
+def test_a_filter_matched_by_fewer_books_than_asked_is_not_padded():
+    books = [create_test_book(title="EN", language="en"), create_test_book(title="ES", language="es"),
+             create_test_book(title="EN2", language="en")]
+    repo = _real_repo(books, [[1.0, 0.0], [0.0, 1.0], [0.9, 0.1]])
+
+    results = repo.search([1.0, 0.0], max_results=10, filters=SearchFilters(language="es"))
+
+    assert [r.book.title for r in results] == ["ES"]
+
+
+def test_every_book_gets_a_cosine_so_unrelated_books_are_ranked_not_dropped():
+    """Dense retrieval has no "no match": an orthogonal book is still returned, with similarity 0."""
+    books = [create_test_book(title="near"), create_test_book(title="orthogonal")]
+    repo = _real_repo(books, [[1.0, 0.0], [0.0, 1.0]])
+
+    results = repo.search([1.0, 0.0], max_results=2)
+
+    assert [r.book.title for r in results] == ["near", "orthogonal"]
+    assert results[1].vector_score == pytest.approx(0.0, abs=1e-6)

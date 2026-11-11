@@ -108,7 +108,7 @@ def clean_dependencies(monkeypatch):
     dependencies.reset_dependencies()
     RecordingReranker.created = []
     monkeypatch.setattr(dependencies, "load_dotenv", lambda *args, **kwargs: None)
-    monkeypatch.setattr(dependencies, "CrossEncoderReranker", RecordingReranker)
+    monkeypatch.setattr("app.infrastructure.search.cross_encoder_reranker.CrossEncoderReranker", RecordingReranker)
     yield
     dependencies.reset_dependencies()
 

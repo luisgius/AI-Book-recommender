@@ -22,6 +22,15 @@ Two modes:
   local flat FAISS index up to ties and half-precision rounding.
 
 One statement per search returns fully hydrated rows.
+
+Identity check (V13): the loader records which encoder produced the stored
+vectors (catalog_info "embedding_model": the encoder's identity, e.g.
+"intfloat/multilingual-e5-large-instruct" for a local model or
+"openrouter:qwen/qwen3-embedding-8b?provider=deepinfra&dimensions=1024" for
+the API encoder, plus "embedding_identity" with model, provider and
+dimension). Given the query encoder's identity, the repository refuses to
+search vectors of another model, provider or dimension, as the FAISS index
+metadata check does in the local profile.
 """
 
 import logging
@@ -48,7 +57,7 @@ MIN_EF_SEARCH = 40  # pgvector's default
 
 
 class EmbeddingModelMismatchError(RuntimeError):
-    """The stored vectors were computed with another model than the query's."""
+    """The stored vectors were computed with another encoder (model, provider or dimension) than the query's."""
 
 
 class PgVectorSearchRepository(VectorSearchRepository):
@@ -59,9 +68,12 @@ class PgVectorSearchRepository(VectorSearchRepository):
         db: Database (the pooled connection string in the API)
         schema: Catalog schema
         mode: "approximate" (ANN index) or "exact" (sequential scan)
-        expected_model: Embedding model of the queries; when given, the
-            model recorded by the loader must be the same (like the FAISS
-            index metadata check of the local profile)
+        expected_identity: Identity of the query encoder (its
+            get_model_name(): the model name of a local model, or
+            "openrouter:<model>?provider=<p>&dimensions=<d>" for the API
+            encoder). When given, the identity recorded by the loader must
+            be the same, or every search raises EmbeddingModelMismatchError
+            (and is_ready() is False, so the API degrades to lexical search).
     """
 
     def __init__(
@@ -69,14 +81,14 @@ class PgVectorSearchRepository(VectorSearchRepository):
         db: PostgresDatabase,
         schema: str,
         mode: str = "approximate",
-        expected_model: Optional[str] = None,
+        expected_identity: Optional[str] = None,
     ) -> None:
         if mode not in MODES:
             raise ValueError(f"mode must be one of {MODES}, got '{mode}'")
         self._db = db
         self._schema = validate_schema_name(schema)
         self._mode = mode
-        self._expected_model = expected_model
+        self._expected_identity = expected_identity
         self._info: Optional[Dict[str, Any]] = None
         self._info_lock = threading.Lock()
 
@@ -94,18 +106,42 @@ class PgVectorSearchRepository(VectorSearchRepository):
                             f"Catalog schema '{self._schema}' has no embeddings: load it with "
                             f"python -m scripts.load_postgres"
                         )
-                    model = info.get("embedding_model")
-                    if self._expected_model and model and _canonical(model) != _canonical(self._expected_model):
-                        raise EmbeddingModelMismatchError(
-                            f"Schema '{self._schema}' holds embeddings of '{model}' but queries are embedded "
-                            f"with '{self._expected_model}'. Reload the schema with that model or set "
-                            f"EMBEDDING_MODEL={model}."
-                        )
+                    self._check_identity(info)
                     self._info = info
         return self._info
 
+    def _check_identity(self, info: Dict[str, Any]) -> None:
+        """
+        Raise if the stored vectors come from another encoder than the queries.
+
+        Raises:
+            EmbeddingModelMismatchError: Naming both identities
+        """
+        if not self._expected_identity:
+            return
+        stored = info.get("embedding_model")
+        if stored and _canonical(stored) == _canonical(self._expected_identity):
+            return
+        details = info.get("embedding_identity") or {}
+        described = (
+            f" (model {details.get('model')}, provider {details.get('provider')}, "
+            f"dimension {details.get('dimension')})" if details else
+            f" (dimension {info.get('embedding_dimension')})" if stored else ""
+        )
+        raise EmbeddingModelMismatchError(
+            f"Schema '{self._schema}' holds vectors of '{stored or 'an unrecorded encoder'}'{described}, but queries "
+            f"are embedded with '{self._expected_identity}'. Query and document vectors must come from the same "
+            f"model, provider and dimension: load the schema with this encoder (python -m scripts.load_postgres) "
+            f"or configure the encoder it was loaded with (EMBEDDING_PROVIDER, EMBEDDING_MODEL, "
+            f"EMBEDDING_DIMENSIONS, EMBEDDING_OPENROUTER_PROVIDER)."
+        )
+
     def dimension(self) -> int:
         return int(self._catalog_info()["embedding_dimension"])
+
+    def stored_identity(self) -> Optional[str]:
+        """Identity of the encoder the stored vectors were built with (catalog_info)."""
+        return self._catalog_info().get("embedding_model")
 
     def index_type(self) -> Optional[str]:
         """ANN index of the schema (lakebase_ann, hnsw) or None."""

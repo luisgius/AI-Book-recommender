@@ -197,13 +197,46 @@ def test_vector_dimension_and_model_checks():
     repo = PgVectorSearchRepository(FakeDatabase(), "cat", "exact")
     with pytest.raises(ValueError):
         repo.search([1.0, 2.0], max_results=3)
-    mismatch = PgVectorSearchRepository(FakeDatabase(), "cat", expected_model="all-MiniLM-L6-v2")
+    mismatch = PgVectorSearchRepository(FakeDatabase(), "cat", expected_identity="all-MiniLM-L6-v2")
     assert mismatch.is_ready() is False
     same = PgVectorSearchRepository(FakeDatabase(), "cat",
-                                    expected_model="intfloat/multilingual-e5-large-instruct")
+                                    expected_identity="intfloat/multilingual-e5-large-instruct")
     assert same.is_ready() is True
     with pytest.raises(ValueError):
         PgVectorSearchRepository(FakeDatabase(), "cat", mode="fuzzy")
+
+
+API_IDENTITY = "openrouter:qwen/qwen3-embedding-8b?provider=deepinfra&dimensions=1024"
+API_INFO = {**INFO, "embedding_model": API_IDENTITY, "embedding_dimension": 3,
+            "embedding_identity": {"model": "qwen/qwen3-embedding-8b", "provider": "openrouter/deepinfra",
+                                   "dimension": 1024, "identity": API_IDENTITY}}
+
+
+@pytest.mark.parametrize("query_identity", [
+    "openrouter:qwen/qwen3-embedding-8b?provider=nebius&dimensions=1024",  # another provider
+    "openrouter:qwen/qwen3-embedding-8b?provider=deepinfra&dimensions=512",  # another dimension
+    "qwen/qwen3-embedding-8b",  # the same model, run locally
+])
+def test_vector_search_refuses_vectors_of_another_encoder_identity(query_identity):
+    from app.infrastructure.search.pgvector_search_repository import EmbeddingModelMismatchError
+
+    db = FakeDatabase(info=API_INFO)
+    repo = PgVectorSearchRepository(db, "cat", "exact", expected_identity=query_identity)
+
+    with pytest.raises(EmbeddingModelMismatchError) as error:
+        repo.search([1.0, 0.0, 0.0], max_results=3)
+    assert API_IDENTITY in str(error.value) and query_identity in str(error.value)
+    assert "provider openrouter/deepinfra" in str(error.value)
+    assert not db.searches() and repo.is_ready() is False
+
+
+def test_vector_search_accepts_the_same_identity_and_refuses_an_unrecorded_one():
+    same = PgVectorSearchRepository(FakeDatabase(info=API_INFO), "cat", "exact", expected_identity=API_IDENTITY)
+    assert same.is_ready() is True and same.stored_identity() == API_IDENTITY
+    unrecorded = {k: v for k, v in INFO.items() if k != "embedding_model"}
+    assert PgVectorSearchRepository(FakeDatabase(info=unrecorded), "cat",
+                                    expected_identity=API_IDENTITY).is_ready() is False
+    assert PgVectorSearchRepository(FakeDatabase(info=unrecorded), "cat").is_ready() is True  # no check asked
 
 
 # --- embeddings store ------------------------------------------------------------
@@ -231,6 +264,39 @@ def test_embeddings_store_encodes_with_the_encoder_and_stores_unit_vectors():
     assert store.is_ready() is True
     with pytest.raises(NotImplementedError):
         store.save_index("x")
+
+
+
+def test_embeddings_batch_is_one_statement_for_all_ids():
+    a, b = uuid4(), uuid4()
+    db = FakeDatabase(results=[[{"id": a, "e": "[0.6,0.8,0]"}, {"id": b, "e": "[1,0,0]"}]])
+    store = PostgresEmbeddingsStore(Encoder(), db, "cat")
+
+    found = store.get_embeddings_batch([a, b, a, uuid4()])
+
+    assert found == {a: [0.6, 0.8, 0.0], b: [1.0, 0.0, 0.0]}
+    [call] = db.calls
+    assert "WHERE id = ANY(%(ids)s::uuid[]) AND embedding IS NOT NULL" in call["sql"]
+    assert len(call["params"]["ids"]) == 3  # duplicates removed
+    assert store.get_embeddings_batch([]) == {} and len(db.calls) == 1  # no statement for no ids
+
+
+def test_port_default_batch_lookup_uses_the_single_item_method():
+    from app.domain.ports import EmbeddingsStore
+
+    class OnlySingle(EmbeddingsStore):
+        def __init__(self):
+            self.asked = []
+
+        def get_embedding(self, book_id):
+            self.asked.append(book_id)
+            return None if book_id == missing else [1.0]
+
+    a, missing = uuid4(), uuid4()
+    store = OnlySingle()
+
+    assert store.get_embeddings_batch([a, missing, a]) == {a: [1.0]}
+    assert store.asked == [a, missing]
 
 
 # --- catalog repository ------------------------------------------------------------

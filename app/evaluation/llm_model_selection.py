@@ -1208,7 +1208,8 @@ def production_top_results(
     from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
     from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
 
-    bm25 = BM25SearchRepository()
+    # Legacy padding (zero-score books fill the list): reproduces the published results (V13)
+    bm25 = BM25SearchRepository(zero_score_padding=True)
     bm25.load_index(str(Path(indexes_dir) / "bm25_index.pkl"))
     embeddings = EmbeddingsStoreFaiss()
     embeddings.load_index(str(Path(indexes_dir) / "faiss_index"))

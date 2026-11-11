@@ -32,10 +32,10 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 # Infrastructure imports
-from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
-from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
-from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
-from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
+# The local adapters (SQLite, rank_bm25, FAISS with sentence-transformers) are
+# imported inside the functions that build them (_local_adapters), so the API
+# can import the helpers of this module (POST /evaluate) without loading torch
+# in the cloud profile.
 
 # Domain imports
 from app.domain.ports import (
@@ -78,6 +78,15 @@ DEFAULT_NEGATIVE_OUTPUT_PATH = "data/evaluation/negative_results.json"
 DEFAULT_ABLATION_OUTPUT_PATH = "data/evaluation/ablation_results.json"
 NEGATIVE_TIMEOUT_MS = 30_000
 
+
+def _local_adapters():
+    """The local adapter classes (imported here, see the note at the imports)."""
+    from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
+    from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
+    from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
+    from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
+
+    return SqliteBookCatalogRepository, BM25SearchRepository, EmbeddingsStoreFaiss, FaissVectorSearchRepository
 
 def _get_git_commit() -> str | None:
     """
@@ -189,13 +198,17 @@ def run_negative_evaluation(
 
     # Load indices (same as main Steps 1-2, but no queries/judgments needed)
     logger.info("Loading search indices...")
+    SqliteBookCatalogRepository, BM25SearchRepository, EmbeddingsStoreFaiss, FaissVectorSearchRepository = (
+        _local_adapters()
+    )
     catalog_repo = SqliteBookCatalogRepository(Path(db_path))
     books = catalog_repo.get_all()
     logger.info("Catalog loaded: %s books", len(books))
 
     indexes_dir_path = Path(indexes_dir)
 
-    bm25_repo = BM25SearchRepository()
+    # Legacy padding (zero-score books fill the list): reproduces the published results (V13)
+    bm25_repo = BM25SearchRepository(zero_score_padding=True)
     bm25_index_path = indexes_dir_path / "bm25_index.pkl"
     if bm25_index_path.exists():
         bm25_repo.load_index(str(bm25_index_path))
@@ -282,9 +295,9 @@ def run_negative_evaluation(
 def _run_ablation_search(
     query_text: str,
     config: AblationConfig,
-    bm25_repo: BM25SearchRepository,
-    vector_repo: FaissVectorSearchRepository,
-    embeddings_store: EmbeddingsStoreFaiss,
+    bm25_repo: LexicalSearchRepository,
+    vector_repo: VectorSearchRepository,
+    embeddings_store: EmbeddingsStore,
     search_service: SearchService,
     max_results: int = 100,
     mmr_top_k: int = 20,
@@ -404,13 +417,17 @@ def run_ablation_evaluation(
 
     # Step 2: Load indices
     logger.info("Loading search indices...")
+    SqliteBookCatalogRepository, BM25SearchRepository, EmbeddingsStoreFaiss, FaissVectorSearchRepository = (
+        _local_adapters()
+    )
     catalog_repo = SqliteBookCatalogRepository(Path(db_path))
     books = catalog_repo.get_all()
     logger.info("Catalog: %d books", len(books))
 
     indexes_dir_path = Path(indexes_dir)
 
-    bm25_repo = BM25SearchRepository()
+    # Legacy padding (zero-score books fill the list): reproduces the published results (V13)
+    bm25_repo = BM25SearchRepository(zero_score_padding=True)
     bm25_index_path = indexes_dir_path / "bm25_index.pkl"
     if bm25_index_path.exists():
         bm25_repo.load_index(str(bm25_index_path))
@@ -1150,13 +1167,17 @@ def main(
 
     # Step 2: Load indices and catalog
     logger.info("Step 2: Loading search indices and catalog...")
+    SqliteBookCatalogRepository, BM25SearchRepository, EmbeddingsStoreFaiss, FaissVectorSearchRepository = (
+        _local_adapters()
+    )
     catalog_repo = SqliteBookCatalogRepository(Path(db_path))
     books = catalog_repo.get_all()
     logger.info("Catalog loaded: %s books", len(books))
 
     indexes_dir_path = Path(indexes_dir)
 
-    bm25_repo = BM25SearchRepository()
+    # Legacy padding (zero-score books fill the list): reproduces the published results (V13)
+    bm25_repo = BM25SearchRepository(zero_score_padding=True)
     bm25_index_path = indexes_dir_path / "bm25_index.pkl"
     if bm25_index_path.exists():
         bm25_repo.load_index(str(bm25_index_path))

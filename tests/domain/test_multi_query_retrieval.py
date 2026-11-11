@@ -136,6 +136,9 @@ class FakeEmbeddingsStore:
     def get_embedding(self, book_id: UUID) -> Optional[List[float]]:
         return self._embeddings.get(book_id, [0.1] * 384)
 
+    def get_embeddings_batch(self, book_ids):
+        return {i: v for i in book_ids if (v := self.get_embedding(i)) is not None}
+
     def store_embedding(self, book_id: UUID, embedding: List[float]) -> None:
         self._embeddings[book_id] = embedding
 
@@ -166,6 +169,9 @@ class FailingEmbeddingsStore:
 
     def get_embedding(self, book_id):
         return None
+
+    def get_embeddings_batch(self, book_ids):
+        return {i: v for i in book_ids if (v := self.get_embedding(i)) is not None}
 
     def is_ready(self) -> bool:
         return True

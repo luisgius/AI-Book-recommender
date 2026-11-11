@@ -260,6 +260,20 @@ class SqliteBookCatalogRepository(BookCatalogRepository):
             result = conn.execute("SELECT COUNT(*) as cnt FROM books").fetchone()
             return result["cnt"]
 
+    def get_categories(self) -> List[str]:
+        """
+        Every distinct category, sorted, from one aggregate query.
+
+        Categories are stored as a JSON list per book; SQLite's json_each
+        expands them without loading any book.
+        """
+        with self._get_connection() as conn:
+            rows = conn.execute(
+                "SELECT DISTINCT j.value AS category FROM books, json_each(books.categories) AS j "
+                "WHERE books.categories IS NOT NULL AND json_valid(books.categories)"
+            ).fetchall()
+        return sorted(str(row["category"]) for row in rows if row["category"] is not None)
+
     def get_by_id(self, book_id: UUID) -> Optional[Book]:
         """Retrieve a book by its internal UUID."""
         with self._get_connection() as conn:

@@ -43,7 +43,7 @@ Design decisions:
   Each request is retried on transient errors with a timeout (openrouter_http.py). Vectors are requested
   as base64 float32 (about 2.4 times smaller than JSON numbers, and exact);
   a provider that answers with JSON numbers is read as well.
-- Every request is recorded in an optional LLMUsageRecorder under the
+- Every request is recorded in an optional UsageRecorder under the
   operation "embedding" (latency, input tokens, reported cost, errors).
 - Vectors are returned as the API sends them (unit length for the supported
   models); the store normalizes before indexing, as with the local encoder.
@@ -51,13 +51,13 @@ Design decisions:
 
 import base64
 import logging
+import struct
 from typing import Any, Dict, List, Mapping, Optional
 
 import httpx
-import numpy as np
 
 from app.infrastructure.config.settings import DEFAULT_OPENROUTER_URL, EmbeddingSettings
-from app.infrastructure.llm.usage import EMBEDDING_OPERATION, LLMUsageRecorder
+from app.infrastructure.usage_recording import EMBEDDING_OPERATION, UsageRecorder
 from app.infrastructure.search.openrouter_http import (
     DEFAULT_MAX_RETRIES,
     DEFAULT_TIMEOUT_S,
@@ -103,9 +103,17 @@ def api_model_identity(model: str, dimension: int, upstream_provider: Optional[s
 
 
 def decode_embedding(raw: Any) -> List[float]:
-    """A vector from the API: base64 little-endian float32, or a list of numbers."""
+    """
+    A vector from the API: base64 little-endian float32, or a list of numbers.
+
+    Decoded with the standard library (struct, "<f": little-endian float32),
+    so the cloud profile needs no numpy; each value is the exact float32.
+    """
     if isinstance(raw, str):
-        return np.frombuffer(base64.b64decode(raw), dtype="<f4").astype(float).tolist()
+        data = base64.b64decode(raw)
+        if len(data) % 4:
+            raise ValueError(f"Base64 embedding of {len(data)} bytes is not a float32 vector")
+        return list(struct.unpack(f"<{len(data) // 4}f", data))
     if isinstance(raw, list):
         return [float(value) for value in raw]
     raise ValueError(f"Unexpected embedding format: {type(raw).__name__}")
@@ -129,7 +137,7 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
         upstream_provider: Optional[str] = None,
         batch_size: int = DEFAULT_BATCH_SIZE,
         max_batch_chars: int = DEFAULT_MAX_BATCH_CHARS,
-        usage_recorder: Optional[LLMUsageRecorder] = None,
+        usage_recorder: Optional[UsageRecorder] = None,
         api_key: Optional[str] = None,
         base_url: str = DEFAULT_OPENROUTER_URL,
         timeout_s: float = DEFAULT_TIMEOUT_S,
@@ -199,7 +207,7 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
 
     @classmethod
     def from_settings(
-        cls, settings: EmbeddingSettings, usage_recorder: Optional[LLMUsageRecorder] = None
+        cls, settings: EmbeddingSettings, usage_recorder: Optional[UsageRecorder] = None
     ) -> "OpenRouterEmbeddingEncoder":
         """Build the encoder of EMBEDDING_PROVIDER=openrouter (reads OPENROUTER_API_KEY)."""
         if settings.provider != "openrouter":

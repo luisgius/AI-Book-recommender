@@ -28,7 +28,6 @@ from app.domain.ports import (
 )
 from app.domain.services import SearchService
 from app.domain.value_objects import SearchFilters
-from app.evaluation.retrieval_evaluation import run_retrieval_evaluation
 
 router = APIRouter()
 
@@ -50,6 +49,10 @@ def evaluate(
     MRR and ILD@k per mode. No LLM is called; LLM-based evaluation (query
     understanding, LLM-as-judge) runs from the CLI evaluation job.
     """
+    # Imported here: the evaluation code is not needed to serve searches, and
+    # importing it at startup would load the local adapters in every profile.
+    from app.evaluation.retrieval_evaluation import run_retrieval_evaluation
+
     try:
         report = run_retrieval_evaluation(
             search_service=service,

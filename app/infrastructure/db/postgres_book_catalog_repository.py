@@ -49,6 +49,7 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
         self._db = db
         self._schema = validate_schema_name(schema)
         self._configs: Optional[Set[str]] = None
+        self._categories: Optional[List[str]] = None  # cached by get_categories, reset by writes
 
     # ------------------------------------------------------------------
     # Reads
@@ -96,18 +97,35 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
     def count(self) -> int:
         return int(self._db.query(f"SELECT count(*) AS n FROM {self._schema}.works")[0]["n"])
 
+    def get_categories(self) -> List[str]:
+        """
+        Every distinct category, sorted: one aggregate statement, cached.
+
+        The API reads it once at startup (LLM filter validation), so no book
+        is loaded. The cache is dropped when this repository writes; changes
+        made by another process (the loader) are seen after a restart.
+        """
+        if self._categories is None:
+            rows = self._db.query(
+                f"SELECT DISTINCT unnest(categories) AS category FROM {self._schema}.works"
+            )
+            self._categories = sorted(str(row["category"]) for row in rows if row["category"] is not None)
+        return list(self._categories)
+
     # ------------------------------------------------------------------
     # Writes
     # ------------------------------------------------------------------
 
     def delete(self, book_id: UUID) -> bool:
         """Delete a book (its texts go with it: ON DELETE CASCADE)."""
+        self._categories = None
         return self._db.execute(f"DELETE FROM {self._schema}.works WHERE id = %(id)s", {"id": book_id}) > 0
 
     def delete_many(self, book_ids: List[UUID]) -> int:
         """Delete several books; returns how many existed (loader helper)."""
         if not book_ids:
             return 0
+        self._categories = None
         return self._db.execute(f"DELETE FROM {self._schema}.works WHERE id = ANY(%(ids)s::uuid[])", {"ids": book_ids})
 
     def save(self, book: Book) -> None:
@@ -153,6 +171,7 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
         if not todo:
             return 0
         sql, values = self._write_script([book for book, _ in todo], [p for _, p in todo])
+        self._categories = None
         self._db.execute(sql, values)
         return len(todo)
 

@@ -13,6 +13,15 @@ Tokenization is pluggable by name (see text_normalization.py): "normalized"
 for new indexes, "whitespace" for the legacy behaviour. The tokenizer name is
 saved with the index so documents and queries are always tokenized the same
 way.
+
+Only books that contain at least one query term are returned (task V13).
+rank_bm25 scores every book of the corpus, and until V13 this adapter cut the
+sorted list at max_results without looking at the scores, so a query with few
+matching books was padded with books that share no term with it (score 0).
+Those books then entered the RRF fusion as if the lexical side had retrieved
+them, which lowered the hybrid (data/evaluation/BM25_PADDING.md). The old
+behaviour is kept behind zero_score_padding=True, only so that evaluation
+runs published before V13 can be reproduced.
 """
 
 import pickle
@@ -50,7 +59,7 @@ class BM25SearchRepository(LexicalSearchRepository):
     search operations fast.
     """
 
-    def __init__(self, tokenizer: str = NORMALIZED_TOKENIZER) -> None:
+    def __init__(self, tokenizer: str = NORMALIZED_TOKENIZER, zero_score_padding: bool = False) -> None:
         """
         Create an empty repository.
 
@@ -58,12 +67,20 @@ class BM25SearchRepository(LexicalSearchRepository):
             tokenizer: Name of the tokenizer used to build new indexes and to
                 tokenize queries ("normalized" or "whitespace"). load_index
                 replaces it with the name stored in the index file.
+            zero_score_padding: Legacy behaviour, ONLY for reproducing
+                evaluation results published before task V13. False (default):
+                search returns only books that contain at least one query
+                term, so it may return fewer than max_results (or none).
+                True: the list is filled up to max_results with books that
+                contain no query term (score 0), as before V13. It is a search
+                option, not part of the saved index, so load_index keeps it.
 
         Raises:
             ValueError: If the tokenizer name is unknown.
         """
         self._tokenizer_name: str = tokenizer
         self._tokenizer: Tokenizer = get_tokenizer(tokenizer)
+        self._zero_score_padding = zero_score_padding
         self._index: Optional[BM25Okapi] = None
         self._books: List[Book] = []
         self._book_map: Dict[UUID, Book] = {}
@@ -156,10 +173,12 @@ class BM25SearchRepository(LexicalSearchRepository):
         Search process:
         1. Tokenize query text
         2. Compute BM25 scores for all documents
-        3. Rank results by score (descending)
-        4. Apply filters if provided
-        5. Take top max_results
-        6. Construct SearchResult entities with complete Book objects
+        3. Keep only the books that contain at least one query term (unless
+           zero_score_padding is on)
+        4. Rank results by score (descending; ties keep catalog order)
+        5. Apply filters if provided
+        6. Take top max_results
+        7. Construct SearchResult entities with complete Book objects
 
         Args:
             query_text: The search query string
@@ -167,7 +186,10 @@ class BM25SearchRepository(LexicalSearchRepository):
             filters: Optional filters (language, category, year range)
 
         Returns:
-            List of SearchResult entities, ranked by BM25 score (descending).
+            List of SearchResult entities, ranked by BM25 score (descending):
+            at most max_results, fewer when fewer books contain a query term,
+            and none when no book does (or the query has no terms left after
+            tokenization, e.g. only stopwords).
             Each result has:
             - book: The matched book entity
             - final_score: BM25 score
@@ -198,7 +220,17 @@ class BM25SearchRepository(LexicalSearchRepository):
             # Pair books with scores
             book_scores = list(zip(self._books, scores))
 
-            # Sort by score descending
+            # Drop the books that contain no query term. Matching is decided
+            # by term presence, not by score > 0: in a tiny corpus rank_bm25
+            # can give a matching term a negative or zero weight (IDF floor).
+            if not self._zero_score_padding:
+                book_scores = [
+                    pair for pair, terms in zip(book_scores, self._index.doc_freqs)
+                    if self._contains_any(terms, tokenized_query)
+                ]
+
+            # Sort by score descending (stable: ties keep catalog order, so
+            # the list is the legacy list minus the non-matching books)
             book_scores.sort(key=lambda x: x[1], reverse=True)
 
             # Apply filters if provided
@@ -323,6 +355,16 @@ class BM25SearchRepository(LexicalSearchRepository):
     def tokenizer_name(self) -> str:
         """Name of the active tokenizer ("normalized" or "whitespace")."""
         return self._tokenizer_name
+
+    @property
+    def zero_score_padding(self) -> bool:
+        """True if the legacy padding with non-matching books is on (see __init__)."""
+        return self._zero_score_padding
+
+    @staticmethod
+    def _contains_any(document_terms: Dict[str, int], query_terms: List[str]) -> bool:
+        """True if the document (term -> frequency, as rank_bm25 keeps it) has a query term."""
+        return any(term in document_terms for term in query_terms)
 
     def _tokenize(self, text: str) -> List[str]:
         """

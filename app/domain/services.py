@@ -1168,12 +1168,11 @@ class SearchService:
             # Without re-ranking rerank_score is None and this is final_score
             return result.rerank_score if result.has_rerank_score() else result.final_score
 
-        # Get embeddings for all candidate books
-        book_embeddings: Dict[UUID, List[float]] = {}
-        for result in results:
-            embedding = self._embeddings_store.get_embedding(result.book.id)
-            if embedding is not None:
-                book_embeddings[result.book.id] = embedding
+        # Embeddings of all candidate books in one lookup (one database round
+        # trip in the cloud profile instead of one per book)
+        book_embeddings: Dict[UUID, List[float]] = self._embeddings_store.get_embeddings_batch(
+            [result.book.id for result in results]
+        )
 
         # If no embeddings available, return original results
         if not book_embeddings:

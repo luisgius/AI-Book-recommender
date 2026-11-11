@@ -29,7 +29,7 @@ Same contract as CrossEncoderReranker:
 - is_ready() is False after a non-transient failure (wrong key, no credits,
   unknown model) until a later call succeeds; there is no model to load, so
   every search still tries the request.
-- Every request is recorded in an optional LLMUsageRecorder under the
+- Every request is recorded in an optional UsageRecorder under the
   operation "rerank" (latency, tokens, reported cost, errors).
 
 This module imports no model library (no torch).
@@ -44,7 +44,7 @@ import httpx
 from app.domain.entities import Book, SearchResult
 from app.domain.ports import Reranker
 from app.infrastructure.config.settings import DEFAULT_OPENROUTER_URL, RerankerSettings
-from app.infrastructure.llm.usage import RERANK_OPERATION, LLMUsageRecorder
+from app.infrastructure.usage_recording import RERANK_OPERATION, UsageRecorder
 from app.infrastructure.search.openrouter_http import (
     DEFAULT_TIMEOUT_S,
     OpenRouterError,
@@ -96,7 +96,7 @@ class ApiReranker(Reranker):
         *,
         upstream_provider: Optional[str] = None,
         max_document_chars: int = DEFAULT_MAX_DOCUMENT_CHARS,
-        usage_recorder: Optional[LLMUsageRecorder] = None,
+        usage_recorder: Optional[UsageRecorder] = None,
         api_key: Optional[str] = None,
         base_url: str = DEFAULT_OPENROUTER_URL,
         timeout_s: float = DEFAULT_TIMEOUT_S,
@@ -131,7 +131,7 @@ class ApiReranker(Reranker):
 
     @classmethod
     def from_settings(
-        cls, settings: RerankerSettings, usage_recorder: Optional[LLMUsageRecorder] = None
+        cls, settings: RerankerSettings, usage_recorder: Optional[UsageRecorder] = None
     ) -> "ApiReranker":
         """Build the reranker of RERANKER_PROVIDER=openrouter (reads OPENROUTER_API_KEY)."""
         if settings.provider != "openrouter" or settings.model is None:

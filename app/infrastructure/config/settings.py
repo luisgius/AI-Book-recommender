@@ -46,10 +46,14 @@ Cost estimate of recorded LLM calls (optional, both or neither):
 Embedding environment variables (all optional):
     EMBEDDING_PROVIDER    "local" (default: a sentence-transformers model in this
                           process) or "openrouter" (OpenRouter's embeddings API;
-                          no model is loaded)
+                          no model is loaded). Default "openrouter" when
+                          SEARCH_PROFILE=cloud.
     EMBEDDING_MODEL       local: sentence-transformers model (default
                           all-MiniLM-L6-v2); openrouter: OpenRouter model id
-                          (required, e.g. qwen/qwen3-embedding-8b).
+                          (required in the local profile, e.g.
+                          qwen/qwen3-embedding-8b; the cloud profile defaults to
+                          qwen/qwen3-embedding-8b at 1024 dimensions pinned to
+                          deepinfra, the choice of data/evaluation/API_MODELS.md).
                           The FAISS index must be built with the same model.
     EMBEDDING_DEVICE      "cpu", "mps" or "cuda" (default: picked automatically)
     EMBEDDING_DIMENSIONS  openrouter only: output dimension, for models trained
@@ -61,11 +65,15 @@ Embedding environment variables (all optional):
 
 Re-ranking environment variables (all optional):
     RERANKER_PROVIDER     "local" (default: cross-encoder in this process) or
-                          "openrouter" (OpenRouter's rerank API)
+                          "openrouter" (OpenRouter's rerank API; the default
+                          when SEARCH_PROFILE=cloud)
     RERANKER_MODEL        reranker model for the third retrieval stage, e.g.
                           BAAI/bge-reranker-v2-m3 (local) or
-                          qwen/qwen3-reranker-8b (openrouter). Empty, unset or
-                          "none" (default) disables re-ranking.
+                          qwen/qwen3-reranker-8b (openrouter). Local profile:
+                          empty, unset or "none" (default) disables re-ranking.
+                          Cloud profile: unset gives qwen/qwen3-reranker-8b
+                          pinned to primeintellect (API_MODELS.md); empty or
+                          "none" disables it.
     RERANK_DEPTH          top fused results the reranker scores (default 30)
     RERANKER_DEVICE       "cpu", "mps" or "cuda" (default: picked automatically)
     RERANKER_OPENROUTER_PROVIDER  openrouter only: upstream provider to pin
@@ -135,6 +143,21 @@ OPENROUTER_API_KEY_VAR = "OPENROUTER_API_KEY"
 
 # Default embedding model: the one the shipped index (data/indexes) was built with.
 DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+# Defaults of the cloud profile (SEARCH_PROFILE=cloud), the models chosen with
+# the speed-quality rule of 2026-11-11 (data/evaluation/API_MODELS.md, V16):
+# embeddings qwen/qwen3-embedding-8b cut to 1024 dimensions on DeepInfra (the
+# provider is pinned because providers return different vectors) and the
+# reranker qwen/qwen3-reranker-8b on PrimeIntellect. Each is overridable by its
+# own variable; the dimension and the pinned provider apply only to the
+# default model. The local profile's defaults do not change.
+CLOUD_EMBEDDING_PROVIDER = "openrouter"
+CLOUD_EMBEDDING_MODEL = "qwen/qwen3-embedding-8b"
+CLOUD_EMBEDDING_DIMENSIONS = 1024
+CLOUD_EMBEDDING_OPENROUTER_PROVIDER = "deepinfra"
+CLOUD_RERANKER_PROVIDER = "openrouter"
+CLOUD_RERANKER_MODEL = "qwen/qwen3-reranker-8b"
+CLOUD_RERANKER_OPENROUTER_PROVIDER = "primeintellect"
 
 # Torch device families accepted for EMBEDDING_DEVICE ("cuda:1" is also valid).
 SUPPORTED_EMBEDDING_DEVICES = ("cpu", "mps", "cuda")
@@ -384,6 +407,11 @@ class TokenPrices:
 SUPPORTED_MODEL_PROVIDERS = ("local", "openrouter")
 
 
+def _is_cloud_profile(env: Mapping[str, str]) -> bool:
+    """True when SEARCH_PROFILE is "cloud" in this environment (the defaults of that profile apply)."""
+    return env.get("SEARCH_PROFILE", "").strip().lower() == "cloud"
+
+
 def _optional_int(raw: str, variable: str) -> Optional[int]:
     """An optional integer environment value ("" gives None)."""
     raw = raw.strip()
@@ -430,20 +458,39 @@ class EmbeddingSettings:
 
     @classmethod
     def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "EmbeddingSettings":
-        """Build settings from environment variables (see module docstring)."""
+        """
+        Build settings from environment variables (see module docstring).
+
+        With SEARCH_PROFILE=cloud the provider defaults to OpenRouter and the
+        model to CLOUD_EMBEDDING_MODEL; while that model is in use, the
+        dimension and the pinned provider default to the measured choice.
+        """
         env = os.environ if env is None else env
-        provider = env.get("EMBEDDING_PROVIDER", "").strip().lower() or "local"
-        # The local default model is not served by OpenRouter, so an API model
-        # must always be named explicitly.
-        default_model = DEFAULT_EMBEDDING_MODEL if provider == "local" else ""
+        cloud = _is_cloud_profile(env)
+        provider = env.get("EMBEDDING_PROVIDER", "").strip().lower() or (
+            CLOUD_EMBEDDING_PROVIDER if cloud else "local"
+        )
+        # The local default model is not served by OpenRouter, so outside the
+        # cloud profile an API model must always be named explicitly.
+        if provider == "local":
+            default_model = DEFAULT_EMBEDDING_MODEL
+        else:
+            default_model = CLOUD_EMBEDDING_MODEL if cloud else ""
         model = env.get("EMBEDDING_MODEL", "").strip() or default_model
+        cloud_choice = cloud and provider == "openrouter" and model.lower() == CLOUD_EMBEDDING_MODEL
+        dimensions = _optional_int(env.get("EMBEDDING_DIMENSIONS", ""), "EMBEDDING_DIMENSIONS")
+        if dimensions is None and cloud_choice:
+            dimensions = CLOUD_EMBEDDING_DIMENSIONS
+        pinned = env.get("EMBEDDING_OPENROUTER_PROVIDER", "").strip().lower() or (
+            CLOUD_EMBEDDING_OPENROUTER_PROVIDER if cloud_choice else None
+        )
         device = env.get("EMBEDDING_DEVICE", "").strip().lower() or None
         return cls(
             model=model,
             device=device,
             provider=provider,
-            dimensions=_optional_int(env.get("EMBEDDING_DIMENSIONS", ""), "EMBEDDING_DIMENSIONS"),
-            openrouter_provider=env.get("EMBEDDING_OPENROUTER_PROVIDER", "").strip().lower() or None,
+            dimensions=dimensions,
+            openrouter_provider=pinned,
         )
 
 
@@ -485,17 +532,66 @@ class RerankerSettings:
 
     @classmethod
     def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "RerankerSettings":
-        """Build settings from environment variables (see module docstring)."""
+        """
+        Build settings from environment variables (see module docstring).
+
+        With SEARCH_PROFILE=cloud the provider defaults to OpenRouter and an
+        unset RERANKER_MODEL gives CLOUD_RERANKER_MODEL (pinned to its
+        measured provider); RERANKER_MODEL empty or "none" still disables it.
+        """
         env = os.environ if env is None else env
-        model = env.get("RERANKER_MODEL", "").strip()
+        cloud = _is_cloud_profile(env)
+        provider = env.get("RERANKER_PROVIDER", "").strip().lower() or (
+            CLOUD_RERANKER_PROVIDER if cloud else "local"
+        )
+        if "RERANKER_MODEL" in env:
+            raw = env["RERANKER_MODEL"].strip()
+            model = None if raw.lower() in ("", "none") else raw
+        else:
+            model = CLOUD_RERANKER_MODEL if cloud and provider == "openrouter" else None
+        cloud_choice = cloud and provider == "openrouter" and (model or "").lower() == CLOUD_RERANKER_MODEL
+        pinned = env.get("RERANKER_OPENROUTER_PROVIDER", "").strip().lower() or (
+            CLOUD_RERANKER_OPENROUTER_PROVIDER if cloud_choice else None
+        )
         depth = env.get("RERANK_DEPTH", "").strip()
         return cls(
-            model=None if model.lower() in ("", "none") else model,
+            model=model,
             depth=int(depth) if depth else DEFAULT_RERANK_DEPTH,
             device=env.get("RERANKER_DEVICE", "").strip().lower() or None,
-            provider=env.get("RERANKER_PROVIDER", "").strip().lower() or "local",
-            openrouter_provider=env.get("RERANKER_OPENROUTER_PROVIDER", "").strip().lower() or None,
+            provider=provider,
+            openrouter_provider=pinned,
         )
+
+
+# --- Usage endpoint: what the model APIs cost since the process started ------
+
+
+_TRUE_VALUES = ("true", "1", "yes", "on")
+_FALSE_VALUES = ("false", "0", "no", "off", "")
+
+
+@dataclass(frozen=True)
+class UsageEndpointSettings:
+    """
+    Settings of GET /api/v1/usage (V13): calls, tokens, latency and reported
+    cost of the API embedding encoder, the API reranker and the LLM client.
+
+    Environment variables (optional):
+        USAGE_ENDPOINT_ENABLED  "true" serves the summary; "false" (default)
+                                answers 404, so a deployment does not publish
+                                its spending unless asked to
+    """
+
+    enabled: bool = False
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "UsageEndpointSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        raw = env.get("USAGE_ENDPOINT_ENABLED", "").strip().lower()
+        if raw not in _TRUE_VALUES + _FALSE_VALUES:
+            raise ValueError(f"USAGE_ENDPOINT_ENABLED must be true or false, got '{raw}'")
+        return cls(enabled=raw in _TRUE_VALUES)
 
 
 # --- MCP server: read-only catalog tools for AI assistants -------------------

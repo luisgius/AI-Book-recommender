@@ -144,6 +144,21 @@ class BookCatalogRepository(Protocol):
         """
         ...
 
+    def get_categories(self) -> List[str]:
+        """
+        Every distinct category of the catalog, sorted.
+
+        Used to validate the category an LLM extracts from a query. Adapters
+        answer it with one aggregate query instead of reading every book
+        (the cloud catalog is large and the API reads it at startup); the
+        default walks the catalog with iter_all, for adapters that do not
+        override it.
+
+        Returns:
+            Distinct category names in code-point order
+        """
+        return sorted({category for book in self.iter_all() for category in book.categories})
+
     def delete(self, book_id: UUID) -> bool:
         """
         Delete a book from the catalog.
@@ -530,6 +545,32 @@ class EmbeddingsStore(Protocol):
             The embedding vector if found, None otherwise
         """
         ...
+
+    def get_embeddings_batch(self, book_ids: List[UUID]) -> Dict[UUID, List[float]]:
+        """
+        Retrieve the stored embeddings of several books in one lookup.
+
+        Used where many books are compared with each other (MMR
+        diversification): a store backed by a database answers all of them
+        in one round trip instead of one per book.
+
+        The default calls get_embedding once per id, so an adapter that only
+        implements the single-item method keeps working; adapters whose
+        storage can answer several ids at once override it.
+
+        Args:
+            book_ids: Ids to look up (duplicates are allowed)
+
+        Returns:
+            Mapping from id to embedding for the ids that have one (ids
+            without an embedding are left out)
+        """
+        found: Dict[UUID, List[float]] = {}
+        for book_id in dict.fromkeys(book_ids):
+            embedding = self.get_embedding(book_id)
+            if embedding is not None:
+                found[book_id] = embedding
+        return found
 
     def build_index(self) -> None:
         """

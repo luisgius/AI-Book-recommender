@@ -4,6 +4,8 @@ Load a SQLite catalog of this project into a Postgres schema (cloud profile, V12
     python -m scripts.load_postgres --from data/catalog.db --schema eval177 \\
         --embedding-model intfloat/multilingual-e5-large-instruct
     python -m scripts.load_postgres --from data/catalog_small/catalog.db --schema catalog_small
+    SEARCH_PROFILE=cloud python -m scripts.load_postgres --from data/catalog.db --schema eval177_api
+        # documents embedded by the cloud profile's API encoder (qwen/qwen3-embedding-8b, 1024 d, deepinfra)
     python -m scripts.load_postgres --schema eval177 --migrate-only   # schema only
     python -m scripts.load_postgres --schema eval177 --report         # sizes only
     python -m scripts.load_postgres --schema eval177 --drop           # delete the schema
@@ -19,14 +21,24 @@ nothing, re-embeds nothing and rebuilds nothing):
    PostgresBookCatalogRepository (unchanged works are skipped).
 3. Delete works that are no longer in the source catalog.
 4. Fill missing embeddings. Vectors of a local FAISS index built with the
-   same model are reused (an index under data/indexes_ablation/<model>/ or
-   data/indexes/ is used automatically when it holds exactly the catalog's
+   same encoder identity are reused (an index under data/indexes_ablation/<slug>/
+   or data/indexes/ is used automatically when it holds exactly the catalog's
    books; --reuse-index names one explicitly); the rest are encoded with
-   the configured EmbeddingsStore (EMBEDDING_MODEL, or --embedding-model).
+   the configured encoder (EmbeddingSettings, as the API: EMBEDDING_PROVIDER
+   "local" loads the sentence-transformers model EMBEDDING_MODEL, or
+   --embedding-model; "openrouter" uses OpenRouter's embeddings API with
+   EMBEDDING_MODEL, EMBEDDING_DIMENSIONS and EMBEDDING_OPENROUTER_PROVIDER,
+   whose defaults under SEARCH_PROFILE=cloud are the cloud choice). The
+   halfvec dimension is the encoder's. A stored vector is kept while its
+   text is unchanged (works.text_hash) and the encoder identity is the one
+   recorded in catalog_info; a schema loaded with another identity (model,
+   provider or dimension) is refused: use another schema or --drop it.
 5. Build the indexes (GIN, BM25 if lakebase_text is installed, ANN) when
    anything changed or an index is missing, then VACUUM ANALYZE.
-6. Record the facts the search adapters need in catalog_info and print row
-   counts and sizes per table and index.
+6. Record the facts the search adapters need in catalog_info (among them
+   the encoder identity: "embedding_model" is the identity string the API
+   compares with its query encoder, "embedding_identity" holds model,
+   provider and dimension) and print row counts and sizes per table and index.
 
 The source SQLite file is opened read-only.
 """
@@ -38,7 +50,7 @@ import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 from uuid import UUID
 
 from dotenv import load_dotenv
@@ -48,6 +60,8 @@ from app.infrastructure.config.settings import (
     EmbeddingSettings,
     database_url,
 )
+from app.infrastructure.search.text_encoding import model_slug
+from app.infrastructure.usage_recording import UsageRecorder
 from app.infrastructure.db.postgres_book_catalog_repository import PostgresBookCatalogRepository
 from app.infrastructure.db.postgres_connection import PostgresDatabase, redact
 from app.infrastructure.db.postgres_schema import (
@@ -109,6 +123,8 @@ def _canonical(model: str) -> str:
 
 def faiss_index_model(index_dir: Path) -> Optional[str]:
     """Model recorded with a FAISS index (legacy indexes are MiniLM), or None if there is no index."""
+    if not index_dir.is_dir():
+        return None  # nothing to read: avoid importing the FAISS store (torch) for nothing
     from app.infrastructure.search.embeddings_store_faiss import (
         INDEX_FILE,
         LEGACY_INDEX_MODEL,
@@ -166,6 +182,28 @@ def find_reusable_index(
 
 
 # =============================================================================
+# Encoder identity
+# =============================================================================
+
+
+def identity_record(identity: str, dimension: int, encoder: Any = None) -> Dict[str, Any]:
+    """
+    What catalog_info records about the encoder of the stored vectors.
+
+    identity: the encoder's get_model_name() (a local model's name, or
+    "openrouter:<model>?provider=<p>&dimensions=<d>" for the API encoder),
+    compared by PgVectorSearchRepository with the query encoder's.
+    """
+    is_api = encoder is not None and getattr(encoder, "get_device", lambda: "")() == "api"
+    return {
+        "identity": identity,
+        "model": (getattr(encoder, "model", None) or identity) if is_api else identity,
+        "provider": f"openrouter/{getattr(encoder, 'upstream_provider', None) or 'any'}" if is_api else "local",
+        "dimension": int(dimension),
+    }
+
+
+# =============================================================================
 # Load
 # =============================================================================
 
@@ -198,8 +236,9 @@ def load(
     source: Path,
     schema: str,
     *,
-    embedding_model: str,
-    device: Optional[str],
+    embedding_model: Optional[str] = None,
+    encoder: Any = None,
+    device: Optional[str] = None,
     vector_index: str,
     reuse_index: Optional[Path],
     rebuild_indexes: bool = False,
@@ -207,19 +246,33 @@ def load(
     embed_batch: int = EMBED_BATCH,
     log: Callable[[str], None] = _log,
 ) -> Dict[str, Any]:
-    """Run the load steps (see the module docstring); returns what was done."""
+    """
+    Run the load steps (see the module docstring); returns what was done.
+
+    Give exactly one of:
+        embedding_model: a local sentence-transformers model, loaded only if
+            a vector must be computed (reused vectors need no model)
+        encoder: an already built encoder (e.g. OpenRouterEmbeddingEncoder);
+            its get_model_name() is the identity, its get_dimension() the
+            halfvec dimension
+
+    Raises:
+        ValueError: If the schema holds vectors of another encoder identity
+            or dimension, or both or neither of embedding_model and encoder are given
+    """
+    if (embedding_model is None) == (encoder is None):
+        raise ValueError("Give either embedding_model (local model) or encoder")
     started = time.perf_counter()
     catalog = ReadOnlySqliteCatalog(source)
     source_ids = catalog.all_ids()
     log(f"Source {source}: {len(source_ids)} books")
 
-    # 1. Embedding dimension (from a reusable index, the schema, or the model) and schema.
-    from app.infrastructure.search.embeddings_store_faiss import model_slug
-
-    candidates = [Path("data/indexes_ablation") / model_slug(embedding_model) / "faiss_index",
+    # 1. Encoder identity, embedding dimension (from the encoder, a reusable
+    #    index, the schema or the local model) and schema.
+    identity = encoder.get_model_name() if encoder is not None else embedding_model
+    candidates = [Path("data/indexes_ablation") / model_slug(identity) / "faiss_index",
                   Path("data/indexes/faiss_index")]
-    reusable = find_reusable_index(embedding_model, source_ids, candidates, reuse_index)
-    encoder = None
+    reusable = find_reusable_index(identity, source_ids, candidates, reuse_index)
 
     def get_encoder():
         nonlocal encoder
@@ -233,18 +286,25 @@ def load(
     reused_vectors: Dict[UUID, List[float]] = {}
     if reusable is not None:
         reused_vectors = faiss_vectors(reusable)
+        log(f"Reusing {len(reused_vectors)} vectors of {identity} from {reusable}")
+    if encoder is not None:
+        dim = encoder.get_dimension()
+    elif reused_vectors:
         dim = len(next(iter(reused_vectors.values())))
-        log(f"Reusing {len(reused_vectors)} vectors of {embedding_model} from {reusable}")
     else:
         dim = embedding_dimension_in_db(db, schema) or get_encoder().get_dimension()
+    if reused_vectors and len(next(iter(reused_vectors.values()))) != dim:
+        raise ValueError(f"{reusable} holds vectors of another dimension than the encoder's {dim}")
     apply_schema(db, schema, dim)
     info = read_catalog_info(db, schema)
-    if info.get("embedding_model") and _canonical(info["embedding_model"]) != _canonical(embedding_model):
+    stored = info.get("embedding_model")
+    if stored and _canonical(stored) != _canonical(identity):
         raise ValueError(
-            f"Schema '{schema}' holds vectors of '{info['embedding_model']}', not '{embedding_model}': "
-            f"use another schema or --drop it first"
+            f"Schema '{schema}' holds vectors of '{stored}', not of '{identity}' (another model, provider or "
+            f"dimension): use another schema or --drop it first"
         )
-    write_catalog_info(db, schema, {"embedding_model": embedding_model})
+    write_catalog_info(db, schema, {"embedding_model": identity,
+                                    "embedding_identity": identity_record(identity, dim, encoder)})
 
     # 2. Works and texts.
     repo = PostgresBookCatalogRepository(db, schema)
@@ -336,7 +396,8 @@ def load(
         f"(SELECT count(*) FROM {schema}.work_texts) AS texts"
     )[0]
     facts = {
-        "embedding_model": embedding_model,
+        "embedding_model": identity,
+        "embedding_identity": identity_record(identity, dim, encoder),
         "embedding_dimension": dim,
         "vector_index": vector_index,
         "lexical_index": "lakebase_bm25" if has_bm25 else None,
@@ -373,7 +434,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--from", dest="source", type=Path, help="SQLite catalog of this project")
     parser.add_argument("--schema", default=None, help=f"target schema (default DATABASE_SCHEMA or {DEFAULT_DATABASE_SCHEMA})")
-    parser.add_argument("--embedding-model", default=None, help="default: EMBEDDING_MODEL (the configured EmbeddingsStore)")
+    parser.add_argument("--embedding-model", default=None,
+                        help="default: EMBEDDING_MODEL (the configured encoder: EMBEDDING_PROVIDER local or openrouter)")
     parser.add_argument("--device", default=None, help="cpu, mps or cuda (default: EMBEDDING_DEVICE or automatic)")
     parser.add_argument("--vector-index", choices=VECTOR_INDEX_TYPES, default=None,
                         help="ANN index (default lakebase_ann when available, else hnsw)")
@@ -411,26 +473,56 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.source is None:
             _log("--from is required to load a catalog")
             return 2
-        settings = EmbeddingSettings.from_env()
+        settings = embedding_settings(os.environ, args.embedding_model)
         vector_index = args.vector_index or (
             "lakebase_ann" if "lakebase_vector" in _available(db) else "hnsw"
         )
+        recorder = UsageRecorder()
+        encoder = build_document_encoder(settings, recorder)
         load(
             db,
             args.source,
             schema,
-            embedding_model=args.embedding_model or settings.model,
+            embedding_model=None if encoder is not None else settings.model,
+            encoder=encoder,
             device=args.device or settings.device,
             vector_index=vector_index,
             reuse_index=args.reuse_index,
             rebuild_indexes=args.rebuild_indexes,
         )
+        total = recorder.summary()["total"]
+        if total["calls"]:
+            _log(f"Embedding API: {total['calls']} requests, {total['input_tokens']} tokens, "
+                 f"reported cost {total['reported_cost_usd']} USD")
         return 0
     except (ValueError, RuntimeError, FileNotFoundError) as error:
         _log(f"Error: {redact(error)}")
         return 1
     finally:
         db.close()
+
+
+def embedding_settings(env: Mapping[str, str], model_override: Optional[str] = None) -> EmbeddingSettings:
+    """
+    The encoder settings, resolved like the API's (EmbeddingSettings.from_env, with
+    the cloud defaults when SEARCH_PROFILE=cloud); --embedding-model replaces EMBEDDING_MODEL.
+    """
+    if model_override:
+        env = {**env, "EMBEDDING_MODEL": model_override}
+    return EmbeddingSettings.from_env(env)
+
+
+def build_document_encoder(settings: EmbeddingSettings, recorder: Optional[UsageRecorder] = None) -> Any:
+    """
+    The API encoder when EMBEDDING_PROVIDER is openrouter (its requests are
+    recorded in `recorder`), or None for a local model, which load() builds
+    only if some vector must be computed.
+    """
+    if settings.provider != "openrouter":
+        return None
+    from app.infrastructure.search.openrouter_embedding_encoder import OpenRouterEmbeddingEncoder
+
+    return OpenRouterEmbeddingEncoder.from_settings(settings, usage_recorder=recorder)
 
 
 def _available(db: PostgresDatabase) -> set:

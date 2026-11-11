@@ -117,6 +117,11 @@ class SystemSpec:
         embedding: Embedding model id, or None without a vector side
         reranker: Cross-encoder model id, or None without re-ranking
         description: One line for the report
+        zero_score_padding: BM25 legacy padding (BM25SearchRepository option):
+            True fills the lexical list with books that contain no query
+            term, as every arm published before task V13 was measured; the
+            arms declared before V13 set it explicitly so they reproduce.
+            False (default, the fixed adapter) for new arms.
     """
 
     name: str
@@ -124,6 +129,7 @@ class SystemSpec:
     embedding: Optional[str] = None
     reranker: Optional[str] = None
     description: str = ""
+    zero_score_padding: bool = False
 
     def __post_init__(self) -> None:
         if self.lexical is None and self.embedding is None:
@@ -140,25 +146,25 @@ class SystemSpec:
 
 
 SYSTEMS: Tuple[SystemSpec, ...] = (
-    SystemSpec("bm25_whitespace", lexical=WHITESPACE,
+    SystemSpec("bm25_whitespace", lexical=WHITESPACE, zero_score_padding=True,
                description="BM25, legacy whitespace tokenizer (as the shipped index)"),
-    SystemSpec("bm25_normalized", lexical=NORMALIZED,
+    SystemSpec("bm25_normalized", lexical=NORMALIZED, zero_score_padding=True,
                description="BM25, normalizing tokenizer (accents folded, punctuation split, stopwords removed)"),
     SystemSpec("vec_minilm", embedding=MINILM,
                description=f"FAISS, {MINILM} (shipped index data/indexes/faiss_index)"),
     SystemSpec("vec_e5", embedding=E5, description=f"FAISS, {E5} (cosine index)"),
     SystemSpec("vec_qwen3", embedding=QWEN3, description=f"FAISS, {QWEN3} (cosine index)"),
-    SystemSpec("hybrid_legacy", lexical=WHITESPACE, embedding=MINILM,
+    SystemSpec("hybrid_legacy", lexical=WHITESPACE, embedding=MINILM, zero_score_padding=True,
                description="RRF(bm25_whitespace, vec_minilm): the system in production today"),
-    SystemSpec("hybrid_norm_minilm", lexical=NORMALIZED, embedding=MINILM,
+    SystemSpec("hybrid_norm_minilm", lexical=NORMALIZED, embedding=MINILM, zero_score_padding=True,
                description="RRF(bm25_normalized, vec_minilm)"),
-    SystemSpec("hybrid_norm_e5", lexical=NORMALIZED, embedding=E5,
+    SystemSpec("hybrid_norm_e5", lexical=NORMALIZED, embedding=E5, zero_score_padding=True,
                description="RRF(bm25_normalized, vec_e5)"),
-    SystemSpec("hybrid_norm_qwen3", lexical=NORMALIZED, embedding=QWEN3,
+    SystemSpec("hybrid_norm_qwen3", lexical=NORMALIZED, embedding=QWEN3, zero_score_padding=True,
                description="RRF(bm25_normalized, vec_qwen3)"),
-    SystemSpec("hybrid_norm_e5_bge", lexical=NORMALIZED, embedding=E5, reranker=BGE,
+    SystemSpec("hybrid_norm_e5_bge", lexical=NORMALIZED, embedding=E5, reranker=BGE, zero_score_padding=True,
                description=f"hybrid_norm_e5 + {BGE} over the top {RERANK_DEPTH}"),
-    SystemSpec("hybrid_norm_e5_mmarco", lexical=NORMALIZED, embedding=E5, reranker=MMARCO,
+    SystemSpec("hybrid_norm_e5_mmarco", lexical=NORMALIZED, embedding=E5, reranker=MMARCO, zero_score_padding=True,
                description=f"hybrid_norm_e5 + {MMARCO} over the top {RERANK_DEPTH}"),
 )
 
@@ -848,7 +854,7 @@ class ModelStack:
                 (the LLM reranker of V07); None loads spec.reranker, if any
         """
         self._reranker = None  # one reranker at a time
-        lexical = self._lexical(spec.lexical) if spec.lexical else None
+        lexical = self._lexical(spec.lexical, zero_score_padding=spec.zero_score_padding) if spec.lexical else None
         if spec.embedding:
             self._load_embedding_model(spec.embedding)
         if reranker is None and spec.reranker:
@@ -856,19 +862,30 @@ class ModelStack:
         return make_searcher(spec, lexical=lexical, vector=self._vector, embeddings=self._embeddings,
                              reranker=reranker)
 
-    def _lexical(self, tokenizer: str):
+    def _lexical(self, tokenizer: str, *, zero_score_padding: bool):
+        """
+        The in-memory BM25 repository of a tokenizer and padding mode (built once).
+
+        zero_score_padding has no default on purpose: every caller states
+        whether it reproduces a run published before V13 (True) or measures
+        the fixed adapter (False).
+        """
         from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
 
-        if tokenizer not in self._bm25:
+        key = (tokenizer, zero_score_padding)
+        if key not in self._bm25:
             started = time.perf_counter()
-            repo = BM25SearchRepository(tokenizer=tokenizer)
+            repo = BM25SearchRepository(tokenizer=tokenizer, zero_score_padding=zero_score_padding)
             repo.build_index(self._books)
-            self.costs[f"bm25:{tokenizer}"] = {
+            # The cost key of the legacy repository is unchanged, so reports
+            # published before V13 are reproduced as they were.
+            cost_key = f"bm25:{tokenizer}" if zero_score_padding else f"bm25:{tokenizer}:matching_only"
+            self.costs[cost_key] = {
                 "role": "lexical", "index_build_seconds": time.perf_counter() - started,
                 "index_source": "built in memory from the catalog",
             }
-            self._bm25[tokenizer] = repo
-        return self._bm25[tokenizer]
+            self._bm25[key] = repo
+        return self._bm25[key]
 
     def _encode_catalog(self, store) -> float:
         """Encode every book and build the FAISS index in store (V02 code); seconds taken."""

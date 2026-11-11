@@ -316,6 +316,61 @@ def test_local_embeddings_stay_the_default(monkeypatch, clean_dependencies):
         def __init__(self, model_name="all-MiniLM-L6-v2", device=None, encoder=None):
             created.append((model_name, device, encoder))
 
-    monkeypatch.setattr(dependencies, "EmbeddingsStoreFaiss", RecordingStore)
+    monkeypatch.setattr("app.infrastructure.search.embeddings_store_faiss.EmbeddingsStoreFaiss", RecordingStore)
     dependencies.build_embeddings_store(EmbeddingSettings.from_env({"EMBEDDING_DEVICE": "cpu"}))
     assert created == [("all-MiniLM-L6-v2", "cpu", None)]
+
+
+# =============================================================================
+# Whole-attempt deadline of the OpenRouter client (V13)
+# =============================================================================
+
+
+def test_a_response_trickling_keep_alive_bytes_is_abandoned_at_the_deadline():
+    """OpenRouter keeps a busy request open with whitespace; each read succeeds, the attempt must not."""
+    import time as time_module
+
+    from app.infrastructure.search.openrouter_http import OpenRouterError, OpenRouterHttp
+
+    class Trickle(httpx.SyncByteStream):
+        def __iter__(self):
+            for _ in range(1000):
+                time_module.sleep(0.01)
+                yield b" "
+
+    attempts = []
+
+    def handler(request):
+        attempts.append(1)
+        return httpx.Response(200, stream=Trickle())
+
+    http = OpenRouterHttp(api_key="k", timeout_s=0.1, max_retries=1, backoff_s=0.0,
+                          transport=httpx.MockTransport(handler), sleep=lambda s: None)
+    started = time_module.perf_counter()
+    with pytest.raises(OpenRouterError) as error:
+        http.post("embeddings", {"input": ["x"]})
+    assert time_module.perf_counter() - started < 2.0
+    assert error.value.transient and len(attempts) == 2  # retried once, then given up
+
+
+def test_compressed_responses_are_still_decoded():
+    import gzip
+
+    from app.infrastructure.search.openrouter_http import OpenRouterHttp
+
+    payload = json.dumps({"results": [{"index": 0, "relevance_score": 0.5}]}).encode()
+
+    def handler(request):
+        return httpx.Response(200, headers={"Content-Encoding": "gzip"}, content=gzip.compress(payload))
+
+    http = OpenRouterHttp(api_key="k", transport=httpx.MockTransport(handler))
+    class Gzipped(httpx.SyncByteStream):  # a streamed body, as the network delivers it
+        def __iter__(self):
+            yield gzip.compress(payload)
+
+    def streamed(request):
+        return httpx.Response(200, headers={"Content-Encoding": "gzip"}, stream=Gzipped())
+
+    assert http.post("rerank", {}).body == json.loads(payload)
+    streaming = OpenRouterHttp(api_key="k", transport=httpx.MockTransport(streamed))
+    assert streaming.post("rerank", {}).body == json.loads(payload)

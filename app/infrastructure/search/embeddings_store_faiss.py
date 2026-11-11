@@ -471,6 +471,23 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         book_id_str = str(book_id)
         return self._embeddings.get(book_id_str)
 
+    def get_embeddings_batch(self, book_ids: List[UUID]) -> Dict[UUID, List[float]]:
+        """
+        Stored embeddings of several books (in-memory lookups).
+
+        Args:
+            book_ids: Book UUIDs to look up.
+
+        Returns:
+            Mapping from id to embedding for the ids that have one.
+        """
+        found: Dict[UUID, List[float]] = {}
+        for book_id in book_ids:
+            embedding = self._embeddings.get(str(book_id))
+            if embedding is not None:
+                found[book_id] = embedding
+        return found
+
     # -------------------------------------------------------------------------
     # Index building and persistence
     # -------------------------------------------------------------------------

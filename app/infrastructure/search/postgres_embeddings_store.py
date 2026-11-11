@@ -1,21 +1,25 @@
 """
 EmbeddingsStore of the cloud profile: the model encodes, Postgres stores.
 
-Texts are encoded by the configured embeddings store (today the local
-sentence-transformers model of EmbeddingsStoreFaiss, used only as an
-encoder: no FAISS index is loaded). Document vectors are stored in
+Texts are encoded by the configured encoder: OpenRouterEmbeddingEncoder (the
+cloud default, no model in the process) or a local sentence-transformers
+model through EmbeddingsStoreFaiss, used only as an encoder (no FAISS index
+is loaded). Anything with the generate_* methods, get_dimension and
+get_model_name works. Document vectors are stored in
 <schema>.works.embedding and the ANN index is built there; this store reads
-and writes them, while PgVectorSearchRepository searches them.
+and writes them (get_embeddings_batch answers many ids in one statement),
+while PgVectorSearchRepository searches them.
 """
 
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from app.domain.ports import EmbeddingsStore
 from app.infrastructure.db.postgres_connection import PostgresDatabase
 from app.infrastructure.db.postgres_rows import normalize, parse_vector, vector_literal
 from app.infrastructure.db.postgres_schema import build_vector_index, read_catalog_info, validate_schema_name
+from app.infrastructure.search.text_encoding import TextEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +27,9 @@ logger = logging.getLogger(__name__)
 class PostgresEmbeddingsStore(EmbeddingsStore):
     """
     Args:
-        encoder: Store whose generate_* methods encode texts (its own index,
-            if any, is not used)
+        encoder: Encoder of queries and documents: a TextEncoder such as
+            OpenRouterEmbeddingEncoder, or a store whose generate_* methods
+            encode (its own index, if any, is not used)
         db: Database
         schema: Catalog schema
         vector_index: ANN index type built by build_index ("lakebase_ann" or "hnsw")
@@ -33,7 +38,7 @@ class PostgresEmbeddingsStore(EmbeddingsStore):
 
     def __init__(
         self,
-        encoder: EmbeddingsStore,
+        encoder: Union[TextEncoder, EmbeddingsStore],
         db: PostgresDatabase,
         schema: str,
         vector_index: str = "lakebase_ann",
@@ -104,6 +109,18 @@ class PostgresEmbeddingsStore(EmbeddingsStore):
             {"id": book_id},
         )
         return parse_vector(rows[0]["e"]) if rows else None
+
+    def get_embeddings_batch(self, book_ids: List[UUID]) -> Dict[UUID, List[float]]:
+        """Stored vectors of several works in ONE statement (one round trip); ids without one are left out."""
+        ids = list(dict.fromkeys(book_ids))
+        if not ids:
+            return {}
+        rows = self._db.query(
+            f"SELECT id, embedding::text AS e FROM {self._schema}.works "
+            f"WHERE id = ANY(%(ids)s::uuid[]) AND embedding IS NOT NULL",
+            {"ids": ids},
+        )
+        return {row["id"]: parse_vector(row["e"]) for row in rows}
 
     def build_index(self) -> None:
         """(Re)build the ANN index over the stored vectors."""

@@ -65,3 +65,44 @@ def test_reusable_index_needs_the_same_model_and_catalog(tmp_path):
 
     vectors = faiss_vectors(same)
     assert set(vectors) == set(ids) and len(next(iter(vectors.values()))) == 3
+
+
+# --- encoder identity (V13) ----------------------------------------------------------
+
+
+def test_identity_record_of_a_local_model_and_of_the_api_encoder():
+    from app.infrastructure.search.openrouter_embedding_encoder import OpenRouterEmbeddingEncoder
+    from scripts.load_postgres import identity_record
+
+    assert identity_record("intfloat/multilingual-e5-large-instruct", 1024) == {
+        "identity": "intfloat/multilingual-e5-large-instruct", "model": "intfloat/multilingual-e5-large-instruct",
+        "provider": "local", "dimension": 1024}
+    api = OpenRouterEmbeddingEncoder("qwen/qwen3-embedding-8b", dimensions=1024, upstream_provider="deepinfra",
+                                     api_key="test-key")
+    assert identity_record(api.get_model_name(), api.get_dimension(), api) == {
+        "identity": "openrouter:qwen/qwen3-embedding-8b?provider=deepinfra&dimensions=1024",
+        "model": "qwen/qwen3-embedding-8b", "provider": "openrouter/deepinfra", "dimension": 1024}
+
+
+def test_loader_encoder_follows_the_api_settings(monkeypatch):
+    from app.infrastructure.search.openrouter_embedding_encoder import OpenRouterEmbeddingEncoder
+    from scripts.load_postgres import build_document_encoder, embedding_settings
+
+    cloud = embedding_settings({"SEARCH_PROFILE": "cloud", "OPENROUTER_API_KEY": "k"})
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    encoder = build_document_encoder(cloud)
+    assert isinstance(encoder, OpenRouterEmbeddingEncoder)
+    assert encoder.get_model_name() == "openrouter:qwen/qwen3-embedding-8b?provider=deepinfra&dimensions=1024"
+    local = embedding_settings({}, model_override="intfloat/multilingual-e5-large-instruct")
+    assert local.provider == "local" and local.model == "intfloat/multilingual-e5-large-instruct"
+    assert build_document_encoder(local) is None  # load() builds the local model only if needed
+
+
+def test_load_needs_exactly_one_encoder_source(tmp_path):
+    from scripts.load_postgres import load
+
+    with pytest.raises(ValueError, match="either embedding_model"):
+        load(None, tmp_path / "x.db", "s", vector_index="hnsw", reuse_index=None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="either embedding_model"):
+        load(None, tmp_path / "x.db", "s", embedding_model="m", encoder=object(),  # type: ignore[arg-type]
+             vector_index="hnsw", reuse_index=None)

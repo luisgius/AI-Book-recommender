@@ -437,15 +437,16 @@ def run_measurement(args: argparse.Namespace, log: Callable[[str], None]) -> Dic
 
     db = _database()
     try:
-        bm25_local = BM25SearchRepository(tokenizer="normalized")
+        # Legacy padding: bm25_normalized and hybrid_norm_e5 as published (V13 fixed the adapter)
+        bm25_local = BM25SearchRepository(tokenizer="normalized", zero_score_padding=True)
         bm25_local.build_index(books)
         faiss_vector = FaissVectorSearchRepository(store, books)
         pg_lexical = {"pg_bm25": PostgresLexicalSearchRepository(db, args.schema, "bm25"),
                       "pg_fts_tsrank": PostgresLexicalSearchRepository(db, args.schema, "ts_rank_cd")}
-        pg_vector = {"pg_vec_exact": PgVectorSearchRepository(db, args.schema, "exact", expected_model=E5),
-                     "pg_vec_ann": PgVectorSearchRepository(db, args.schema, "approximate", expected_model=E5)}
+        pg_vector = {"pg_vec_exact": PgVectorSearchRepository(db, args.schema, "exact", expected_identity=E5),
+                     "pg_vec_ann": PgVectorSearchRepository(db, args.schema, "approximate", expected_identity=E5)}
         if args.hnsw_schema:
-            pg_vector["pg_vec_hnsw"] = PgVectorSearchRepository(db, args.hnsw_schema, "approximate", expected_model=E5)
+            pg_vector["pg_vec_hnsw"] = PgVectorSearchRepository(db, args.hnsw_schema, "approximate", expected_identity=E5)
 
         searchers: Dict[str, Searcher] = {}
         for spec in local_specs():
@@ -553,8 +554,8 @@ def ann_recall(args: argparse.Namespace, log: Callable[[str], None]) -> Dict[str
     vectors = {q.query_id: store.generate_query_embedding(q.text) for q in queries}
     db = _database()
     try:
-        exact = PgVectorSearchRepository(db, args.schema, "exact", expected_model=E5)
-        approx = PgVectorSearchRepository(db, args.schema, "approximate", expected_model=E5)
+        exact = PgVectorSearchRepository(db, args.schema, "exact", expected_identity=E5)
+        approx = PgVectorSearchRepository(db, args.schema, "approximate", expected_identity=E5)
         bm25 = PostgresLexicalSearchRepository(db, args.schema, "bm25")
         index_type = approx.index_type()
         timings: Dict[str, List[float]] = {"exact": [], "approximate": [], "bm25": []}
@@ -619,7 +620,7 @@ def cold_start(args: argparse.Namespace, log: Callable[[str], None]) -> Dict[str
         """The cloud profile's adapters as the API wires them (fresh: no catalog facts read yet)."""
         return SearchService(
             lexical_search=PostgresLexicalSearchRepository(db, args.schema, "bm25"),
-            vector_search=PgVectorSearchRepository(db, args.schema, "exact", expected_model=E5),
+            vector_search=PgVectorSearchRepository(db, args.schema, "exact", expected_identity=E5),
             embeddings_store=PostgresEmbeddingsStore(PrecomputedEncoder(), db, args.schema),  # type: ignore[arg-type]
         )
 

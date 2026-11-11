@@ -9,7 +9,12 @@ simpler than another client library.
 Behaviour:
 - POST JSON to https://openrouter.ai/api/v1/<path> with the API key as a
   bearer token. No identifying header is sent (no HTTP-Referer, no X-Title).
-- One timeout per attempt (timeout_s).
+- One timeout per attempt (timeout_s), for the whole attempt: the body is
+  read in chunks and the attempt is abandoned (a transient timeout) once it
+  has lasted timeout_s. A per-read timeout alone is not enough: while an
+  upstream provider is busy, OpenRouter keeps a non-streaming request open by
+  sending keep-alive whitespace, so every read succeeds and a request could
+  wait indefinitely (seen on 2026-11-11 with DeepInfra "Model busy", V13).
 - Transient failures are retried up to max_retries times, waiting
   backoff_s * 2^(attempt-1) seconds, or the Retry-After header when the
   server sends one (at most MAX_WAIT_S): timeouts, connection errors, and
@@ -113,6 +118,7 @@ class OpenRouterHttp:
         if max_retries < 0:
             raise ValueError(f"max_retries must be >= 0, got {max_retries}")
         key = api_key if api_key is not None else openrouter_api_key()
+        self._timeout_s = timeout_s
         self._max_retries = max_retries
         self._backoff_s = backoff_s
         self._sleep = sleep
@@ -149,7 +155,7 @@ class OpenRouterHttp:
             attempt += 1
             response: Optional[httpx.Response] = None
             try:
-                response = self._client.post(path, json=dict(body))
+                response = self._post_once(path, body)
             except (httpx.TimeoutException, httpx.TransportError) as error:
                 failure = OpenRouterError(f"POST {path}: {type(error).__name__}", transient=True)
             else:
@@ -164,6 +170,28 @@ class OpenRouterHttp:
             wait = self._wait_s(attempt, response)
             logger.warning("OpenRouter %s failed (%s); retrying in %.1f s", path, failure, wait)
             self._sleep(wait)
+
+    def _post_once(self, path: str, body: Mapping[str, Any]) -> httpx.Response:
+        """
+        One attempt, abandoned once it has lasted timeout_s (see the module docstring).
+
+        Raises:
+            httpx.ReadTimeout: When the whole response has not arrived in time
+        """
+        deadline = time.perf_counter() + self._timeout_s
+        with self._client.stream("POST", path, json=dict(body)) as streamed:
+            if streamed.is_stream_consumed:  # already read into memory (in-memory test transports)
+                return streamed
+            chunks = []
+            # Raw (still compressed) bytes: the Response built below decodes them
+            # with the response's own Content-Encoding header.
+            for chunk in streamed.iter_raw():
+                chunks.append(chunk)
+                if time.perf_counter() > deadline:
+                    raise httpx.ReadTimeout(f"no complete response within {self._timeout_s:.0f} s",
+                                            request=streamed.request)
+            return httpx.Response(streamed.status_code, headers=streamed.headers, content=b"".join(chunks),
+                                  request=streamed.request)
 
     @staticmethod
     def _check(path: str, response: httpx.Response) -> Optional[OpenRouterError]:

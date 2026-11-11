@@ -79,7 +79,7 @@ def clean_dependencies():
 def test_embeddings_store_is_built_from_settings(monkeypatch, tmp_path: Path, clean_dependencies):
     monkeypatch.setenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-large-instruct")
     monkeypatch.setenv("EMBEDDING_DEVICE", "cpu")
-    monkeypatch.setattr(dependencies, "EmbeddingsStoreFaiss", RecordingStore)
+    monkeypatch.setattr("app.infrastructure.search.embeddings_store_faiss.EmbeddingsStoreFaiss", RecordingStore)
     monkeypatch.setattr(dependencies, "INDEXES_DIR", tmp_path)
     (tmp_path / "faiss_index").mkdir()
 
@@ -98,7 +98,7 @@ def test_default_wiring_keeps_minilm(monkeypatch, tmp_path: Path, clean_dependen
     monkeypatch.delenv("EMBEDDING_MODEL", raising=False)
     monkeypatch.delenv("EMBEDDING_DEVICE", raising=False)
     monkeypatch.setattr(dependencies, "load_dotenv", lambda *args, **kwargs: None)
-    monkeypatch.setattr(dependencies, "EmbeddingsStoreFaiss", RecordingStore)
+    monkeypatch.setattr("app.infrastructure.search.embeddings_store_faiss.EmbeddingsStoreFaiss", RecordingStore)
     monkeypatch.setattr(dependencies, "INDEXES_DIR", tmp_path)
 
     dependencies.get_embeddings_store()

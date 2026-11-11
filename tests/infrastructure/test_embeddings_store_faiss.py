@@ -526,3 +526,19 @@ class TestEdgeCases:
         mapping = store.get_id_mapping()
         assert str(book_id) in mapping
         assert isinstance(mapping[0], str)
+
+
+class TestBatchLookup:
+    """get_embeddings_batch (V13): several stored vectors in one call."""
+
+    def test_returns_the_stored_vectors_and_leaves_out_unknown_ids(self, store: EmbeddingsStoreFaiss):
+        a, b, unknown = uuid4(), uuid4(), uuid4()
+        dim = store.get_dimension()
+        store.store_embedding(a, [0.1] * dim)
+        store.store_embedding(b, [0.2] * dim)
+
+        found = store.get_embeddings_batch([a, unknown, b, a])
+
+        assert found == {a: [0.1] * dim, b: [0.2] * dim}
+        assert found[a] == store.get_embedding(a)
+        assert store.get_embeddings_batch([]) == {}

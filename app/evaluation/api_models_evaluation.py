@@ -521,7 +521,7 @@ class TimingStack(ModelStack):
 
     def searcher_for(self, spec: SystemSpec, reranker: Optional[Reranker] = None):
         self._reranker = None  # one reranker at a time
-        lexical = self._lexical(spec.lexical) if spec.lexical else None
+        lexical = self._lexical(spec.lexical, zero_score_padding=spec.zero_score_padding) if spec.lexical else None
         if spec.embedding:
             self._load_embedding_model(spec.embedding)
         if reranker is None and spec.reranker:
@@ -531,8 +531,8 @@ class TimingStack(ModelStack):
         return make_searcher(spec, lexical=lexical, vector=self._vector, embeddings=embeddings, reranker=timed)
 
     def lexical(self, tokenizer: str):
-        """The in-memory BM25 repository of a tokenizer (built once)."""
-        return self._lexical(tokenizer)
+        """The in-memory BM25 repository of a tokenizer (built once), with the legacy padding of V16's runs."""
+        return self._lexical(tokenizer, zero_score_padding=True)
 
 
 def run_local(search: Callable[[str], Sequence[SearchResult]], queries: Sequence[TestQuery],
@@ -763,7 +763,7 @@ def measure_e2e(embedding_arm: EmbeddingArm, rerank_arm: RerankArm, http: OpenRo
     """
     store, vector, _ = embed_documents(embedding_arm.build(http), transport, books)  # cached document calls
     reranker = rerank_arm.build(http)
-    spec = SystemSpec(E2E, lexical=NORMALIZED, embedding=store.get_model_name())
+    spec = SystemSpec(E2E, lexical=NORMALIZED, embedding=store.get_model_name(), zero_score_padding=True)
     search = make_searcher(spec, lexical=stack.lexical(NORMALIZED), vector=vector, embeddings=store,
                            reranker=reranker)
     record: Dict[str, Any] = {

@@ -983,7 +983,8 @@ def run_fill(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
     catalog = SqliteBookCatalogRepository(Path(args.db_path))
     books = catalog.get_all()
     books_by_id = {book.id: book for book in books}
-    bm25 = BM25SearchRepository()
+    # Legacy padding (zero-score books fill the list): reproduces the V05 pool (V13)
+    bm25 = BM25SearchRepository(zero_score_padding=True)
     bm25.load_index(str(Path(args.indexes_dir) / "bm25_index.pkl"))
     embeddings = EmbeddingsStoreFaiss()
     embeddings.load_index(str(Path(args.indexes_dir) / "faiss_index"))

@@ -71,7 +71,7 @@ def cloud(monkeypatch):
     deps.reset_dependencies()
     monkeypatch.setattr(deps, "_profile_settings", SearchProfileSettings("cloud", "eval177", "ts_rank_cd", "exact"))
     monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@127.0.0.1:1/none")
-    monkeypatch.setattr(deps, "EmbeddingsStoreFaiss", FakeEncoderStore)
+    monkeypatch.setattr("app.infrastructure.search.embeddings_store_faiss.EmbeddingsStoreFaiss", FakeEncoderStore)
     yield
     deps.reset_dependencies()
 

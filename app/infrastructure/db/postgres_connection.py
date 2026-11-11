@@ -19,6 +19,13 @@ pooled connection string (PgBouncer in transaction mode):
 - Timeouts: connect timeout, a statement_timeout per call, and a bounded wait
   for a free pooled connection. A call that fails because its connection
   died (e.g. the compute was suspended) is retried once on a fresh one.
+- TCP keepalives (V13): statement_timeout is enforced by the server, so a
+  connection whose network path died silently would leave a call waiting
+  for the operating system's TCP timeout (about five minutes, seen on
+  2026-11-11 from the measuring machine). Keepalive probes after 10 s of
+  silence, every 5 s, three times, turn that into a connection error after
+  about 25 s, which the retry above then handles; TCP_USER_TIMEOUT (Linux
+  only, ignored elsewhere) bounds unacknowledged writes the same way.
 
 Connection strings are never logged; errors are redacted (redact()).
 """
@@ -40,6 +47,15 @@ DEFAULT_MAX_IDLE_S = 240.0  # below Neon's 5-minute scale-to-zero timeout
 DEFAULT_CONNECT_TIMEOUT_S = 10
 DEFAULT_STATEMENT_TIMEOUT_MS = 15000
 DEFAULT_POOL_WAIT_S = 15.0
+
+# libpq connection options that detect a dead network path (see the module docstring).
+TCP_KEEPALIVE_OPTIONS = {
+    "keepalives": 1,
+    "keepalives_idle": 10,
+    "keepalives_interval": 5,
+    "keepalives_count": 3,
+    "tcp_user_timeout": 25000,  # ms; Linux only
+}
 
 _URL_PATTERN = re.compile(r"postgres(?:ql)?://\S+", re.IGNORECASE)
 _SECRET_PATTERN = re.compile(r"(password|user)\s*=\s*\S+", re.IGNORECASE)
@@ -118,6 +134,7 @@ class PostgresDatabase:
                 "prepare_threshold": None,  # no server-side prepared statements
                 "connect_timeout": connect_timeout_s,
                 "cursor_factory": psycopg.ClientCursor,  # client-side binding
+                **TCP_KEEPALIVE_OPTIONS,
             },
         )
         self._open_lock = threading.Lock()

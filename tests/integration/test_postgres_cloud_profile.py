@@ -204,7 +204,7 @@ def _brute_force(query, k):
 def test_vector_search_matches_brute_force(setup, mode):
     from app.infrastructure.search.pgvector_search_repository import PgVectorSearchRepository
 
-    repo = PgVectorSearchRepository(setup["db"], setup["schema"], mode, expected_model=MODEL)
+    repo = PgVectorSearchRepository(setup["db"], setup["schema"], mode, expected_identity=MODEL)
     query = [0.95, 0.05, 0.0, 0.0]
     results = repo.search(query, max_results=3)
     assert [r.book.id for r in results] == _brute_force(query, 3)
@@ -239,3 +239,97 @@ def test_embedding_is_kept_on_metadata_change_and_reset_on_text_change(setup):
     assert store.get_embedding(poems.id) is None
     store.store_embeddings_batch([poems.id], [VECTORS[poems.id]])
     assert store.get_embedding(poems.id) == pytest.approx([0.0, 0.0, 0.0, 1.0])
+
+
+# --- V13: encoder identity, batch lookups, catalog facts ----------------------------
+
+
+API_IDENTITY = "openrouter:test/api-model?provider=testprovider&dimensions=4"
+
+
+class FakeApiEncoder:
+    """Stands in for OpenRouterEmbeddingEncoder: vectors by book text, counts the texts it encodes."""
+
+    model = "test/api-model"
+    upstream_provider = "testprovider"
+
+    def __init__(self):
+        self.encoded = 0
+        self._by_text = {b.get_searchable_text(): VECTORS[b.id] for b in BOOKS}
+
+    def generate_embeddings_batch(self, texts):
+        self.encoded += len(texts)
+        return [self._by_text.get(text, [0.5, 0.5, 0.5, 0.5]) for text in texts]
+
+    def generate_query_embedding(self, text):
+        return [0.95, 0.05, 0.0, 0.0]
+
+    def get_dimension(self):
+        return 4
+
+    def get_model_name(self):
+        return API_IDENTITY
+
+    def get_device(self):
+        return "api"
+
+
+@pytest.fixture(scope="module")
+def api_setup(setup):
+    from app.infrastructure.db.postgres_schema import drop_schema
+    from scripts.load_postgres import load
+
+    schema = f"it_v13_{uuid4().hex[:8]}"
+    encoder = FakeApiEncoder()
+    first = load(setup["direct"], setup["source"], schema, encoder=encoder, vector_index=setup["vector_index"],
+                 reuse_index=None, log=lambda message: None)
+    encoded_first = encoder.encoded
+    second = load(setup["direct"], setup["source"], schema, encoder=encoder, vector_index=setup["vector_index"],
+                  reuse_index=None, log=lambda message: None)
+    try:
+        yield {**setup, "api_schema": schema, "encoder": encoder, "first": first, "second": second,
+               "encoded_first": encoded_first, "encoded_second": encoder.encoded - encoded_first}
+    finally:
+        drop_schema(setup["direct"], schema)
+
+
+def test_loader_embeds_with_the_api_encoder_and_records_its_identity(api_setup):
+    facts = api_setup["first"]["facts"]
+    assert api_setup["encoded_first"] == 5 and api_setup["encoded_second"] == 0  # stored vectors reused
+    assert facts["embedding_model"] == API_IDENTITY and facts["embedding_dimension"] == 4
+    assert facts["embedding_identity"] == {"identity": API_IDENTITY, "model": "test/api-model",
+                                           "provider": "openrouter/testprovider", "dimension": 4}
+
+
+def test_loader_refuses_a_schema_of_another_encoder_identity(setup):
+    from scripts.load_postgres import load
+
+    with pytest.raises(ValueError, match="holds vectors of 'test/fake-embedding-model'"):
+        load(setup["direct"], setup["source"], setup["schema"], encoder=FakeApiEncoder(),
+             vector_index=setup["vector_index"], reuse_index=None, log=lambda message: None)
+
+
+def test_vector_search_refuses_another_identity_and_serves_its_own(api_setup):
+    from app.infrastructure.search.pgvector_search_repository import (
+        EmbeddingModelMismatchError,
+        PgVectorSearchRepository,
+    )
+
+    own = PgVectorSearchRepository(api_setup["db"], api_setup["api_schema"], "exact", expected_identity=API_IDENTITY)
+    assert [r.book.id for r in own.search([0.95, 0.05, 0.0, 0.0], 2)] == _brute_force([0.95, 0.05, 0.0, 0.0], 2)
+    other = PgVectorSearchRepository(api_setup["db"], api_setup["api_schema"], "exact", expected_identity=MODEL)
+    with pytest.raises(EmbeddingModelMismatchError, match=MODEL):
+        other.search([1.0, 0.0, 0.0, 0.0], 2)
+
+
+def test_batch_embeddings_and_categories_in_one_statement_each(setup):
+    from app.infrastructure.db.postgres_book_catalog_repository import PostgresBookCatalogRepository
+    from app.infrastructure.search.postgres_embeddings_store import PostgresEmbeddingsStore
+
+    store = PostgresEmbeddingsStore(FakeApiEncoder(), setup["db"], setup["schema"])  # type: ignore[arg-type]
+    found = store.get_embeddings_batch([b.id for b in BOOKS] + [uuid4()])
+    assert set(found) == {b.id for b in BOOKS}
+    for book in BOOKS:
+        assert found[book.id] == pytest.approx(store.get_embedding(book.id), abs=1e-3)
+    repo = PostgresBookCatalogRepository(setup["db"], setup["schema"])
+    assert repo.get_categories() == ["Computers", "Fiction", "Poetry"]

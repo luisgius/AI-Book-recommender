@@ -379,8 +379,9 @@ class TestBM25Tokenizers:
 
         results = repo.search(query, max_results=10)
 
-        # No document shares a token with the query: every score is zero
-        assert all(result.lexical_score == 0 for result in results)
+        # No document shares a token with the query: nothing matches (V13:
+        # the books with score zero are no longer returned as padding)
+        assert results == []
 
     def test_query_without_enye_matches_document_with_enye_when_normalized(
         self, sample_books
@@ -397,7 +398,7 @@ class TestBM25Tokenizers:
 
         assert normalized_results[0].book.id == spain_book.id
         assert normalized_results[0].lexical_score > 0
-        assert whitespace_results[0].lexical_score == 0
+        assert whitespace_results == []  # no document has the token "espana"
 
     def test_save_index_persists_tokenizer_name(self, sample_books, tmp_path):
         index_path = tmp_path / "index.pkl"
@@ -474,7 +475,7 @@ class TestBM25Tokenizers:
         assert repo.tokenizer_name == "whitespace"
         # Queries are tokenized like the legacy documents: "españa." keeps its period
         assert repo._tokenize("Historia de España.") == ["historia", "de", "españa."]
-        assert repo.search("espana", max_results=1)[0].lexical_score == 0
+        assert repo.search("espana", max_results=1) == []  # "españa." is another token
 
     def test_load_index_with_unknown_tokenizer_fails_without_changing_state(
         self, sample_books, tmp_path
@@ -495,3 +496,86 @@ class TestBM25Tokenizers:
 
         assert repo.tokenizer_name == "whitespace"
         assert not repo.is_ready()
+
+
+def _plain_book(title: str, description: str = "", language: str = "en") -> Book:
+    return Book(id=uuid4(), title=title, authors=["Test Author"], description=description or None,
+                language=language, categories=[], source="test", source_id=title)
+
+
+class TestOnlyMatchingBooks:
+    """V13: BM25 returns only books that contain a query term; the old padding is an explicit option."""
+
+    def test_returns_only_books_with_a_query_term(self, bm25_repo):
+        results = bm25_repo.search("python", max_results=10)
+
+        assert [r.book.title for r in results] == ["Python Programming for Beginners"]
+        assert results[0].rank == 1 and results[0].lexical_score > 0
+
+    def test_no_matching_book_gives_an_empty_list(self, bm25_repo):
+        assert bm25_repo.search("cooking recipes", max_results=10) == []
+
+    def test_a_query_of_stopwords_only_gives_an_empty_list(self, bm25_repo):
+        # The normalizing tokenizer drops English and Spanish stopwords
+        assert bm25_repo.search("de la the", max_results=10) == []
+
+    def test_fewer_matches_than_max_results_are_not_padded(self, bm25_repo):
+        results = bm25_repo.search("neural", max_results=10)
+
+        assert len(results) == 2
+        assert {r.book.title for r in results} == {"Deep Learning Fundamentals", "Advanced Neural Networks"}
+        assert [r.rank for r in results] == [1, 2]
+
+    def test_filters_apply_to_the_matching_books_only(self, bm25_repo):
+        results = bm25_repo.search("learning", max_results=10, filters=SearchFilters(min_year=2021))
+
+        assert {r.book.title for r in results} == {"Deep Learning Fundamentals", "Advanced Neural Networks"}
+
+    def test_matching_is_by_term_presence_even_with_a_negative_bm25_weight(self):
+        # "book" is in every document: in a tiny corpus rank_bm25's IDF floor
+        # gives it a negative weight, yet the books do contain the term.
+        books = [_plain_book("book alpha"), _plain_book("book beta"), _plain_book("book gamma")]
+        repo = BM25SearchRepository()
+        repo.build_index(books)
+
+        results = repo.search("book", max_results=10)
+
+        assert {r.book.id for r in results} == {b.id for b in books}
+        assert all(r.lexical_score <= 0 for r in results)
+        assert repo.search("delta", max_results=10) == []
+
+    def test_legacy_padding_fills_the_list_with_zero_score_books(self, sample_books):
+        legacy = BM25SearchRepository(zero_score_padding=True)
+        legacy.build_index(sample_books)
+
+        results = legacy.search("python", max_results=4)
+
+        assert len(results) == 4
+        assert results[0].book.title == "Python Programming for Beginners"
+        assert all(r.lexical_score == 0 for r in results[1:])
+        assert legacy.search("cooking recipes", max_results=3)  # padded even without any match
+
+    @pytest.mark.parametrize("query", ["python", "learning", "neural networks", "historia espana", "cooking"])
+    def test_fixed_list_is_the_legacy_list_without_the_non_matching_books(self, sample_books, query):
+        fixed = BM25SearchRepository()
+        fixed.build_index(sample_books)
+        legacy = BM25SearchRepository(zero_score_padding=True)
+        legacy.build_index(sample_books)
+
+        fixed_ids = [r.book.id for r in fixed.search(query, max_results=5)]
+        legacy_matching = [r.book.id for r in legacy.search(query, max_results=5) if r.lexical_score != 0]
+
+        assert fixed_ids == legacy_matching
+
+    def test_default_is_fixed_and_the_option_survives_load_index(self, sample_books, tmp_path):
+        assert BM25SearchRepository().zero_score_padding is False
+        path = tmp_path / "index.pkl"
+        source = BM25SearchRepository()
+        source.build_index(sample_books)
+        source.save_index(str(path))
+
+        legacy = BM25SearchRepository(zero_score_padding=True)
+        legacy.load_index(str(path))
+
+        assert legacy.zero_score_padding is True
+        assert len(legacy.search("python", max_results=3)) == 3

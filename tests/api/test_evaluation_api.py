@@ -54,6 +54,9 @@ class Embeddings:
             return None
         return [0.1, 0.2]
 
+    def get_embeddings_batch(self, book_ids):
+        return {i: v for i in book_ids if (v := self.get_embedding(i)) is not None}
+
     def is_ready(self) -> bool:
         return True
 
@@ -141,7 +144,7 @@ class TestEvaluateEndpoint:
             return {"num_queries": 44, "num_queries_with_relevant": 40, "latency_ms": 12.0,
                     "modes": {"hybrid_rrf": {"ndcg_at_10": 0.54}}}
 
-        monkeypatch.setattr(evaluation_endpoints, "run_retrieval_evaluation", fake_run)
+        monkeypatch.setattr("app.evaluation.retrieval_evaluation.run_retrieval_evaluation", fake_run)
 
         response = api_client.post("/api/v1/evaluate", json={"modes": ["hybrid_rrf"], "max_results": 50})
 
@@ -159,7 +162,7 @@ class TestEvaluateEndpoint:
         def missing(**kwargs):
             raise FileNotFoundError("test_queries.json")
 
-        monkeypatch.setattr(evaluation_endpoints, "run_retrieval_evaluation", missing)
+        monkeypatch.setattr("app.evaluation.retrieval_evaluation.run_retrieval_evaluation", missing)
         assert api_client.post("/api/v1/evaluate", json={}).status_code == 503
 
 
