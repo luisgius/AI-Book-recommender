@@ -8,7 +8,7 @@ of the domain with no conceptual identity.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Literal
+from typing import List, Optional, Literal, Tuple
 
 
 class RetrievalStrategy(Enum):
@@ -167,11 +167,106 @@ class SearchQuery:
 
 
 @dataclass(frozen=True)
+class BookDescription:
+    """
+    One description of a work in one language, with its origin.
+
+    A work of the multi-source catalog can have several descriptions (for
+    example the intro of its English and Spanish Wikipedia articles). Each one
+    keeps the source, licence and attribution URL it came with, because some
+    texts (Wikipedia, CC BY-SA 4.0) must be attributed per record.
+    """
+
+    text: str
+    """Plain-text description"""
+
+    language: Optional[str] = None
+    """ISO 639-1 code of the text; None until the ingestion detects it"""
+
+    source: str = "unknown"
+    """Source of the text (e.g. 'wikipedia', 'gutenberg', 'doab', 'open_library')"""
+
+    license: Optional[str] = None
+    """Licence of the text (e.g. 'CC BY-SA 4.0'), when the source states one"""
+
+    attribution_url: Optional[str] = None
+    """Page to cite for this text (e.g. the Wikipedia article URL)"""
+
+    auto_generated: bool = False
+    """True when the source says the text was generated automatically"""
+
+    def __post_init__(self) -> None:
+        """Validate description data."""
+        if not self.text or not self.text.strip():
+            raise ValueError("Description text cannot be empty")
+        if self.language is not None and len(self.language) != 2:
+            raise ValueError(
+                f"language must be a 2-letter ISO 639-1 code, got '{self.language}'"
+            )
+
+
+@dataclass(frozen=True)
+class SourceRecord:
+    """
+    Provenance of a catalog record: one source record that contributed to it.
+
+    A merged work lists one SourceRecord per contributing record, so the
+    catalog can always say where each piece of data came from and under
+    which licence.
+    """
+
+    source: str
+    """Source name (e.g. 'wikidata', 'wikipedia', 'gutenberg', 'doab', 'open_library')"""
+
+    record_id: str
+    """Identifier of the record in that source (e.g. 'Q480', 'en:Don Quixote')"""
+
+    license: Optional[str] = None
+    """Licence that applies to the data taken from this record"""
+
+    url: Optional[str] = None
+    """Public page of the record (also the attribution URL when one is needed)"""
+
+
+@dataclass(frozen=True)
+class SourceLicense:
+    """
+    Licence and attribution terms of a bulk data source, as verified at download.
+
+    Bulk sources report this so the catalog report can list, per source, what
+    may be done with the data and how it must be attributed.
+    """
+
+    source: str
+    """Source name used in the catalog (e.g. 'doab')"""
+
+    name: str
+    """Human-readable name (e.g. 'Directory of Open Access Books')"""
+
+    license: str
+    """Licence of the metadata (e.g. 'CC0 1.0')"""
+
+    terms_url: str
+    """Page where the licence or terms were checked"""
+
+    attribution: str
+    """What must be shown to attribute the data"""
+
+    notes: str = ""
+    """Restrictions or remarks (e.g. per-record licences, access rules)"""
+
+
+@dataclass(frozen=True)
 class BookMetadata:
     """
     Additional metadata for a book.
 
     This is optional information that may not be available for all books.
+
+    The fields after ``preview_link`` were added for the multi-source catalog
+    (Wikidata/Wikipedia, Project Gutenberg, DOAB, Open Library). They all
+    default to empty values, so books created before them (the original
+    Google Books catalog) are unchanged.
     """
 
     isbn: Optional[str] = None
@@ -198,6 +293,41 @@ class BookMetadata:
     preview_link: Optional[str] = None
     """URL to preview/info page"""
 
+    # --- Multi-source catalog fields -------------------------------------
+
+    work_language: Optional[str] = None
+    """Language of the work as stated by a source (ISO 639-1); None if unknown"""
+
+    descriptions: Tuple[BookDescription, ...] = ()
+    """Every description of the work (at most one per language), primary first"""
+
+    titles: Tuple[Tuple[str, str], ...] = ()
+    """Titles of the work in other languages, as (language, title) pairs"""
+
+    wikidata_id: Optional[str] = None
+    """Wikidata item of the work (e.g. 'Q480')"""
+
+    openlibrary_ids: Tuple[str, ...] = ()
+    """Open Library work ids (e.g. 'OL45804W')"""
+
+    gutenberg_ids: Tuple[str, ...] = ()
+    """Project Gutenberg e-book numbers (e.g. '2000')"""
+
+    isbn13s: Tuple[str, ...] = ()
+    """Every known ISBN-13 of the work (isbn13 keeps the first one)"""
+
+    doi: Optional[str] = None
+    """DOI of the book (open access books)"""
+
+    wikipedia_editions: Optional[int] = None
+    """Popularity signal: number of Wikipedia language editions with an article"""
+
+    gutenberg_downloads: Optional[int] = None
+    """Popularity signal: Project Gutenberg downloads in the last 30 days"""
+
+    provenance: Tuple[SourceRecord, ...] = ()
+    """Source records that contributed to this work"""
+
     def __post_init__(self) -> None:
         """Validate metadata constraints."""
         if self.average_rating is not None:
@@ -214,6 +344,30 @@ class BookMetadata:
             raise ValueError(
                 f"ratings_count cannot be negative, got {self.ratings_count}"
             )
+
+        if self.work_language is not None and len(self.work_language) != 2:
+            raise ValueError(
+                f"work_language must be a 2-letter ISO 639-1 code, got '{self.work_language}'"
+            )
+
+    def get_description(self, language: str) -> Optional[BookDescription]:
+        """Return the description in the given language, if there is one."""
+        for description in self.descriptions:
+            if description.language == language:
+                return description
+        return None
+
+    def description_languages(self) -> List[str]:
+        """Languages that have a description, in stored order (primary first)."""
+        return [d.language for d in self.descriptions if d.language is not None]
+
+    def sources(self) -> List[str]:
+        """Distinct names of the sources that contributed, in provenance order."""
+        seen: List[str] = []
+        for record in self.provenance:
+            if record.source not in seen:
+                seen.append(record.source)
+        return seen
 
 
 @dataclass(frozen=True)

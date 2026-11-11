@@ -9,11 +9,11 @@ Following Hexagonal Architecture principles, the domain layer depends only
 on these abstract protocols, never on concrete implementations.
 """
 
-from typing import Protocol, List, Optional, Dict, Any, TYPE_CHECKING
+from typing import Protocol, List, Optional, Dict, Any, Iterator, Tuple, TYPE_CHECKING
 from uuid import UUID
 
 from .entities import AgentAnswer, Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters, QueryIntent
+from .value_objects import SearchQuery, SearchFilters, QueryIntent, SourceLicense
 
 if TYPE_CHECKING:
     from app.infrastructure.llm.schemas_judge import ExplanationJudgmentLLM
@@ -102,6 +102,36 @@ class BookCatalogRepository(Protocol):
 
         Returns:
             List of all books, up to the specified limit
+        """
+        ...
+
+    def get_many(self, book_ids: List[UUID]) -> Dict[UUID, Book]:
+        """
+        Retrieve several books by id in one lookup.
+
+        Used by the bulk ingestion to load the existing works a batch of
+        incoming records must be merged into.
+
+        Args:
+            book_ids: Ids to look up (unknown ids are ignored)
+
+        Returns:
+            Mapping from id to Book for the ids that exist
+        """
+        ...
+
+    def iter_all(self, batch_size: int = 1000) -> Iterator[Book]:
+        """
+        Stream every book of the catalog in a stable order (by id).
+
+        Unlike get_all(), only one batch is held in memory at a time, so it
+        can walk catalogs of hundreds of thousands of books.
+
+        Args:
+            batch_size: Number of rows fetched per database round trip
+
+        Yields:
+            Books, ordered by id
         """
         ...
 
@@ -613,6 +643,103 @@ class ExternalBooksProvider(Protocol):
 
         Returns:
             Source identifier (e.g., 'google_books', 'open_library')
+        """
+        ...
+
+
+class BulkBooksSource(Protocol):
+    """
+    Port for reading a whole external catalog in bulk (dumps, exports, caches).
+
+    ExternalBooksProvider answers search queries against a live API; a bulk
+    source instead walks every record of a downloaded dataset (Wikidata and
+    Wikipedia, Project Gutenberg, DOAB, the Open Library dump) so the catalog
+    builder can normalise, filter, de-duplicate and store them.
+
+    Implementations read local files only. Downloading those files is a
+    separate infrastructure step, so parsing stays testable offline.
+
+    The books yielded are raw: descriptions sit in metadata.descriptions (with
+    their language when the source states it) and are cleaned, filtered and
+    ranked later by the ingestion pipeline.
+    """
+
+    def get_source_name(self) -> str:
+        """
+        Get the name of this source.
+
+        Returns:
+            Source identifier (e.g., 'wikidata', 'gutenberg', 'doab', 'open_library')
+        """
+        ...
+
+    def get_license(self) -> SourceLicense:
+        """
+        Get the licence and attribution terms of the source's data.
+
+        Returns:
+            SourceLicense with the licence, terms URL and attribution notice
+        """
+        ...
+
+    def iter_books(self, limit: Optional[int] = None) -> Iterator[Book]:
+        """
+        Stream the books of the downloaded dataset.
+
+        Args:
+            limit: Optional maximum number of books to yield (quick trials)
+
+        Yields:
+            One Book per source record that has at least a title and an author
+
+        Raises:
+            FileNotFoundError: If the dataset has not been downloaded
+        """
+        ...
+
+    def get_rejected_counts(self) -> Dict[str, int]:
+        """
+        Count source records that could not become a Book, by reason.
+
+        Valid after iter_books() has been consumed (e.g. 'no_title',
+        'no_author'). These records count as read but rejected.
+
+        Returns:
+            Mapping from reason to number of records
+        """
+        ...
+
+
+class DuplicateKeyIndex(Protocol):
+    """
+    Port for the lookup table used to de-duplicate works across sources.
+
+    Each work is registered under several match keys: identifiers
+    ('wikidata:Q480', 'gutenberg:2000', 'isbn13:978...') and a normalised
+    title/author key. An incoming record is merged into the work that shares
+    one of its keys. The index lives outside memory so the catalog builder
+    can de-duplicate hundreds of thousands of works in bounded memory.
+    """
+
+    def lookup(self, keys: List[str]) -> Dict[str, List[UUID]]:
+        """
+        Find the works registered under any of the keys.
+
+        Args:
+            keys: Match keys to look up
+
+        Returns:
+            Mapping from each found key to the ids registered under it
+            (in registration order); keys with no work are absent
+        """
+        ...
+
+    def add(self, entries: List[Tuple[str, UUID]]) -> None:
+        """
+        Register works under keys (an existing (key, id) pair is kept as is).
+
+        Args:
+            entries: (key, book id) pairs
         """
         ...
 
