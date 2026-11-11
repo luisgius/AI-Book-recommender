@@ -66,6 +66,7 @@ opencode.json
 # V11 multi-source catalog: raw downloads and the built large catalog (regenerable)
 /data/downloads/
 /data/catalog_v2/
+/data/catalog_core/
 !/data/catalog_small/catalog.db
 
 # Neon CLI project link (local)

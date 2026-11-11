@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import httpx
+import pytest
 
 from app.infrastructure.external.bulk_download import PoliteHttpClient
 from app.infrastructure.external.doab_source import DoabSource, classification_labels, parse_languages
@@ -317,6 +318,29 @@ class TestOpenLibraryDumpSource:
         source = OpenLibraryDumpSource(tmp_path)
         assert len(list(source.iter_books())) == 1
         assert source.get_rejected_counts()["no_or_short_description"] == 2
+
+    def test_runs_from_the_candidates_cache_when_the_works_dump_is_gone(self, tmp_path, caplog):
+        self.make_dumps(tmp_path)
+        list(OpenLibraryDumpSource(tmp_path).iter_books())
+        (tmp_path / "ol_dump_works_2026-10-31.txt.gz").unlink()
+        source = OpenLibraryDumpSource(tmp_path)
+        assert source.is_available()
+        with caplog.at_level("INFO"):
+            assert [b.authors for b in source.iter_books()] == [["F. Scott Fitzgerald"]]
+        assert "using the cached candidates" in caplog.text
+
+    def test_without_the_authors_dump_names_cannot_be_resolved(self, tmp_path):
+        self.make_dumps(tmp_path)
+        list(OpenLibraryDumpSource(tmp_path).iter_books())
+        (tmp_path / "ol_dump_works_2026-10-31.txt.gz").unlink()
+        (tmp_path / "ol_dump_authors_2026-10-31.txt.gz").unlink()
+        source = OpenLibraryDumpSource(tmp_path)
+        assert source.is_available()  # the cache exists ...
+        with pytest.raises(FileNotFoundError, match="author names cannot be resolved"):
+            list(source.iter_books())  # ... but works would have no authors
+
+    def test_not_available_without_dump_or_cache(self, tmp_path):
+        assert not OpenLibraryDumpSource(tmp_path).is_available()
 
 
 # ------------------------------------------------------------------ download

@@ -19,7 +19,10 @@ streaming passes and never holds the dump in memory:
 Works records have no language (languages belong to editions), so the
 description language is detected by the ingestion pipeline. Candidates are
 cached next to the dump (``works_candidates_<min>.jsonl.gz``) and reused by
-later runs.
+later runs. When the raw works dump has been deleted to save disk, the cached
+candidates alone are enough for pass 3, but the candidates store author KEYS
+only (``/authors/OL1A``), never names: the authors dump is then still needed
+to resolve them, and the source refuses to run without it.
 """
 
 import gzip
@@ -134,18 +137,36 @@ class OpenLibraryDumpSource(BulkBooksSource):
             raise FileNotFoundError(f"No ol_dump_works_*.txt.gz in {self._dir}: run the download step")
         return path
 
+    def is_available(self) -> bool:
+        """True when the works dump or the cached candidates file is present."""
+        return self._latest("works") is not None or self._candidates_path().exists()
+
     def iter_books(self, limit: Optional[int] = None) -> Iterator[Book]:
         """
         Yield one Book per work with a long enough description and an author.
 
         Raises:
-            FileNotFoundError: If the works dump has not been downloaded
+            FileNotFoundError: If neither the works dump nor the cached
+                candidates exist, or if the authors dump is missing (the
+                candidates hold author keys only, so names cannot be resolved)
         """
         self._rejected = {}
         candidates_path = self._candidates_path()
+        if self._latest("authors") is None:
+            raise FileNotFoundError(
+                f"No ol_dump_authors_*.txt.gz in {self._dir}: author names cannot be resolved "
+                "(the candidates file stores author keys only). Download the authors dump, or "
+                "leave open_library out of --sources."
+            )
         if not candidates_path.exists():
             self._extract_candidates(candidates_path)
         else:
+            if self._latest("works") is None:
+                logger.info(
+                    "Open Library works dump not found: using the cached candidates %s "
+                    "(works are read from the cache; the raw dump is only needed to rebuild it)",
+                    candidates_path.name,
+                )
             self._load_pass_one_counts(candidates_path)
 
         author_keys: Set[str] = set()
@@ -256,8 +277,7 @@ class OpenLibraryDumpSource(BulkBooksSource):
         """Pass 2: names of the given author keys from the authors dump (if downloaded)."""
         dump = self._latest("authors")
         if dump is None:
-            logger.warning("No authors dump in %s: works will have no author names", self._dir)
-            return {}
+            raise FileNotFoundError(f"No ol_dump_authors_*.txt.gz in {self._dir}")
         names: Dict[str, str] = {}
         with gzip.open(dump, "rt", encoding="utf-8", errors="replace") as handle:
             for line in handle:

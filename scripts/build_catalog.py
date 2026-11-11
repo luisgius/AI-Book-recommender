@@ -56,7 +56,7 @@ OPENLIBRARY_DUMP_URL = "https://archive.org/download/ol_dump_{date}/{name}"
 # Wikimedia: 10 requests/minute for clients whose User-Agent has no contact
 # details; 200/minute with a policy-compliant User-Agent (contact URL/e-mail).
 ANONYMOUS_WIKI_RATE = 9 / 60
-IDENTIFIED_WIKI_RATE = 3.0
+IDENTIFIED_WIKI_RATE = 2.5  # 150 requests/minute, a margin under the 200 limit
 
 
 def make_source(name: str, downloads: Path, languages: List[str]) -> BulkBooksSource:
@@ -81,7 +81,9 @@ def is_downloaded(name: str, downloads: Path) -> bool:
     if name == "doab":
         return (downloads / "doab" / doab_source.EXPORT_NAME).exists()
     if name == "open_library":
-        return any((downloads / "openlibrary").glob("ol_dump_works_*.txt.gz"))
+        # The raw works dump or its cached candidates file is enough; the source
+        # itself fails loudly if the authors dump (needed for names) is missing.
+        return OpenLibraryDumpSource(downloads / "openlibrary").is_available()
     return False
 
 
@@ -222,7 +224,10 @@ def step_select(args: argparse.Namespace) -> int:
         "source_catalog": str(source_db),
         "database_bytes": out.stat().st_size,
     }
-    (out.parent / "selection.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    # catalog.db keeps the historical name selection.json; any other file name
+    # gets its own summary so that a side-by-side selection never overwrites it.
+    summary_name = "selection.json" if out.stem == "catalog" else f"{out.stem}.selection.json"
+    (out.parent / summary_name).write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info("Selected %d works into %s; language mix: %s", len(selected), out, mix)
     return 0
 
