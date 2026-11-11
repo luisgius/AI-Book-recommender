@@ -78,6 +78,7 @@ def mock_embeddings_store():
     """Mock EmbeddingsStore."""
     mock = Mock()
     mock.generate_embedding = Mock(return_value=[0.1] * 384)  # Fake embedding
+    mock.generate_query_embedding = Mock(return_value=[0.1] * 384)
     mock.get_embedding = Mock(return_value=[0.1] * 384)
     mock.is_ready = Mock(return_value=True)
     return mock

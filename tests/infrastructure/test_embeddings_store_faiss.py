@@ -437,6 +437,7 @@ class TestProtocolCompliance:
         # Required methods from Protocol
         required_methods = [
             "generate_embedding",
+            "generate_query_embedding",
             "generate_embeddings_batch",
             "store_embedding",
             "store_embeddings_batch",

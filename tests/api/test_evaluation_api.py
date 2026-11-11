@@ -47,6 +47,8 @@ class Embeddings:
     def generate_embedding(self, text: str) -> List[float]:
         return [0.1, 0.2]
 
+    generate_query_embedding = generate_embedding  # same vector for queries
+
     def get_embedding(self, book_id: UUID) -> Optional[List[float]]:
         if self._known is not None and book_id not in self._known:
             return None

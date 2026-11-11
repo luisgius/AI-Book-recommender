@@ -135,6 +135,8 @@ class FakeEmbeddingsStore:
     def generate_embedding(self, text: str) -> List[float]:
         return [0.1] * self._dimension
 
+    generate_query_embedding = generate_embedding  # same vector for queries
+
     def is_ready(self) -> bool:
         return self._ready
 

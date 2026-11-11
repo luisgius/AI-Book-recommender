@@ -8,7 +8,11 @@ domain SearchResult entities with fully hydrated Book objects.
 Design decisions:
 - Uses Option A from CLAUDE.md: keeps Book objects in-memory for fast hydration
 - Applies filters post-retrieval (FAISS only knows about vectors, not metadata)
-- Converts L2 distances to similarity scores: similarity = 1 / (1 + distance)
+- Turns FAISS output into a "higher is better" similarity score, following
+  the metric of the index:
+  - inner product index (new indexes, unit vectors): score = cosine similarity,
+    and the query is L2-normalized first like the indexed documents
+  - L2 index (legacy indexes): score = 1 / (1 + squared L2 distance)
 - Over-fetches candidates to compensate for filtering
 - Explicitly sorts results after filtering to guarantee descending similarity order
 
@@ -23,7 +27,7 @@ responsibility of EmbeddingsStore. It only performs search operations.
 """
 
 import logging
-from typing import List, Optional, Dict
+from typing import Any, List, Optional, Dict
 
 import numpy as np
 
@@ -31,6 +35,7 @@ from app.domain.entities import Book, SearchResult
 from app.domain.value_objects import SearchFilters
 from app.domain.ports import VectorSearchRepository
 from app.infrastructure.search import FaissIndexProvider
+from app.infrastructure.search.faiss_runtime import faiss  # torch before faiss (macOS)
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +53,8 @@ class FaissVectorSearchRepository(VectorSearchRepository):
     - Queries the FAISS index via FaissIndexProvider protocol
     - Maintains an in-memory book_id -> Book mapping for fast hydration
     - Applies filters in-memory after FAISS search
-    - Converts L2 distances to similarity scores
+    - Converts FAISS distances to similarity scores (cosine for inner
+      product indexes, 1 / (1 + distance) for legacy L2 indexes)
     - Validates index/mapping consistency before search
 
     The repository is designed to be used alongside BM25SearchRepository
@@ -61,7 +67,7 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         books = catalog_repo.get_all()
         vector_repo = FaissVectorSearchRepository(embeddings_store, books)
 
-        query_embedding = embeddings_store.generate_embedding("science fiction")
+        query_embedding = embeddings_store.generate_query_embedding("science fiction")
         results = vector_repo.search(query_embedding, max_results=10)
     """
 
@@ -107,7 +113,7 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         3. Query FAISS index for k nearest neighbors (over-fetched)
         4. Convert FAISS indices to book IDs using id_mapping
         5. Hydrate Book entities from in-memory mapping
-        6. Convert L2 distances to similarity scores
+        6. Convert FAISS distances to similarity scores (see _to_similarity)
         7. Apply filters (language, category, year range)
         8. Sort by similarity descending (explicit, post-filter guarantee)
         9. Truncate to max_results and assign ranks
@@ -122,7 +128,9 @@ class FaissVectorSearchRepository(VectorSearchRepository):
             List of SearchResult entities, ranked by similarity score (descending).
             Each result has:
             - book: The matched book entity (fully hydrated)
-            - final_score: Similarity score (1 / (1 + L2_distance))
+            - final_score: Similarity score, higher is better (cosine
+              similarity for inner product indexes, 1 / (1 + L2_distance)
+              for legacy L2 indexes)
             - vector_score: Same as final_score
             - source: "vector"
             - rank: 1-indexed position
@@ -173,12 +181,18 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         # dtype must be float32 (FAISS uses single precision).
         query_vector = np.array([query_embedding], dtype=np.float32)
 
+        # An inner product index holds unit-length vectors, so the inner
+        # product is a cosine only if the query has unit length too.
+        uses_inner_product = self._uses_inner_product(faiss_index)
+        if uses_inner_product:
+            faiss.normalize_L2(query_vector)
+
         # -----------------------------------------------------------------------
         # Step 5: Determine how many candidates to fetch
         # -----------------------------------------------------------------------
         # Over-fetch to compensate for post-retrieval filtering.
         # With filters, a fixed over-fetch can starve: the nearest neighbours of
-        # an English query may all fail a language=es filter. IndexFlatL2 scans
+        # an English query may all fail a language=es filter. A flat index scans
         # every vector anyway, so with filters we rank the whole index and let
         # the filter pick the best matching books.
         # We can't fetch more than the index contains.
@@ -191,13 +205,16 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         # Step 6: Execute FAISS search
         # -----------------------------------------------------------------------
         # faiss_index.search returns:
-        #   distances: shape (n_queries, k) - L2 distances to nearest neighbors
+        #   distances: shape (n_queries, k) - one value per neighbour
         #   indices: shape (n_queries, k) - internal FAISS indices of neighbors
         #
-        # For IndexFlatL2:
-        #   - distances are squared L2 distances: sum((a_i - b_i)^2)
-        #   - Lower distance = more similar
-        #   - Results are sorted by distance ascending (most similar first)
+        # For IndexFlatIP (new indexes):
+        #   - values are inner products = cosine similarities (unit vectors)
+        #   - Higher value = more similar, sorted descending
+        # For IndexFlatL2 (legacy indexes):
+        #   - values are squared L2 distances: sum((a_i - b_i)^2)
+        #   - Lower distance = more similar, sorted ascending
+        # Either way the most similar neighbour comes first.
         try:
             distances, indices = faiss_index.search(query_vector, k_fetch)
         except Exception as e:
@@ -230,14 +247,7 @@ class FaissVectorSearchRepository(VectorSearchRepository):
                 )
                 continue
 
-            # Convert L2 distance to similarity score.
-            # Formula: similarity = 1 / (1 + distance)
-            # Properties:
-            #   - distance = 0 -> similarity = 1 (identical vectors)
-            #   - distance -> inf -> similarity -> 0 (very different)
-            #   - Monotonically decreasing (preserves ranking)
-            #   - Always positive, bounded in (0, 1]
-            similarity_score = 1.0 / (1.0 + float(distance))
+            similarity_score = self._to_similarity(float(distance), uses_inner_product)
 
             candidates.append((book, similarity_score))
 
@@ -256,7 +266,7 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         # -----------------------------------------------------------------------
         # Step 9: Explicit sort by similarity descending
         # -----------------------------------------------------------------------
-        # FAISS returns results sorted by distance (ascending), which means
+        # FAISS returns the most similar neighbours first, which means
         # similarity is descending. After filtering, the relative order is preserved,
         # but we sort explicitly here to:
         # 1. Guarantee the invariant regardless of implementation details
@@ -287,6 +297,35 @@ class FaissVectorSearchRepository(VectorSearchRepository):
         )
 
         return results
+
+    @staticmethod
+    def _uses_inner_product(faiss_index: Any) -> bool:
+        """
+        True if the index ranks by inner product (cosine on unit vectors).
+
+        Every FAISS index exposes its metric in ``metric_type``. Objects
+        without it (test doubles) are treated as L2, the legacy metric.
+        """
+        metric = getattr(faiss_index, "metric_type", faiss.METRIC_L2)
+        return metric == faiss.METRIC_INNER_PRODUCT
+
+    @staticmethod
+    def _to_similarity(value: float, uses_inner_product: bool) -> float:
+        """
+        Convert one FAISS output value to a "higher is better" similarity.
+
+        - Inner product index: the value already is the cosine similarity of
+          the unit query and the unit document, in [-1, 1]. It is used as is.
+        - L2 index: the value is a squared L2 distance (lower is better) and
+          is mapped to 1 / (1 + distance). Properties:
+            - distance = 0 -> similarity = 1 (identical vectors)
+            - distance -> inf -> similarity -> 0 (very different)
+            - Monotonically decreasing (preserves ranking)
+            - Always positive, bounded in (0, 1]
+        """
+        if uses_inner_product:
+            return value
+        return 1.0 / (1.0 + value)
 
     @staticmethod
     def _matches_filters(book: Book, filters: SearchFilters) -> bool:

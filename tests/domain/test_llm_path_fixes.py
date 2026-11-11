@@ -85,6 +85,8 @@ class FakeEmbeddings:
     def generate_embedding(self, text: str) -> List[float]:
         return [0.1, 0.2, 0.3]
 
+    generate_query_embedding = generate_embedding  # same vector for queries
+
     def get_embedding(self, book_id: UUID) -> Optional[List[float]]:
         return self._vectors.get(book_id, [0.1, 0.2, 0.3])
 

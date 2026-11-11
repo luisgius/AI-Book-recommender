@@ -1,10 +1,11 @@
 """
-Runtime configuration for the LLM adapter, read from environment variables.
+Runtime configuration for the LLM and embedding adapters, read from
+environment variables.
 
-Kept as a small frozen dataclass (no framework) so the composition root can
-build the LLM client from it and tests can construct it directly.
+Kept as small frozen dataclasses (no framework) so the composition root can
+build the adapters from them and tests can construct them directly.
 
-Environment variables (all optional):
+LLM environment variables (all optional):
     LLM_PROVIDER          "ollama" (default), "openai", "anthropic" or "none"
     LLM_MODEL             model id; default depends on the provider
     LLM_BASE_URL          server URL (default http://127.0.0.1:11434 for Ollama)
@@ -18,6 +19,11 @@ Environment variables (all optional):
                           LLM as a hard filter (default "false": soft signal)
     LLM_MAX_TOKENS        cap on generated tokens per call (default 1024)
     LLM_TIMEOUT_S         HTTP timeout per call in seconds (default 180)
+
+Embedding environment variables (all optional):
+    EMBEDDING_MODEL       sentence-transformers model (default all-MiniLM-L6-v2).
+                          The FAISS index must be built with the same model.
+    EMBEDDING_DEVICE      "cpu", "mps" or "cuda" (default: picked automatically)
 """
 
 import os
@@ -34,6 +40,12 @@ DEFAULT_MODELS = {
 }
 
 SUPPORTED_PROVIDERS = ("ollama", "openai", "anthropic", "none")
+
+# Default embedding model: the one the shipped index (data/indexes) was built with.
+DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+# Torch device families accepted for EMBEDDING_DEVICE ("cuda:1" is also valid).
+SUPPORTED_EMBEDDING_DEVICES = ("cpu", "mps", "cuda")
 
 
 @dataclass(frozen=True)
@@ -93,3 +105,28 @@ class LLMSettings:
             max_tokens=int(env.get("LLM_MAX_TOKENS", "1024")),
             timeout_s=float(env.get("LLM_TIMEOUT_S", "180")),
         )
+
+
+@dataclass(frozen=True)
+class EmbeddingSettings:
+    """Settings needed to build the embeddings store (vector side)."""
+
+    model: str = DEFAULT_EMBEDDING_MODEL
+    device: Optional[str] = None  # None: sentence-transformers picks the device
+
+    def __post_init__(self) -> None:
+        if not self.model.strip():
+            raise ValueError("EMBEDDING_MODEL must not be empty")
+        if self.device is not None and self.device.split(":")[0] not in SUPPORTED_EMBEDDING_DEVICES:
+            raise ValueError(
+                f"EMBEDDING_DEVICE must be one of {SUPPORTED_EMBEDDING_DEVICES} "
+                f"(optionally with an index, e.g. cuda:0), got '{self.device}'"
+            )
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "EmbeddingSettings":
+        """Build settings from environment variables (see module docstring)."""
+        env = os.environ if env is None else env
+        model = env.get("EMBEDDING_MODEL", "").strip() or DEFAULT_EMBEDDING_MODEL
+        device = env.get("EMBEDDING_DEVICE", "").strip().lower() or None
+        return cls(model=model, device=device)

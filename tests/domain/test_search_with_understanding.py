@@ -138,6 +138,7 @@ def mock_embeddings_store():
     mock = Mock()
     mock.is_ready.return_value = True
     mock.generate_embedding.return_value = [0.1] * 384  # MiniLM dimension
+    mock.generate_query_embedding.return_value = [0.1] * 384
     mock.get_embedding.return_value = [0.1] * 384
     return mock
 

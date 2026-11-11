@@ -28,7 +28,7 @@ from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatal
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
 from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
-from app.infrastructure.config.settings import LLMSettings
+from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ _embeddings_store: Optional[EmbeddingsStore] = None
 _vector_repository: Optional[VectorSearchRepository] = None
 _search_service: Optional[SearchService] = None
 _llm_settings: Optional[LLMSettings] = None
+_embedding_settings: Optional[EmbeddingSettings] = None
 _llm_client: Optional[LLMClient] = None
 _llm_initialized: bool = False
 _search_agent: Optional[SearchAgent] = None
@@ -69,12 +70,27 @@ def get_bm25_repository() -> LexicalSearchRepository:
     return _bm25_repository
 
 
+def get_embedding_settings() -> EmbeddingSettings:
+    """Provide the embedding settings, read once from the environment (and .env)."""
+    global _embedding_settings
+    if _embedding_settings is None:
+        load_dotenv()
+        _embedding_settings = EmbeddingSettings.from_env()
+    return _embedding_settings
+
+
 def get_embeddings_store() -> EmbeddingsStore:
-    """Provide a singleton instance of the embeddings store."""
+    """
+    Provide a singleton instance of the embeddings store.
+
+    The model comes from EMBEDDING_MODEL. Loading an index built with a
+    different model raises an error that asks to rebuild the index.
+    """
     global _embeddings_store
     if _embeddings_store is None:
+        settings = get_embedding_settings()
         faiss_path = INDEXES_DIR / "faiss_index"
-        store = EmbeddingsStoreFaiss()
+        store = EmbeddingsStoreFaiss(model_name=settings.model, device=settings.device)
         if faiss_path.exists():
             store.load_index(str(faiss_path))
         _embeddings_store = store
@@ -200,7 +216,7 @@ def reset_dependencies() -> None:
     global _catalog_repository, _bm25_repository, _embeddings_store
     global _vector_repository, _search_service
     global _llm_settings, _llm_client, _llm_initialized
-    global _search_agent, _agent_initialized
+    global _search_agent, _agent_initialized, _embedding_settings
 
     _catalog_repository = None
     _bm25_repository = None
@@ -208,6 +224,7 @@ def reset_dependencies() -> None:
     _vector_repository = None
     _search_service = None
     _llm_settings = None
+    _embedding_settings = None
     _llm_client = None
     _llm_initialized = False
     _search_agent = None

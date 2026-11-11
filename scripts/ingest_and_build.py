@@ -17,8 +17,18 @@ Args:
     --provider: google (default) or openlibrary
     --max-items: Maximum number of books to fetch (default: 100)
     --db-path: Path to SQLite database (default: data/catalog.db)
-    --out-dir: Directory for storing indices (default: data/indexes)
+    --out-dir: Directory for storing indices (default: data/indexes for the
+               default embedding model, data/indexes_ablation/<model-slug>
+               for any other model, so indexes of several models coexist)
+    --embedding-model: sentence-transformers model for the FAISS index
+               (default: EMBEDDING_MODEL, else all-MiniLM-L6-v2).
+               EMBEDDING_DEVICE selects the device.
     --rebuild: Rebuild indices from existing catalog without fetching new books
+
+Example (index for a multilingual model, next to the shipped one):
+    python -m scripts.ingest_and_build --rebuild \
+        --embedding-model intfloat/multilingual-e5-large-instruct
+    # -> data/indexes_ablation/intfloat_multilingual-e5-large-instruct/
     --smoke-test-query: Query for smoke test (default: uses --query; if omitted in --rebuild, uses 'programming')
 """
 
@@ -37,7 +47,8 @@ from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatal
 from app.infrastructure.external.google_books_provider import GoogleBooksProvider
 from app.infrastructure.external.open_library_provider import OpenLibraryProvider
 from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
-from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
+from app.infrastructure.config.settings import DEFAULT_EMBEDDING_MODEL, EmbeddingSettings
+from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss, model_slug
 from app.infrastructure.search.faiss_vector_search_repository import FaissVectorSearchRepository
 from app.ingestion.ingestion_service import IngestionService
 from app.domain.services import SearchService
@@ -53,6 +64,20 @@ logger = logging.getLogger(__name__)
 # Default paths
 DEFAULT_DB_PATH = "data/catalog.db"
 DEFAULT_OUT_DIR = "data/indexes"
+ABLATION_OUT_ROOT = "data/indexes_ablation"
+
+
+def default_out_dir(model_name: str) -> str:
+    """
+    Output directory used when --out-dir is not given.
+
+    The default model keeps writing to data/indexes. Any other model gets its
+    own folder under data/indexes_ablation/, so building an index for a new
+    model never overwrites the shipped one.
+    """
+    if model_name == DEFAULT_EMBEDDING_MODEL:
+        return DEFAULT_OUT_DIR
+    return str(Path(ABLATION_OUT_ROOT) / model_slug(model_name))
 
 
 def create_directories(db_path: str, out_dir: str) -> None:
@@ -156,7 +181,8 @@ def build_bm25_index(
 def build_faiss_index(
     catalog_repo: SqliteBookCatalogRepository,
     out_dir: str,
-    model_name: str = "all-MiniLM-L6-v2",
+    model_name: str = DEFAULT_EMBEDDING_MODEL,
+    device: Optional[str] = None,
 ) -> tuple[EmbeddingsStoreFaiss, FaissVectorSearchRepository]:
     """
     Step 3: Generate embeddings and build FAISS index.
@@ -165,6 +191,7 @@ def build_faiss_index(
         catalog_repo: Catalog repository
         out_dir: Output directory for index
         model_name: Sentence transformer model name
+        device: Torch device for the model (None: automatic)
 
     Returns:
         Tuple of (embeddings_store, vector_search_repo)
@@ -177,12 +204,12 @@ def build_faiss_index(
 
     if not books:
         logger.warning("No books in catalog. Skipping FAISS index build.")
-        embeddings_store = EmbeddingsStoreFaiss(model_name=model_name)
+        embeddings_store = EmbeddingsStoreFaiss(model_name=model_name, device=device)
         vector_repo = FaissVectorSearchRepository(embeddings_store, [])
         return embeddings_store, vector_repo
 
     logger.info(f"Initializing embeddings model: {model_name}")
-    embeddings_store = EmbeddingsStoreFaiss(model_name=model_name)
+    embeddings_store = EmbeddingsStoreFaiss(model_name=model_name, device=device)
 
     logger.info(f"Generating embeddings for {len(books)} books...")
     texts = [book.get_searchable_text() for book in books]
@@ -268,6 +295,8 @@ def run_smoke_test(
 def rebuild_indices_only(
     db_path: str,
     out_dir: str,
+    model_name: str = DEFAULT_EMBEDDING_MODEL,
+    device: Optional[str] = None,
 ) -> tuple[BM25SearchRepository, EmbeddingsStoreFaiss, FaissVectorSearchRepository]:
     """
     Rebuild indices from existing catalog without fetching new books.
@@ -275,6 +304,8 @@ def rebuild_indices_only(
     Args:
         db_path: Path to SQLite database
         out_dir: Output directory for indices
+        model_name: Sentence transformer model for the FAISS index
+        device: Torch device for the model (None: automatic)
 
     Returns:
         Tuple of (bm25_repo, vector_repo)
@@ -288,7 +319,7 @@ def rebuild_indices_only(
     logger.info(f"Found {len(books)} books in catalog")
 
     bm25_repo = build_bm25_index(catalog_repo, out_dir)
-    embeddings_store, vector_repo = build_faiss_index(catalog_repo, out_dir)
+    embeddings_store, vector_repo = build_faiss_index(catalog_repo, out_dir, model_name, device)
 
     return bm25_repo, embeddings_store, vector_repo
 
@@ -297,11 +328,12 @@ def main(
     query: Optional[str],
     max_items: int = 100,
     db_path: str = DEFAULT_DB_PATH,
-    out_dir: str = DEFAULT_OUT_DIR,
+    out_dir: Optional[str] = None,
     language: Optional[str] = None,
     rebuild: bool = False,
     smoke_test_query: Optional[str] = None,
     provider_name: str = "google",
+    embedding_model: Optional[str] = None,
 ) -> None:
     """
     Main entry point for the ingestion and build script.
@@ -310,17 +342,25 @@ def main(
         query: Search query for Google Books API
         max_items: Maximum number of books to fetch
         db_path: Path to SQLite database
-        out_dir: Directory for storing indices
+        out_dir: Directory for storing indices (None: default_out_dir(model))
         language: Optional language filter (e.g., 'es', 'en')
         rebuild: If True, rebuild indices from existing catalog
         smoke_test_query: Query for smoke test (defaults to query)
+        provider_name: "google" or "openlibrary"
+        embedding_model: Embedding model (None: EMBEDDING_MODEL or the default)
     """
+    embedding_settings = EmbeddingSettings.from_env()
+    model_name = embedding_model or embedding_settings.model
+    device = embedding_settings.device
+    out_dir = out_dir or default_out_dir(model_name)
+
     logger.info("Starting Book Ingestion and Index Building Pipeline")
     logger.info(f"Configuration:")
     logger.info(f"  - Query: '{query}'" if query else "  - Query: n/a")
     logger.info(f"  - Max items: {max_items}")
     logger.info(f"  - DB path: {db_path}")
     logger.info(f"  - Output dir: {out_dir}")
+    logger.info(f"  - Embedding model: {model_name} (device: {device or 'auto'})")
     logger.info(f"  - Language: {language or 'all'}")
     logger.info(f"  - Rebuild mode: {rebuild}")
     logger.info("")
@@ -333,7 +373,9 @@ def main(
 
     if rebuild:
         # Rebuild mode: skip ingestion
-        bm25_repo, embeddings_store, vector_repo = rebuild_indices_only(db_path, out_dir)
+        bm25_repo, embeddings_store, vector_repo = rebuild_indices_only(
+            db_path, out_dir, model_name, device
+        )
     else:
         # Normal mode: ingest + build indices
         catalog_repo = SqliteBookCatalogRepository(Path(db_path))
@@ -351,7 +393,9 @@ def main(
         bm25_repo = build_bm25_index(catalog_repo, out_dir)
 
         # Step 3: Build FAISS index
-        embeddings_store, vector_repo = build_faiss_index(catalog_repo, out_dir)
+        embeddings_store, vector_repo = build_faiss_index(
+            catalog_repo, out_dir, model_name, device
+        )
 
     # Step 4: Smoke test
     test_query = smoke_test_query or query or "programming"
@@ -365,6 +409,11 @@ def main(
     logger.info("PIPELINE COMPLETED SUCCESSFULLY")
     logger.info("=" * 70)
     logger.info("Next steps:")
+    if model_name != DEFAULT_EMBEDDING_MODEL or out_dir != DEFAULT_OUT_DIR:
+        logger.info(
+            f"  0. Serve these indexes with: INDEXES_DIR={out_dir} "
+            f"EMBEDDING_MODEL={model_name}"
+        )
     if (project_root / "app" / "main.py").exists():
         logger.info("  1. Start the API: python -m app.main")
     logger.info("  2. Test search: POST /search with your query")
@@ -399,8 +448,20 @@ if __name__ == "__main__":
     parser.add_argument(
         "--out-dir",
         type=str,
-        default=DEFAULT_OUT_DIR,
-        help=f"Directory for storing indices (default: {DEFAULT_OUT_DIR})",
+        default=None,
+        help=(
+            f"Directory for storing indices (default: {DEFAULT_OUT_DIR} for the "
+            f"default embedding model, {ABLATION_OUT_ROOT}/<model-slug> otherwise)"
+        ),
+    )
+    parser.add_argument(
+        "--embedding-model",
+        type=str,
+        default=None,
+        help=(
+            "sentence-transformers model for the FAISS index "
+            f"(default: EMBEDDING_MODEL, else {DEFAULT_EMBEDDING_MODEL})"
+        ),
     )
     parser.add_argument(
         "--provider",
@@ -446,6 +507,7 @@ if __name__ == "__main__":
             rebuild=args.rebuild,
             smoke_test_query=args.smoke_test_query,
             provider_name=args.provider,
+            embedding_model=args.embedding_model,
         )
     except KeyboardInterrupt:
         logger.info("\nPipeline interrupted by user")

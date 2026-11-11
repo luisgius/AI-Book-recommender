@@ -131,6 +131,8 @@ class FakeEmbeddingsStore:
     def generate_embedding(self, text: str) -> List[float]:
         return [0.1] * 384
 
+    generate_query_embedding = generate_embedding  # same vector for queries
+
     def get_embedding(self, book_id: UUID) -> Optional[List[float]]:
         return self._embeddings.get(book_id, [0.1] * 384)
 
@@ -159,6 +161,8 @@ class FailingEmbeddingsStore:
 
     def generate_embedding(self, text: str):
         raise RuntimeError("Embeddings exploded")
+
+    generate_query_embedding = generate_embedding  # queries fail the same way
 
     def get_embedding(self, book_id):
         return None

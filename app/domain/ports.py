@@ -322,18 +322,20 @@ class EmbeddingsStore(Protocol):
 
     The embeddings model (e.g., sentence-transformers) is an implementation
     detail hidden behind this port.
+
+    Queries and documents are embedded through different methods because
+    some models are asymmetric (see generate_query_embedding).
     """
 
     def generate_embedding(self, text: str) -> List[float]:
         """
-        Generate an embedding vector for the given text.
+        Generate the embedding vector of a document (book text).
 
-        This is typically used for:
-        - Encoding book searchable text during ingestion
-        - Encoding user query text during search
+        Used to encode the searchable text of a book during ingestion and
+        index building. User queries must go through generate_query_embedding.
 
         Args:
-            text: The text to encode
+            text: The document text to encode
 
         Returns:
             Embedding vector (list of floats)
@@ -344,12 +346,43 @@ class EmbeddingsStore(Protocol):
         """
         ...
 
+    def generate_query_embedding(self, text: str) -> List[float]:
+        """
+        Generate the embedding vector of a search query.
+
+        Some embedding models are asymmetric: they were trained to encode a
+        short query and a long document differently, usually by adding an
+        instruction or a prefix to the query only (for example "query: " for
+        E5 models, or "Instruct: ...\\nQuery: " for instruction-tuned ones).
+        Encoding a query with the document format, or the other way round,
+        lowers retrieval quality without raising any error.
+
+        This method applies the query-side convention of the configured model,
+        while generate_embedding and generate_embeddings_batch apply the
+        document-side one. For symmetric models (e.g. all-MiniLM-L6-v2) both
+        return the same vector.
+
+        Use it for any text that stands for the user's information need: the
+        raw query, a reformulated query or a multi-query variation.
+
+        Args:
+            text: The query text to encode
+
+        Returns:
+            Embedding vector, with the same dimension as document embeddings
+
+        Raises:
+            ValueError: If text is empty
+            RuntimeError: If embedding generation fails
+        """
+        ...
+
     def generate_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         """
-        Generate embeddings for multiple texts in a batch.
+        Generate document embeddings for multiple texts in a batch.
 
         This is more efficient than calling generate_embedding repeatedly.
-        Used during bulk ingestion.
+        Used during bulk ingestion (document side, like generate_embedding).
 
         Args:
             texts: List of texts to encode

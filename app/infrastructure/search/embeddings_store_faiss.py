@@ -15,24 +15,219 @@ It does NOT perform search operations - that is the responsibility of
 VectorSearchRepository, which uses the index built by this store.
 
 Design decisions (see ADR 003 for details):
-- MVP uses IndexFlatL2 (exact L2 distance, no normalization)
-- Alternative: normalize embeddings + IndexFlatIP for cosine similarity
+- The embedding model is configurable (constructor argument, wired from
+  EMBEDDING_MODEL). Asymmetric models format queries and documents
+  differently; PROMPT_CONVENTIONS lists the convention of each known model.
+- New indexes store L2-normalized vectors in an IndexFlatIP, so the inner
+  product is the cosine similarity.
+- Every saved index carries a sidecar metadata file (faiss_metadata.json) with
+  the model that produced its vectors. Loading an index with a different model
+  raises IndexModelMismatchError instead of silently mixing vector spaces.
+- Legacy indexes saved before the metadata file existed (data/indexes) are
+  still loaded as before: all-MiniLM-L6-v2 vectors in an IndexFlatL2.
 - book_id uses UUID (serialized to string for JSON persistence)
 """
 
 import json
 import logging
+import re
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from app.domain.ports import EmbeddingsStore
+from app.infrastructure.search.faiss_runtime import faiss  # torch before faiss (macOS)
 
 logger = logging.getLogger(__name__)
+
+
+# -----------------------------------------------------------------------------
+# Model conventions
+# -----------------------------------------------------------------------------
+
+# Model used when the store is built without a model name.
+DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+# Model of every index saved before faiss_metadata.json existed. This is a
+# fact about old files and must not follow future changes of the default.
+LEGACY_INDEX_MODEL = "all-MiniLM-L6-v2"
+
+# Metric names written to the metadata file.
+METRIC_INNER_PRODUCT = "inner_product"
+METRIC_L2 = "l2"
+
+# File names inside an index directory.
+INDEX_FILE = "faiss_index.bin"
+MAPPING_FILE = "faiss_id_mapping.json"
+EMBEDDINGS_FILE = "faiss_embeddings.json"
+METADATA_FILE = "faiss_metadata.json"
+
+
+@dataclass(frozen=True)
+class PromptConvention:
+    """
+    How a model expects queries and documents to be written before encoding.
+
+    Attributes:
+        query_prefix: Text prepended to every query.
+        document_prefix: Text prepended to every document.
+        query_prompt_name: Name of a prompt stored in the model's own
+            sentence-transformers config (``model.prompts``), passed to
+            ``encode(prompt_name=...)`` for queries. None means no stored prompt.
+    """
+
+    query_prefix: str = ""
+    document_prefix: str = ""
+    query_prompt_name: Optional[str] = None
+
+
+# Task description used in the query instruction of instruction-tuned E5.
+E5_INSTRUCT_TASK = "Given a book search query, retrieve relevant books"
+
+# Per-model conventions, taken from each model card on huggingface.co.
+# Models not listed here are treated as symmetric (no prompt on either side).
+PROMPT_CONVENTIONS: Dict[str, PromptConvention] = {
+    # Symmetric model: queries and documents are encoded the same way.
+    "all-MiniLM-L6-v2": PromptConvention(),
+    # Instruction on the query only; documents are encoded raw.
+    "intfloat/multilingual-e5-large-instruct": PromptConvention(
+        query_prefix=f"Instruct: {E5_INSTRUCT_TASK}\nQuery: ",
+    ),
+    # E5 family: every input starts with "query: " or "passage: ".
+    "intfloat/multilingual-e5-small": PromptConvention(
+        query_prefix="query: ", document_prefix="passage: "
+    ),
+    "intfloat/multilingual-e5-base": PromptConvention(
+        query_prefix="query: ", document_prefix="passage: "
+    ),
+    "intfloat/multilingual-e5-large": PromptConvention(
+        query_prefix="query: ", document_prefix="passage: "
+    ),
+    # Qwen3 ships its query instruction as the stored prompt "query".
+    "Qwen/Qwen3-Embedding-0.6B": PromptConvention(query_prompt_name="query"),
+}
+
+
+def canonical_model_name(model_name: str) -> str:
+    """
+    Normalize a model name for comparisons.
+
+    sentence-transformers resolves "all-MiniLM-L6-v2" to
+    "sentence-transformers/all-MiniLM-L6-v2", and Hugging Face ids are not
+    case sensitive, so both spellings must count as the same model.
+    """
+    name = model_name.strip().lower()
+    prefix = "sentence-transformers/"
+    return name[len(prefix):] if name.startswith(prefix) else name
+
+
+def prompt_convention_for(model_name: str) -> PromptConvention:
+    """Return the prompt convention of a model (no prompt if unknown)."""
+    wanted = canonical_model_name(model_name)
+    for known_name, convention in PROMPT_CONVENTIONS.items():
+        if canonical_model_name(known_name) == wanted:
+            return convention
+    return PromptConvention()
+
+
+def model_slug(model_name: str) -> str:
+    """
+    File-system friendly name of a model, used to keep one index per model.
+
+    Example: "intfloat/multilingual-e5-large-instruct"
+             -> "intfloat_multilingual-e5-large-instruct"
+    """
+    return re.sub(r"[^a-z0-9.-]+", "_", canonical_model_name(model_name)).strip("_")
+
+
+# -----------------------------------------------------------------------------
+# Index metadata (sidecar file)
+# -----------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class IndexMetadata:
+    """
+    Description of a saved FAISS index, persisted as faiss_metadata.json.
+
+    It records which model produced the vectors, so a store never answers
+    queries embedded by one model against documents embedded by another.
+    """
+
+    model_name: str
+    dimension: int
+    metric: str  # METRIC_INNER_PRODUCT or METRIC_L2
+    normalized: bool  # True if vectors were L2-normalized before indexing
+    vector_count: int
+    created_at: Optional[str]  # ISO 8601 (UTC); None for legacy indexes
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to a JSON-compatible dict."""
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "IndexMetadata":
+        """Build from the dict stored in faiss_metadata.json."""
+        return cls(
+            model_name=str(data["model_name"]),
+            dimension=int(data["dimension"]),
+            metric=str(data["metric"]),
+            normalized=bool(data["normalized"]),
+            vector_count=int(data["vector_count"]),
+            created_at=data.get("created_at"),
+        )
+
+
+def legacy_index_metadata(index: Any) -> IndexMetadata:
+    """
+    Metadata assumed for an index saved before faiss_metadata.json existed.
+
+    Those indexes (e.g. the shipped data/indexes/faiss_index) were always
+    built with all-MiniLM-L6-v2 vectors in an IndexFlatL2, without extra
+    normalization.
+    """
+    return IndexMetadata(
+        model_name=LEGACY_INDEX_MODEL,
+        dimension=index.d,
+        metric=METRIC_L2,
+        normalized=False,
+        vector_count=index.ntotal,
+        created_at=None,
+    )
+
+
+def read_index_metadata(path: str) -> Optional[IndexMetadata]:
+    """
+    Read the metadata of a saved index without loading any model.
+
+    Useful to find out which embedding model an index needs before building
+    a store for it.
+
+    Args:
+        path: Directory that contains the index files.
+
+    Returns:
+        The stored metadata, or None for a legacy index without metadata.
+    """
+    metadata_path = Path(path) / METADATA_FILE
+    if not metadata_path.exists():
+        return None
+    with open(metadata_path, "r", encoding="utf-8") as f:
+        return IndexMetadata.from_dict(json.load(f))
+
+
+class IndexModelMismatchError(ValueError):
+    """Raised when an index was built with a different model than the store's."""
+
+
+# -----------------------------------------------------------------------------
+# Store
+# -----------------------------------------------------------------------------
 
 
 class EmbeddingsStoreFaiss(EmbeddingsStore):
@@ -40,45 +235,50 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
     FAISS-based embeddings store for semantic search.
 
     This implementation uses:
-    - IndexFlatL2 for exact nearest-neighbor search (MVP, simplest)
+    - A configurable sentence-transformers model, with the query/document
+      prompt convention of that model (see PROMPT_CONVENTIONS)
+    - IndexFlatIP over L2-normalized vectors (exact cosine search) for new
+      indexes; legacy IndexFlatL2 indexes are still loaded and searched
     - A mapping from FAISS internal indices to book UUIDs
-    - Persistence to disk for both the index and the mapping
+    - Persistence to disk for the index, the mapping and its metadata
 
     For larger datasets (>100k books), consider switching to approximate
     nearest neighbor (ANN) indices like HNSW or IVF for better performance.
     See the ADR at docs/arch_decisions/003_faiss_vector_index.md for details.
-
-    Distance metric choice (MVP vs production):
-    - MVP: IndexFlatL2 with raw embeddings (L2/Euclidean distance)
-    - Production alternative: Normalize embeddings + IndexFlatIP (cosine similarity)
-      Cosine is often better for semantic similarity but adds complexity.
     """
 
     def __init__(
         self,
-        model_name: str = "all-MiniLM-L6-v2",
+        model_name: str = DEFAULT_EMBEDDING_MODEL,
+        device: Optional[str] = None,
     ):
         """
         Initialize the FAISS embeddings store.
 
         Args:
             model_name: Name of the sentence-transformers model to use.
-                        "all-MiniLM-L6-v2" is a good balance of speed and quality,
-                        producing 384-dimensional embeddings.
+                        "all-MiniLM-L6-v2" (default) is small and fast and
+                        produces 384-dimensional embeddings, but it is
+                        English-only.
+            device: Torch device for the model ("cpu", "mps", "cuda").
+                    None lets sentence-transformers pick the best available.
         """
         # Load the sentence-transformers model for generating embeddings.
         # This model converts text into dense vectors of fixed dimension.
-        self._model = SentenceTransformer(model_name)
+        self._model = SentenceTransformer(model_name, device=device)
         self._model_name = model_name
+        self._prompts = prompt_convention_for(model_name)
 
         # Get the embedding dimension from the model.
         # All embeddings must have the same dimension to be indexed together.
         self._dimension: int = self._model.get_sentence_embedding_dimension()
 
-        # FAISS index - initialized as None, created when build_index() is called.
-        # We use IndexFlatL2 which performs exact L2 (Euclidean) distance search.
-        # This is the simplest index type: no training required, exact results.
-        self._index: Optional[faiss.IndexFlatL2] = None
+        # FAISS index - None until build_index() or load_index() is called.
+        self._index: Optional[faiss.Index] = None
+
+        # Metadata of the current index (model, metric, ...). None until built
+        # or loaded.
+        self._index_metadata: Optional[IndexMetadata] = None
 
         # Mapping from FAISS internal index (0, 1, 2, ...) to book UUID.
         # FAISS uses contiguous integer indices internally, but our books have
@@ -93,16 +293,37 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
 
         logger.info(
             f"Initialized EmbeddingsStoreFaiss with model '{model_name}' "
-            f"(dimension={self._dimension})"
+            f"(dimension={self._dimension}, device={self.get_device()})"
         )
+
+    # -------------------------------------------------------------------------
+    # Embedding generation
+    # -------------------------------------------------------------------------
+
+    def _encode(
+        self,
+        texts: List[str],
+        prefix: str = "",
+        prompt_name: Optional[str] = None,
+    ) -> np.ndarray:
+        """
+        Encode texts with the model, applying a prefix or a stored prompt.
+
+        Returns:
+            Matrix of shape (len(texts), dimension).
+        """
+        inputs = [prefix + text for text in texts]
+        # Pass prompt_name only when the convention defines one, so symmetric
+        # models are called exactly as before.
+        extra: Dict[str, Any] = {"prompt_name": prompt_name} if prompt_name else {}
+        return self._model.encode(inputs, convert_to_numpy=True, **extra)
 
     def generate_embedding(self, text: str) -> List[float]:
         """
-        Generate an embedding vector for the given text.
+        Generate the embedding of a document (book text).
 
-        This method uses the sentence-transformers model to encode text
-        into a dense vector representation. The resulting embedding captures
-        the semantic meaning of the text.
+        The model's document convention is applied (e.g. "passage: " for E5).
+        Queries must use generate_query_embedding instead.
 
         Args:
             text: The text to embed (e.g., book title + description).
@@ -117,17 +338,43 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         if not text or not text.strip():
             raise ValueError("Cannot generate embedding for empty text")
 
-        # The encode() method handles tokenization, padding, and inference.
-        # We get back a numpy array of shape (dimension,).
-        embedding = self._model.encode(text, convert_to_numpy=True)
+        embedding = self._encode([text], prefix=self._prompts.document_prefix)[0]
 
         # Convert to Python list for serialization compatibility.
         # The domain layer works with List[float], not numpy arrays.
         return embedding.tolist()
 
+    def generate_query_embedding(self, text: str) -> List[float]:
+        """
+        Generate the embedding of a search query.
+
+        The model's query convention is applied: a prefix such as "query: "
+        or an instruction, or the prompt stored in the model under
+        ``query_prompt_name``. For symmetric models this returns the same
+        vector as generate_embedding.
+
+        Args:
+            text: The query text.
+
+        Returns:
+            The query embedding vector.
+
+        Raises:
+            ValueError: If text is empty.
+        """
+        if not text or not text.strip():
+            raise ValueError("Cannot generate embedding for empty text")
+
+        embedding = self._encode(
+            [text],
+            prefix=self._prompts.query_prefix,
+            prompt_name=self._prompts.query_prompt_name,
+        )[0]
+        return embedding.tolist()
+
     def generate_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         """
-        Generate embeddings for multiple texts in a batch.
+        Generate document embeddings for multiple texts in a batch.
 
         This is more efficient than calling generate_embedding repeatedly
         because sentence-transformers can batch the inference.
@@ -149,12 +396,14 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
             if not text or not text.strip():
                 raise ValueError(f"Text at index {i} is empty")
 
-        # Batch encode is much faster than individual calls.
-        # The model handles batching internally for GPU/CPU efficiency.
-        embeddings = self._model.encode(texts, convert_to_numpy=True)
+        embeddings = self._encode(texts, prefix=self._prompts.document_prefix)
 
         # Convert numpy array to list of lists
         return [emb.tolist() for emb in embeddings]
+
+    # -------------------------------------------------------------------------
+    # Embedding storage
+    # -------------------------------------------------------------------------
 
     def store_embedding(self, book_id: UUID, embedding: List[float]) -> None:
         """
@@ -219,43 +468,34 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         book_id_str = str(book_id)
         return self._embeddings.get(book_id_str)
 
+    # -------------------------------------------------------------------------
+    # Index building and persistence
+    # -------------------------------------------------------------------------
 
     def build_index(self) -> None:
         """
         Build or rebuild the FAISS index from all stored embeddings.
 
         This method:
-        1. Creates a new IndexFlatL2 index
-        2. Converts all stored embeddings to a numpy matrix
-        3. Adds them to the index in a single batch operation
+        1. Converts all stored embeddings to a numpy matrix
+        2. L2-normalizes every row (unit length)
+        3. Adds them to a new IndexFlatIP in a single batch operation
         4. Updates the id_mapping to track FAISS index -> book_id correspondence
 
-        After calling this method, the index is ready for search operations
-        (via VectorSearchRepository).
+        With unit-length vectors, the inner product equals the cosine
+        similarity: cos(a, b) = a.b / (|a| |b|) = a.b. The vector search
+        repository normalizes each query the same way before searching.
 
         Note on index types:
-        - IndexFlatL2: Exact search, O(n) per query. Best for small datasets (<10k).
+        - IndexFlatIP / IndexFlatL2: Exact search, O(n) per query. Best for
+          small datasets (<10k), like this catalog.
         - IndexIVFFlat: Approximate, uses clustering. Better for medium datasets.
         - IndexHNSWFlat: Approximate, uses graph. Best quality/speed trade-off.
-
-        For this MVP, we use IndexFlatL2. See _build_index_hnsw() for an ANN option.
-
-        Raises:
-            RuntimeError: If no embeddings have been stored.
+        See _build_index_hnsw() for an ANN option.
         """
         if not self._embeddings:
             logger.warning("No embeddings to index")
             return
-
-        # Create a fresh index with the correct dimension.
-        # IndexFlatL2 computes exact L2 (Euclidean) distances.
-        # L2 distance: d(x,y) = sqrt(sum((x_i - y_i)^2))
-        #
-        # Alternative for cosine similarity:
-        #   1. Normalize all embeddings: emb = emb / np.linalg.norm(emb)
-        #   2. Use IndexFlatIP (inner product) instead of IndexFlatL2
-        #   With normalized vectors, inner product == cosine similarity.
-        self._index = faiss.IndexFlatL2(self._dimension)
 
         # Build the id mapping and embeddings matrix.
         # The order in _id_mapping corresponds to FAISS internal indices.
@@ -267,24 +507,37 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         # FAISS expects shape (n_vectors, dimension) with dtype float32.
         embeddings_matrix = np.array(embeddings_list, dtype=np.float32)
 
+        # Normalize rows in place to unit length, then index by inner product.
+        faiss.normalize_L2(embeddings_matrix)
+        self._index = faiss.IndexFlatIP(self._dimension)
+
         # Add all embeddings to the index in one batch.
-        # This is much faster than adding one by one.
         # After this call, self._index.ntotal == len(self._embeddings).
         self._index.add(embeddings_matrix)
 
+        self._index_metadata = IndexMetadata(
+            model_name=self._model_name,
+            dimension=self._dimension,
+            metric=METRIC_INNER_PRODUCT,
+            normalized=True,
+            vector_count=self._index.ntotal,
+            created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        )
+
         logger.info(
             f"Built FAISS index with {len(self._embeddings)} embeddings "
-            f"(index.ntotal={self._index.ntotal})"
+            f"(index.ntotal={self._index.ntotal}, metric=cosine)"
         )
-    
 
     def save_index(self, path: str) -> None:
         """
-        Persist the FAISS index and id mapping to disk.
+        Persist the FAISS index, its id mapping and its metadata to disk.
 
-        This saves two files in the specified directory:
+        This saves four files in the specified directory:
         - faiss_index.bin: The FAISS index binary file
         - faiss_id_mapping.json: The book_id mapping
+        - faiss_embeddings.json: The stored embeddings (for get_embedding)
+        - faiss_metadata.json: Model, dimension, metric and creation date
 
         Args:
             path: Directory path where index files should be saved.
@@ -296,31 +549,31 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         if self._index is None:
             raise RuntimeError("Cannot save: index has not been built")
 
-        # Create Path objects for the two files
         dir_path = Path(path)
-        index_path = dir_path / "faiss_index.bin"
-        mapping_path = dir_path / "faiss_id_mapping.json"
-        embeddings_path = dir_path / "faiss_embeddings.json"
-
-        # Ensure directory exists
         dir_path.mkdir(parents=True, exist_ok=True)
 
         # Save the FAISS index to disk.
         # faiss.write_index() handles the binary serialization.
-        faiss.write_index(self._index, str(index_path))
+        faiss.write_index(self._index, str(dir_path / INDEX_FILE))
 
         # Save the id mapping as JSON.
         # This is a simple list: FAISS index position -> book_id (UUID string).
         # ensure_ascii=False allows proper Unicode (e.g., Spanish characters).
-        with open(mapping_path, "w", encoding="utf-8") as f:
+        with open(dir_path / MAPPING_FILE, "w", encoding="utf-8") as f:
             json.dump(self._id_mapping, f, ensure_ascii=False)
 
         # Save the embeddings dict so we can restore get_embedding() functionality.
-        with open(embeddings_path, "w", encoding="utf-8") as f:
+        with open(dir_path / EMBEDDINGS_FILE, "w", encoding="utf-8") as f:
             json.dump(self._embeddings, f, ensure_ascii=False)
 
+        # Save the metadata sidecar (which model produced these vectors).
+        metadata = self._index_metadata or legacy_index_metadata(self._index)
+        with open(dir_path / METADATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(metadata.to_dict(), f, ensure_ascii=False, indent=2)
+
         logger.info(
-            f"Saved FAISS index ({self._index.ntotal} vectors) to {path}"
+            f"Saved FAISS index ({self._index.ntotal} vectors, "
+            f"model={metadata.model_name}, metric={metadata.metric}) to {path}"
         )
 
     def load_index(self, path: str) -> None:
@@ -330,17 +583,23 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         This restores the index to a searchable state without needing
         to regenerate embeddings.
 
+        If the directory has a metadata file, the model recorded there must be
+        the model of this store. A legacy index without metadata is assumed to
+        hold all-MiniLM-L6-v2 vectors in an IndexFlatL2 and keeps working as
+        before.
+
         Args:
             path: Directory path to the saved index files.
 
         Raises:
-            IOError: If loading fails.
-            ValueError: If index format is invalid.
+            FileNotFoundError: If the index or the mapping file is missing.
+            IndexModelMismatchError: If the index was built with another model.
+            ValueError: If the index format is invalid (size or dimension).
         """
         dir_path = Path(path)
-        index_path = dir_path / "faiss_index.bin"
-        mapping_path = dir_path / "faiss_id_mapping.json"
-        embeddings_path = dir_path / "faiss_embeddings.json"
+        index_path = dir_path / INDEX_FILE
+        mapping_path = dir_path / MAPPING_FILE
+        embeddings_path = dir_path / EMBEDDINGS_FILE
 
         if not index_path.exists():
             raise FileNotFoundError(f"Index file not found: {index_path}")
@@ -348,12 +607,49 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         if not mapping_path.exists():
             raise FileNotFoundError(f"Mapping file not found: {mapping_path}")
 
-        # Load the FAISS index from disk.
-        self._index = faiss.read_index(str(index_path))
-
-        # Load the id mapping from JSON.
+        # Read everything into locals first; the store state only changes
+        # once all checks pass.
+        index = faiss.read_index(str(index_path))
         with open(mapping_path, "r", encoding="utf-8") as f:
-            self._id_mapping = json.load(f)
+            id_mapping = json.load(f)
+
+        stored_metadata = read_index_metadata(path)
+        metadata = stored_metadata or legacy_index_metadata(index)
+
+        # Check 1: the index must come from the same model as the queries.
+        if canonical_model_name(metadata.model_name) != canonical_model_name(self._model_name):
+            origin = (
+                "recorded in its metadata"
+                if stored_metadata
+                else "assumed: legacy index without metadata"
+            )
+            raise IndexModelMismatchError(
+                f"The FAISS index at '{path}' was built with embedding model "
+                f"'{metadata.model_name}' ({origin}), but this store uses "
+                f"'{self._model_name}'. Query and document vectors would come "
+                f"from different models. Rebuild the index with "
+                f"`python -m scripts.ingest_and_build --rebuild "
+                f"--embedding-model {self._model_name} --out-dir <dir>`, "
+                f"or set EMBEDDING_MODEL={metadata.model_name}."
+            )
+
+        # Check 2: vector dimension must match the model output.
+        if index.d != self._dimension:
+            raise ValueError(
+                f"Index dimension ({index.d}) does not match the dimension of "
+                f"model '{self._model_name}' ({self._dimension}). Rebuild the index."
+            )
+
+        # Check 3: the mapping must match the index size.
+        if len(id_mapping) != index.ntotal:
+            raise ValueError(
+                f"Mapping size ({len(id_mapping)}) does not match "
+                f"index size ({index.ntotal})"
+            )
+
+        self._index = index
+        self._id_mapping = id_mapping
+        self._index_metadata = metadata
 
         # Load the embeddings dict if it exists (for get_embedding support).
         if embeddings_path.exists():
@@ -367,16 +663,19 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
             )
             self._embeddings = {}
 
-        # Validate that the mapping matches the index size.
-        if len(self._id_mapping) != self._index.ntotal:
-            raise ValueError(
-                f"Mapping size ({len(self._id_mapping)}) does not match "
-                f"index size ({self._index.ntotal})"
+        if stored_metadata is None:
+            logger.info(
+                f"Loaded legacy FAISS index without metadata from {path} "
+                f"(assumed model={LEGACY_INDEX_MODEL}, metric=l2)"
             )
-
         logger.info(
-            f"Loaded FAISS index ({self._index.ntotal} vectors) from {path}"
+            f"Loaded FAISS index ({index.ntotal} vectors, "
+            f"metric={metadata.metric}) from {path}"
         )
+
+    # -------------------------------------------------------------------------
+    # Accessors
+    # -------------------------------------------------------------------------
 
     def get_dimension(self) -> int:
         """
@@ -387,16 +686,29 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         """
         return self._dimension
 
+    def get_model_name(self) -> str:
+        """Name of the sentence-transformers model used by this store."""
+        return self._model_name
+
+    def get_device(self) -> str:
+        """Torch device the model runs on (e.g. "cpu", "mps")."""
+        return str(getattr(self._model, "device", "unknown"))
+
+    def get_index_metadata(self) -> Optional[IndexMetadata]:
+        """Metadata of the built or loaded index, or None if there is none."""
+        return self._index_metadata
+
     # -------------------------------------------------------------------------
     # Additional helper methods (not part of Protocol, but useful internally)
     # -------------------------------------------------------------------------
 
-    def get_index(self) -> Optional[faiss.IndexFlatL2]:
+    def get_index(self) -> Optional[faiss.Index]:
         """
         Get the underlying FAISS index for use by VectorSearchRepository.
 
         This is an internal method, not part of the EmbeddingsStore Protocol.
-        VectorSearchRepository uses this to perform searches.
+        VectorSearchRepository uses this to perform searches. The index's
+        metric_type tells the repository how to turn distances into scores.
 
         Returns:
             The FAISS index, or None if not built.
@@ -447,6 +759,7 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
     def clear(self) -> None:
         """Clear the index and all stored embeddings."""
         self._index = None
+        self._index_metadata = None
         self._id_mapping = []
         self._embeddings = {}
         logger.info("Cleared FAISS index and stored embeddings")
@@ -469,7 +782,7 @@ def _build_index_hnsw(
     HNSW (Hierarchical Navigable Small World) provides excellent query
     performance with high recall. It's recommended for datasets > 10k vectors.
 
-    Trade-offs vs IndexFlatL2:
+    Trade-offs vs the flat (exact) indexes:
     - Faster queries: O(log n) vs O(n)
     - Uses more memory (stores graph structure)
     - Approximate results (configurable recall)
@@ -489,7 +802,8 @@ def _build_index_hnsw(
         index.hnsw.efSearch = 64  # Set search depth for queries
         distances, indices = index.search(query, k=10)
     """
-    # Create the HNSW index with L2 distance.
+    # Create the HNSW index with L2 distance. On unit-length vectors,
+    # L2 ranks neighbours exactly like cosine similarity.
     index = faiss.IndexHNSWFlat(dimension, M)
 
     # ef_construction controls build quality vs speed.
@@ -499,38 +813,3 @@ def _build_index_hnsw(
     index.add(embeddings)
 
     return index
-
-
-# -----------------------------------------------------------------------------
-# Normalization helper (for cosine similarity alternative)
-# -----------------------------------------------------------------------------
-
-
-def _normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
-    """
-    Normalize embeddings to unit length for cosine similarity.
-
-    When using normalized embeddings with IndexFlatIP (inner product),
-    the result is equivalent to cosine similarity:
-        cosine_sim(a, b) = dot(a, b) / (||a|| * ||b||)
-    With ||a|| = ||b|| = 1, this simplifies to dot(a, b).
-
-    Args:
-        embeddings: Matrix of shape (n_vectors, dimension)
-
-    Returns:
-        Normalized embeddings with unit L2 norm per row.
-
-    Example:
-        normalized = _normalize_embeddings(embeddings_matrix)
-        index = faiss.IndexFlatIP(dimension)  # Inner product
-        index.add(normalized)
-        # Now search returns cosine similarity scores
-    """
-    # Compute L2 norm for each embedding
-    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-
-    # Avoid division by zero
-    norms = np.maximum(norms, 1e-10)
-
-    return embeddings / norms

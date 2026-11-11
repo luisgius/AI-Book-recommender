@@ -398,7 +398,7 @@ class SearchService:
         )
 
         logger.debug("Generating query embedding and executing vector search")
-        query_embedding = self._embeddings_store.generate_embedding(query.text)
+        query_embedding = self._embeddings_store.generate_query_embedding(query.text)
         vector_results = self._vector_search.search(
             query_embedding=query_embedding,
             max_results=candidate_limit,
@@ -664,7 +664,7 @@ class SearchService:
         )
 
         # Vector search
-        query_embedding = self._embeddings_store.generate_embedding(variation_text)
+        query_embedding = self._embeddings_store.generate_query_embedding(variation_text)
         vector_results = self._vector_search.search(
             query_embedding=query_embedding,
             max_results=vector_top_k,

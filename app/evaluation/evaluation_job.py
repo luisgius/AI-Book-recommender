@@ -571,7 +571,7 @@ def run_vector_search(
     max_results: int = 100
 ):
     """Mode 2: Vector-only search (FAISS)."""
-    query_embedding = embeddings_store.generate_embedding(query_text)
+    query_embedding = embeddings_store.generate_query_embedding(query_text)
     return vector_repo.search(query_embedding, max_results=max_results)
 
 

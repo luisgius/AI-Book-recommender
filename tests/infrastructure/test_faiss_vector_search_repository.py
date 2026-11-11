@@ -801,7 +801,7 @@ class TestIntegrationWithRealStore:
         repo = FaissVectorSearchRepository(store, books)
 
         # Search for mystery-related content
-        query_embedding = store.generate_embedding("detective crime investigation mystery")
+        query_embedding = store.generate_query_embedding("detective crime investigation mystery")
         results = repo.search(query_embedding, max_results=3)
 
         assert len(results) == 3
@@ -825,7 +825,7 @@ class TestIntegrationWithRealStore:
         repo = FaissVectorSearchRepository(store, books)
 
         # Search for space/sci-fi content
-        query_embedding = store.generate_embedding("space exploration science fiction galaxy")
+        query_embedding = store.generate_query_embedding("space exploration science fiction galaxy")
         results = repo.search(query_embedding, max_results=5)
 
         # Find ranks of specific books
@@ -848,7 +848,7 @@ class TestIntegrationWithRealStore:
         store, books = real_store_and_books
         repo = FaissVectorSearchRepository(store, books)
 
-        query_embedding = store.generate_embedding("interesting book to read")
+        query_embedding = store.generate_query_embedding("interesting book to read")
 
         # Filter for Spanish books
         filters = SearchFilters(language="es")

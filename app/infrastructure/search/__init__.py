@@ -39,7 +39,8 @@ class FaissIndexProvider(Protocol):
         Get the underlying FAISS index for search operations.
 
         Returns:
-            The FAISS index (e.g., IndexFlatL2), or None if not built.
+            The FAISS index (IndexFlatIP, or IndexFlatL2 for legacy indexes),
+            or None if not built. Its metric_type tells how to score results.
             The return type is Any to avoid importing faiss in the protocol.
         """
         ...

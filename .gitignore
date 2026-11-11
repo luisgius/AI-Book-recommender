@@ -46,6 +46,7 @@ htmlcov/
 data/indices/*.pkl
 data/indices/*.faiss
 data/indices/*.index
+data/indexes_ablation/
 
 # Jupyter
 .ipynb_checkpoints/

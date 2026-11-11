@@ -75,6 +75,8 @@ class FakeEmbeddingsStore:
     def generate_embedding(self, text: str) -> List[float]:
         return [0.1] * 384
 
+    generate_query_embedding = generate_embedding  # same vector for queries
+
     def generate_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         return [[0.1] * 384 for _ in texts]
 
