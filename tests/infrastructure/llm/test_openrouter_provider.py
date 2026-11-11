@@ -86,7 +86,7 @@ class TestOpenRouterSettings:
 class TestOpenRouterJudgeSettings:
     def test_default_judge_is_another_family_with_low_effort(self):
         settings = JudgeSettings.from_env({"LLM_PROVIDER": "openrouter"})
-        assert (settings.provider, settings.model) == ("openrouter", "minimax/minimax-m3.1-flash")
+        assert (settings.provider, settings.model) == ("openrouter", "z-ai/glm-5.3-flash")
         assert settings.reasoning == "low"  # its reasoning cannot be switched off
         assert settings.base_url == DEFAULT_OPENROUTER_URL and settings.num_ctx is None
         assert settings.system_llm == "openrouter/qwen/qwen3.8-flash"
@@ -95,7 +95,7 @@ class TestOpenRouterJudgeSettings:
     def test_openrouter_judge_for_a_local_system_llm(self):
         settings = JudgeSettings.from_env({"JUDGE_PROVIDER": "openrouter"})
         assert (settings.model, settings.base_url, settings.num_ctx) == (
-            "minimax/minimax-m3.1-flash", DEFAULT_OPENROUTER_URL, None,
+            "z-ai/glm-5.3-flash", DEFAULT_OPENROUTER_URL, None,
         )
         assert settings.system_llm == "ollama/qwen3.8:27b-mlx"
 

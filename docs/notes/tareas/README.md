@@ -16,6 +16,7 @@ Estado: `[ ]` pendiente, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V06** Ablación unificada y elección de la configuración por defecto
 - [ ] **V07** Línea base de contexto largo (catálogo completo en el prompt)
 - [x] **V08** Proveedor OpenRouter, modelos por defecto y coste por llamada
+- [x] **V10** Selección de los modelos LLM (OpenRouter) sobre las tareas del proyecto
 - [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI)
 
 ## Aplazadas (con motivo)

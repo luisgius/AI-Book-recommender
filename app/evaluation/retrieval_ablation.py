@@ -1295,7 +1295,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-resamples", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--output-json", default=DEFAULT_OUTPUT_JSON)
-    parser.add_argument("--output-md", default=DEFAULT_OUTPUT_MD)
+    parser.add_argument("--output-md", default=DEFAULT_OUTPUT_MD,
+                        help="Markdown report; an empty value writes only the JSON (e.g. for a judge-sensitivity run)")
     return parser
 
 
@@ -1406,7 +1407,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             args.output_json, report["run"]["extended_judgments_sha256"]
         )
     _write(args.output_json, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    _write(args.output_md, build_markdown(report))
+    if args.output_md:
+        _write(args.output_md, build_markdown(report))
 
     contrasts = report["contrasts"]["final"]
     for name, c in contrasts.items():
@@ -1415,7 +1417,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     check = report["reproduction_check"]
     if check is not None:
         print(f"Reproduction check: {'all values match' if check['all_match'] else 'MISMATCH, see the report'}")
-    print(f"Saved {args.output_json} and {args.output_md}")
+    print(f"Saved {args.output_json}" + (f" and {args.output_md}" if args.output_md else ""))
     return 0
 
 

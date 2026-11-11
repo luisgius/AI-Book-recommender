@@ -1,0 +1,546 @@
+{
+  "date": "2026-11-11T15:54:00+00:00",
+  "git_commit": "b8d6ee3",
+  "old_judge": {
+    "models": [
+      "qwen3.8:27b-mlx"
+    ],
+    "num_llm": 919,
+    "judgments_path": "app/evaluation/relevance_judgments_extended.json"
+  },
+  "new_judge": {
+    "model": "z-ai/glm-5.3-flash",
+    "num_llm": 919,
+    "judgments_path": "app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json",
+    "prompt_version": "v1.0",
+    "cache_file": "data/evaluation/llm_judgments/z-ai-glm-5.3-flash__prompt-v1.0.jsonl"
+  },
+  "num_original": 637,
+  "agreement": {
+    "config": {
+      "grades": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "confusion_matrix": "rows: original grade 0-3, columns: LLM grade 0-3",
+      "mean_signed_difference": "mean of LLM grade - original grade (positive: the LLM grades higher)",
+      "quadratic_weighted_kappa_ci95": "percentile bootstrap over pairs, 2000 resamples, seed 0",
+      "binary": "kappa and agreement after mapping grades to grade >= threshold"
+    },
+    "overall": {
+      "n": 919,
+      "exact_agreement": 0.8117519042437432,
+      "within_one_agreement": 0.9934711643090316,
+      "quadratic_weighted_kappa": 0.846964335067451,
+      "quadratic_weighted_kappa_ci95": [
+        0.8221916661407151,
+        0.8711039076805499
+      ],
+      "binary": {
+        "at_least_1": {
+          "kappa": 0.771983046382009,
+          "agreement": 0.8944504896626768
+        },
+        "at_least_2": {
+          "kappa": 0.7690152143105431,
+          "agreement": 0.9488574537540805
+        }
+      },
+      "mean_signed_difference": 0.03808487486398259,
+      "confusion_matrix": [
+        [
+          537,
+          63,
+          0,
+          0
+        ],
+        [
+          34,
+          145,
+          21,
+          5
+        ],
+        [
+          0,
+          20,
+          41,
+          13
+        ],
+        [
+          0,
+          1,
+          16,
+          23
+        ]
+      ],
+      "grade_distribution": {
+        "original": [
+          600,
+          205,
+          74,
+          40
+        ],
+        "llm": [
+          571,
+          229,
+          78,
+          41
+        ]
+      }
+    },
+    "by_language": {
+      "en": {
+        "n": 529,
+        "exact_agreement": 0.8412098298676749,
+        "within_one_agreement": 0.9924385633270322,
+        "quadratic_weighted_kappa": 0.8724564884345882,
+        "quadratic_weighted_kappa_ci95": [
+          0.8367413588475625,
+          0.9008373432442615
+        ],
+        "binary": {
+          "at_least_1": {
+            "kappa": 0.8313433549600676,
+            "agreement": 0.9243856332703214
+          },
+          "at_least_2": {
+            "kappa": 0.7403298645199293,
+            "agreement": 0.943289224952741
+          }
+        },
+        "mean_signed_difference": 0.04158790170132325,
+        "confusion_matrix": [
+          [
+            330,
+            29,
+            0,
+            0
+          ],
+          [
+            11,
+            78,
+            11,
+            4
+          ],
+          [
+            0,
+            15,
+            18,
+            7
+          ],
+          [
+            0,
+            0,
+            7,
+            19
+          ]
+        ],
+        "grade_distribution": {
+          "original": [
+            359,
+            104,
+            40,
+            26
+          ],
+          "llm": [
+            341,
+            122,
+            36,
+            30
+          ]
+        }
+      },
+      "es": {
+        "n": 390,
+        "exact_agreement": 0.7717948717948718,
+        "within_one_agreement": 0.9948717948717949,
+        "quadratic_weighted_kappa": 0.8079335621196255,
+        "quadratic_weighted_kappa_ci95": [
+          0.7584150418358361,
+          0.8460163017082586
+        ],
+        "binary": {
+          "at_least_1": {
+            "kappa": 0.694768639296993,
+            "agreement": 0.8538461538461538
+          },
+          "at_least_2": {
+            "kappa": 0.8067168095154802,
+            "agreement": 0.9564102564102565
+          }
+        },
+        "mean_signed_difference": 0.03333333333333333,
+        "confusion_matrix": [
+          [
+            207,
+            34,
+            0,
+            0
+          ],
+          [
+            23,
+            67,
+            10,
+            1
+          ],
+          [
+            0,
+            5,
+            23,
+            6
+          ],
+          [
+            0,
+            1,
+            9,
+            4
+          ]
+        ],
+        "grade_distribution": {
+          "original": [
+            241,
+            101,
+            34,
+            14
+          ],
+          "llm": [
+            230,
+            107,
+            42,
+            11
+          ]
+        }
+      }
+    }
+  },
+  "agreement_note": "rows / 'original': old judge; columns / 'llm': new judge",
+  "contrasts": [
+    {
+      "name": "C1",
+      "question": "Does the normalizing tokenizer improve BM25?",
+      "system": "bm25_normalized",
+      "reference": "bm25_whitespace",
+      "old": {
+        "system": "bm25_normalized",
+        "reference": "bm25_whitespace",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.47148999642573003,
+        "mean_reference": 0.41782317351616477,
+        "mean_difference": 0.05366682290956519,
+        "ci_low": 0.009408303964669854,
+        "ci_high": 0.1075324191252282,
+        "p_value": 0.025997400259974,
+        "p_value_holm": 0.1553844615538446,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "new": {
+        "system": "bm25_normalized",
+        "reference": "bm25_whitespace",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.49615825856604945,
+        "mean_reference": 0.45127557661065315,
+        "mean_difference": 0.04488268195539638,
+        "ci_low": 0.0039110614965216905,
+        "ci_high": 0.09485597181076379,
+        "p_value": 0.0471952804719528,
+        "p_value_holm": 0.23597640235976403,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "holds": true
+    },
+    {
+      "name": "C2",
+      "question": "Does multilingual-e5-large-instruct improve the vector side?",
+      "system": "vec_e5",
+      "reference": "vec_minilm",
+      "old": {
+        "system": "vec_e5",
+        "reference": "vec_minilm",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.6214821581499268,
+        "mean_reference": 0.5230561237289301,
+        "mean_difference": 0.09842603442099679,
+        "ci_low": 0.005688916781939463,
+        "ci_high": 0.18722952519441877,
+        "p_value": 0.0397960203979602,
+        "p_value_holm": 0.1591840815918408,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "new": {
+        "system": "vec_e5",
+        "reference": "vec_minilm",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.6738371836335125,
+        "mean_reference": 0.5629564958995795,
+        "mean_difference": 0.11088068773393299,
+        "ci_low": 0.023267288737225222,
+        "ci_high": 0.19595605652650838,
+        "p_value": 0.0170982901709829,
+        "p_value_holm": 0.10258974102589741,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "holds": true
+    },
+    {
+      "name": "C3",
+      "question": "Does Qwen3-Embedding-0.6B improve the vector side?",
+      "system": "vec_qwen3",
+      "reference": "vec_minilm",
+      "old": {
+        "system": "vec_qwen3",
+        "reference": "vec_minilm",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.5922230985375814,
+        "mean_reference": 0.5230561237289301,
+        "mean_difference": 0.06916697480865133,
+        "ci_low": -0.006867197640113503,
+        "ci_high": 0.14530582411789936,
+        "p_value": 0.0821917808219178,
+        "p_value_holm": 0.1643835616438356,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "new": {
+        "system": "vec_qwen3",
+        "reference": "vec_minilm",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.6233056473997096,
+        "mean_reference": 0.5629564958995795,
+        "mean_difference": 0.06034915150013005,
+        "ci_low": -0.02363773321349478,
+        "ci_high": 0.1436650891814853,
+        "p_value": 0.17268273172682733,
+        "p_value_holm": 0.27957204279572045,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "holds": true
+    },
+    {
+      "name": "C4a",
+      "question": "Do tokenizer + e5 together improve the production hybrid?",
+      "system": "hybrid_norm_e5",
+      "reference": "hybrid_legacy",
+      "old": {
+        "system": "hybrid_norm_e5",
+        "reference": "hybrid_legacy",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.5698854145603711,
+        "mean_reference": 0.5081663131349706,
+        "mean_difference": 0.06171910142540038,
+        "ci_low": 0.0019619644101294153,
+        "ci_high": 0.11801062208866814,
+        "p_value": 0.0446955304469553,
+        "p_value_holm": 0.1591840815918408,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "new": {
+        "system": "hybrid_norm_e5",
+        "reference": "hybrid_legacy",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.6013543533542006,
+        "mean_reference": 0.542799269759035,
+        "mean_difference": 0.05855508359516545,
+        "ci_low": -0.004028603411021363,
+        "ci_high": 0.11793525973561195,
+        "p_value": 0.06989301069893011,
+        "p_value_holm": 0.27957204279572045,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "holds": true
+    },
+    {
+      "name": "C4b",
+      "question": "Do tokenizer + Qwen3 together improve the production hybrid?",
+      "system": "hybrid_norm_qwen3",
+      "reference": "hybrid_legacy",
+      "old": {
+        "system": "hybrid_norm_qwen3",
+        "reference": "hybrid_legacy",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.5803302742465237,
+        "mean_reference": 0.5081663131349706,
+        "mean_difference": 0.07216396111155308,
+        "ci_low": 0.010224181534519606,
+        "ci_high": 0.13378719438838454,
+        "p_value": 0.025897410258974102,
+        "p_value_holm": 0.1553844615538446,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": true
+      },
+      "new": {
+        "system": "hybrid_norm_qwen3",
+        "reference": "hybrid_legacy",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.609946944939189,
+        "mean_reference": 0.542799269759035,
+        "mean_difference": 0.06714767518015391,
+        "ci_low": -0.0054745999124169815,
+        "ci_high": 0.13808133371568126,
+        "p_value": 0.07489251074892511,
+        "p_value_holm": 0.27957204279572045,
+        "direction": "+",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "holds": true
+    },
+    {
+      "name": "C5",
+      "question": "Does the bge cross-encoder improve the e5 hybrid?",
+      "system": "hybrid_norm_e5_bge",
+      "reference": "hybrid_norm_e5",
+      "old": {
+        "system": "hybrid_norm_e5_bge",
+        "reference": "hybrid_norm_e5",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.6676466411367202,
+        "mean_reference": 0.5698854145603711,
+        "mean_difference": 0.09776122657634917,
+        "ci_low": 0.045992759569827665,
+        "ci_high": 0.15455705983896054,
+        "p_value": 0.0010998900109989002,
+        "p_value_holm": 0.007699230076992301,
+        "direction": "+",
+        "significant_holm": true,
+        "significant_unadjusted": true
+      },
+      "new": {
+        "system": "hybrid_norm_e5_bge",
+        "reference": "hybrid_norm_e5",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.7009057555041345,
+        "mean_reference": 0.6013543533542006,
+        "mean_difference": 0.09955140214993391,
+        "ci_low": 0.04260762609731736,
+        "ci_high": 0.15996203259519445,
+        "p_value": 0.0026997300269973002,
+        "p_value_holm": 0.0188981101889811,
+        "direction": "+",
+        "significant_holm": true,
+        "significant_unadjusted": true
+      },
+      "holds": true
+    },
+    {
+      "name": "C6",
+      "question": "Does the mMARCO cross-encoder improve the e5 hybrid?",
+      "system": "hybrid_norm_e5_mmarco",
+      "reference": "hybrid_norm_e5",
+      "old": {
+        "system": "hybrid_norm_e5_mmarco",
+        "reference": "hybrid_norm_e5",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.5376620295262861,
+        "mean_reference": 0.5698854145603711,
+        "mean_difference": -0.032223385034084985,
+        "ci_low": -0.11289017574094945,
+        "ci_high": 0.045380295380562014,
+        "p_value": 0.43655634436556345,
+        "p_value_holm": 0.43655634436556345,
+        "direction": "-",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "new": {
+        "system": "hybrid_norm_e5_mmarco",
+        "reference": "hybrid_norm_e5",
+        "metric": "ndcg_at_10",
+        "mean_system": 0.5280335978707233,
+        "mean_reference": 0.6013543533542006,
+        "mean_difference": -0.07332075548347722,
+        "ci_low": -0.16441014739124207,
+        "ci_high": 0.010926498398301737,
+        "p_value": 0.11198880111988802,
+        "p_value_holm": 0.27957204279572045,
+        "direction": "-",
+        "significant_holm": false,
+        "significant_unadjusted": false
+      },
+      "holds": true
+    }
+  ],
+  "systems_ndcg": {
+    "bm25_whitespace": {
+      "old": 0.41782317351616477,
+      "new": 0.4512755766106531
+    },
+    "bm25_normalized": {
+      "old": 0.47148999642573003,
+      "new": 0.49615825856604945
+    },
+    "vec_minilm": {
+      "old": 0.5230561237289301,
+      "new": 0.5629564958995795
+    },
+    "vec_e5": {
+      "old": 0.6214821581499268,
+      "new": 0.6738371836335125
+    },
+    "vec_qwen3": {
+      "old": 0.5922230985375815,
+      "new": 0.6233056473997096
+    },
+    "hybrid_legacy": {
+      "old": 0.5081663131349707,
+      "new": 0.542799269759035
+    },
+    "hybrid_norm_minilm": {
+      "old": 0.5292417662106564,
+      "new": 0.5631487517224275
+    },
+    "hybrid_norm_e5": {
+      "old": 0.569885414560371,
+      "new": 0.6013543533542005
+    },
+    "hybrid_norm_qwen3": {
+      "old": 0.5803302742465238,
+      "new": 0.6099469449391891
+    },
+    "hybrid_norm_e5_bge": {
+      "old": 0.6676466411367202,
+      "new": 0.7009057555041346
+    },
+    "hybrid_norm_e5_mmarco": {
+      "old": 0.5376620295262862,
+      "new": 0.5280335978707232
+    }
+  },
+  "same_runs": true,
+  "reproduction_original_matches": true,
+  "old_ablation_json": "data/evaluation/results_retrieval_ablation.json",
+  "new_ablation_json": "data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json",
+  "grading": {
+    "date": "2026-11-11T15:41:21+00:00",
+    "judge_provider": "openrouter",
+    "judge_model": "z-ai/glm-5.3-flash",
+    "judge_reasoning": "low",
+    "prompt_version": "v1.0",
+    "pairs": 919,
+    "judged_in_this_run": 919,
+    "already_cached": 0,
+    "failed": 0,
+    "remaining": 0,
+    "seconds_per_judgment": 1.953484594085435,
+    "workers": 4,
+    "reported_cost_usd": 0.059056378,
+    "cache_file": "data/evaluation/llm_judgments/z-ai-glm-5.3-flash__prompt-v1.0.jsonl"
+  }
+}

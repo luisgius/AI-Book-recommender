@@ -591,3 +591,73 @@ class TestRetryLogic:
         assert isinstance(result, QueryIntent)
         assert result.intent_type == "recommendation"
         assert mock_graph.invoke.call_count == 3
+
+
+# ================================================================================
+# TEST: raw output observer (evaluation hook, before the guardrails)
+# ================================================================================
+
+class TestRawOutputObserver:
+    """The observer sees what the model wrote before any guardrail discards it."""
+
+    def test_explanation_observer_sees_citations_the_guardrail_drops(self, sample_book, sample_query_text):
+        raw = GroundedExplanationLLM(
+            summary="A guide to software craftsmanship for developers.",
+            reasoning="The description mentions software craftsmanship [CITE: description].",
+            citations=[
+                CitationLLM(book_id=str(sample_book.id), chunk_id="description",
+                            snippet="software craftsmanship", relevance_score=0.9),
+                CitationLLM(book_id=str(sample_book.id), chunk_id="title",
+                            snippet="Clean Code", relevance_score=0.8),  # not in the title
+            ],
+            confidence=0.9,
+        )
+        mock_chain = Mock()
+        mock_chain.invoke.return_value = raw
+        client = create_mock_client(chain_mock=mock_chain)
+        seen = []
+        client.raw_output_observer = lambda operation, output: seen.append((operation, output))
+
+        explanation = client.generate_grounded_explanation(sample_query_text, sample_book)
+
+        assert seen == [("explanation", raw)]
+        assert len(seen[0][1].citations) == 2  # everything the model wrote
+        assert [c.snippet for c in explanation.citations] == ["software craftsmanship"]  # after the guardrail
+
+    def test_explanation_observer_is_not_called_when_the_call_fails(self, sample_book, sample_query_text):
+        mock_chain = Mock()
+        mock_chain.invoke.side_effect = ValueError("output does not fit the schema")
+        client = create_mock_client(chain_mock=mock_chain)
+        seen = []
+        client.raw_output_observer = lambda operation, output: seen.append(operation)
+
+        explanation = client.generate_grounded_explanation(sample_query_text, sample_book)
+
+        assert seen == []
+        assert "Unable to generate explanation" in explanation.text
+
+    def test_query_observer_sees_filters_the_guards_drop(
+        self, mock_query_intent_llm, mock_extracted_filters, mock_reformulated_query
+    ):
+        state = {
+            "original_query": "books about Python",  # asks for no language
+            "intent": mock_query_intent_llm,
+            "filters": mock_extracted_filters,  # language="en"
+            "reformulated": mock_reformulated_query,
+            "final_query": "python programming books",
+            "error": None,
+        }
+        mock_graph = Mock()
+        mock_graph.invoke.return_value = state
+        client = create_mock_client(graph_mock=mock_graph)
+        seen = []
+        client.raw_output_observer = lambda operation, output: seen.append((operation, output))
+
+        intent = client.extract_query_intent("books about Python")
+
+        assert seen == [("query_understanding", state)]
+        assert seen[0][1]["filters"].language == "en"  # as the model extracted it
+        assert intent.extracted_filters.language is None  # dropped by the filter guard
+
+    def test_no_observer_by_default(self):
+        assert create_mock_client().raw_output_observer is None

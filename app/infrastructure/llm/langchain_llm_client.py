@@ -8,7 +8,7 @@ import random
 
 import httpx
 from datetime import datetime, UTC
-from typing import Callable, List, Optional, TypeVar
+from typing import Any, Callable, List, Optional, TypeVar
 
 from langchain.chat_models import init_chat_model
 
@@ -37,6 +37,13 @@ logger = logging.getLogger(__name__)
 
 # Type variable for generic retry function
 T = TypeVar('T')
+
+# Receives (operation, raw model output) after each successful LLM call and
+# before any guardrail: the GroundedExplanationLLM of an explanation (with
+# every citation the model wrote) or the final state of the query
+# understanding graph (with the filters as extracted). See
+# LangChainLLMClient.raw_output_observer.
+RawOutputObserver = Callable[[str, Any], None]
 
 # Default retry configuration
 DEFAULT_MAX_RETRIES = 3
@@ -181,6 +188,12 @@ class LangChainLLMClient(LLMClient):
     - usage_recorder (LLMUsageRecorder) records every call of the chat model,
       including those of the search agent that reuses it, labelled
       query_understanding, explanation, explanation_judge or agent.
+
+    Raw outputs (evaluation only):
+    - raw_output_observer, when set, receives the model output before the
+      guardrails discard anything (invalid citations, unrequested filters),
+      so an evaluation can measure what the model itself wrote. It is None
+      in production.
     """
 
     def __init__(
@@ -251,6 +264,9 @@ class LangChainLLMClient(LLMClient):
 
         # Records operation, latency and tokens of every call of self.model
         self.usage_recorder = LLMUsageRecorder()
+
+        # Optional hook that sees each raw model output (evaluation only)
+        self.raw_output_observer: Optional[RawOutputObserver] = None
 
         # Log initialization (without exposing API key)
         logger.info(f"Initializing {provider} LLM with model {model_name} (temp={temperature})")
@@ -403,6 +419,8 @@ class LangChainLLMClient(LLMClient):
                 operation=lambda: self.chain.invoke(inputs, config=operation_config("explanation")),
                 operation_name=f"Explanation generation for book {book.id}"
             )
+            if self.raw_output_observer is not None:
+                self.raw_output_observer("explanation", result)
 
             explanation = validate_grounded_explanation(
                 explanation_llm=result,
@@ -471,6 +489,8 @@ class LangChainLLMClient(LLMClient):
                 }, config=operation_config("query_understanding")),
                 operation_name="Query understanding"
             )
+            if self.raw_output_observer is not None:
+                self.raw_output_observer("query_understanding", result)
 
             # 3. Convert graph output to domain QueryIntent
             query_intent = self._convert_graph_result_to_query_intent(result)

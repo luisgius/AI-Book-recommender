@@ -30,7 +30,7 @@ LLM environment variables (all optional):
 Relevance judge environment variables (all optional; evaluation only):
     JUDGE_PROVIDER        provider of the LLM that grades (query, book) pairs;
                           default LLM_PROVIDER
-    JUDGE_MODEL           judge model id; default minimax/minimax-m3.1-flash on
+    JUDGE_MODEL           judge model id; default z-ai/glm-5.3-flash on
                           OpenRouter, otherwise LLM_MODEL (or the provider's
                           default model when JUDGE_PROVIDER differs)
     JUDGE_BASE_URL        judge server URL; default LLM_BASE_URL (or the
@@ -98,14 +98,16 @@ REASONING_EFFORTS = ("minimal", "low", "medium", "high", "xhigh", "max")
 Reasoning = Union[bool, str, None]
 
 # Default judge per provider when JUDGE_MODEL is not set. On OpenRouter it is
-# MiniMax M3.1 Flash, another model family than the default system LLM
-# (Qwen3.8 Flash): the literature recommends a judge from a different family
-# than the system it judges. Other providers fall back to the system model.
-DEFAULT_JUDGE_MODELS = {"openrouter": "minimax/minimax-m3.1-flash"}
+# GLM-5.3 Flash (Z.ai), another vendor than the default system LLM (Qwen3.8
+# Flash, Alibaba): the literature recommends a judge from a different family
+# than the system it judges. Both were chosen on the project's own tasks
+# (data/evaluation/LLM_MODEL_SELECTION.md, 2026-11-11). Other providers fall
+# back to the system model.
+DEFAULT_JUDGE_MODELS = {"openrouter": "z-ai/glm-5.3-flash"}
 
 # Thinking mode of those default judges when JUDGE_REASONING is not set.
-# MiniMax M3.1 Flash has mandatory reasoning on OpenRouter ("off" is rejected
-# with HTTP 400), so it runs at its lowest effort level.
+# GLM-5.3 Flash has mandatory reasoning on OpenRouter ("off" is rejected with
+# HTTP 400), so it runs at effort "low", the level it was measured with.
 DEFAULT_JUDGE_REASONING = {"openrouter": "low"}
 
 # Environment variable holding the OpenRouter API key.

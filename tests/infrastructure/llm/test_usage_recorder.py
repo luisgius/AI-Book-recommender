@@ -192,8 +192,46 @@ class TestSummary:
         assert summary == {TOTAL: {
             "calls": 0, "failed_calls": 0, "calls_without_usage": 0, "input_tokens": None,
             "output_tokens": None, "total_latency_s": 0, "mean_latency_s": None,
-            "median_latency_s": None, "estimated_cost_usd": None,
+            "median_latency_s": None, "estimated_cost_usd": None, "reported_cost_usd": None,
         }}
+
+    def test_reported_cost_is_summed_and_none_when_never_reported(self):
+        recorder = recorder_with(
+            LLMCallRecord(operation="explanation", model="m", latency_s=1.0, input_tokens=10,
+                          output_tokens=5, cost_usd=0.002),
+            LLMCallRecord(operation="explanation", model="m", latency_s=1.0, input_tokens=10,
+                          output_tokens=5, cost_usd=0.003),
+            record("explanation", 1.0, 10, 5),  # a call whose provider reported no cost
+            record("agent", 1.0, 10, 5),
+        )
+        summary = recorder.summary()
+        assert summary["explanation"]["reported_cost_usd"] == pytest.approx(0.005)
+        assert summary["agent"]["reported_cost_usd"] is None
+        assert summary[TOTAL]["reported_cost_usd"] == pytest.approx(0.005)
+
+
+class TestReportedCost:
+    def test_openrouter_cost_in_the_usage_block_is_recorded(self):
+        recorder = LLMUsageRecorder()
+        message = AIMessage(
+            content="ok",
+            usage_metadata={"input_tokens": 39, "output_tokens": 19, "total_tokens": 58},
+            response_metadata={"token_usage": {"prompt_tokens": 39, "completion_tokens": 19, "cost": 1.478e-05}},
+        )
+        fake_model(recorder, message).invoke("hello")
+        [record_] = recorder.records
+        assert record_.cost_usd == pytest.approx(1.478e-05)
+
+    def test_no_reported_cost_gives_none(self):
+        recorder = LLMUsageRecorder()
+        fake_model(recorder, answer(input_tokens=3, output_tokens=2)).invoke("hello")
+        assert recorder.records[0].cost_usd is None
+
+    def test_failed_call_has_no_cost(self):
+        recorder = LLMUsageRecorder()
+        with pytest.raises(ConnectionError):
+            fake_model(recorder, cls=FailingChatModel).invoke("hello")
+        assert recorder.records[0].cost_usd is None
 
 
 class TestTokenPrices:

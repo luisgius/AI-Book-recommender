@@ -664,6 +664,18 @@ def _judge_description(settings, judge: RelevanceJudge) -> Dict[str, Any]:
     }
 
 
+def _thinking(judge_info: Mapping[str, Any]) -> str:
+    """How the judge's thinking mode was set, in words."""
+    reasoning = judge_info.get("reasoning")
+    if reasoning is False:
+        return "thinking off"
+    if reasoning is True:
+        return "thinking on"
+    if reasoning is None:
+        return "the model's default thinking mode"
+    return f"thinking at effort `{reasoning}` (it cannot be switched off)"
+
+
 def _judge_note(judge_info: Mapping[str, Any]) -> str:
     """Markdown note on which model judges and why that matters."""
     if judge_info["same_as_system_llm"]:
@@ -761,7 +773,7 @@ def build_agreement_markdown(document: Mapping[str, Any], max_disagreements: int
 - Git commit: `{commit}`{dirty}
 - Reproduce: `{run["command"]}`
 - Judge: `{judge["provider"]}/{judge["model"]}`, prompt `{judge["prompt_version"]}`
-  (`{judge["prompt"]}`), temperature {judge["temperature"]}, thinking off, at most
+  (`{judge["prompt"]}`), temperature {judge["temperature"]}, {_thinking(judge)}, at most
   {judge["max_tokens"]} output tokens, structured output (rationale, then grade 0-3).
 - {_judge_note(judge)}{timing}
 - Sample: {sample["n"]} of the {sample["population"]} original judgments, seed {sample["seed"]}, stratified
@@ -792,13 +804,26 @@ Mean LLM - original: positive when the LLM grades higher.
 """
 
 
-def run_agreement(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
-    """`agreement` subcommand: judge a stratified sample of judged pairs blind and report."""
+def run_agreement(
+    args: argparse.Namespace,
+    raw_args: Sequence[str],
+    build_judge: Optional[Callable[[], Tuple[Any, RelevanceJudge]]] = None,
+) -> int:
+    """
+    `agreement` subcommand: judge a stratified sample of judged pairs blind and report.
+
+    Args:
+        args: Parsed CLI arguments
+        raw_args: The CLI arguments as given, recorded in the report
+        build_judge: Returns (JudgeSettings, judge); default _build_judge
+            (JUDGE_* from the environment). The model comparison
+            (llm_model_selection.py) passes one judge per candidate model.
+    """
     from app.evaluation.evaluation_job import load_relevance_judgments, load_test_queries
     from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
 
     started = datetime.now(UTC)
-    settings, judge = _build_judge()
+    settings, judge = (build_judge or _build_judge)()
     catalog = SqliteBookCatalogRepository(Path(args.db_path))
     books = {(book.source, book.source_id): book for book in catalog.get_all()}
     queries = {query.query_id: query for query in load_test_queries(args.queries_path)}
@@ -836,7 +861,11 @@ def run_agreement(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
         "run": _provenance(started, raw_args),
         "judge": _judge_description(settings, judge),
         "cache_file": str(cache.path),
-        "timing": {"judged_in_this_run": stats.judged, "seconds_per_judgment": stats.seconds_per_judgment},
+        "timing": {
+            "judged_in_this_run": stats.judged,
+            "failed_in_this_run": stats.failed,
+            "seconds_per_judgment": stats.seconds_per_judgment,
+        },
         "sample": {
             "n": len(sample),
             "population": len(population),
@@ -893,7 +922,7 @@ def build_fill_markdown(document: Mapping[str, Any], before: Mapping[str, Any], 
 - Git commit: `{commit}`{dirty}
 - Reproduce: `{run["command"]}`
 - Judge: `{judge["provider"]}/{judge["model"]}`, prompt `{judge["prompt_version"]}`, temperature
-  {judge["temperature"]}, thinking off. {_judge_note(judge)}
+  {judge["temperature"]}, {_thinking(judge)}. {_judge_note(judge)}
 - {agreement_line}
 - Holes: {fill["unjudged_pairs"]} (query, book) pairs in the top {fill["k"]} of the systems below had no
   judgment; the LLM judged all of them (grades 0 / 1 / 2 / 3: {grades}).

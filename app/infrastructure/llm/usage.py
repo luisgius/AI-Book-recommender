@@ -17,7 +17,9 @@ Token counts are the ones the provider reports (usage_metadata of the
 response: Ollama's prompt_eval_count/eval_count, the OpenAI-compatible
 `usage` block). When a provider reports none, the counts are recorded as
 None, never estimated. Output tokens include thinking tokens when the
-provider counts them as output.
+provider counts them as output. The cost is recorded only when the provider
+reports it (OpenRouter's `usage.cost`, in USD, the price of the endpoint
+that served the call); otherwise it is None.
 
 The recorder only appends a small record per call (no logging, no I/O), so
 it costs nothing noticeable when nobody reads it. Evaluation code reads
@@ -66,6 +68,7 @@ class LLMCallRecord:
     output_tokens: Optional[int]  # None: the provider did not report it
     step: Optional[str] = None  # LangGraph node that made the call, if any
     error: Optional[str] = None  # exception type when the call failed
+    cost_usd: Optional[float] = None  # cost the provider reported; None: not reported
 
 
 @dataclass(frozen=True)
@@ -95,6 +98,26 @@ def reported_tokens(response: LLMResult) -> Tuple[Optional[int], Optional[int]]:
     if token_usage:
         return token_usage.get("prompt_tokens"), token_usage.get("completion_tokens")
     return None, None
+
+
+def reported_cost(response: LLMResult) -> Optional[float]:
+    """
+    Cost in USD the provider reported for one call, if any.
+
+    OpenRouter adds `cost` to the OpenAI-style `usage` block, which
+    LangChain's OpenAI client keeps in llm_output["token_usage"] and in the
+    message's response_metadata["token_usage"]. Other providers report no
+    cost, so the result is None for them.
+    """
+    usage_blocks = [(response.llm_output or {}).get("token_usage") or {}]
+    for generations in response.generations:
+        for generation in generations:
+            metadata = getattr(getattr(generation, "message", None), "response_metadata", None) or {}
+            usage_blocks.append(metadata.get("token_usage") or {})
+    for block in usage_blocks:
+        if isinstance(block.get("cost"), (int, float)):
+            return float(block["cost"])
+    return None
 
 
 class LLMUsageRecorder(BaseCallbackHandler):
@@ -145,9 +168,9 @@ class LLMUsageRecorder(BaseCallbackHandler):
             self._pending[run_id] = pending
 
     def on_llm_end(self, response: LLMResult, *, run_id: UUID, **kwargs: Any) -> None:
-        """Record a finished call with the tokens the provider reported."""
+        """Record a finished call with the tokens (and cost) the provider reported."""
         input_tokens, output_tokens = reported_tokens(response)
-        self._finish(run_id, input_tokens, output_tokens, error=None)
+        self._finish(run_id, input_tokens, output_tokens, error=None, cost_usd=reported_cost(response))
 
     def on_llm_error(self, error: BaseException, *, run_id: UUID, **kwargs: Any) -> None:
         """Record a failed call (no tokens), so latency statistics include it."""
@@ -159,6 +182,7 @@ class LLMUsageRecorder(BaseCallbackHandler):
         input_tokens: Optional[int],
         output_tokens: Optional[int],
         error: Optional[str],
+        cost_usd: Optional[float] = None,
     ) -> None:
         ended = time.perf_counter()
         with self._lock:
@@ -173,6 +197,7 @@ class LLMUsageRecorder(BaseCallbackHandler):
                 output_tokens=output_tokens,
                 step=pending.step,
                 error=error,
+                cost_usd=cost_usd,
             ))
 
     # -- reading ---------------------------------------------------------------
@@ -200,9 +225,10 @@ class LLMUsageRecorder(BaseCallbackHandler):
             {operation: row}, where a row has calls, failed_calls,
             calls_without_usage, input_tokens, output_tokens (sums of the
             reported counts; None when no call reported any), total_latency_s,
-            mean_latency_s, median_latency_s and estimated_cost_usd (from the
+            mean_latency_s, median_latency_s, estimated_cost_usd (from the
             reported counts only; calls_without_usage says how many calls
-            it misses).
+            it misses) and reported_cost_usd (sum of the costs the provider
+            reported; None when no call reported one).
         """
         records = self.records
         operations = sorted({record.operation for record in records})
@@ -211,7 +237,7 @@ class LLMUsageRecorder(BaseCallbackHandler):
         return rows
 
 
-def _sum_reported(values: List[Optional[int]]) -> Optional[int]:
+def _sum_reported(values: List[Optional[float]]) -> Optional[float]:
     reported = [value for value in values if value is not None]
     return sum(reported) if reported else None
 
@@ -235,4 +261,5 @@ def _summarize(records: List[LLMCallRecord], prices: Optional[TokenPrices]) -> D
         "mean_latency_s": statistics.fmean(latencies) if latencies else None,
         "median_latency_s": statistics.median(latencies) if latencies else None,
         "estimated_cost_usd": cost,
+        "reported_cost_usd": _sum_reported([record.cost_usd for record in records]),
     }

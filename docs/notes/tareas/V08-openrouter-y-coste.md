@@ -98,6 +98,7 @@ Sin LLM, `LLM_PROVIDER=none`. Con Ollama, `LLM_PROVIDER=ollama`. El juez usa `JU
 - El coste de DeepSeek depende del enrutamiento de OpenRouter y la estimación puede quedar muy por debajo del real.
 - Qué modelo es mejor para cada función se decidirá en una comparación aparte sobre las tareas del proyecto (pendiente). La muestra de esta tarea (tres consultas, cinco pares) solo comprueba que todo funciona y mide coste y latencia.
 - Los precios y los modelos disponibles son los del 2026-11-11 y pueden cambiar.
+- El juez por defecto que nombra esta nota (`minimax/minimax-m3.1-flash`) fue sustituido por `z-ai/glm-5.3-flash` en la tarea V10 (ver `V10-seleccion-modelos-llm.md`).
 
 ## Ficheros
 
