@@ -24,6 +24,10 @@ that served the call); otherwise it is None.
 The recorder only appends a small record per call (no logging, no I/O), so
 it costs nothing noticeable when nobody reads it. Evaluation code reads
 `recorder.records` or `recorder.summary(prices)`.
+
+Calls that are not chat-model calls (embedding and rerank requests made over
+HTTP by the API adapters of app/infrastructure/search/) are recorded with
+record_call() under the operations "embedding" and "rerank".
 """
 
 import statistics
@@ -46,6 +50,11 @@ UNLABELLED = "unlabelled"
 
 # Key of the summary row that aggregates every operation.
 TOTAL = "total"
+
+# Operations of calls that are not chat-model calls (recorded with
+# LLMUsageRecorder.record_call by the API encoder and the API reranker).
+EMBEDDING_OPERATION = "embedding"
+RERANK_OPERATION = "rerank"
 
 
 def operation_config(operation: str) -> Dict[str, Any]:
@@ -196,6 +205,45 @@ class LLMUsageRecorder(BaseCallbackHandler):
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
                 step=pending.step,
+                error=error,
+                cost_usd=cost_usd,
+            ))
+
+    # -- calls made without LangChain -------------------------------------------
+
+    def record_call(
+        self,
+        operation: str,
+        model: str,
+        latency_s: float,
+        input_tokens: Optional[int],
+        output_tokens: Optional[int] = 0,
+        cost_usd: Optional[float] = None,
+        error: Optional[str] = None,
+    ) -> None:
+        """
+        Record one call that does not go through a LangChain chat model.
+
+        Used for embedding and rerank requests (operations EMBEDDING_OPERATION
+        and RERANK_OPERATION), which have input tokens but generate none, so
+        their output tokens are 0 rather than unknown.
+
+        Args:
+            operation: Operation label of the call
+            model: Model id
+            latency_s: Wall clock of the call, retries included
+            input_tokens: Tokens the provider reported (None: not reported)
+            output_tokens: Generated tokens (0 for embedding and rerank calls)
+            cost_usd: Cost the provider reported (None: not reported)
+            error: Exception type when the call failed
+        """
+        with self._lock:
+            self._records.append(LLMCallRecord(
+                operation=operation,
+                model=model,
+                latency_s=latency_s,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
                 error=error,
                 cost_usd=cost_usd,
             ))

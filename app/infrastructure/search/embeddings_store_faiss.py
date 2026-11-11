@@ -17,7 +17,13 @@ VectorSearchRepository, which uses the index built by this store.
 Design decisions (see ADR 003 for details):
 - The embedding model is configurable (constructor argument, wired from
   EMBEDDING_MODEL). Asymmetric models format queries and documents
-  differently; PROMPT_CONVENTIONS lists the convention of each known model.
+  differently; PROMPT_CONVENTIONS (text_encoding.py) lists the convention of
+  each known model.
+- Encoding is delegated to a TextEncoder (text_encoding.py). By default the
+  store builds the local sentence-transformers encoder below, exactly as
+  before; a caller can inject another one instead, such as the OpenRouter
+  API encoder of the cloud profile, which loads no model. The store itself
+  only stores, normalizes, indexes and persists vectors.
 - New indexes store L2-normalized vectors in an IndexFlatIP, so the inner
   product is the cosine similarity.
 - Every saved index carries a sidecar metadata file (faiss_metadata.json) with
@@ -30,7 +36,6 @@ Design decisions (see ADR 003 for details):
 
 import json
 import logging
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -42,6 +47,19 @@ from sentence_transformers import SentenceTransformer
 
 from app.domain.ports import EmbeddingsStore
 from app.infrastructure.search.faiss_runtime import faiss  # torch before faiss (macOS)
+
+# The conventions live in a module without model libraries (so the API
+# encoder can use them without torch); they are re-exported here because
+# callers and tests import them from this module.
+from app.infrastructure.search.text_encoding import (  # noqa: F401  (re-exports)
+    E5_INSTRUCT_TASK,
+    PROMPT_CONVENTIONS,
+    PromptConvention,
+    TextEncoder,
+    canonical_model_name,
+    model_slug,
+    prompt_convention_for,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,83 +84,6 @@ INDEX_FILE = "faiss_index.bin"
 MAPPING_FILE = "faiss_id_mapping.json"
 EMBEDDINGS_FILE = "faiss_embeddings.json"
 METADATA_FILE = "faiss_metadata.json"
-
-
-@dataclass(frozen=True)
-class PromptConvention:
-    """
-    How a model expects queries and documents to be written before encoding.
-
-    Attributes:
-        query_prefix: Text prepended to every query.
-        document_prefix: Text prepended to every document.
-        query_prompt_name: Name of a prompt stored in the model's own
-            sentence-transformers config (``model.prompts``), passed to
-            ``encode(prompt_name=...)`` for queries. None means no stored prompt.
-    """
-
-    query_prefix: str = ""
-    document_prefix: str = ""
-    query_prompt_name: Optional[str] = None
-
-
-# Task description used in the query instruction of instruction-tuned E5.
-E5_INSTRUCT_TASK = "Given a book search query, retrieve relevant books"
-
-# Per-model conventions, taken from each model card on huggingface.co.
-# Models not listed here are treated as symmetric (no prompt on either side).
-PROMPT_CONVENTIONS: Dict[str, PromptConvention] = {
-    # Symmetric model: queries and documents are encoded the same way.
-    "all-MiniLM-L6-v2": PromptConvention(),
-    # Instruction on the query only; documents are encoded raw.
-    "intfloat/multilingual-e5-large-instruct": PromptConvention(
-        query_prefix=f"Instruct: {E5_INSTRUCT_TASK}\nQuery: ",
-    ),
-    # E5 family: every input starts with "query: " or "passage: ".
-    "intfloat/multilingual-e5-small": PromptConvention(
-        query_prefix="query: ", document_prefix="passage: "
-    ),
-    "intfloat/multilingual-e5-base": PromptConvention(
-        query_prefix="query: ", document_prefix="passage: "
-    ),
-    "intfloat/multilingual-e5-large": PromptConvention(
-        query_prefix="query: ", document_prefix="passage: "
-    ),
-    # Qwen3 ships its query instruction as the stored prompt "query".
-    "Qwen/Qwen3-Embedding-0.6B": PromptConvention(query_prompt_name="query"),
-}
-
-
-def canonical_model_name(model_name: str) -> str:
-    """
-    Normalize a model name for comparisons.
-
-    sentence-transformers resolves "all-MiniLM-L6-v2" to
-    "sentence-transformers/all-MiniLM-L6-v2", and Hugging Face ids are not
-    case sensitive, so both spellings must count as the same model.
-    """
-    name = model_name.strip().lower()
-    prefix = "sentence-transformers/"
-    return name[len(prefix):] if name.startswith(prefix) else name
-
-
-def prompt_convention_for(model_name: str) -> PromptConvention:
-    """Return the prompt convention of a model (no prompt if unknown)."""
-    wanted = canonical_model_name(model_name)
-    for known_name, convention in PROMPT_CONVENTIONS.items():
-        if canonical_model_name(known_name) == wanted:
-            return convention
-    return PromptConvention()
-
-
-def model_slug(model_name: str) -> str:
-    """
-    File-system friendly name of a model, used to keep one index per model.
-
-    Example: "intfloat/multilingual-e5-large-instruct"
-             -> "intfloat_multilingual-e5-large-instruct"
-    """
-    return re.sub(r"[^a-z0-9.-]+", "_", canonical_model_name(model_name)).strip("_")
 
 
 # -----------------------------------------------------------------------------
@@ -226,79 +167,30 @@ class IndexModelMismatchError(ValueError):
 
 
 # -----------------------------------------------------------------------------
-# Store
+# Local encoder (sentence-transformers)
 # -----------------------------------------------------------------------------
 
 
-class EmbeddingsStoreFaiss(EmbeddingsStore):
+class SentenceTransformerEncoder(TextEncoder):
     """
-    FAISS-based embeddings store for semantic search.
+    TextEncoder backed by a sentence-transformers model running in this process.
 
-    This implementation uses:
-    - A configurable sentence-transformers model, with the query/document
-      prompt convention of that model (see PROMPT_CONVENTIONS)
-    - IndexFlatIP over L2-normalized vectors (exact cosine search) for new
-      indexes; legacy IndexFlatL2 indexes are still loaded and searched
-    - A mapping from FAISS internal indices to book UUIDs
-    - Persistence to disk for the index, the mapping and its metadata
-
-    For larger datasets (>100k books), consider switching to approximate
-    nearest neighbor (ANN) indices like HNSW or IVF for better performance.
-    See the ADR at docs/arch_decisions/003_faiss_vector_index.md for details.
+    It applies the model's prompt convention (PROMPT_CONVENTIONS): a prefix
+    or instruction for queries and documents, or the prompt stored in the
+    model under ``query_prompt_name``. This is the encoding code the store
+    always had; it only moved out of the store class.
     """
 
-    def __init__(
-        self,
-        model_name: str = DEFAULT_EMBEDDING_MODEL,
-        device: Optional[str] = None,
-    ):
+    def __init__(self, model: Any, model_name: str):
         """
-        Initialize the FAISS embeddings store.
-
         Args:
-            model_name: Name of the sentence-transformers model to use.
-                        "all-MiniLM-L6-v2" (default) is small and fast and
-                        produces 384-dimensional embeddings, but it is
-                        English-only.
-            device: Torch device for the model ("cpu", "mps", "cuda").
-                    None lets sentence-transformers pick the best available.
+            model: A loaded sentence_transformers.SentenceTransformer
+            model_name: The name it was loaded with (recorded in index metadata)
         """
-        # Load the sentence-transformers model for generating embeddings.
-        # This model converts text into dense vectors of fixed dimension.
-        self._model = SentenceTransformer(model_name, device=device)
+        self._model = model
         self._model_name = model_name
         self._prompts = prompt_convention_for(model_name)
-
-        # Get the embedding dimension from the model.
-        # All embeddings must have the same dimension to be indexed together.
-        self._dimension: int = self._model.get_sentence_embedding_dimension()
-
-        # FAISS index - None until build_index() or load_index() is called.
-        self._index: Optional[faiss.Index] = None
-
-        # Metadata of the current index (model, metric, ...). None until built
-        # or loaded.
-        self._index_metadata: Optional[IndexMetadata] = None
-
-        # Mapping from FAISS internal index (0, 1, 2, ...) to book UUID.
-        # FAISS uses contiguous integer indices internally, but our books have
-        # UUIDs. This list maintains the correspondence:
-        # _id_mapping[faiss_idx] = book_uuid (as string for JSON serialization)
-        self._id_mapping: List[str] = []
-
-        # Storage for embeddings keyed by book_id (UUID as string).
-        # We accumulate embeddings here, then batch-add them to FAISS when
-        # build_index() is called.
-        self._embeddings: Dict[str, List[float]] = {}
-
-        logger.info(
-            f"Initialized EmbeddingsStoreFaiss with model '{model_name}' "
-            f"(dimension={self._dimension}, device={self.get_device()})"
-        )
-
-    # -------------------------------------------------------------------------
-    # Embedding generation
-    # -------------------------------------------------------------------------
+        self._dimension: int = model.get_sentence_embedding_dimension()
 
     def _encode(
         self,
@@ -319,6 +211,143 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         return self._model.encode(inputs, convert_to_numpy=True, **extra)
 
     def generate_embedding(self, text: str) -> List[float]:
+        """Document vector (the model's document convention is applied)."""
+        if not text or not text.strip():
+            raise ValueError("Cannot generate embedding for empty text")
+        embedding = self._encode([text], prefix=self._prompts.document_prefix)[0]
+        # Convert to Python list for serialization compatibility.
+        # The domain layer works with List[float], not numpy arrays.
+        return embedding.tolist()
+
+    def generate_query_embedding(self, text: str) -> List[float]:
+        """Query vector (prefix, instruction or stored prompt of the model)."""
+        if not text or not text.strip():
+            raise ValueError("Cannot generate embedding for empty text")
+        embedding = self._encode(
+            [text],
+            prefix=self._prompts.query_prefix,
+            prompt_name=self._prompts.query_prompt_name,
+        )[0]
+        return embedding.tolist()
+
+    def generate_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
+        """Document vectors in one batched model call (input order kept)."""
+        if not texts:
+            return []
+        for i, text in enumerate(texts):
+            if not text or not text.strip():
+                raise ValueError(f"Text at index {i} is empty")
+        embeddings = self._encode(texts, prefix=self._prompts.document_prefix)
+        return [emb.tolist() for emb in embeddings]
+
+    def get_dimension(self) -> int:
+        """Output dimension of the model."""
+        return self._dimension
+
+    def get_model_name(self) -> str:
+        """The model name, recorded unchanged in the index metadata."""
+        return self._model_name
+
+    def get_device(self) -> str:
+        """Torch device the model runs on (e.g. "cpu", "mps")."""
+        return str(getattr(self._model, "device", "unknown"))
+
+
+# -----------------------------------------------------------------------------
+# Store
+# -----------------------------------------------------------------------------
+
+
+class EmbeddingsStoreFaiss(EmbeddingsStore):
+    """
+    FAISS-based embeddings store for semantic search.
+
+    This implementation uses:
+    - A TextEncoder for queries and documents: by default a configurable
+      sentence-transformers model with its query/document prompt convention
+      (see PROMPT_CONVENTIONS); an injected encoder otherwise (for example the
+      OpenRouter API encoder)
+    - IndexFlatIP over L2-normalized vectors (exact cosine search) for new
+      indexes; legacy IndexFlatL2 indexes are still loaded and searched
+    - A mapping from FAISS internal indices to book UUIDs
+    - Persistence to disk for the index, the mapping and its metadata
+
+    For larger datasets (>100k books), consider switching to approximate
+    nearest neighbor (ANN) indices like HNSW or IVF for better performance.
+    See the ADR at docs/arch_decisions/003_faiss_vector_index.md for details.
+    """
+
+    def __init__(
+        self,
+        model_name: str = DEFAULT_EMBEDDING_MODEL,
+        device: Optional[str] = None,
+        encoder: Optional[TextEncoder] = None,
+    ):
+        """
+        Initialize the FAISS embeddings store.
+
+        Args:
+            model_name: Name of the sentence-transformers model to use.
+                        "all-MiniLM-L6-v2" (default) is small and fast and
+                        produces 384-dimensional embeddings, but it is
+                        English-only. Not used when `encoder` is given.
+            device: Torch device for the model ("cpu", "mps", "cuda").
+                    None lets sentence-transformers pick the best available.
+            encoder: An already built TextEncoder to use instead of loading a
+                     sentence-transformers model (e.g. an API encoder). Its
+                     get_model_name() is the identity recorded in the index.
+
+        Raises:
+            ValueError: If both a non-default model_name or a device and an
+                encoder are given (the encoder decides the model).
+        """
+        if encoder is None:
+            # Load the sentence-transformers model for generating embeddings.
+            # This model converts text into dense vectors of fixed dimension.
+            self._model = SentenceTransformer(model_name, device=device)
+            encoder = SentenceTransformerEncoder(self._model, model_name)
+        else:
+            if model_name != DEFAULT_EMBEDDING_MODEL or device is not None:
+                raise ValueError(
+                    "Give either model_name/device (local model) or encoder, not both: "
+                    f"the encoder '{encoder.get_model_name()}' decides the model"
+                )
+            self._model = None  # no model in this process
+        self._encoder: TextEncoder = encoder
+        self._model_name = encoder.get_model_name()
+
+        # Get the embedding dimension from the encoder.
+        # All embeddings must have the same dimension to be indexed together.
+        self._dimension: int = encoder.get_dimension()
+
+        # FAISS index - None until build_index() or load_index() is called.
+        self._index: Optional[faiss.Index] = None
+
+        # Metadata of the current index (model, metric, ...). None until built
+        # or loaded.
+        self._index_metadata: Optional[IndexMetadata] = None
+
+        # Mapping from FAISS internal index (0, 1, 2, ...) to book UUID.
+        # FAISS uses contiguous integer indices internally, but our books have
+        # UUIDs. This list maintains the correspondence:
+        # _id_mapping[faiss_idx] = book_uuid (as string for JSON serialization)
+        self._id_mapping: List[str] = []
+
+        # Storage for embeddings keyed by book_id (UUID as string).
+        # We accumulate embeddings here, then batch-add them to FAISS when
+        # build_index() is called.
+        self._embeddings: Dict[str, List[float]] = {}
+
+        logger.info(
+            f"Initialized EmbeddingsStoreFaiss with model '{self._model_name}' "
+            f"(dimension={self._dimension}, device={self.get_device()})"
+        )
+
+    # -------------------------------------------------------------------------
+    # Embedding generation (delegated to the encoder)
+    # -------------------------------------------------------------------------
+
+    def generate_embedding(self, text: str) -> List[float]:
         """
         Generate the embedding of a document (book text).
 
@@ -335,14 +364,7 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         Raises:
             ValueError: If text is empty.
         """
-        if not text or not text.strip():
-            raise ValueError("Cannot generate embedding for empty text")
-
-        embedding = self._encode([text], prefix=self._prompts.document_prefix)[0]
-
-        # Convert to Python list for serialization compatibility.
-        # The domain layer works with List[float], not numpy arrays.
-        return embedding.tolist()
+        return self._encoder.generate_embedding(text)
 
     def generate_query_embedding(self, text: str) -> List[float]:
         """
@@ -362,22 +384,14 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         Raises:
             ValueError: If text is empty.
         """
-        if not text or not text.strip():
-            raise ValueError("Cannot generate embedding for empty text")
-
-        embedding = self._encode(
-            [text],
-            prefix=self._prompts.query_prefix,
-            prompt_name=self._prompts.query_prompt_name,
-        )[0]
-        return embedding.tolist()
+        return self._encoder.generate_query_embedding(text)
 
     def generate_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         """
         Generate document embeddings for multiple texts in a batch.
 
         This is more efficient than calling generate_embedding repeatedly
-        because sentence-transformers can batch the inference.
+        because the encoder can batch the inference (or the API request).
 
         Args:
             texts: List of texts to encode.
@@ -388,18 +402,7 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         Raises:
             ValueError: If any text is empty.
         """
-        if not texts:
-            return []
-
-        # Validate all texts are non-empty
-        for i, text in enumerate(texts):
-            if not text or not text.strip():
-                raise ValueError(f"Text at index {i} is empty")
-
-        embeddings = self._encode(texts, prefix=self._prompts.document_prefix)
-
-        # Convert numpy array to list of lists
-        return [emb.tolist() for emb in embeddings]
+        return self._encoder.generate_embeddings_batch(texts)
 
     # -------------------------------------------------------------------------
     # Embedding storage
@@ -687,12 +690,16 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         return self._dimension
 
     def get_model_name(self) -> str:
-        """Name of the sentence-transformers model used by this store."""
+        """Identity of the encoder's vectors (the model name for a local model)."""
         return self._model_name
 
     def get_device(self) -> str:
-        """Torch device the model runs on (e.g. "cpu", "mps")."""
-        return str(getattr(self._model, "device", "unknown"))
+        """Where the encoder runs: torch device of a local model, "api" for an API."""
+        return self._encoder.get_device()
+
+    def get_encoder(self) -> TextEncoder:
+        """The encoder that produces this store's vectors."""
+        return self._encoder
 
     def get_index_metadata(self) -> Optional[IndexMetadata]:
         """Metadata of the built or loaded index, or None if there is none."""
@@ -749,7 +756,7 @@ class EmbeddingsStoreFaiss(EmbeddingsStore):
         """
         try:
             return (
-                self._model is not None
+                self._encoder is not None
                 and self._index is not None
                 and self._index.ntotal > 0
             )

@@ -5,6 +5,7 @@
 - Raw results: `data/evaluation/results_llm_model_selection.json`; this report is rendered from them by
   `python -m app.evaluation.llm_model_selection report`.
 - All models are called through OpenRouter (the local Ollama model is no longer used).
+- **Current decision** (speed-quality rule of 2026-11-11, which supersedes the V10 decision below): system LLM **`deepseek/deepseek-v4.1-flash`**, judge **`z-ai/glm-5.3-flash`**. The V10 rule and decision are kept as history.
 
 ## Why
 
@@ -61,7 +62,7 @@ higher. All costs below are the costs OpenRouter reported for each call.
   the sum of its three calls. Thinking off where the model allows it, otherwise effort `low`.
   At most 4 requests in flight.
 
-## Selection rule (fixed before any result was seen)
+## Selection rule of V10 (fixed before any result was seen; superseded on 2026-11-11)
 
 - System LLM: among the candidates with 100% parsed calls in B and C, the highest pre-guardrail
   citation precision; candidates within 0.02 of the best are tied, and ties are broken by the
@@ -124,7 +125,7 @@ explanations (an explanation with no valid citation is replaced by the guardrail
 Unrequested shares over the queries whose filter step parsed. Real cost per search: one query
 understanding plus 3 explanations.
 
-## Decision (mechanical application of the rule)
+## Decision of V10 (mechanical application of the V10 rule; history, superseded)
 
 - System LLM: **`qwen/qwen3.8-flash`**. Eligible: `qwen/qwen3.8-flash`, `deepseek/deepseek-v4.1-flash`, `minimax/minimax-m3.1-flash`. Best pre-guardrail citation precision: 0.972; tied within 0.02: `qwen/qwen3.8-flash`, `deepseek/deepseek-v4.1-flash`, `minimax/minimax-m3.1-flash`. Decided by: tie on citation precision, broken by the share of explanations in the query language.
 - Excluded from the system-LLM choice:
@@ -133,6 +134,45 @@ understanding plus 3 explanations.
 - Judge: **`z-ai/glm-5.3-flash`**. Eligible: `deepseek/deepseek-v4.1-flash`, `minimax/minimax-m3.1-flash`, `z-ai/glm-5.3-flash`, `z-ai/glm-5.3`. Best kappa: 0.765; tied within 0.02: `z-ai/glm-5.3-flash`. Decided by: highest kappa (no tie).
 - Excluded from the judge choice:
   - `qwen/qwen3.8-flash`: same vendor as the system LLM (qwen)
+
+## Decision with the speed-quality rule (2026-11-11; supersedes the V10 decision)
+
+Why the rule changed: The author asked for models balanced between speed and quality and for choices that are measured. The V10 rule chose on quality alone, and the system LLM it chose was the slowest candidate (6.6 s per explanation, 8.2 s per query understanding).
+
+Rule: For each role, the candidates whose primary quality metric is within 0.02 of the best are tied on quality; among them the lowest median latency wins; if another tied candidate is within 10% of that latency, the cheaper one wins. A candidate that failed any call in the measurement is excluded. System LLM: quality = pre-guardrail citation precision (B); a candidate must have parsed every call (B and C) and written at least 95% of its explanations in the query language; latency = median per explanation; cost = real cost per explanation. Judge: among the candidates of another vendor than the selected system LLM, the highest quadratic-weighted kappa (A), with the same 0.02 tie band and the cheaper winning a tie (speed does not matter for the judge).
+
+Applied mechanically to the saved V10 measurements (tables A, B and C above; no new model call):
+
+System LLM (pre-guardrail citation precision (B); median latency per explanation (B); real cost per explanation (B)):
+
+| Model | Citation precision | Median latency / explanation (s) | Real cost / explanation (USD) | Status |
+|---|---|---|---|---|
+| `qwen/qwen3.8-flash` | 0.964 | 6.61 | 0.000283 | tied on quality |
+| `deepseek/deepseek-v4.1-flash` | 0.972 | 2.68 | 0.000409 | selected |
+| `minimax/minimax-m3.1-flash` | 0.958 | 2.98 | 0.000407 | excluded: 0.633 of the explanations in the query language (at least 0.95 required) |
+| `z-ai/glm-5.3-flash` | 0.959 | 4.35 | 0.000310 | excluded: not every call parsed (explanations 60/60, queries 43/44) |
+| `z-ai/glm-5.3` | 0.970 | 2.85 | 0.000935 | excluded: not every call parsed (explanations 59/60, queries 44/44) |
+
+- Result: **`deepseek/deepseek-v4.1-flash`**. Best quality 0.972; tied within 0.02:
+  `deepseek/deepseek-v4.1-flash`, `qwen/qwen3.8-flash`. Decided by: tie on quality (within 0.02), broken by the lowest median latency (no other tied candidate within 10% of it).
+
+Judge (quadratic-weighted kappa (A); real cost per judgment (A)):
+
+| Model | Kappa | Real cost / judgment (USD) | Failed judge calls | Status |
+|---|---|---|---|---|
+| `qwen/qwen3.8-flash` | 0.752 | 0.000084 | 0 | tied on quality |
+| `deepseek/deepseek-v4.1-flash` | 0.714 | 0.000084 | 0 | excluded: same vendor as the system LLM (deepseek) |
+| `minimax/minimax-m3.1-flash` | 0.739 | 0.000085 | 0 | below the tie band |
+| `z-ai/glm-5.3-flash` | 0.765 | 0.000071 | 0 | selected |
+| `z-ai/glm-5.3` | 0.715 | 0.000189 | 0 | below the tie band |
+
+- Result: **`z-ai/glm-5.3-flash`**. Best kappa 0.765; tied within 0.02:
+  `qwen/qwen3.8-flash`, `z-ai/glm-5.3-flash`. Decided by: tie on kappa (within 0.02), broken by the lower cost per judgment.
+
+Reading of the exclusion clause: it is applied per role, so a judge candidate is excluded for a failed call in A (none failed). If a failed call anywhere in the V10 measurement (B or C) excluded a model from every role, the judge would be `qwen/qwen3.8-flash` (tie on kappa (within 0.02), broken by the lower cost per judgment).
+
+These are the OpenRouter defaults from 2026-11-11 on (`DEFAULT_MODELS["openrouter"]` and
+`DEFAULT_JUDGE_MODELS["openrouter"]` in `app/infrastructure/config/settings.py`, and `.env.example`).
 
 ## Failure patterns
 

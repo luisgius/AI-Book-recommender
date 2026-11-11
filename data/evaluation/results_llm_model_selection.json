@@ -36292,6 +36292,146 @@
         ],
         "decided_by": "highest kappa (no tie)"
       }
+    },
+    "decision_speed_quality": {
+      "date": "2026-11-11",
+      "reason": "The author asked for models balanced between speed and quality and for choices that are measured. The V10 rule chose on quality alone, and the system LLM it chose was the slowest candidate (6.6 s per explanation, 8.2 s per query understanding).",
+      "rule": "For each role, the candidates whose primary quality metric is within 0.02 of the best are tied on quality; among them the lowest median latency wins; if another tied candidate is within 10% of that latency, the cheaper one wins. A candidate that failed any call in the measurement is excluded. System LLM: quality = pre-guardrail citation precision (B); a candidate must have parsed every call (B and C) and written at least 95% of its explanations in the query language; latency = median per explanation; cost = real cost per explanation. Judge: among the candidates of another vendor than the selected system LLM, the highest quadratic-weighted kappa (A), with the same 0.02 tie band and the cheaper winning a tie (speed does not matter for the judge).",
+      "system_llm": {
+        "winner": "deepseek/deepseek-v4.1-flash",
+        "excluded": {
+          "minimax/minimax-m3.1-flash": "0.633 of the explanations in the query language (at least 0.95 required)",
+          "z-ai/glm-5.3-flash": "not every call parsed (explanations 60/60, queries 43/44)",
+          "z-ai/glm-5.3": "not every call parsed (explanations 59/60, queries 44/44)"
+        },
+        "eligible": [
+          "qwen/qwen3.8-flash",
+          "deepseek/deepseek-v4.1-flash"
+        ],
+        "best_quality": 0.9720670391061452,
+        "tied": [
+          "deepseek/deepseek-v4.1-flash",
+          "qwen/qwen3.8-flash"
+        ],
+        "within_latency_band": [
+          "deepseek/deepseek-v4.1-flash"
+        ],
+        "decided_by": "tie on quality (within 0.02), broken by the lowest median latency (no other tied candidate within 10% of it)",
+        "rows": {
+          "qwen/qwen3.8-flash": {
+            "quality": 0.9635036496350365,
+            "median_latency_s": 6.606806458556093,
+            "cost_usd": 0.0002834117666666667,
+            "failed_calls": 0,
+            "excluded_reason": null
+          },
+          "deepseek/deepseek-v4.1-flash": {
+            "quality": 0.9720670391061452,
+            "median_latency_s": 2.678732145926915,
+            "cost_usd": 0.00040875759,
+            "failed_calls": 0,
+            "excluded_reason": null
+          },
+          "minimax/minimax-m3.1-flash": {
+            "quality": 0.9576271186440678,
+            "median_latency_s": 2.982454687124118,
+            "cost_usd": 0.000407109,
+            "failed_calls": 0,
+            "excluded_reason": "0.633 of the explanations in the query language (at least 0.95 required)"
+          },
+          "z-ai/glm-5.3-flash": {
+            "quality": 0.9588235294117647,
+            "median_latency_s": 4.3525030630407855,
+            "cost_usd": 0.0003099758,
+            "failed_calls": 0,
+            "excluded_reason": "not every call parsed (explanations 60/60, queries 43/44)"
+          },
+          "z-ai/glm-5.3": {
+            "quality": 0.9698795180722891,
+            "median_latency_s": 2.847005937481299,
+            "cost_usd": 0.0009349444616666666,
+            "failed_calls": 0,
+            "excluded_reason": "not every call parsed (explanations 59/60, queries 44/44)"
+          }
+        },
+        "quality": "pre-guardrail citation precision (B)",
+        "latency": "median latency per explanation (B)",
+        "cost": "real cost per explanation (B)"
+      },
+      "judge": {
+        "winner": "z-ai/glm-5.3-flash",
+        "excluded": {
+          "deepseek/deepseek-v4.1-flash": "same vendor as the system LLM (deepseek)"
+        },
+        "eligible": [
+          "qwen/qwen3.8-flash",
+          "minimax/minimax-m3.1-flash",
+          "z-ai/glm-5.3-flash",
+          "z-ai/glm-5.3"
+        ],
+        "best_quality": 0.764622428580641,
+        "tied": [
+          "qwen/qwen3.8-flash",
+          "z-ai/glm-5.3-flash"
+        ],
+        "within_latency_band": [
+          "qwen/qwen3.8-flash",
+          "z-ai/glm-5.3-flash"
+        ],
+        "decided_by": "tie on kappa (within 0.02), broken by the lower cost per judgment",
+        "rows": {
+          "qwen/qwen3.8-flash": {
+            "quality": 0.7516849946789641,
+            "median_latency_s": 0.0,
+            "cost_usd": 8.402665e-05,
+            "failed_calls": 0,
+            "excluded_reason": null
+          },
+          "deepseek/deepseek-v4.1-flash": {
+            "quality": 0.7136590715243085,
+            "median_latency_s": 0.0,
+            "cost_usd": 8.366709999999999e-05,
+            "failed_calls": 0,
+            "excluded_reason": "same vendor as the system LLM (deepseek)"
+          },
+          "minimax/minimax-m3.1-flash": {
+            "quality": 0.7386384601193039,
+            "median_latency_s": 0.0,
+            "cost_usd": 8.480475e-05,
+            "failed_calls": 0,
+            "excluded_reason": null
+          },
+          "z-ai/glm-5.3-flash": {
+            "quality": 0.764622428580641,
+            "median_latency_s": 0.0,
+            "cost_usd": 7.071961e-05,
+            "failed_calls": 0,
+            "excluded_reason": null
+          },
+          "z-ai/glm-5.3": {
+            "quality": 0.7147284637599494,
+            "median_latency_s": 0.0,
+            "cost_usd": 0.000189381657,
+            "failed_calls": 0,
+            "excluded_reason": null
+          }
+        },
+        "quality": "quadratic-weighted kappa (A)",
+        "cost": "real cost per judgment (A)"
+      },
+      "judge_if_failures_anywhere_exclude": {
+        "winner": "qwen/qwen3.8-flash",
+        "tied": [
+          "minimax/minimax-m3.1-flash",
+          "qwen/qwen3.8-flash"
+        ],
+        "excluded": {
+          "deepseek/deepseek-v4.1-flash": "same vendor as the system LLM (deepseek)",
+          "z-ai/glm-5.3-flash": "1 failed call(s) in the measurement",
+          "z-ai/glm-5.3": "1 failed call(s) in the measurement"
+        },
+        "decided_by": "tie on kappa (within 0.02), broken by the lower cost per judgment"
+      }
     }
   },
   "spend": {

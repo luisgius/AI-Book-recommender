@@ -9,9 +9,16 @@ read. Importing torch first avoids the crash, so the adapters import faiss
 from this module instead of importing it directly:
 
     from app.infrastructure.search.faiss_runtime import faiss
+
+An installation without torch (a deployment that encodes through an API and
+loads no model) has no second OpenMP runtime and no crash to avoid, so torch
+is imported only when it is installed.
 """
 
-import torch  # noqa: F401  (must be loaded before faiss, see module docstring)
+try:
+    import torch  # noqa: F401  (must be loaded before faiss, see module docstring)
+except ImportError:  # no torch installed: nothing to protect against
+    pass
 import faiss
 
 __all__ = ["faiss"]

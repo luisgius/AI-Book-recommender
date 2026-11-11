@@ -46,7 +46,7 @@ def no_openrouter_key(monkeypatch):
 class TestOpenRouterSettings:
     def test_defaults(self):
         settings = LLMSettings.from_env({"LLM_PROVIDER": "openrouter"})
-        assert (settings.provider, settings.model) == ("openrouter", "qwen/qwen3.8-flash")
+        assert (settings.provider, settings.model) == ("openrouter", "deepseek/deepseek-v4.1-flash")
         assert settings.base_url == DEFAULT_OPENROUTER_URL
         assert settings.reasoning is False  # thinking off, as for Ollama
         assert settings.num_ctx is None
@@ -89,7 +89,7 @@ class TestOpenRouterJudgeSettings:
         assert (settings.provider, settings.model) == ("openrouter", "z-ai/glm-5.3-flash")
         assert settings.reasoning == "low"  # its reasoning cannot be switched off
         assert settings.base_url == DEFAULT_OPENROUTER_URL and settings.num_ctx is None
-        assert settings.system_llm == "openrouter/qwen/qwen3.8-flash"
+        assert settings.system_llm == "openrouter/deepseek/deepseek-v4.1-flash"
         assert not settings.same_as_system_llm
 
     def test_openrouter_judge_for_a_local_system_llm(self):

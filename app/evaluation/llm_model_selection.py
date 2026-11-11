@@ -124,6 +124,29 @@ MAX_IN_FLIGHT = 4
 TIE_MARGIN = 0.02
 SPEND_LIMIT_USD = 3.0
 
+# Speed-quality rule of 2026-11-11 (task V16), which supersedes the V10 rule:
+# the author asked for models "balanced speed-quality", and the V10 choice,
+# made on quality alone, was the slowest candidate. Re-applied to the saved
+# V10 measurements, without new calls.
+LATENCY_BAND = 0.10  # candidates within 10% of the fastest tied one: the cheaper wins
+MIN_QUERY_LANGUAGE_SHARE = 0.95  # system LLM: share of explanations in the query language
+SPEED_QUALITY_RULE_DATE = "2026-11-11"
+SPEED_QUALITY_RULE_REASON = (
+    "The author asked for models balanced between speed and quality and for choices that are measured. "
+    "The V10 rule chose on quality alone, and the system LLM it chose was the slowest candidate "
+    "(6.6 s per explanation, 8.2 s per query understanding)."
+)
+SPEED_QUALITY_RULE_TEXT = (
+    "For each role, the candidates whose primary quality metric is within 0.02 of the best are tied on "
+    "quality; among them the lowest median latency wins; if another tied candidate is within 10% of that "
+    "latency, the cheaper one wins. A candidate that failed any call in the measurement is excluded. "
+    "System LLM: quality = pre-guardrail citation precision (B); a candidate must have parsed every call "
+    "(B and C) and written at least 95% of its explanations in the query language; latency = median per "
+    "explanation; cost = real cost per explanation. Judge: among the candidates of another vendor than the "
+    "selected system LLM, the highest quadratic-weighted kappa (A), with the same 0.02 tie band and the "
+    "cheaper winning a tie (speed does not matter for the judge)."
+)
+
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
 OPENROUTER_KEY_URL = "https://openrouter.ai/api/v1/key"
 
@@ -462,6 +485,193 @@ def select_judge(
     }
 
 
+# =============================================================================
+# Speed-quality rule (2026-11-11, supersedes the V10 rule above)
+# =============================================================================
+
+
+def select_by_speed_quality(
+    rows: Mapping[str, Mapping[str, Any]],
+    *,
+    margin: float = TIE_MARGIN,
+    latency_band: float = LATENCY_BAND,
+) -> Dict[str, Any]:
+    """
+    The speed-quality rule, for any role.
+
+    Candidates whose quality is within `margin` of the best are tied on
+    quality; among them the lowest median latency wins, and when another
+    tied candidate is within `latency_band` (10%) of that latency the
+    cheaper one wins. A candidate with any failed call, or a reason in
+    `excluded_reason`, is excluded before anything else.
+
+    Args:
+        rows: name -> {quality, median_latency_s, cost_usd, failed_calls,
+            excluded_reason (optional)}; higher quality is better
+        margin: Quality tie band (absolute)
+        latency_band: Relative latency band within which cost decides
+
+    Returns:
+        winner (None if nobody is eligible), excluded {name: reason},
+        eligible, best_quality, tied (by latency), within_latency_band
+        (the candidates cost decided between) and decided_by
+    """
+    excluded: Dict[str, str] = {}
+    eligible: List[str] = []
+    for name, row in rows.items():
+        if row.get("excluded_reason"):
+            excluded[name] = str(row["excluded_reason"])
+        elif row.get("failed_calls"):
+            excluded[name] = f"{row['failed_calls']} failed call(s) in the measurement"
+        elif row.get("quality") is None or row.get("median_latency_s") is None:
+            excluded[name] = "no quality or latency measurement"
+        else:
+            eligible.append(name)
+    if not eligible:
+        return {"winner": None, "excluded": excluded, "eligible": [], "tied": [],
+                "within_latency_band": [], "best_quality": None, "decided_by": None}
+
+    def latency(name: str) -> float:
+        return float(rows[name]["median_latency_s"])
+
+    def cost(name: str) -> float:
+        value = rows[name].get("cost_usd")
+        return float("inf") if value is None else float(value)
+
+    best = max(float(rows[name]["quality"]) for name in eligible)
+    tied = sorted((n for n in eligible if _within(best, float(rows[n]["quality"]), margin)),
+                  key=lambda n: (latency(n), n))
+    fastest = latency(tied[0])
+    band = [n for n in tied if latency(n) <= fastest * (1 + latency_band) + 1e-12]
+    winner = min(band, key=lambda n: (cost(n), latency(n), n))
+    if len(tied) == 1:
+        decided_by = "highest quality, no other candidate within the tie band"
+    elif len(band) == 1:
+        decided_by = (f"tie on quality (within {margin}), broken by the lowest median latency "
+                      f"(no other tied candidate within {latency_band:.0%} of it)")
+    else:
+        decided_by = (f"tie on quality (within {margin}) and on latency (within {latency_band:.0%}), "
+                      f"broken by the lower cost")
+    return {"winner": winner, "excluded": excluded, "eligible": eligible, "best_quality": best,
+            "tied": tied, "within_latency_band": band, "decided_by": decided_by}
+
+
+def select_system_llm_speed_quality(
+    explanation_rows: Mapping[str, Mapping[str, Any]],
+    query_rows: Mapping[str, Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """
+    System LLM under the speed-quality rule, from tables B and C of V10.
+
+    Quality: pre-guardrail citation precision (B). Eligible: every call
+    parsed in B and C, and at least MIN_QUERY_LANGUAGE_SHARE of the
+    explanations in the query language. Latency: median per explanation (B);
+    cost: real cost per explanation (B).
+    """
+    rows: Dict[str, Dict[str, Any]] = {}
+    for model, b in explanation_rows.items():
+        c = query_rows.get(model)
+        reason = None
+        if c is None:
+            reason = "no query-understanding measurement"
+        elif b["parsed_share"] != 1.0 or c["parsed_share"] != 1.0:
+            reason = (f"not every call parsed (explanations {b['parsed']}/{b['n']}, "
+                      f"queries {c['parsed']}/{c['n']})")
+        elif (b["in_query_language_share"] or 0.0) < MIN_QUERY_LANGUAGE_SHARE - 1e-9:
+            reason = (f"{_f(b['in_query_language_share'])} of the explanations in the query language "
+                      f"(at least {MIN_QUERY_LANGUAGE_SHARE:.2f} required)")
+        rows[model] = {
+            "quality": b["citation_precision"],
+            "median_latency_s": b["median_latency_s"],
+            "cost_usd": b["cost_per_explanation_usd"],
+            "failed_calls": 0,
+            "excluded_reason": reason,
+        }
+    return {**select_by_speed_quality(rows), "rows": rows,
+            "quality": "pre-guardrail citation precision (B)",
+            "latency": "median latency per explanation (B)", "cost": "real cost per explanation (B)"}
+
+
+def select_judge_speed_quality(
+    judge_rows: Mapping[str, Mapping[str, Any]],
+    system_llm: Optional[str],
+    *,
+    margin: float = TIE_MARGIN,
+) -> Dict[str, Any]:
+    """
+    Judge under the speed-quality rule: speed does not matter for the judge.
+
+    Among the candidates of another vendor than `system_llm` that completed
+    measurement A without a failed judge call, the highest quadratic-weighted
+    kappa; candidates within `margin` are tied and the cheaper one (real cost
+    per judgment) wins.
+    """
+    rows: Dict[str, Dict[str, Any]] = {}
+    for model, row in judge_rows.items():
+        reason = None
+        if system_llm is not None and vendor(model) == vendor(system_llm):
+            reason = f"same vendor as the system LLM ({vendor(model)})"
+        elif not row.get("complete") or row.get("kappa") is None:
+            reason = "agreement measurement incomplete"
+        rows[model] = {
+            "quality": row.get("kappa"),
+            # Speed is not a criterion: one latency for all, so cost decides every tie.
+            "median_latency_s": 0.0,
+            "cost_usd": row.get("cost_per_judgment_usd"),
+            "failed_calls": row.get("failures") or 0,
+            "excluded_reason": reason,
+        }
+    decision = select_by_speed_quality(rows, margin=margin)
+    if decision["winner"] is not None:
+        decision["decided_by"] = ("highest kappa, no other candidate within the tie band"
+                                  if len(decision["tied"]) == 1 else
+                                  f"tie on kappa (within {margin}), broken by the lower cost per judgment")
+    return {**decision, "rows": rows, "quality": "quadratic-weighted kappa (A)",
+            "cost": "real cost per judgment (A)"}
+
+
+def strict_failure_exclusion_judge(
+    judge_rows: Mapping[str, Mapping[str, Any]],
+    explanation_rows: Mapping[str, Mapping[str, Any]],
+    query_rows: Mapping[str, Mapping[str, Any]],
+    system_llm: Optional[str],
+) -> Dict[str, Any]:
+    """
+    The judge under the other reading of the exclusion clause (reported, not applied).
+
+    The rule says a candidate that failed any call in the measurement is
+    excluded. Applied per role, the judge's measurement is A. Read across
+    the whole V10 measurement, a failed call in B or C also excludes a model
+    from the judge role; this function gives the judge under that reading.
+    """
+    failed_elsewhere = {
+        model: (explanation_rows[model]["n"] - explanation_rows[model]["parsed"]
+                + (query_rows.get(model, {}).get("n", 0) - query_rows.get(model, {}).get("parsed", 0)))
+        for model in explanation_rows
+    }
+    rows = {model: dict(row, failures=(row.get("failures") or 0) + failed_elsewhere.get(model, 0))
+            for model, row in judge_rows.items()}
+    return select_judge_speed_quality(rows, system_llm)
+
+
+def speed_quality_decision(tables: Mapping[str, Any]) -> Dict[str, Any]:
+    """Both roles under the speed-quality rule, from the V10 tables (no model call)."""
+    system = select_system_llm_speed_quality(tables["explanation"], tables["query_understanding"])
+    judge = select_judge_speed_quality(tables["judge"], system["winner"])
+    strict = strict_failure_exclusion_judge(tables["judge"], tables["explanation"],
+                                            tables["query_understanding"], system["winner"])
+    return {
+        "date": SPEED_QUALITY_RULE_DATE,
+        "reason": SPEED_QUALITY_RULE_REASON,
+        "rule": SPEED_QUALITY_RULE_TEXT,
+        "system_llm": system,
+        "judge": judge,
+        "judge_if_failures_anywhere_exclude": {"winner": strict["winner"], "tied": strict["tied"],
+                                               "excluded": strict["excluded"],
+                                               "decided_by": strict["decided_by"]},
+    }
+
+
 def check_candidates(
     models: Mapping[str, Reasoning], catalog: Mapping[str, Mapping[str, Any]]
 ) -> Dict[str, Dict[str, Any]]:
@@ -541,7 +751,7 @@ def compute_tables(results: Mapping[str, Any]) -> Dict[str, Any]:
 
     system = select_system_llm(explanation_rows, query_rows)
     judge = select_judge(judge_rows, system["winner"])
-    return {
+    tables = {
         "judge": judge_rows,
         "local_judge": local_row,
         "explanation": explanation_rows,
@@ -551,8 +761,12 @@ def compute_tables(results: Mapping[str, Any]) -> Dict[str, Any]:
             for model in explanation_rows if model in query_rows
         },
         "pairwise_kappa": pairwise_kappa(grades) if grades else {},
+        # V10 rule (quality only), kept as history
         "decision": {"system_llm": system, "judge": judge},
     }
+    # Speed-quality rule (2026-11-11), which supersedes the V10 decision
+    tables["decision_speed_quality"] = speed_quality_decision(tables)
+    return tables
 
 
 # =============================================================================
@@ -648,6 +862,67 @@ def total_spend(results: Mapping[str, Any]) -> Dict[str, Any]:
     return {"per_model": per_model, "total_usd": total}
 
 
+def _speed_quality_markdown(current: Mapping[str, Any]) -> str:
+    """Section of the speed-quality decision (2026-11-11), which supersedes the V10 one."""
+    system, judge = current["system_llm"], current["judge"]
+
+    def status(block: Mapping[str, Any], name: str) -> str:
+        if name == block["winner"]:
+            return "selected"
+        if name in block["excluded"]:
+            return f"excluded: {block['excluded'][name]}"
+        if name in block["tied"]:
+            return "tied on quality"
+        return "below the tie band"
+
+    system_rows = [
+        [f"`{m}`", _f(r["quality"]), _f(r["median_latency_s"], 2), _usd(r["cost_usd"], 6), status(system, m)]
+        for m, r in system["rows"].items()
+    ]
+    judge_rows = [
+        [f"`{m}`", _f(r["quality"]), _usd(r["cost_usd"], 6), str(r["failed_calls"]), status(judge, m)]
+        for m, r in judge["rows"].items()
+    ]
+    alternative = current.get("judge_if_failures_anywhere_exclude") or {}
+    alternative_line = ""
+    if alternative and alternative.get("winner") != judge["winner"]:
+        alternative_line = (
+            f"\n\nReading of the exclusion clause: it is applied per role, so a judge candidate is excluded "
+            f"for a failed call in A (none failed). If a failed call anywhere in the V10 measurement (B or C) "
+            f"excluded a model from every role, the judge would be `{alternative.get('winner')}` "
+            f"({alternative.get('decided_by')})."
+        )
+
+    def tied_text(block: Mapping[str, Any]) -> str:
+        return ", ".join(f"`{m}`" for m in block["tied"]) or "none"
+
+    return f"""## Decision with the speed-quality rule ({current["date"]}; supersedes the V10 decision)
+
+Why the rule changed: {current["reason"]}
+
+Rule: {current["rule"]}
+
+Applied mechanically to the saved V10 measurements (tables A, B and C above; no new model call):
+
+System LLM ({system["quality"]}; {system["latency"]}; {system["cost"]}):
+
+{_table(["Model", "Citation precision", "Median latency / explanation (s)", "Real cost / explanation (USD)",
+         "Status"], system_rows)}
+
+- Result: **`{system["winner"]}`**. Best quality {_f(system["best_quality"])}; tied within {TIE_MARGIN}:
+  {tied_text(system)}. Decided by: {system["decided_by"]}.
+
+Judge ({judge["quality"]}; {judge["cost"]}):
+
+{_table(["Model", "Kappa", "Real cost / judgment (USD)", "Failed judge calls", "Status"], judge_rows)}
+
+- Result: **`{judge["winner"]}`**. Best kappa {_f(judge["best_quality"])}; tied within {TIE_MARGIN}:
+  {tied_text(judge)}. Decided by: {judge["decided_by"]}.{alternative_line}
+
+These are the OpenRouter defaults from {current["date"]} on (`DEFAULT_MODELS["openrouter"]` and
+`DEFAULT_JUDGE_MODELS["openrouter"]` in `app/infrastructure/config/settings.py`, and `.env.example`)."""
+
+
 def build_markdown(results: Mapping[str, Any], tables: Mapping[str, Any]) -> str:
     """LLM_MODEL_SELECTION.md from the raw results and the computed tables."""
     run = results.get("run", {})
@@ -737,6 +1012,14 @@ def build_markdown(results: Mapping[str, Any], tables: Mapping[str, Any]) -> str
         if judge["winner"] else "No candidate is eligible."
     )
 
+    current = tables.get("decision_speed_quality") or speed_quality_decision(tables)
+    speed_quality_section = _speed_quality_markdown(current)
+    current_line = (
+        f"- **Current decision** (speed-quality rule of {current['date']}, which supersedes the V10 "
+        f"decision below): system LLM **`{current['system_llm']['winner']}`**, judge "
+        f"**`{current['judge']['winner']}`**. The V10 rule and decision are kept as history."
+    )
+
     spend = total_spend(results)
     spend_rows = [
         [f"`{model}`"] + [_usd(roles.get(role)) for role in ROLES]
@@ -761,6 +1044,7 @@ def build_markdown(results: Mapping[str, Any], tables: Mapping[str, Any]) -> str
 - Raw results: `{DEFAULT_RESULTS_JSON}`; this report is rendered from them by
   `python -m app.evaluation.llm_model_selection report`.
 - All models are called through OpenRouter (the local Ollama model is no longer used).
+{current_line}
 
 ## Why
 
@@ -810,7 +1094,7 @@ higher. All costs below are the costs OpenRouter reported for each call.
   the sum of its three calls. Thinking off where the model allows it, otherwise effort `low`.
   At most {MAX_IN_FLIGHT} requests in flight.
 
-## Selection rule (fixed before any result was seen)
+## Selection rule of V10 (fixed before any result was seen; superseded on {SPEED_QUALITY_RULE_DATE})
 
 - System LLM: among the candidates with 100% parsed calls in B and C, the highest pre-guardrail
   citation precision; candidates within {TIE_MARGIN} of the best are tied, and ties are broken by the
@@ -846,12 +1130,14 @@ explanations (an explanation with no valid citation is replaced by the guardrail
 Unrequested shares over the queries whose filter step parsed. Real cost per search: one query
 understanding plus {EXPLAINED_RESULTS} explanations.
 
-## Decision (mechanical application of the rule)
+## Decision of V10 (mechanical application of the V10 rule; history, superseded)
 
 - System LLM: {system_text}
 - Excluded from the system-LLM choice:{excluded_lines(system) if system.get("excluded") is not None else " none"}
 - Judge: {judge_text}
 - Excluded from the judge choice:{excluded_lines(judge) if judge.get("excluded") is not None else " none"}
+
+{speed_quality_section}
 
 ## Failure patterns
 
@@ -1323,8 +1609,15 @@ def run(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
 
 def _print_decision(tables: Mapping[str, Any]) -> None:
     decision = tables["decision"]
-    print(f"System LLM: {decision['system_llm']['winner']} ({decision['system_llm']['decided_by']})")
-    print(f"Judge: {decision['judge']['winner']} ({decision['judge']['decided_by']})")
+    print(f"V10 rule (history) - system LLM: {decision['system_llm']['winner']} "
+          f"({decision['system_llm']['decided_by']})")
+    print(f"V10 rule (history) - judge: {decision['judge']['winner']} ({decision['judge']['decided_by']})")
+    current = tables.get("decision_speed_quality")
+    if current:
+        print(f"Speed-quality rule ({current['date']}) - system LLM: {current['system_llm']['winner']} "
+              f"({current['system_llm']['decided_by']})")
+        print(f"Speed-quality rule ({current['date']}) - judge: {current['judge']['winner']} "
+              f"({current['judge']['decided_by']})")
 
 
 def report(args: argparse.Namespace) -> int:
