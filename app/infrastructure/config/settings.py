@@ -6,27 +6,42 @@ Kept as small frozen dataclasses (no framework) so the composition root can
 build the adapters from them and tests can construct them directly.
 
 LLM environment variables (all optional):
-    LLM_PROVIDER          "ollama" (default), "openai", "anthropic" or "none"
+    LLM_PROVIDER          "ollama" (default), "openrouter", "openai", "anthropic"
+                          or "none"
     LLM_MODEL             model id; default depends on the provider
-    LLM_BASE_URL          server URL (default http://127.0.0.1:11434 for Ollama)
+    LLM_BASE_URL          server URL (default http://127.0.0.1:11434 for Ollama,
+                          https://openrouter.ai/api/v1 for OpenRouter)
     LLM_TEMPERATURE       sampling temperature (default 0.0, reproducible runs)
     LLM_NUM_CTX           context window for Ollama (default 8192)
-    LLM_REASONING         "false" (default for Ollama: no thinking tokens),
-                          "true", or "default" (let the model decide)
+    LLM_REASONING         thinking mode: "false" (default for Ollama and
+                          OpenRouter: no thinking tokens), "true", "default"
+                          (let the model decide) or an effort level ("low",
+                          "medium", "high", ...) for models whose thinking
+                          cannot be switched off
     LLM_MAX_RETRIES       retries for transient errors (default 1)
     LLM_MAX_EXPLANATIONS  top results explained per search (default 3)
     LLM_APPLY_CATEGORY_FILTER  "true" to apply the category inferred by the
                           LLM as a hard filter (default "false": soft signal)
     LLM_MAX_TOKENS        cap on generated tokens per call (default 1024)
     LLM_TIMEOUT_S         HTTP timeout per call in seconds (default 180)
+    OPENROUTER_API_KEY    API key, required by the "openrouter" provider (read
+                          only when the chat model is built, never stored here)
 
 Relevance judge environment variables (all optional; evaluation only):
     JUDGE_PROVIDER        provider of the LLM that grades (query, book) pairs;
                           default LLM_PROVIDER
-    JUDGE_MODEL           judge model id; default LLM_MODEL (or the provider's
+    JUDGE_MODEL           judge model id; default minimax/minimax-m3.1-flash on
+                          OpenRouter, otherwise LLM_MODEL (or the provider's
                           default model when JUDGE_PROVIDER differs)
     JUDGE_BASE_URL        judge server URL; default LLM_BASE_URL (or the
                           provider's default when JUDGE_PROVIDER differs)
+    JUDGE_REASONING       judge thinking mode, same values as LLM_REASONING;
+                          default "false" ("low" for the default OpenRouter
+                          judge, whose thinking cannot be switched off)
+
+Cost estimate of recorded LLM calls (optional, both or neither):
+    LLM_PRICE_INPUT_PER_MTOK   USD per million input tokens
+    LLM_PRICE_OUTPUT_PER_MTOK  USD per million output tokens
 
 Embedding environment variables (all optional):
     EMBEDDING_MODEL       sentence-transformers model (default all-MiniLM-L6-v2).
@@ -43,24 +58,107 @@ Re-ranking environment variables (all optional):
 
 import os
 from dataclasses import dataclass
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Union
 
 # Ollama listens on IPv4; "localhost" can resolve to ::1 first on macOS.
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 
+# OpenRouter serves many model families behind the OpenAI chat-completions API.
+DEFAULT_OPENROUTER_URL = "https://openrouter.ai/api/v1"
+
 DEFAULT_MODELS = {
     "ollama": "qwen3.8:27b-mlx",
-    "openai": "gpt-4o-mini",
+    "openrouter": "qwen/qwen3.8-flash",
+    "openai": "gpt-6-luna",  # gpt-4o-mini-2024-07-18 is retired on 2027-01-14
     "anthropic": "claude-haiku-5-5",
 }
 
-SUPPORTED_PROVIDERS = ("ollama", "openai", "anthropic", "none")
+# Server URL per provider when LLM_BASE_URL / JUDGE_BASE_URL is not set
+# (a provider not listed uses its client library's default).
+DEFAULT_BASE_URLS = {
+    "ollama": DEFAULT_OLLAMA_URL,
+    "openrouter": DEFAULT_OPENROUTER_URL,
+}
+
+SUPPORTED_PROVIDERS = ("ollama", "openrouter", "openai", "anthropic", "none")
+
+# Providers whose thinking mode is off unless LLM_REASONING says otherwise:
+# thinking tokens make structured output slower and costlier, and the
+# default models of both providers can switch it off.
+THINKING_OFF_BY_DEFAULT = ("ollama", "openrouter")
+
+# Effort levels accepted by LLM_REASONING / JUDGE_REASONING besides
+# true/false/default. Some OpenRouter models (e.g. MiniMax M3.1 Flash,
+# Gemini 3.8 Flash) reject "false" because their reasoning is mandatory;
+# for them the lowest effort level is the closest to "off".
+REASONING_EFFORTS = ("minimal", "low", "medium", "high", "xhigh", "max")
+
+# Thinking mode: True/False switch it on/off, an effort level sets its
+# effort, None keeps the model default.
+Reasoning = Union[bool, str, None]
+
+# Default judge per provider when JUDGE_MODEL is not set. On OpenRouter it is
+# MiniMax M3.1 Flash, another model family than the default system LLM
+# (Qwen3.8 Flash): the literature recommends a judge from a different family
+# than the system it judges. Other providers fall back to the system model.
+DEFAULT_JUDGE_MODELS = {"openrouter": "minimax/minimax-m3.1-flash"}
+
+# Thinking mode of those default judges when JUDGE_REASONING is not set.
+# MiniMax M3.1 Flash has mandatory reasoning on OpenRouter ("off" is rejected
+# with HTTP 400), so it runs at its lowest effort level.
+DEFAULT_JUDGE_REASONING = {"openrouter": "low"}
+
+# Environment variable holding the OpenRouter API key.
+OPENROUTER_API_KEY_VAR = "OPENROUTER_API_KEY"
 
 # Default embedding model: the one the shipped index (data/indexes) was built with.
 DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # Torch device families accepted for EMBEDDING_DEVICE ("cuda:1" is also valid).
 SUPPORTED_EMBEDDING_DEVICES = ("cpu", "mps", "cuda")
+
+
+def parse_reasoning(raw: str) -> Reasoning:
+    """
+    Parse an LLM_REASONING / JUDGE_REASONING value.
+
+    "true"/"false" give a bool, an effort level ("low", ...) is kept as text,
+    anything else ("default") gives None: the model decides.
+    """
+    value = raw.strip().lower()
+    if value in ("true", "false"):
+        return value == "true"
+    if value in REASONING_EFFORTS:
+        return value
+    return None
+
+
+def _check_reasoning(reasoning: Reasoning, variable: str) -> None:
+    if isinstance(reasoning, str) and reasoning not in REASONING_EFFORTS:
+        raise ValueError(
+            f"{variable} must be true, false, default or one of {REASONING_EFFORTS}, got '{reasoning}'"
+        )
+
+
+def openrouter_api_key(env: Optional[Mapping[str, str]] = None) -> str:
+    """
+    The OpenRouter API key, read from OPENROUTER_API_KEY.
+
+    It is read only when an OpenRouter chat model is built and never stored
+    in the settings dataclasses, so settings can be printed or written to an
+    evaluation report without leaking it.
+
+    Raises:
+        ValueError: If the variable is unset or empty
+    """
+    env = os.environ if env is None else env
+    key = env.get(OPENROUTER_API_KEY_VAR, "").strip()
+    if not key:
+        raise ValueError(
+            f"{OPENROUTER_API_KEY_VAR} is not set: the 'openrouter' provider needs an OpenRouter "
+            f"API key. Set {OPENROUTER_API_KEY_VAR} in the environment or in .env."
+        )
+    return key
 
 
 @dataclass(frozen=True)
@@ -72,7 +170,7 @@ class LLMSettings:
     base_url: Optional[str] = DEFAULT_OLLAMA_URL
     temperature: float = 0.0
     num_ctx: Optional[int] = 8192
-    reasoning: Optional[bool] = False
+    reasoning: Reasoning = False
     max_retries: int = 1
     max_explanations: int = 3
     apply_extracted_category: bool = False
@@ -90,6 +188,7 @@ class LLMSettings:
             raise ValueError(
                 f"LLM_MAX_EXPLANATIONS must be >= 0, got {self.max_explanations}"
             )
+        _check_reasoning(self.reasoning, "LLM_REASONING")
 
     @property
     def enabled(self) -> bool:
@@ -103,17 +202,18 @@ class LLMSettings:
         provider = env.get("LLM_PROVIDER", "ollama").strip().lower()
         is_ollama = provider == "ollama"
 
-        reasoning_raw = env.get("LLM_REASONING", "false" if is_ollama else "default")
-        reasoning = {"true": True, "false": False}.get(reasoning_raw.strip().lower())
+        reasoning_raw = env.get(
+            "LLM_REASONING", "false" if provider in THINKING_OFF_BY_DEFAULT else "default"
+        )
 
         num_ctx_raw = env.get("LLM_NUM_CTX")
         return cls(
             provider=provider,
             model=env.get("LLM_MODEL", DEFAULT_MODELS.get(provider, "")),
-            base_url=env.get("LLM_BASE_URL", DEFAULT_OLLAMA_URL if is_ollama else None),
+            base_url=env.get("LLM_BASE_URL", DEFAULT_BASE_URLS.get(provider)),
             temperature=float(env.get("LLM_TEMPERATURE", "0.0")),
             num_ctx=int(num_ctx_raw) if num_ctx_raw else (8192 if is_ollama else None),
-            reasoning=reasoning,
+            reasoning=parse_reasoning(reasoning_raw),
             max_retries=int(env.get("LLM_MAX_RETRIES", "1")),
             max_explanations=int(env.get("LLM_MAX_EXPLANATIONS", "3")),
             apply_extracted_category=env.get("LLM_APPLY_CATEGORY_FILTER", "false").strip().lower() == "true",
@@ -133,9 +233,11 @@ class JudgeSettings:
 
     Separate from LLMSettings so the judge can be another model than the one
     the search system uses: the literature recommends a judge from a
-    different model family than the systems it judges. Temperature (0),
-    thinking mode (off) and the token cap are fixed, not read from the
-    environment, so every judgment is made the same way.
+    different model family than the systems it judges. Temperature (0) and
+    the token cap are fixed, not read from the environment, so every
+    judgment is made the same way. Thinking is off unless JUDGE_REASONING
+    says otherwise; models whose thinking cannot be switched off (such as
+    the default OpenRouter judge) run at their lowest effort instead.
     """
 
     provider: str = "ollama"
@@ -144,7 +246,7 @@ class JudgeSettings:
     num_ctx: Optional[int] = 8192
     timeout_s: Optional[float] = 180.0
     temperature: float = 0.0
-    reasoning: bool = False
+    reasoning: Reasoning = False
     max_tokens: int = JUDGE_MAX_TOKENS
     system_llm: str = ""  # "provider/model" of the system LLM, for provenance notes
 
@@ -156,6 +258,7 @@ class JudgeSettings:
             )
         if not self.model.strip():
             raise ValueError("JUDGE_MODEL must not be empty")
+        _check_reasoning(self.reasoning, "JUDGE_REASONING")
 
     @property
     def same_as_system_llm(self) -> bool:
@@ -167,25 +270,90 @@ class JudgeSettings:
         """
         Build the judge settings from JUDGE_* variables, falling back to LLM_*.
 
-        When JUDGE_PROVIDER names another provider than LLM_PROVIDER, the model
-        and URL fall back to that provider's defaults instead, since a model
-        id of one provider means nothing to another.
+        Without JUDGE_MODEL the judge is the provider's default judge when it
+        has one (OpenRouter: a model of another family than the default
+        system LLM), otherwise the system model. When JUDGE_PROVIDER names
+        another provider than LLM_PROVIDER, the model and URL fall back to
+        that provider's defaults instead, since a model id of one provider
+        means nothing to another.
         """
         env = os.environ if env is None else env
         system = LLMSettings.from_env(env)
         provider = env.get("JUDGE_PROVIDER", "").strip().lower() or system.provider
         same_provider = provider == system.provider
         is_ollama = provider == "ollama"
+
+        model = env.get("JUDGE_MODEL", "").strip()
+        if not model:
+            if provider in DEFAULT_JUDGE_MODELS:
+                model = DEFAULT_JUDGE_MODELS[provider]
+            else:
+                model = system.model if same_provider else DEFAULT_MODELS.get(provider, "")
+
+        reasoning_raw = env.get("JUDGE_REASONING", "").strip()
+        if reasoning_raw:
+            reasoning = parse_reasoning(reasoning_raw)
+        elif model == DEFAULT_JUDGE_MODELS.get(provider):
+            reasoning = DEFAULT_JUDGE_REASONING[provider]
+        else:
+            reasoning = False
+
         return cls(
             provider=provider,
-            model=env.get("JUDGE_MODEL", "").strip()
-            or (system.model if same_provider else DEFAULT_MODELS.get(provider, "")),
+            model=model,
             base_url=env.get("JUDGE_BASE_URL", "").strip()
-            or (system.base_url if same_provider else (DEFAULT_OLLAMA_URL if is_ollama else None)),
+            or (system.base_url if same_provider else DEFAULT_BASE_URLS.get(provider)),
             num_ctx=system.num_ctx if same_provider else (8192 if is_ollama else None),
             timeout_s=system.timeout_s,
+            reasoning=reasoning,
             system_llm=f"{system.provider}/{system.model}",
         )
+
+
+@dataclass(frozen=True)
+class TokenPrices:
+    """
+    Prices of one model in USD per million tokens, used only to estimate the
+    cost of recorded LLM calls (app/infrastructure/llm/usage.py).
+
+    No price is hardcoded: prices change often and differ per provider, so
+    they are given for each run (LLM_PRICE_INPUT_PER_MTOK and
+    LLM_PRICE_OUTPUT_PER_MTOK, or constructed directly).
+    """
+
+    input_per_mtok: float
+    output_per_mtok: float
+
+    def __post_init__(self) -> None:
+        if self.input_per_mtok < 0 or self.output_per_mtok < 0:
+            raise ValueError("Token prices must be >= 0")
+
+    def cost(self, input_tokens: int, output_tokens: int) -> float:
+        """Estimated cost in USD of the given token counts."""
+        return (input_tokens * self.input_per_mtok + output_tokens * self.output_per_mtok) / 1_000_000
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> Optional["TokenPrices"]:
+        """
+        Prices from LLM_PRICE_INPUT_PER_MTOK and LLM_PRICE_OUTPUT_PER_MTOK.
+
+        Returns:
+            TokenPrices, or None when neither variable is set
+
+        Raises:
+            ValueError: If only one of the two variables is set
+        """
+        env = os.environ if env is None else env
+        raw_input = env.get("LLM_PRICE_INPUT_PER_MTOK", "").strip()
+        raw_output = env.get("LLM_PRICE_OUTPUT_PER_MTOK", "").strip()
+        if not raw_input and not raw_output:
+            return None
+        if not (raw_input and raw_output):
+            raise ValueError(
+                "Set both LLM_PRICE_INPUT_PER_MTOK and LLM_PRICE_OUTPUT_PER_MTOK "
+                "(USD per million tokens), or neither"
+            )
+        return cls(input_per_mtok=float(raw_input), output_per_mtok=float(raw_output))
 
 
 @dataclass(frozen=True)

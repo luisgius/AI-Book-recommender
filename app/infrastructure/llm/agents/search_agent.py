@@ -42,6 +42,8 @@ from app.infrastructure.llm.prompts_agent import (
     AGENT_REFLECTION_PROMPT,
     AGENT_SYSTEM_PROMPT,
 )
+from app.infrastructure.llm.structured_output import with_structured_output
+from app.infrastructure.llm.usage import operation_config
 
 logger = logging.getLogger(__name__)
 
@@ -233,7 +235,7 @@ class LangGraphSearchAgent:
         self._max_reflections = max_reflections
         self._tools = build_catalog_tools(search_service, catalog_repo)
         self._model_with_tools = model.bind_tools(self._tools)
-        self._finalizer = model.with_structured_output(RecommendationListLLM)
+        self._finalizer = with_structured_output(model, RecommendationListLLM)
         self.graph = self._build_graph()
 
     # -- nodes -----------------------------------------------------------------
@@ -319,7 +321,10 @@ class LangGraphSearchAgent:
         }
         recursion_limit = 4 * (self._max_tool_rounds + 2) * (self._max_reflections + 1)
         try:
-            state = self.graph.invoke(initial, config={"recursion_limit": recursion_limit})
+            # The "agent" label reaches every LLM call of the graph (usage records)
+            state = self.graph.invoke(
+                initial, config={"recursion_limit": recursion_limit, **operation_config("agent")}
+            )
         except ConnectionError as e:
             raise RuntimeError(f"LLM unreachable: {e}") from e
 

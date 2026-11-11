@@ -14,11 +14,13 @@ How a judgment is made (pointwise, one judge, as in UMBRELA):
    one-sentence rationale and the grade, via structured output.
 
 The chat model is built with build_chat_model, the same factory the system
-LLM client uses, from JudgeSettings: temperature 0, thinking off and a small
-token cap, so a judgment is reproducible and cannot run away.
+LLM client uses, from JudgeSettings: temperature 0, thinking off (or its
+lowest effort for models that cannot switch it off) and a small token cap,
+so a judgment is reproducible and cannot run away. Its calls are recorded
+by usage_recorder under the operation "relevance_judge".
 """
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 from app.domain.entities import Book
 from app.infrastructure.config.settings import JudgeSettings
@@ -26,6 +28,11 @@ from app.infrastructure.config.settings import JudgeSettings
 from .langchain_llm_client import build_chat_model
 from .prompts_judge import RELEVANCE_JUDGE_PROMPT_VERSION, build_relevance_judge_prompt
 from .schemas_judge import RelevanceGradeLLM
+from .structured_output import with_structured_output
+from .usage import LLMUsageRecorder
+
+# Operation label of the judge's LLM calls in the usage records.
+RELEVANCE_JUDGE_OPERATION = "relevance_judge"
 
 
 def build_book_prompt(query_text: str, book: Book) -> str:
@@ -48,21 +55,31 @@ class LangChainRelevanceJudge:
     Attributes:
         model_name: Judge model id, recorded with every judgment
         prompt_version: Version of the judging prompt, recorded likewise
+        usage_recorder: Records latency and tokens of every judge call when
+            the judge is built with from_settings; None otherwise
     """
 
-    def __init__(self, chat_model, model_name: str) -> None:
+    def __init__(
+        self,
+        chat_model,
+        model_name: str,
+        usage_recorder: Optional[LLMUsageRecorder] = None,
+    ) -> None:
         """
         Args:
             chat_model: LangChain chat model that supports structured output
             model_name: Model id to record with each judgment
+            usage_recorder: The recorder attached to chat_model, if any
         """
         self.model_name = model_name
         self.prompt_version = RELEVANCE_JUDGE_PROMPT_VERSION
-        self._structured_model = chat_model.with_structured_output(RelevanceGradeLLM)
+        self.usage_recorder = usage_recorder
+        self._structured_model = with_structured_output(chat_model, RelevanceGradeLLM)
 
     @classmethod
     def from_settings(cls, settings: JudgeSettings) -> "LangChainRelevanceJudge":
         """Build the judge from JudgeSettings (temperature 0, thinking off, token cap)."""
+        recorder = LLMUsageRecorder(default_operation=RELEVANCE_JUDGE_OPERATION)
         chat_model = build_chat_model(
             settings.provider,
             settings.model,
@@ -72,8 +89,9 @@ class LangChainRelevanceJudge:
             reasoning=settings.reasoning,
             max_tokens=settings.max_tokens,
             timeout_s=settings.timeout_s,
+            usage_recorder=recorder,
         )
-        return cls(chat_model, settings.model)
+        return cls(chat_model, settings.model, usage_recorder=recorder)
 
     def judge(self, query_text: str, book: Book) -> Tuple[int, str]:
         """

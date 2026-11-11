@@ -15,7 +15,7 @@ Estado: `[ ]` pendiente, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V05** Juez LLM de relevancia con procedencia y acuerdo
 - [ ] **V06** Ablación unificada y elección de la configuración por defecto
 - [ ] **V07** Línea base de contexto largo (catálogo completo en el prompt)
-- [ ] **V08** Valores por defecto actualizados y coste por consulta
+- [x] **V08** Proveedor OpenRouter, modelos por defecto y coste por llamada
 - [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI)
 
 ## Aplazadas (con motivo)

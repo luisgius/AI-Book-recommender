@@ -10,10 +10,16 @@ Architecture separation:
 - Infrastructure schemas (this file): Pydantic BaseModels for LLM I/O validation
 
 The LangChainLLMClient converts from these Pydantic schemas to domain value objects.
+
+As in schemas.py, the JSON schemas hold only standard keywords (no example
+payloads) and limits on free text are soft (cut, not rejected).
 """
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Literal
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Field
+
+from .schemas import soft_max_items, soft_max_length
 
 
 class QueryIntentLLM(BaseModel):
@@ -45,7 +51,7 @@ class QueryIntentLLM(BaseModel):
         )
     )
 
-    reasoning: str = Field(
+    reasoning: Annotated[str, soft_max_length(200)] = Field(
         min_length=10,
         max_length=200,
         description=(
@@ -53,14 +59,6 @@ class QueryIntentLLM(BaseModel):
             "What keywords or patterns led to this classification?"
         )
     )
-
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "intent_type": "recommendation",
-            "confidence": 0.9,
-            "reasoning": "User explicitly asks for 'books like 1984', indicating a recommendation intent based on similarity."
-        }
-    })
 
 
 class ExtractedFiltersLLM(BaseModel):
@@ -118,16 +116,6 @@ class ExtractedFiltersLLM(BaseModel):
         )
     )
 
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "language": "es",
-            "category": "Fiction",
-            "min_year": 2020,
-            "max_year": None,
-            "author_hint": None
-        }
-    })
-
 
 class ReformulatedQueryLLM(BaseModel):
     """
@@ -142,7 +130,7 @@ class ReformulatedQueryLLM(BaseModel):
     3. Extract key keywords that represent the core search intent
     """
 
-    optimized_query: str = Field(
+    optimized_query: Annotated[str, soft_max_length(300)] = Field(
         min_length=1,
         max_length=300,
         description=(
@@ -152,7 +140,7 @@ class ReformulatedQueryLLM(BaseModel):
         )
     )
 
-    keywords: list[str] = Field(
+    keywords: Annotated[list[str], soft_max_items(10)] = Field(
         max_length=10,
         description=(
             "List of key search terms extracted from the query (max 10). "
@@ -168,14 +156,6 @@ class ReformulatedQueryLLM(BaseModel):
             "This is optional, for debugging/transparency."
         )
     )
-
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "optimized_query": "science fiction artificial intelligence ethics",
-            "keywords": ["science fiction", "AI", "artificial intelligence", "ethics", "technology"],
-            "removed_noise": ["I'm looking for", "books about", "please"]
-        }
-    })
 
 
 # Type alias for code readability

@@ -6,15 +6,22 @@ These schemas define the structured outputs for:
 2. Grounding validation
 3. Relevance grade of a book for a query (RelevanceGradeLLM), used to fill
    the unjudged pairs of the test collection
+
+Scores and grades are hard ranges (a value outside them is an error); the
+length of a justification is a soft limit (cut, not rejected; see schemas.py).
 """
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field
+
+from .schemas import soft_max_length
 
 
 class JudgmentDimension(BaseModel):
     """
     Single dimension of LLM judgment.
-    
+
     Each dimension has a score (1-5) and brief reasoning.
     """
     score: int = Field(
@@ -23,8 +30,10 @@ class JudgmentDimension(BaseModel):
         le=5,
         description="Score from 1 (poor) to 5 (excellent)"
     )
-   
-    reasoning: str = Field(max_length=200, description="Brief justification for the score")
+
+    reasoning: Annotated[str, soft_max_length(200)] = Field(
+        max_length=200, description="Brief justification for the score"
+    )
 
 
 class ExplanationJudgmentLLM(BaseModel):

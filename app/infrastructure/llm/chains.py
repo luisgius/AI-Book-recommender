@@ -16,6 +16,7 @@ from .prompts import build_grounded_explanation_prompt
 from .prompts_judge import build_llm_judge_prompt
 from .schemas import GroundedExplanationLLM
 from .schemas_judge import ExplanationJudgmentLLM
+from .structured_output import with_structured_output
 
 
 def create_grounded_explanation_chain(llm):
@@ -32,8 +33,8 @@ def create_grounded_explanation_chain(llm):
     which is more robust than manual JSON parsing.
 
     Args:
-        llm: A LangChain ChatModel (e.g., ChatOpenAI or ChatAnthropic)
-             Must support structured output (OpenAI function calling or Anthropic tools)
+        llm: A LangChain ChatModel (e.g., ChatOllama or ChatOpenAI)
+             Must support structured output (JSON schema or tool calling)
 
     Returns:
         A runnable chain that accepts:
@@ -41,8 +42,8 @@ def create_grounded_explanation_chain(llm):
         - Output: GroundedExplanationLLM (Pydantic model)
 
     Example:
-        >>> from langchain_openai import ChatOpenAI
-        >>> llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        >>> from app.infrastructure.llm.langchain_llm_client import build_chat_model
+        >>> llm = build_chat_model("openrouter", "qwen/qwen3.8-flash")
         >>> chain = create_grounded_explanation_chain(llm)
         >>> result = chain.invoke({
         ...     "query_text": "books about AI",
@@ -56,9 +57,9 @@ def create_grounded_explanation_chain(llm):
         >>> print(result.citations)
     """
     # Step 1: Add structured output capability to the LLM
-    # This uses native function calling (OpenAI) or tools (Anthropic)
-    # instead of relying on the LLM to generate valid JSON in its response
-    llm_with_structure = llm.with_structured_output(GroundedExplanationLLM)
+    # The method is chosen per client (structured_output.py): the schema
+    # constrains the answer instead of relying on the LLM to write valid JSON
+    llm_with_structure = with_structured_output(llm, GroundedExplanationLLM)
 
     # Step 2: Create prompt formatter function
     # This function converts the input dict into a formatted prompt message
@@ -124,8 +125,8 @@ def create_llm_judge_chain(llm):
     - Relevance: Does it address the user's query intent?
 
     Args:
-        llm: A LangChain ChatModel (e.g., ChatOpenAI or ChatAnthropic)
-             Must support structured output (OpenAI function calling or Anthropic tools)
+        llm: A LangChain ChatModel (e.g., ChatOllama or ChatOpenAI)
+             Must support structured output (JSON schema or tool calling)
 
     Returns:
         A runnable chain that accepts:
@@ -133,8 +134,8 @@ def create_llm_judge_chain(llm):
         - Output: ExplanationJudgmentLLM (Pydantic model with 3 JudgmentDimension objects)
 
     Example:
-        >>> from langchain_openai import ChatOpenAI
-        >>> llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        >>> from app.infrastructure.llm.langchain_llm_client import build_chat_model
+        >>> llm = build_chat_model("openrouter", "qwen/qwen3.8-flash")
         >>> chain = create_llm_judge_chain(llm)
         >>> result = chain.invoke({
         ...     "query_text": "books about AI",
@@ -148,7 +149,7 @@ def create_llm_judge_chain(llm):
     # Step 1: Add structured output capability
     # This ensures the LLM returns a valid ExplanationJudgmentLLM object
     # instead of free-form text that we'd have to parse
-    llm_with_structure = llm.with_structured_output(ExplanationJudgmentLLM)
+    llm_with_structure = with_structured_output(llm, ExplanationJudgmentLLM)
 
     # Step 2: Create prompt formatter function
     def format_judge_prompt(inputs: dict) -> list:

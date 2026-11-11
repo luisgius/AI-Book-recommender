@@ -198,7 +198,7 @@ class TestJudgeSettings:
     def test_another_provider_uses_its_own_defaults(self):
         settings = JudgeSettings.from_env({"JUDGE_PROVIDER": "openai"})
         assert (settings.provider, settings.model, settings.base_url, settings.num_ctx) == (
-            "openai", "gpt-4o-mini", None, None,
+            "openai", "gpt-6-luna", None, None,
         )
 
     def test_needs_an_llm(self):

@@ -51,7 +51,7 @@ class TestLLMSettings:
 
     def test_hosted_provider_has_no_ollama_options(self):
         settings = LLMSettings.from_env({"LLM_PROVIDER": "openai"})
-        assert settings.model == "gpt-4o-mini"
+        assert settings.model == "gpt-6-luna"  # gpt-4o-mini is retired on 2027-01-14
         assert settings.base_url is None
         assert settings.num_ctx is None
         assert settings.reasoning is None

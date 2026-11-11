@@ -369,7 +369,7 @@ class Explanation:
     """
 
     model: str = "unknown"
-    """Which LLM model generated this explanation (e.g., 'gpt-4o-mini')"""
+    """Which LLM model generated this explanation (e.g., 'qwen/qwen3.8-flash')"""
 
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     """When this explanation was generated"""

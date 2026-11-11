@@ -100,7 +100,7 @@ def validate_grounded_explanation(
         explanation_llm: Pydantic schema from LLM (may contain hallucinations)
         book: The book entity being explained
         query_text: The user's search query
-        model_name: LLM model identifier (e.g., "gpt-4o-mini")
+        model_name: LLM model identifier (e.g., "qwen/qwen3.8-flash")
 
     Returns:
         Explanation domain entity with validated citations

@@ -38,6 +38,7 @@ from ..prompts_query import (
     FILTER_EXTRACTION_PROMPT,
     QUERY_REFORMULATION_PROMPT
 )
+from ..structured_output import with_structured_output
 
 class QueryUnderstandingState(TypedDict):
     """
@@ -74,7 +75,7 @@ def parse_intent_node(state: QueryUnderstandingState, llm) -> dict:
 
         prompt_text = INTENT_EXTRACTION_PROMPT.format(query = query)
 
-        llm_with_structure = llm.with_structured_output(QueryIntentLLM)
+        llm_with_structure = with_structured_output(llm, QueryIntentLLM)
         intent_result = llm_with_structure.invoke(prompt_text)
 
         return {"intent":intent_result}
@@ -98,7 +99,7 @@ def extract_filters_node(state: QueryUnderstandingState, llm) -> dict:
         query = state["original_query"]
         prompt_text = FILTER_EXTRACTION_PROMPT.format(query=query)
         
-        llm_with_structure = llm.with_structured_output(ExtractedFiltersLLM)
+        llm_with_structure = with_structured_output(llm, ExtractedFiltersLLM)
         filters_result = llm_with_structure.invoke(prompt_text)
         
         return {"filters": filters_result}
@@ -121,7 +122,7 @@ def reformulate_query_node(state: QueryUnderstandingState, llm) -> dict:
         query = state["original_query"]
         prompt_text = QUERY_REFORMULATION_PROMPT.format(query=query)
 
-        llm_with_structure = llm.with_structured_output(ReformulatedQueryLLM)
+        llm_with_structure = with_structured_output(llm, ReformulatedQueryLLM)
         reformulated_result = llm_with_structure.invoke(prompt_text)
 
         return {"reformulated": reformulated_result}
@@ -321,8 +322,8 @@ def create_query_understanding_graph(llm):
         Compiled StateGraph ready for invocation
 
     Example:
-        >>> from langchain_openai import ChatOpenAI
-        >>> llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        >>> from app.infrastructure.llm.langchain_llm_client import build_chat_model
+        >>> llm = build_chat_model("openrouter", "qwen/qwen3.8-flash")
         >>> graph = create_query_understanding_graph(llm)
         >>> result = graph.invoke({"original_query": "books like 1984"})
         >>> print(result["final_query"])

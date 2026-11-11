@@ -15,6 +15,12 @@ from langchain.chat_models import init_chat_model
 from app.domain.ports import LLMClient
 from app.domain.entities import Book, Explanation
 from app.domain.value_objects import QueryIntent, SearchFilters
+from app.infrastructure.config.settings import (
+    DEFAULT_MODELS,
+    DEFAULT_OPENROUTER_URL,
+    Reasoning,
+    openrouter_api_key,
+)
 
 from .chains import create_grounded_explanation_chain, create_llm_judge_chain
 from .filter_guards import guard_filters
@@ -22,6 +28,7 @@ from .guardrails import validate_grounded_explanation
 from .schemas import GroundedExplanationLLM
 from .schemas_judge import ExplanationJudgmentLLM
 from .graphs.query_understanding import create_query_understanding_graph
+from .usage import LLMUsageRecorder, operation_config
 
 from dotenv import load_dotenv
 
@@ -44,6 +51,43 @@ MIN_PLAUSIBLE_YEAR = 1000
 MAX_PLAUSIBLE_YEAR = 2100
 
 
+def openrouter_reasoning(reasoning: Reasoning) -> Optional[dict]:
+    """
+    OpenRouter's `reasoning` request field for a thinking-mode setting.
+
+    True/False switch thinking on/off ({"enabled": ...}); an effort level
+    ("low", ...) is sent as {"effort": level}, for models whose thinking
+    cannot be switched off; None sends nothing (model default).
+    """
+    if reasoning is None:
+        return None
+    if isinstance(reasoning, bool):
+        return {"enabled": reasoning}
+    return {"effort": reasoning}
+
+
+def openrouter_options(base_url: Optional[str], reasoning: Reasoning) -> dict:
+    """
+    Client options of an OpenRouter chat model (LangChain's OpenAI client).
+
+    - base_url: the OpenRouter API unless another URL is given.
+    - api_key: OPENROUTER_API_KEY; a missing key raises ValueError naming it.
+    - extra_body: OpenRouter-only request fields. "require_parameters" makes
+      OpenRouter route only to providers that support every parameter sent
+      (JSON schema, thinking switch, token cap), so none of them is silently
+      ignored. No identifying headers (HTTP-Referer, X-Title) are sent.
+    """
+    extra_body: dict = {"provider": {"require_parameters": True}}
+    reasoning_field = openrouter_reasoning(reasoning)
+    if reasoning_field is not None:
+        extra_body["reasoning"] = reasoning_field
+    return {
+        "base_url": base_url or DEFAULT_OPENROUTER_URL,
+        "api_key": openrouter_api_key(),
+        "extra_body": extra_body,
+    }
+
+
 def build_chat_model(
     provider: str,
     model_name: str,
@@ -51,9 +95,10 @@ def build_chat_model(
     temperature: float = 0.0,
     base_url: Optional[str] = None,
     num_ctx: Optional[int] = None,
-    reasoning: Optional[bool] = None,
+    reasoning: Reasoning = None,
     max_tokens: Optional[int] = None,
     timeout_s: Optional[float] = None,
+    usage_recorder: Optional[LLMUsageRecorder] = None,
 ):
     """
     Build a LangChain chat model with the provider-specific options.
@@ -64,23 +109,33 @@ def build_chat_model(
     Ollama takes the context window (num_ctx), the thinking switch
     (reasoning), the token cap as num_predict and the timeout through the HTTP
     client; hosted providers take max_tokens and timeout directly.
+    OpenRouter speaks the OpenAI chat-completions API, so it is built with
+    LangChain's OpenAI client and the options of openrouter_options().
 
     Args:
-        provider: LangChain provider name ("ollama", "openai", "anthropic")
-        model_name: Model identifier
+        provider: "ollama", "openrouter", "openai" or "anthropic"
+        model_name: Model identifier (OpenRouter: "vendor/model")
         temperature: Sampling temperature
         base_url: Optional server URL (e.g. the local Ollama server)
         num_ctx: Context window size (Ollama only)
-        reasoning: Ollama thinking mode (None keeps the model default)
+        reasoning: Thinking mode for Ollama and OpenRouter (None keeps the
+            model default)
         max_tokens: Cap on generated tokens per call
         timeout_s: HTTP timeout per call, in seconds
+        usage_recorder: Optional callback that records every call of the
+            model (operation, latency, tokens); see usage.py
 
     Returns:
         A LangChain chat model
+
+    Raises:
+        ValueError: For "openrouter" when OPENROUTER_API_KEY is not set
     """
     model_kwargs: dict = {"temperature": temperature}
     if base_url:
         model_kwargs["base_url"] = base_url
+    if usage_recorder is not None:
+        model_kwargs["callbacks"] = [usage_recorder]
     if provider == "ollama":
         if num_ctx:
             model_kwargs["num_ctx"] = num_ctx
@@ -95,6 +150,9 @@ def build_chat_model(
             model_kwargs["max_tokens"] = max_tokens
         if timeout_s:
             model_kwargs["timeout"] = timeout_s
+    if provider == "openrouter":
+        model_kwargs.update(openrouter_options(base_url, reasoning))
+        return init_chat_model(model=model_name, model_provider="openai", **model_kwargs)
     return init_chat_model(model=model_name, model_provider=provider, **model_kwargs)
 
 
@@ -118,19 +176,24 @@ class LangChainLLMClient(LLMClient):
     - extract_query_intent() -> QueryIntent (domain value object)
     - judge_explanation() -> ExplanationJudgmentLLM (infrastructure schema)
     - get_model_name() -> str
+
+    Usage recording:
+    - usage_recorder (LLMUsageRecorder) records every call of the chat model,
+      including those of the search agent that reuses it, labelled
+      query_understanding, explanation, explanation_judge or agent.
     """
 
     def __init__(
         self,
         provider: str = "openai",
-        model_name: str = "gpt-4o-mini",
+        model_name: str = DEFAULT_MODELS["openai"],
         temperature: float = 0.0,
         max_retries: int = DEFAULT_MAX_RETRIES,
         base_delay: float = DEFAULT_BASE_DELAY,
         max_delay: float = DEFAULT_MAX_DELAY,
         base_url: Optional[str] = None,
         num_ctx: Optional[int] = None,
-        reasoning: Optional[bool] = None,
+        reasoning: Reasoning = None,
         known_categories: Optional[List[str]] = None,
         apply_extracted_category: bool = False,
         max_tokens: Optional[int] = None,
@@ -139,24 +202,27 @@ class LangChainLLMClient(LLMClient):
         """
         Initialize the LLM client.
 
-        The API key is loaded from environment variables:
+        The API key is loaded from environment variables (and .env):
+        - OPENROUTER_API_KEY for the "openrouter" provider
         - OPENAI_API_KEY for OpenAI models
         - ANTHROPIC_API_KEY for Anthropic models
 
         Make sure to set the appropriate environment variable before initializing.
 
         Args:
-            provider: LLM provider ("openai" or "anthropic")
-            model_name: Model identifier (e.g., "gpt-4o-mini", "claude-3-haiku-20240307")
+            provider: LLM provider ("ollama", "openrouter", "openai" or "anthropic")
+            model_name: Model identifier (e.g., "qwen/qwen3.8-flash" on
+                OpenRouter, "gpt-6-luna", "claude-haiku-5-5")
             temperature: Sampling temperature (0.0 = deterministic, recommended for evaluation)
             max_retries: Maximum number of retry attempts for transient failures (default: 3)
             base_delay: Initial delay in seconds for exponential backoff (default: 1.0)
             max_delay: Maximum delay in seconds between retries (default: 60.0)
             base_url: Optional server URL (e.g. the local Ollama server)
             num_ctx: Optional context window size (Ollama only)
-            reasoning: Ollama thinking mode: False disables thinking tokens
-                (faster structured output), True enables it, None keeps the
-                model default
+            reasoning: Thinking mode (Ollama and OpenRouter): False disables
+                thinking tokens (faster structured output), True enables it,
+                an effort level ("low", ...) sets it for models that cannot
+                switch it off, None keeps the model default
             known_categories: Catalog categories. When given, a category
                 extracted from a query is kept only if it can match at least
                 one of them; otherwise it is dropped instead of emptying the
@@ -183,6 +249,9 @@ class LangChainLLMClient(LLMClient):
         self.known_categories = [c.lower() for c in known_categories] if known_categories else None
         self.apply_extracted_category = apply_extracted_category
 
+        # Records operation, latency and tokens of every call of self.model
+        self.usage_recorder = LLMUsageRecorder()
+
         # Log initialization (without exposing API key)
         logger.info(f"Initializing {provider} LLM with model {model_name} (temp={temperature})")
 
@@ -196,6 +265,7 @@ class LangChainLLMClient(LLMClient):
                 reasoning=reasoning,
                 max_tokens=max_tokens,
                 timeout_s=timeout_s,
+                usage_recorder=self.usage_recorder,
             )
         except Exception as e:
             logger.error(f"Failed to initialize {provider} model {model_name}: {e}")
@@ -330,7 +400,7 @@ class LangChainLLMClient(LLMClient):
         try:
             # Use retry wrapper for the LLM call
             result = self._invoke_with_retry(
-                operation=lambda: self.chain.invoke(inputs),
+                operation=lambda: self.chain.invoke(inputs, config=operation_config("explanation")),
                 operation_name=f"Explanation generation for book {book.id}"
             )
 
@@ -398,7 +468,7 @@ class LangChainLLMClient(LLMClient):
                     "final_query": None,
                     "query_variations": [],
                     "error": None
-                }),
+                }, config=operation_config("query_understanding")),
                 operation_name="Query understanding"
             )
 
@@ -607,7 +677,7 @@ class LangChainLLMClient(LLMClient):
         # 3. Invoke the judge chain with retry logic
         try:
             judgment = self._invoke_with_retry(
-                operation=lambda: self.judge_chain.invoke(inputs),
+                operation=lambda: self.judge_chain.invoke(inputs, config=operation_config("explanation_judge")),
                 operation_name=f"LLM judge for book {book.id}"
             )
 

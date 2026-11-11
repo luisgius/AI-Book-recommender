@@ -9,10 +9,43 @@ Architecture separation:
 - Infrastructure schemas (this file): Pydantic BaseModels for LLM I/O validation
 
 The LangChainLLMClient converts from these Pydantic schemas to domain entities.
+
+The JSON schema of each model is sent to the LLM provider, so it holds only
+standard JSON Schema keywords: no example payloads (json_schema_extra), which
+strict structured-output APIs can reject as unknown keywords.
+
+Length limits on free text are soft (soft_max_length): a constrained decoder
+(Ollama) stops a string at maxLength, but some hosted strict modes accept
+maxLength without enforcing it, and one over-long sentence should not discard
+the whole answer. Numeric ranges, enums and minimum lengths stay hard: a
+value outside them is an error.
 """
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Literal
+from typing import Annotated, Any, Literal
+
+from pydantic import BaseModel, BeforeValidator, Field
+
+
+def soft_max_length(limit: int) -> BeforeValidator:
+    """
+    Validator that cuts a string to `limit` characters before validation.
+
+    Used with Field(max_length=limit): the JSON schema sent to the model
+    still states the limit (a BeforeValidator does not change it), and an
+    answer that ignores it is cut instead of rejected.
+    """
+    def cut(value: Any) -> Any:
+        return value[:limit] if isinstance(value, str) else value
+
+    return BeforeValidator(cut)
+
+
+def soft_max_items(limit: int) -> BeforeValidator:
+    """Validator that keeps the first `limit` items of a list (see soft_max_length)."""
+    def cut(value: Any) -> Any:
+        return value[:limit] if isinstance(value, list) else value
+
+    return BeforeValidator(cut)
 
 
 class CitationLLM(BaseModel):
@@ -37,7 +70,9 @@ class CitationLLM(BaseModel):
         description="Which book field is being cited. MUST be one of: title, description, categories, authors"
     )
 
-    snippet: str = Field(
+    # A cut snippet is still a substring of the field, so the guardrail
+    # can still verify it.
+    snippet: Annotated[str, soft_max_length(200)] = Field(
         min_length=1,
         max_length=200,
         description="Exact verbatim text from the cited book field (max 200 chars). MUST be a literal substring."
@@ -48,15 +83,6 @@ class CitationLLM(BaseModel):
         le=1.0,
         description="How relevant this citation is to supporting the explanation (0.0 to 1.0)"
     )
-
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "book_id": "123e4567-e89b-12d3-a456-426614174000",
-            "chunk_id": "title",
-            "snippet": "Artificial Intelligence: A Modern Approach",
-            "relevance_score": 0.9
-        }
-    })
 
 
 class GroundedExplanationLLM(BaseModel):
@@ -78,13 +104,13 @@ class GroundedExplanationLLM(BaseModel):
     - If no valid citations remain after filtering, return "no evidence" response
     """
 
-    summary: str = Field(
+    summary: Annotated[str, soft_max_length(200)] = Field(
         min_length=10,
         max_length=200,
         description="One-sentence summary of why this book is relevant to the query"
     )
 
-    reasoning: str = Field(
+    reasoning: Annotated[str, soft_max_length(500)] = Field(
         min_length=20,
         max_length=500,
         description=(
@@ -110,34 +136,6 @@ class GroundedExplanationLLM(BaseModel):
         )
     )
 
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "summary": "This book covers AI fundamentals and modern techniques.",
-            "reasoning": (
-                "The book is highly relevant because [CITE: title] it explicitly focuses on "
-                "artificial intelligence, and [CITE: description] the description mentions "
-                "machine learning and neural networks."
-            ),
-            "citations": [
-                {
-                    "book_id": "123e4567-e89b-12d3-a456-426614174000",
-                    "chunk_id": "title",
-                    "snippet": "Artificial Intelligence: A Modern Approach",
-                    "relevance_score": 0.95
-                },
-                {
-                    "book_id": "123e4567-e89b-12d3-a456-426614174000",
-                    "chunk_id": "description",
-                    "snippet": "comprehensive introduction to machine learning and neural networks",
-                    "relevance_score": 0.85
-                }
-            ],
-            "confidence": 0.9
-        }
-    })
-
 
 # Type alias for code readability
 ChunkFieldStr = Literal["title", "description", "categories", "authors"]
-
-
