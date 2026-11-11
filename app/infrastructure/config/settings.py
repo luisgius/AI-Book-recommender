@@ -422,3 +422,81 @@ class RerankerSettings:
             depth=int(depth) if depth else DEFAULT_RERANK_DEPTH,
             device=env.get("RERANKER_DEVICE", "").strip().lower() or None,
         )
+
+
+# --- MCP server: read-only catalog tools for AI assistants -------------------
+
+# Host headers and browser origins the MCP endpoint accepts by default: this
+# machine only (protection against DNS rebinding). A public deployment lists
+# its own hostname in MCP_ALLOWED_HOSTS.
+DEFAULT_MCP_ALLOWED_HOSTS = ("127.0.0.1:*", "localhost:*", "[::1]:*")
+DEFAULT_MCP_ALLOWED_ORIGINS = ("http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*")
+
+# Requests per minute accepted from one client address (0 disables the limit).
+DEFAULT_MCP_RATE_LIMIT_PER_MINUTE = 60
+
+# Largest JSON payload one tool may return, in bytes (UTF-8, compact JSON).
+DEFAULT_MCP_MAX_RESPONSE_BYTES = 40_000
+
+
+def _split_list(raw: str) -> tuple[str, ...]:
+    """Split a comma-separated environment value into its non-empty items."""
+    return tuple(item.strip() for item in raw.split(",") if item.strip())
+
+
+@dataclass(frozen=True)
+class MCPSettings:
+    """
+    Settings of the MCP endpoint (/mcp) that exposes the catalog to AI assistants.
+
+    Environment variables (all optional):
+        MCP_ENABLED                "false" switches the endpoint off (default "true")
+        MCP_ALLOWED_HOSTS          comma-separated Host header values accepted;
+                                   "host:*" accepts any port. "*" turns the Host
+                                   and Origin checks off (only behind a proxy that
+                                   controls the Host header). Default: localhost.
+        MCP_ALLOWED_ORIGINS        comma-separated browser origins accepted
+                                   (requests without an Origin header always pass).
+                                   Default: http://localhost and http://127.0.0.1.
+        MCP_RATE_LIMIT_PER_MINUTE  requests per minute per client address (default 60,
+                                   0 disables the limit)
+        MCP_MAX_RESPONSE_BYTES     largest JSON payload of one tool result (default 40000)
+    """
+
+    enabled: bool = True
+    allowed_hosts: tuple[str, ...] = DEFAULT_MCP_ALLOWED_HOSTS
+    allowed_origins: tuple[str, ...] = DEFAULT_MCP_ALLOWED_ORIGINS
+    rate_limit_per_minute: int = DEFAULT_MCP_RATE_LIMIT_PER_MINUTE
+    max_response_bytes: int = DEFAULT_MCP_MAX_RESPONSE_BYTES
+
+    def __post_init__(self) -> None:
+        if self.rate_limit_per_minute < 0:
+            raise ValueError(
+                f"MCP_RATE_LIMIT_PER_MINUTE must be >= 0, got {self.rate_limit_per_minute}"
+            )
+        if self.max_response_bytes < 2_000:
+            raise ValueError(
+                f"MCP_MAX_RESPONSE_BYTES must be at least 2000, got {self.max_response_bytes}"
+            )
+
+    @property
+    def host_check_enabled(self) -> bool:
+        """False when MCP_ALLOWED_HOSTS is "*" (Host and Origin checks off)."""
+        return "*" not in self.allowed_hosts
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "MCPSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        enabled = env.get("MCP_ENABLED", "true").strip().lower()
+        if enabled not in ("true", "false", "1", "0", "yes", "no", "on", "off"):
+            raise ValueError(f"MCP_ENABLED must be true or false, got '{enabled}'")
+        rate_limit = env.get("MCP_RATE_LIMIT_PER_MINUTE", "").strip()
+        max_bytes = env.get("MCP_MAX_RESPONSE_BYTES", "").strip()
+        return cls(
+            enabled=enabled in ("true", "1", "yes", "on"),
+            allowed_hosts=_split_list(env.get("MCP_ALLOWED_HOSTS", "")) or DEFAULT_MCP_ALLOWED_HOSTS,
+            allowed_origins=_split_list(env.get("MCP_ALLOWED_ORIGINS", "")) or DEFAULT_MCP_ALLOWED_ORIGINS,
+            rate_limit_per_minute=int(rate_limit) if rate_limit else DEFAULT_MCP_RATE_LIMIT_PER_MINUTE,
+            max_response_bytes=int(max_bytes) if max_bytes else DEFAULT_MCP_MAX_RESPONSE_BYTES,
+        )
