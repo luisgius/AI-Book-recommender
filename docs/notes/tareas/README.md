@@ -13,7 +13,7 @@ Estado: `[ ]` pendiente, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V03** Higiene de evaluación (bootstrap, idioma, `Judged@k`, ficha de juicios)
 - [x] **V04** Puerto `Reranker` y adaptador cross-encoder
 - [x] **V05** Juez LLM de relevancia con procedencia y acuerdo
-- [ ] **V06** Ablación unificada y elección de la configuración por defecto
+- [x] **V06** Ablación unificada y elección de la configuración por defecto
 - [ ] **V07** Línea base de contexto largo (catálogo completo en el prompt)
 - [x] **V08** Proveedor OpenRouter, modelos por defecto y coste por llamada
 - [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI)
