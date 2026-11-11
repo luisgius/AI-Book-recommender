@@ -1,7 +1,8 @@
 # Lista de tareas: actualización del TFG a noviembre de 2026
 
 Origen: `docs/notes/2026-11-11-validacion-proyecto-2026.md` (incluye las
-decisiones del autor del 2026-11-11, sección 7).
+decisiones del autor del 2026-11-11, sección 7) y
+`docs/notes/2026-11-11-propuesta-nube-y-mcp.md` (perfil nube y MCP).
 Cada tarea tiene código, tests y una nota propia en este directorio con qué se
 hizo, por qué, qué alternativas se descartaron, el objetivo y la fecha.
 
@@ -22,13 +23,16 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 
 - [~] **V07** El LLM como recomendador: RAG frente a contexto largo y frente a "sin catálogo"
 - [~] **V11** Catálogo nuevo, multilingüe y de varias fuentes (Wikidata/Wikipedia, Gutenberg, DOAB, Open Library)
+- [~] **V12** Perfil nube: catálogo y búsqueda en Postgres (Neon, pgvector) y medida de paridad con el perfil local
+- [~] **V15** Servidor MCP de solo lectura sobre el buscador
 
 ## Pendientes
 
-- [ ] **V12** Búsqueda a la escala del catálogo nuevo (BM25 escalable, hidratación bajo demanda, índices)
-- [ ] **V13** Configuración por defecto según lo medido (tokenizador normalizado, e5 multilingüe, reranker bge con latencia acotada) y catálogo pequeño versionado
+- [ ] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
+- [ ] **V13** Configuración por defecto de cada perfil según lo medido y catálogo pequeño versionado
 - [ ] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
-- [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI)
+- [ ] **V17** Despliegue del perfil nube y carga del catálogo grande en Neon
+- [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI) y URL pública
 
 ## Aplazadas (con motivo)
 

@@ -1,7 +1,7 @@
 # Propuesta: dónde debe vivir el sistema y qué aporta MCP
 
 **Fecha:** 2026-11-11
-**Estado:** propuesta pendiente de decisión del autor
+**Estado:** decidida por el autor el 2026-11-11 (ver sección 6)
 **Origen:** el autor plantea que el sistema viva en la nube y no en su
 portátil (por ejemplo Vercel + Supabase), y pide investigar si conviene usar
 MCP o dar al LLM acceso directo a otras bases de datos.
@@ -151,8 +151,19 @@ control del sistema y así debe constar en la memoria.
 4. **MCP:** servidor de solo lectura ahora; la consulta en vivo como
    experimento posterior.
 
-Hacen falta del autor: crear la cuenta de la base de datos y la de Vercel, y
-entregar la cadena de conexión como secreto.
+**Decisiones tomadas (2026-11-11):**
+
+1. Dos perfiles, con la condición de medir y probar cada pieza.
+2. Neon: más adecuado para un TFG y más barato. El proyecto existe en la
+   región de Fráncfort, en el plan gratuito.
+3. Sobre los modelos: deben equilibrar velocidad y calidad. La velocidad
+   entra en la regla de selección del LLM, del modelo de embeddings y del
+   reranker (tarea V16).
+4. MCP: servidor de solo lectura (tarea V15).
+
+Queda por decidir el alojamiento del backend (Vercel o Cloud Run) y, cuando
+el catálogo supere lo que admite el plan gratuito de Neon, el paso al plan de
+pago por uso.
 
 ---
 
