@@ -16,19 +16,19 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V04** Puerto `Reranker` y adaptador cross-encoder
 - [x] **V05** Juez LLM de relevancia con procedencia y acuerdo
 - [x] **V06** Ablación unificada de la recuperación (colección de 177 libros)
+- [x] **V07** El LLM como recomendador: anclado a lo recuperado, con el catálogo entero y sin catálogo
 - [x] **V08** Proveedor OpenRouter, modelos por defecto y coste por llamada
 - [x] **V10** Selección de los modelos LLM (OpenRouter) sobre las tareas del proyecto
 
 ## En curso
 
-- [~] **V07** El LLM como recomendador: RAG frente a contexto largo y frente a "sin catálogo"
 - [~] **V11** Catálogo nuevo, multilingüe y de varias fuentes (Wikidata/Wikipedia, Gutenberg, DOAB, Open Library)
 - [~] **V12** Perfil nube: catálogo y búsqueda en Postgres (Neon, pgvector) y medida de paridad con el perfil local
 - [~] **V15** Servidor MCP de solo lectura sobre el buscador
+- [~] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
 
 ## Pendientes
 
-- [ ] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
 - [ ] **V13** Configuración por defecto de cada perfil según lo medido y catálogo pequeño versionado
 - [ ] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
 - [ ] **V17** Despliegue del perfil nube y carga del catálogo grande en Neon
