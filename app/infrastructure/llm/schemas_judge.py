@@ -4,6 +4,8 @@ Pydantic schemas for LLM-as-Judge evaluation (Block 3).
 These schemas define the structured outputs for:
 1. Explanation quality judgment (3 dimensions)
 2. Grounding validation
+3. Relevance grade of a book for a query (RelevanceGradeLLM), used to fill
+   the unjudged pairs of the test collection
 """
 
 from pydantic import BaseModel, Field
@@ -43,4 +45,20 @@ class ExplanationJudgmentLLM(BaseModel):
     def overall_score(self) -> float:
         """Compute average score across all dimensions."""
         return (self.groundedness.score + self.clarity.score + self.relevance.score) / 3
+
+
+class RelevanceGradeLLM(BaseModel):
+    """
+    LLM relevance judgment of one (query, book) pair.
+
+    The rationale comes first so the model writes its one-sentence reason
+    before it commits to a grade (structured output follows field order).
+    The grade uses the scale of the repository's judgments (0-3).
+    """
+    rationale: str = Field(description="One sentence explaining the grade")
+    grade: int = Field(
+        ge=0,
+        le=3,
+        description="3 = Perfectly relevant, 2 = Relevant, 1 = Somewhat relevant, 0 = Not relevant",
+    )
         

@@ -20,10 +20,25 @@ LLM environment variables (all optional):
     LLM_MAX_TOKENS        cap on generated tokens per call (default 1024)
     LLM_TIMEOUT_S         HTTP timeout per call in seconds (default 180)
 
+Relevance judge environment variables (all optional; evaluation only):
+    JUDGE_PROVIDER        provider of the LLM that grades (query, book) pairs;
+                          default LLM_PROVIDER
+    JUDGE_MODEL           judge model id; default LLM_MODEL (or the provider's
+                          default model when JUDGE_PROVIDER differs)
+    JUDGE_BASE_URL        judge server URL; default LLM_BASE_URL (or the
+                          provider's default when JUDGE_PROVIDER differs)
+
 Embedding environment variables (all optional):
     EMBEDDING_MODEL       sentence-transformers model (default all-MiniLM-L6-v2).
                           The FAISS index must be built with the same model.
     EMBEDDING_DEVICE      "cpu", "mps" or "cuda" (default: picked automatically)
+
+Re-ranking environment variables (all optional):
+    RERANKER_MODEL        cross-encoder model for the third retrieval stage,
+                          e.g. BAAI/bge-reranker-v2-m3. Empty, unset or "none"
+                          (default) disables re-ranking.
+    RERANK_DEPTH          top fused results the reranker scores (default 30)
+    RERANKER_DEVICE       "cpu", "mps" or "cuda" (default: picked automatically)
 """
 
 import os
@@ -32,13 +47,6 @@ from typing import Mapping, Optional
 
 # Ollama listens on IPv4; "localhost" can resolve to ::1 first on macOS.
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
-
-Re-ranking environment variables (all optional):
-    RERANKER_MODEL        cross-encoder model for the third retrieval stage,
-                          e.g. BAAI/bge-reranker-v2-m3. Empty, unset or "none"
-                          (default) disables re-ranking.
-    RERANK_DEPTH          top fused results the reranker scores (default 30)
-    RERANKER_DEVICE       "cpu", "mps" or "cuda" (default: picked automatically)
 
 DEFAULT_MODELS = {
     "ollama": "qwen3.8:27b-mlx",
@@ -111,6 +119,72 @@ class LLMSettings:
             apply_extracted_category=env.get("LLM_APPLY_CATEGORY_FILTER", "false").strip().lower() == "true",
             max_tokens=int(env.get("LLM_MAX_TOKENS", "1024")),
             timeout_s=float(env.get("LLM_TIMEOUT_S", "180")),
+        )
+
+
+# A one-sentence rationale and a grade fit well under this cap.
+JUDGE_MAX_TOKENS = 256
+
+
+@dataclass(frozen=True)
+class JudgeSettings:
+    """
+    Settings of the LLM relevance judge (app/evaluation/relevance_judge.py).
+
+    Separate from LLMSettings so the judge can be another model than the one
+    the search system uses: the literature recommends a judge from a
+    different model family than the systems it judges. Temperature (0),
+    thinking mode (off) and the token cap are fixed, not read from the
+    environment, so every judgment is made the same way.
+    """
+
+    provider: str = "ollama"
+    model: str = DEFAULT_MODELS["ollama"]
+    base_url: Optional[str] = DEFAULT_OLLAMA_URL
+    num_ctx: Optional[int] = 8192
+    timeout_s: Optional[float] = 180.0
+    temperature: float = 0.0
+    reasoning: bool = False
+    max_tokens: int = JUDGE_MAX_TOKENS
+    system_llm: str = ""  # "provider/model" of the system LLM, for provenance notes
+
+    def __post_init__(self) -> None:
+        if self.provider not in SUPPORTED_PROVIDERS or self.provider == "none":
+            raise ValueError(
+                "The relevance judge needs an LLM: JUDGE_PROVIDER (or LLM_PROVIDER) must be one of "
+                f"{tuple(p for p in SUPPORTED_PROVIDERS if p != 'none')}, got '{self.provider}'"
+            )
+        if not self.model.strip():
+            raise ValueError("JUDGE_MODEL must not be empty")
+
+    @property
+    def same_as_system_llm(self) -> bool:
+        """True when the judge is the model the search system itself uses."""
+        return f"{self.provider}/{self.model}" == self.system_llm
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "JudgeSettings":
+        """
+        Build the judge settings from JUDGE_* variables, falling back to LLM_*.
+
+        When JUDGE_PROVIDER names another provider than LLM_PROVIDER, the model
+        and URL fall back to that provider's defaults instead, since a model
+        id of one provider means nothing to another.
+        """
+        env = os.environ if env is None else env
+        system = LLMSettings.from_env(env)
+        provider = env.get("JUDGE_PROVIDER", "").strip().lower() or system.provider
+        same_provider = provider == system.provider
+        is_ollama = provider == "ollama"
+        return cls(
+            provider=provider,
+            model=env.get("JUDGE_MODEL", "").strip()
+            or (system.model if same_provider else DEFAULT_MODELS.get(provider, "")),
+            base_url=env.get("JUDGE_BASE_URL", "").strip()
+            or (system.base_url if same_provider else (DEFAULT_OLLAMA_URL if is_ollama else None)),
+            num_ctx=system.num_ctx if same_provider else (8192 if is_ollama else None),
+            timeout_s=system.timeout_s,
+            system_llm=f"{system.provider}/{system.model}",
         )
 
 

@@ -1,5 +1,6 @@
 """
-Prompts for LLM-as-Judge evaluation (Block 3).
+Prompts for LLM-as-Judge evaluation (Block 3) and for the relevance judge
+that grades (query, book) pairs of the test collection.
 
 All prompts are versioned for reproducibility and evaluation tracking.
 Changes to prompts should increment the version number and be documented.
@@ -10,7 +11,7 @@ Versioning format: "vX.Y"
 """
 
 import json
-from typing import List
+from typing import List, Optional
 
 from app.domain.entities import Citation
 
@@ -116,6 +117,99 @@ Provide your evaluation now:"""
 
 
 # =============================================================================
+# RELEVANCE JUDGE (fills the unjudged pairs of the test collection)
+# =============================================================================
+
+RELEVANCE_JUDGE_PROMPT_VERSION = "v1.0"
+"""
+Version history:
+- v1.0 (2026-11-11): Pointwise grading of one (query, book) pair on the 0-3
+  scale of the repository's judgments, one-sentence rationale.
+"""
+
+RELEVANCE_SCALE = {
+    3: "Perfectly relevant",
+    2: "Relevant",
+    1: "Somewhat relevant",
+    0: "Not relevant",
+}
+"""
+Grade labels of the existing judgments, verbatim from the RelevanceJudgment
+docstring (app/evaluation/types.py). The repository records no further
+grading guidelines, so the prompt adds none.
+"""
+
+MISSING_DESCRIPTION = "(missing: the catalog has no description for this book)"
+
+LANGUAGE_NAMES = {"en": "English", "es": "Spanish"}
+
+RELEVANCE_JUDGE_PROMPT_TEMPLATE = """Grade how relevant a book is to a search query. The grade is used to evaluate a book search engine.
+
+Relevance scale:
+{scale}
+
+Rules:
+- The query is a short keyword search typed by a user, in Spanish or in English.
+- Base the grade only on the book information below.
+- A book written in another language than the query can still be relevant, unless the query asks for a language.
+- If the description is missing, judge from the title, the categories and the other fields.
+
+Query: "{query_text}"
+
+Book:
+- Title: {title}
+- Authors: {authors}
+- Categories: {categories}
+- Year: {year}
+- Language: {language}
+- Description: {description}
+
+Answer with one sentence in English that explains the grade, and the grade (0, 1, 2 or 3)."""
+
+
+def build_relevance_judge_prompt(
+    query_text: str,
+    title: str,
+    authors: List[str],
+    categories: List[str],
+    year: Optional[int],
+    language: Optional[str],
+    description: Optional[str],
+) -> str:
+    """
+    Build the relevance-judging prompt for one (query, book) pair.
+
+    Only the query and the catalog fields of the book go into the prompt:
+    the judge never sees an existing grade, a system name, a rank or a
+    score. Missing fields are named as missing instead of left blank.
+
+    Args:
+        query_text: The test query, as the user typed it
+        title: Book title
+        authors: Author names
+        categories: Catalog categories
+        year: Publication year, or None
+        language: ISO 639-1 code of the book's language, or None
+        description: Book description, or None / empty when missing
+
+    Returns:
+        Complete prompt text
+    """
+    scale = "\n".join(f"{grade} = {label}" for grade, label in RELEVANCE_SCALE.items())
+    language_name = LANGUAGE_NAMES.get(language or "", language or "unknown")
+    return RELEVANCE_JUDGE_PROMPT_TEMPLATE.format(
+        scale=scale,
+        query_text=query_text.strip(),
+        title=title.strip() or "unknown",
+        authors=", ".join(authors) if authors else "unknown",
+        categories=", ".join(categories) if categories else "none",
+        year=year if year is not None else "unknown",
+        language=language_name,
+        description=description.strip() if description and description.strip() else MISSING_DESCRIPTION,
+    )
+
+
+# =============================================================================
 # SYSTEM MESSAGES
 # =============================================================================
 
@@ -165,6 +259,7 @@ def get_judge_prompt_metadata() -> dict[str, str]:
     """
     return {
         "llm_judge": LLM_JUDGE_PROMPT_VERSION,
+        "relevance_judge": RELEVANCE_JUDGE_PROMPT_VERSION,
     }
 
 

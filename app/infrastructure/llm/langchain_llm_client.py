@@ -44,6 +44,59 @@ MIN_PLAUSIBLE_YEAR = 1000
 MAX_PLAUSIBLE_YEAR = 2100
 
 
+def build_chat_model(
+    provider: str,
+    model_name: str,
+    *,
+    temperature: float = 0.0,
+    base_url: Optional[str] = None,
+    num_ctx: Optional[int] = None,
+    reasoning: Optional[bool] = None,
+    max_tokens: Optional[int] = None,
+    timeout_s: Optional[float] = None,
+):
+    """
+    Build a LangChain chat model with the provider-specific options.
+
+    Shared by LangChainLLMClient and the relevance judge
+    (relevance_judge.py), so both talk to a model in the same way.
+
+    Ollama takes the context window (num_ctx), the thinking switch
+    (reasoning), the token cap as num_predict and the timeout through the HTTP
+    client; hosted providers take max_tokens and timeout directly.
+
+    Args:
+        provider: LangChain provider name ("ollama", "openai", "anthropic")
+        model_name: Model identifier
+        temperature: Sampling temperature
+        base_url: Optional server URL (e.g. the local Ollama server)
+        num_ctx: Context window size (Ollama only)
+        reasoning: Ollama thinking mode (None keeps the model default)
+        max_tokens: Cap on generated tokens per call
+        timeout_s: HTTP timeout per call, in seconds
+
+    Returns:
+        A LangChain chat model
+    """
+    model_kwargs: dict = {"temperature": temperature}
+    if base_url:
+        model_kwargs["base_url"] = base_url
+    if provider == "ollama":
+        if num_ctx:
+            model_kwargs["num_ctx"] = num_ctx
+        if reasoning is not None:
+            model_kwargs["reasoning"] = reasoning
+        if max_tokens:
+            model_kwargs["num_predict"] = max_tokens
+        if timeout_s:
+            model_kwargs["client_kwargs"] = {"timeout": timeout_s}
+    else:
+        if max_tokens:
+            model_kwargs["max_tokens"] = max_tokens
+        if timeout_s:
+            model_kwargs["timeout"] = timeout_s
+    return init_chat_model(model=model_name, model_provider=provider, **model_kwargs)
+
 
 class LangChainLLMClient(LLMClient):
     """
@@ -134,27 +187,15 @@ class LangChainLLMClient(LLMClient):
         logger.info(f"Initializing {provider} LLM with model {model_name} (temp={temperature})")
 
         try:
-            model_kwargs: dict = {"temperature": self.temperature}
-            if base_url:
-                model_kwargs["base_url"] = base_url
-            if self.provider == "ollama":
-                if num_ctx:
-                    model_kwargs["num_ctx"] = num_ctx
-                if reasoning is not None:
-                    model_kwargs["reasoning"] = reasoning
-                if max_tokens:
-                    model_kwargs["num_predict"] = max_tokens
-                if timeout_s:
-                    model_kwargs["client_kwargs"] = {"timeout": timeout_s}
-            else:
-                if max_tokens:
-                    model_kwargs["max_tokens"] = max_tokens
-                if timeout_s:
-                    model_kwargs["timeout"] = timeout_s
-            self.model = init_chat_model(
-                model=self.model_name,
-                model_provider=self.provider,
-                **model_kwargs,
+            self.model = build_chat_model(
+                self.provider,
+                self.model_name,
+                temperature=self.temperature,
+                base_url=base_url,
+                num_ctx=num_ctx,
+                reasoning=reasoning,
+                max_tokens=max_tokens,
+                timeout_s=timeout_s,
             )
         except Exception as e:
             logger.error(f"Failed to initialize {provider} model {model_name}: {e}")
