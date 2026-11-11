@@ -1,7 +1,7 @@
 # V11 · Catálogo nuevo, multilingüe y de varias fuentes
 
 - **Fecha:** 2026-11-11
-- **Estado:** hecha y validada, con una parte pendiente (resúmenes de Wikipedia)
+- **Estado:** hecha y validada (actualizada el mismo día: resúmenes de Wikipedia completados)
 - **Capa:** dominio (`app/domain/`), ingesta (`app/ingestion/`), infraestructura (`app/infrastructure/external/`, `app/infrastructure/db/`), scripts
 
 ## Qué se ha hecho
@@ -50,7 +50,7 @@ La investigación se hizo el mismo día con fuentes primarias y llamadas reales.
 | Una biblioteca de detección de idioma | Sería una dependencia nueva para una decisión que las palabras funcionales y el sistema de escritura resuelven con un 98,4 % de aciertos sobre datos reales |
 | Mantener todos los registros en memoria para deduplicar | Un índice de claves en SQLite mantiene la memoria en 646 MB para más de un millón de obras |
 | Descartar los registros con año implausible o sin autor | Se descarta el año y se conserva el registro; las obras de Wikidata sin autor usan el creador y, si no, "Unknown" |
-| Enviar datos de contacto en el User-Agent para obtener el límite mayor de Wikimedia | Es una decisión del autor, no algo que deba hacerse por defecto |
+| Enviar datos de contacto en el User-Agent para obtener el límite mayor de Wikimedia | Es una decisión del autor, no algo que deba hacerse por defecto (resuelto el mismo día; véase la sección de actualización) |
 
 ## Cómo se ha validado
 
@@ -104,12 +104,90 @@ Verificadas el 2026-11-11 y listadas por fuente en el informe del catálogo.
 
 Descripciones por licencia: Open Library (sin licencia explícita) 944 249, CC BY-SA 3.0 118 527, CC0 69 401, Gutenberg (sin licencia explícita) 64 107, CC BY-SA 4.0 13 291. Antes de publicar el catálogo grande conviene que el autor revise las condiciones de redistribución de las dos fuentes sin licencia explícita.
 
-Nota: la API de Wikipedia descargó 16 551 introducciones, pero en el catálogo final figuran 13 291 descripciones con licencia CC BY-SA 4.0. La diferencia (3 260) no se ha desglosado; es compatible con introducciones que no superaron el filtro de calidad o que perdieron frente a otra descripción del mismo idioma, pero no se ha comprobado.
+Nota: la API de Wikipedia descargó 16 551 introducciones, pero en el catálogo final figuran 13 291 descripciones con licencia CC BY-SA 4.0. La diferencia (3 260) no se ha desglosado; es compatible con introducciones que no superaron el filtro de calidad o que perdieron frente a otra descripción del mismo idioma, pero no se ha comprobado. Tras completar las introducciones (resuelto el mismo día; véase la sección de actualización), el catálogo sin Open Library contiene 82 186 descripciones CC BY-SA 4.0 y 118 527 CC BY-SA 3.0; la diferencia anterior no se investigó más.
+
+## Actualización: resúmenes de Wikipedia completados y catálogo sin Open Library
+
+### Qué ocurrió
+
+El 2026-11-11 el autor aprobó identificar al cliente ante Wikimedia. El User-Agent llevaba solo la URL pública del repositorio (`https://github.com/luisgius/AI-Book-recommender`), sin nombre ni correo electrónico. Con ella el límite es de 200 peticiones por minuto; la ejecución usó 150 por minuto, hasta 20 títulos por petición, y duró unos 56 minutos en dos tandas (la primera la cortó un tiempo máximo de 30 minutos de la herramienta que la lanzó y la segunda se reanudó desde disco). No hubo ningún HTTP 429 ni 403. Se obtuvieron 99 265 introducciones y ya no falta ningún par (idioma, artículo).
+
+Introducciones obtenidas en esta ejecución, por idioma:
+
+| Idioma | Introducciones |
+|---|---|
+| en | 15 724 |
+| fr | 17 446 |
+| it | 12 087 |
+| de | 11 889 |
+| ar | 8 973 |
+| ja | 8 440 |
+| ru | 7 972 |
+| zh | 4 226 |
+| pt | 4 290 |
+| nl | 3 579 |
+| es | 2 448 |
+| ca | 2 191 |
+
+### Segundo catálogo, sin Open Library
+
+Se construyó `data/catalog_core/catalog.db` (no versionado, 808 MB) con Wikidata, Gutenberg y DOAB. Tiene **254 909 obras**. Su informe es `data/catalog_core/CATALOG_REPORT.md`.
+
+| Fuente | Leídos | Conservados | Obras nuevas | Fusionados |
+|---|---|---|---|---|
+| `wikidata` | 156 724 | 120 143 | 120 143 | 0 |
+| `gutenberg` | 79 785 | 74 318 | 65 508 | 8 810 |
+| `doab` | 102 078 | 76 121 | 69 258 | 6 863 |
+
+4 066 obras proceden de más de una fuente. Los registros de Wikidata rechazados bajan de 82 364 a: 36 513 por descripción corta, 67 sin descripción y 1 sin autor.
+
+Idioma de la obra (los cinco primeros): inglés 165 664 (65,0 %), alemán 20 954 (8,2 %), francés 20 384 (8,0 %), español 7 231 (2,8 %), italiano 7 019 (2,8 %). El idioma lo declara una fuente en 219 946 obras y se toma de la descripción principal en 34 963.
+
+Descripciones: 33 626 obras (13,2 %) las tienen en más de un idioma. Resúmenes generados automáticamente por Gutenberg como descripción principal: 65 748. Longitud de la descripción principal: mínimo 200, mediana 809, máximo 1 200 caracteres.
+
+| Idioma | Obras con descripción en él | Obras cuya descripción principal está en él |
+|---|---|---|
+| en | 194 047 | 188 359 |
+| es | 17 542 | 7 416 |
+| fr | 27 564 | 16 552 |
+| de | 24 276 | 16 114 |
+| it | 17 862 | 6 781 |
+| pt | 10 071 | 3 295 |
+| ca | 4 693 | 999 |
+| nl | 6 272 | 2 138 |
+| ru | 13 581 | 4 934 |
+| zh | 3 458 | 840 |
+| ja | 5 181 | 2 636 |
+| ar | 11 815 | 4 845 |
+
+Cobertura de campos: año 55,1 %, materias 70,1 %, ISBN-13 25,8 %, identificador de Wikidata 47,1 %, de Open Library 11,7 %, de Gutenberg 27,3 %, DOI 23,9 %. Descripciones por fuente: Wikipedia 200 713, DOAB 69 399, Gutenberg 66 250. Descripciones por licencia: CC BY-SA 3.0 118 527, CC BY-SA 4.0 82 186, CC0 69 399, Gutenberg (sin licencia explícita) 66 250.
+
+### Comparación de los dos catálogos
+
+| Magnitud | Con Open Library | Sin Open Library |
+|---|---|---|
+| Obras | 1 147 627 | 254 909 |
+| Idioma de la obra: inglés | 85,0 % | 65,0 % |
+| Obras en español | 23 214 | 7 231 |
+| Obras con año de publicación | 21,9 % | 55,1 % |
+| Obras con descripciones en más de un idioma | 2,2 % | 13,2 % |
+| Tamaño en disco | 2,6 GB | 808 MB |
+
+### El nuevo catálogo pequeño
+
+`data/catalog_small/catalog.next.db` (5 000 obras, 39 MB) mantiene las mismas cuotas por idioma. Fuentes: Wikidata 4 805 y Gutenberg 195; ya no se selecciona ninguna obra de DOAB (la selección anterior tenía 28). 4 445 obras tienen descripciones en más de un idioma (antes 3 870). 4 668 de las 5 000 obras coinciden con la selección anterior. Se escribe junto al fichero anterior, que se conserva hasta que la tarea de despliegue cambie a este.
+
+### Cambios de código de esta actualización
+
+- La fuente de Open Library se considera disponible si existe el volcado de obras o su fichero de candidatos en caché.
+- Sin el volcado de autores, ahora se detiene con un error claro en lugar de descartar en silencio todas las obras: el fichero de candidatos guarda solo claves de autor, de modo que los nombres no se pueden resolver sin ese volcado.
+- El paso `select` ya no sobrescribe el resumen de selección de otro catálogo.
+- Tres tests nuevos en `tests/external/test_bulk_sources.py`.
 
 ## Límites que debe conocer el tribunal
 
 1. **Wikidata no se pudo consultar por el servicio oficial.** Contar las obras tardó 59,7 s, las consultas paginadas agotaron el tiempo y una devolvió 502. Se usó QLever (Universidad de Friburgo; volcado de Wikidata del 2026-08-10 con actualizaciones en vivo), que no publica condiciones de uso.
-2. **Wikimedia limita a 10 peticiones por minuto** a los clientes cuyo User-Agent no lleva datos de contacto (200 con ellos). El proyecto no envía datos personales en las peticiones, así que la mayoría de las introducciones salen de los resúmenes de DBpedia: 118 527 descripciones, de revisiones de Wikipedia de hacia noviembre de 2022, CC BY-SA 3.0, cada una con la URL del artículo. La API en vivo añadió 16 551 a unas 9 peticiones por minuto (primero las obras en español sin descripción, 7 171, completas; después 9 380 en inglés). El informe del catálogo contabiliza 13 291 descripciones CC BY-SA 4.0; esta nota no explica la diferencia con las 16 551. Quedan sin descripción y fuera del catálogo 67 532 obras de Wikidata, y faltan 99 265 pares (idioma, artículo).
+2. **Wikimedia limita a 10 peticiones por minuto** a los clientes cuyo User-Agent no lleva datos de contacto (200 con ellos). El proyecto no envía datos personales en las peticiones, así que la mayoría de las introducciones salen de los resúmenes de DBpedia: 118 527 descripciones, de revisiones de Wikipedia de hacia noviembre de 2022, CC BY-SA 3.0, cada una con la URL del artículo. La API en vivo añadió 16 551 a unas 9 peticiones por minuto (primero las obras en español sin descripción, 7 171, completas; después 9 380 en inglés). El informe del catálogo contabiliza 13 291 descripciones CC BY-SA 4.0; esta nota no explica la diferencia con las 16 551. Quedan sin descripción y fuera del catálogo 67 532 obras de Wikidata, y faltan 99 265 pares (idioma, artículo) (resuelto el mismo día; véase la sección de actualización).
 3. **Open Library no declara idioma** en las obras. En 956 923 el idioma se infiere de la descripción principal, con el error que eso conlleva (0,3 % sobre la muestra de Wikipedia, no medido sobre Open Library).
 4. **Sesgo de idioma.** El catálogo es un 85,0 % inglés; el español son 23 214 obras (2,0 %). El catálogo pequeño corrige la mezcla con cuotas, no el grande.
 5. **63 677 descripciones principales son resúmenes que Project Gutenberg genera automáticamente**; cada registro lo indica. Los registros de Gutenberg no tienen año.
@@ -121,8 +199,11 @@ Nota: la API de Wikipedia descargó 16 551 introducciones, pero en el catálogo 
 
 ## Trabajo pendiente y cómo completarlo
 
-- **Completar las introducciones de Wikipedia.** `python -m scripts.build_catalog download --sources wikidata` reanuda la descarga: unas 9 horas a 10 peticiones por minuto, o unos 30 minutos si el autor decide enviar un contacto en el User-Agent con `--wiki-user-agent`. Después, `python -m scripts.build_catalog ingest --restart`, `report` y `select --size 5000 --out data/catalog_small/catalog.db`.
-- **Decisión abierta del autor: si Open Library permanece en el catálogo que se desplegará.** A favor y en contra, anotados el 2026-11-11: multiplica el catálogo por unas seis, pero sus descripciones son casi todas en inglés y sus obras no declaran idioma ni año; la base de datos en la nube está en un plan gratuito de 1 GB de almacenamiento. El `--sources` de `ingest` permite construir el catálogo con o sin ella.
+La compleción de los resúmenes de Wikipedia ya está hecha (véase la sección de actualización). Queda lo siguiente.
+
+- **Decisión abierta del autor: si Open Library forma parte del catálogo que se desplegará.** A favor y en contra, anotados el 2026-11-11: multiplica el catálogo por unas seis, pero sus descripciones son casi todas en inglés y sus obras no declaran idioma ni año. La base de datos en la nube está en un plan gratuito de 1 GB; el mismo día, en la tarea V12, se midió que ese plan admite unas 31 600 obras de este tipo multilingüe, de modo que el catálogo desplegado será una selección de unas 30 000 obras tomadas del catálogo sin Open Library, salvo que el autor pase al plan de pago por uso. El `--sources` de `ingest` permite construir el catálogo con o sin ella.
+- **Reingerir Open Library en este equipo** exige volver a descargar los volcados de obras y de autores (unos 4,6 GB), porque ambos se borraron para liberar disco.
+- **Sin verificar:** las condiciones de uso de QLever y la antigüedad del texto de DBpedia.
 - **Para las tareas de búsqueda:** usar `get_many` en lugar de un diccionario en memoria, y decidir si las descripciones de idiomas secundarios entran en el texto de búsqueda.
 
 ## Ficheros
@@ -131,5 +212,5 @@ Nota: la API de Wikipedia descargó 16 551 introducciones, pero en el catálogo 
 - Ingesta: `app/ingestion/catalog_builder.py`, `catalog_report.py`, `catalog_selection.py`, `language_detection.py`.
 - Infraestructura: `app/infrastructure/external/` (`wikidata_wikipedia_source.py`, `gutenberg_source.py`, `doab_source.py`, `openlibrary_dump_source.py`, `bulk_download.py`) y `app/infrastructure/db/` (`sqlite_book_catalog_repository.py`, `sqlite_catalog_build_state.py`).
 - Script: `scripts/build_catalog.py`.
-- Datos: `data/catalog_v2/CATALOG_REPORT.md` (el catálogo grande no se versiona), `data/catalog_small/catalog.db`, `data/catalog_small/selection.json`.
-- Tests: `tests/external/test_bulk_sources.py`, `tests/ingestion/`, `tests/domain/test_book_normalization.py`, `tests/domain/test_value_objects.py`.
+- Datos: `data/catalog_v2/CATALOG_REPORT.md` (el catálogo grande no se versiona), `data/catalog_core/CATALOG_REPORT.md` (generado, no versionado), `data/catalog_small/catalog.db`, `data/catalog_small/selection.json`.
+- Tests: `tests/external/test_bulk_sources.py` (incluye los tres tests nuevos de la actualización), `tests/ingestion/`, `tests/domain/test_book_normalization.py`, `tests/domain/test_value_objects.py`.
