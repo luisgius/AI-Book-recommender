@@ -145,3 +145,33 @@ Cada cambio es una tarea con código, tests y una nota propia en
 en la memoria sin leer antes la fuente original. La comparación entre RAG y
 contexto largo procede de fuentes secundarias; por eso la tarea V07 la mide
 sobre el catálogo propio. No se ha consultado al tutor.
+
+---
+
+## 7. Decisiones del autor (2026-11-11)
+
+Tras leer las secciones 1 a 5, el autor decidió lo siguiente. Estas decisiones
+sustituyen a lo que digan las secciones anteriores cuando haya diferencia.
+
+| N.º | Decisión | Consecuencia en las tareas |
+|---|---|---|
+| 1 | Añadir el reranker | Pasa a formar parte del pipeline por defecto (V13). La ablación V06 lo respalda: es la única mejora que supera la corrección de Holm (+0,098 nDCG@10) |
+| 2 | Ampliar el catálogo: más libros y más fuentes, la mayor biblioteca posible; una API de pago solo si el coste es bajo | La ampliación deja de estar aplazada (V11, V12). La investigación del mismo día descartó Google Books como base (sin clave devuelve HTTP 429 con cuota 0 y sus condiciones prohíben construir una base de datos permanente) y las fuentes de pago; no hace falta pagar nada |
+| 3 | Los embeddings deben cubrir todos los idiomas, porque la consulta puede llegar en cualquiera | El modelo multilingüe deja de ser una opción de ablación y pasa a ser requisito (V13): `intfloat/multilingual-e5-large-instruct` |
+| 4 | Aplicar las medidas léxicas | El tokenizador normalizado es el de los índices nuevos (V13) |
+| 5 | Aplicar la comparación RAG frente a contexto largo | V07 |
+| 6 | Usar por ahora modelos baratos a través de OpenRouter; el modelo local es demasiado lento y deja de usarse | V08 y V10. Ollama sigue soportado en el código, pero no se usa |
+| 7 | No usar modelos GPT; usar modelos chinos baratos | V10 mide cinco candidatos sobre las tareas del proyecto: `qwen/qwen3.8-flash` como LLM del sistema y `z-ai/glm-5.3-flash` como juez |
+| 8 | Aplicar el LLM como recomendador | V07 lo incorpora anclado a lo recuperado (el LLM elige entre candidatos del catálogo) y mide cuántas recomendaciones quedan fuera del catálogo cuando no se le ancla |
+| 9 | Completar la higiene de evaluación | V14: más consultas y en más idiomas, pool completo juzgado por un juez de otro proveedor que el LLM del sistema, hoja para la validación humana |
+
+**Efecto sobre la sección 3 ("Qué se mantiene").** Se mantienen la
+arquitectura hexagonal, SQLite, FAISS plano, RRF como fusión de partida y la
+ausencia de ajuste fino. Cambian dos cosas: el catálogo deja de ser pequeño,
+de modo que la implementación de BM25 y la carga de todos los libros en
+memoria deben escalar (V12); y el LLM por defecto para el trabajo diario pasa
+a ser un modelo alojado, con el modo sin LLM como vía de ejecución sin clave.
+
+**Efecto sobre la sección 5.** "Ampliar ya el catálogo" pasa de aplazado a
+decidido. El juez reproducible que se pedía como condición existe desde V05 y
+se ha contrastado con un segundo juez de otro proveedor en V10.
