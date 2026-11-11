@@ -1,16 +1,153 @@
 """
 Evaluation service for computing IR metrics.
+
+The ranking metrics are defined once, as functions over a ranked list of book
+ids and the graded judgments of one query (book id -> grade 0-3). The
+EvaluationService methods apply them to lists of SearchResult, and
+app/evaluation/comparison.py applies them to stored rankings, so every report
+uses the same definitions:
+
+- gain of a book with grade g is 2^g - 1 (nDCG);
+- a book is relevant when its grade is >= 1 (Recall, Precision, MRR);
+- a book without a judgment counts as not relevant (grade 0).
 """
 
 import math
 from itertools import combinations
-from typing import List
+from typing import Dict, Hashable, List, Mapping, Sequence, TypeVar
 
 from app.domain.entities import SearchResult
 from app.evaluation.types import RelevanceJudgment
 
 from app.domain.entities import Book, Explanation
 from app.domain.citation_validation import get_book_field_text, is_valid_snippet
+
+RELEVANT_GRADE = 1
+"""Minimum grade for a book to count as relevant in the binary metrics."""
+
+BookId = TypeVar("BookId", bound=Hashable)
+"""Any hashable book identifier (UUID in the catalog, str in tests)."""
+
+
+def ndcg_at_k(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int], k: int = 10) -> float:
+    """
+    nDCG@k with gain 2^grade - 1 and a log2(rank + 1) discount.
+
+    Args:
+        ranked_ids: Book ids in ranked order
+        grades: Graded judgments of the query (book id -> 0-3)
+        k: Cutoff position
+
+    Returns:
+        nDCG@k in [0, 1]; 0.0 when the query has no relevant book
+    """
+    dcg = 0.0
+    for i, book_id in enumerate(ranked_ids[:k], start=1):
+        gain = (2 ** grades.get(book_id, 0)) - 1
+        dcg += gain / math.log2(i + 1)
+
+    ideal_grades = sorted(grades.values(), reverse=True)[:k]
+    idcg = 0.0
+    for i, grade in enumerate(ideal_grades, start=1):
+        gain = (2 ** grade) - 1
+        idcg += gain / math.log2(i + 1)
+
+    if idcg == 0:
+        return 0.0
+    return dcg / idcg
+
+
+def recall_at_k(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int], k: int = 100) -> float:
+    """
+    Recall@k = relevant books in the top k / all books judged relevant.
+
+    Returns 0.0 when the query has no relevant book.
+    """
+    retrieved_relevant = {
+        book_id for book_id in ranked_ids[:k] if grades.get(book_id, 0) >= RELEVANT_GRADE
+    }
+    total_relevant = {book_id for book_id, grade in grades.items() if grade >= RELEVANT_GRADE}
+    if not total_relevant:
+        return 0.0
+    return len(retrieved_relevant) / len(total_relevant)
+
+
+def precision_at_k(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int], k: int = 5) -> float:
+    """
+    Precision@k = relevant books in the top k / k.
+
+    The denominator is k even when fewer than k books are returned, so a
+    short list is penalised (standard trec_eval behaviour).
+
+    Raises:
+        ValueError: If k is not positive
+    """
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+    relevant_in_top_k = sum(1 for book_id in ranked_ids[:k] if grades.get(book_id, 0) >= RELEVANT_GRADE)
+    return relevant_in_top_k / k
+
+
+def reciprocal_rank(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int]) -> float:
+    """
+    1 / rank of the first relevant book over the whole list (0.0 if none).
+
+    Averaged over queries this is MRR; with lists of depth 10 it is MRR@10.
+    """
+    for i, book_id in enumerate(ranked_ids, start=1):
+        if grades.get(book_id, 0) >= RELEVANT_GRADE:
+            return 1.0 / i
+    return 0.0
+
+
+def judged_fraction_at_k(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int], k: int = 10) -> float:
+    """
+    Share of the top-k positions filled by a book that has a judgment (Judged@k).
+
+    The denominator is k, as in ir-measures; a short list therefore lowers it.
+    """
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+    return sum(1 for book_id in ranked_ids[:k] if book_id in grades) / k
+
+
+def condensed_ranking(ranked_ids: Sequence[BookId], grades: Mapping[BookId, int]) -> List[BookId]:
+    """
+    Ranked list with the unjudged books removed (condensed list, Sakai 2007).
+
+    Scoring the condensed list measures a system only on the books that were
+    judged, so it is not penalised for surfacing books outside the pool.
+    """
+    return [book_id for book_id in ranked_ids if book_id in grades]
+
+
+def judged_at_k(
+    results_by_query: Dict[str, List[SearchResult]],
+    judgments: Mapping[str, RelevanceJudgment],
+    k: int = 10,
+) -> float:
+    """
+    Mean Judged@k over the queries that have judgments.
+
+    Judgments were pooled from earlier systems; a system that surfaces books
+    nobody judged is scored as if those books were irrelevant. Reporting
+    Judged@k shows how much of a difference may be pool bias.
+
+    Args:
+        results_by_query: Search results per query id
+        judgments: Relevance judgments per query id
+        k: Cutoff position
+
+    Returns:
+        Mean share of judged books in the top k (0.0 if no query is judged)
+    """
+    shares = []
+    for query_id, results in results_by_query.items():
+        judged = judgments.get(query_id)
+        if judged is None or not judged.judgments:
+            continue
+        shares.append(judged_fraction_at_k([r.book.id for r in results], judged.judgments, k=k))
+    return sum(shares) / len(shares) if shares else 0.0
 
 
 class EvaluationService:
@@ -73,29 +210,7 @@ class EvaluationService:
         Returns:
             nDCG@k score in [0, 1], where 1 is perfect ranking
         """
-        # Limit to top-k results
-        top_k = results[:k]
-        
-        # Compute DCG
-        dcg = 0.0
-        for i, result in enumerate(top_k, start=1):
-            book_id = result.book.id
-            relevance = judgment.judgments.get(book_id, 0)
-            gain = (2 ** relevance) - 1
-            dcg += gain / math.log2(i + 1)
-        
-        # Compute IDCG (ideal DCG)
-        ideal_relevances = sorted(judgment.judgments.values(), reverse=True)[:k]
-        idcg = 0.0
-        for i, rel in enumerate(ideal_relevances, start=1):
-            gain = (2 ** rel) - 1
-            idcg += gain / math.log2(i + 1)
-        
-        # Handle edge case: no relevant documents
-        if idcg == 0:
-            return 0.0
-        
-        return dcg / idcg
+        return ndcg_at_k([r.book.id for r in results], judgment.judgments, k=k)
 
     def compute_recall_at_k(
         self,
@@ -116,23 +231,7 @@ class EvaluationService:
         Returns:
             Recall@k score in [0, 1]
         """
-        # Count relevant documents in top-k (relevance >= 1)
-        top_k = results[:k]
-        retrieved_relevant_ids = {
-            r.book.id for r in top_k
-            if judgment.judgments.get(r.book.id, 0) >= 1
-        }
-        
-        # Count total relevant documents
-        total_relevant_ids = {
-            book_id for book_id, rel in judgment.judgments.items()
-            if rel >= 1
-        }
-        
-        if len(total_relevant_ids) == 0:
-            return 0.0
-        
-        return len(retrieved_relevant_ids) / len(total_relevant_ids)
+        return recall_at_k([r.book.id for r in results], judgment.judgments, k=k)
 
     def compute_precision_at_k(
         self,
@@ -156,12 +255,7 @@ class EvaluationService:
         Returns:
             Precision@k score in [0, 1]
         """
-        if k <= 0:
-            raise ValueError(f"k must be positive, got {k}")
-        relevant_in_top_k = sum(
-            1 for r in results[:k] if judgment.judgments.get(r.book.id, 0) >= 1
-        )
-        return relevant_in_top_k / k
+        return precision_at_k([r.book.id for r in results], judgment.judgments, k=k)
 
     def compute_mrr(
         self,
@@ -180,14 +274,7 @@ class EvaluationService:
         Returns:
             MRR score, or 0.0 if no relevant docs found
         """
-        for i, result in enumerate(results, start=1):
-            book_id = result.book.id
-            relevance = judgment.judgments.get(book_id, 0)
-            if relevance >= 1:  # First relevant document
-                return 1.0 / i
-        
-        # No relevant documents found
-        return 0.0
+        return reciprocal_rank([r.book.id for r in results], judgment.judgments)
 
     def compute_ild(
         self,

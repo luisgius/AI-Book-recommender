@@ -10,7 +10,7 @@ Estado: `[ ]` pendiente, `[x]` hecha y validada, `[-]` aplazada.
 
 - [x] **V01** Normalización léxica para BM25 (acentos, puntuación, palabras vacías)
 - [x] **V02** Embeddings configurables, índice normalizado y control modelo-índice
-- [ ] **V03** Higiene de evaluación (bootstrap, idioma, `Judged@k`, ficha de juicios)
+- [x] **V03** Higiene de evaluación (bootstrap, idioma, `Judged@k`, ficha de juicios)
 - [ ] **V04** Puerto `Reranker` y adaptador cross-encoder
 - [ ] **V05** Juez LLM de relevancia con procedencia y acuerdo
 - [ ] **V06** Ablación unificada y elección de la configuración por defecto

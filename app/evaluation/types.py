@@ -10,14 +10,29 @@ from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
 
+QUERY_LANGUAGES = frozenset({"es", "en"})
+"""Languages a test query can be labelled with (the language it is written in)."""
+
+
 @dataclass(frozen=True)
 class TestQuery:
     """
     A test query for evaluation.
+
+    language is the language the query text is written in ("es" or "en"),
+    used to break results down by language; None when not labelled.
     """
     query_id: str
     text: str
     category: str | None = None
+    language: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate the language label."""
+        if self.language is not None and self.language not in QUERY_LANGUAGES:
+            raise ValueError(
+                f"language must be one of {sorted(QUERY_LANGUAGES)} or None, got {self.language!r}"
+            )
 
 
 @dataclass(frozen=True)

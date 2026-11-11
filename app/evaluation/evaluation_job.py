@@ -503,16 +503,17 @@ def run_ablation_evaluation(
 
 
 def load_test_queries(path: str) -> List[TestQuery]:
-    """Load test queries from JSON file."""
+    """Load test queries from JSON file (category and language are optional)."""
     with open(path, "r") as f:
         data = json.load(f)
-    
+
     queries = []
     for item in data:
         query = TestQuery(
             query_id=item["query_id"],
             text=item["text"],
-            category=item.get("category") 
+            category=item.get("category"),
+            language=item.get("language"),
         )
         queries.append(query)
 

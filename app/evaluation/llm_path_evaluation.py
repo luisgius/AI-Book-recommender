@@ -47,7 +47,7 @@ from app.evaluation.evaluation_job import (
     resolve_judgments_to_uuids,
     run_hybrid_search,
 )
-from app.evaluation.evaluation_service import EvaluationService
+from app.evaluation.evaluation_service import EvaluationService, judged_at_k
 from app.evaluation.statistics import holm_correction, paired_permutation_test
 from app.infrastructure.llm.filter_guards import FILTER_GUARDS_VERSION, guard_filters
 
@@ -129,24 +129,6 @@ class FixedIntentClient:
 # =============================================================================
 # Evaluation
 # =============================================================================
-
-
-def judged_at_k(results_by_query: Dict[str, list], judgments, k: int = 10) -> float:
-    """
-    Mean share of the top-k results that have a relevance judgment.
-
-    Judgments were pooled from earlier systems; a system that surfaces books
-    nobody judged is scored as if those books were irrelevant. Reporting
-    Judged@k shows how much of a difference may be pool bias.
-    """
-    shares = []
-    for query_id, results in results_by_query.items():
-        judged = judgments.get(query_id)
-        if judged is None or not judged.judgments:
-            continue
-        top = results[:k]
-        shares.append(sum(1 for r in top if r.book.id in judged.judgments) / k)
-    return sum(shares) / len(shares) if shares else 0.0
 
 
 def collect_intents(
