@@ -16,6 +16,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:29+00:00",
+        "rationale": "The book is about Spanish literature with no connection to machine learning or Python."
+      },
+      {
+        "source": "google_books",
         "source_id": "3Wc6ywEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -103,6 +113,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:41:41+00:00",
         "rationale": "The book matches machine learning but its description mentions no Python coverage, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "Wo4TEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:05+00:00",
+        "rationale": "The book teaches Python programming but focuses on general coding fundamentals rather than machine learning, so it only partially matches the query."
       },
       {
         "source": "google_books",
@@ -206,6 +226,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:56+00:00",
+        "rationale": "The book is about Python programming but focuses on general Python/Linux reference rather than machine learning, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "qv9azwEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -223,6 +253,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:41:54+00:00",
         "rationale": "The book teaches Python programming but does not specifically cover machine learning, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:36+00:00",
+        "rationale": "The book covers Python programming for beginners but the description does not mention machine learning, so it only partially matches the query."
       }
     ]
   },
@@ -364,6 +404,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:41:37+00:00",
         "rationale": "Although in Spanish,"
+      },
+      {
+        "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:06+00:00",
+        "rationale": "The title indicates a historical novel set in 11th-century Spain, matching the query, but the lack of description and categories prevents confirming it is a full historical novel."
       },
       {
         "source": "google_books",
@@ -1128,6 +1178,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:26+00:00",
+        "rationale": "The book is highly relevant because it is an introduction to Machine Learning for beginners and explicitly discusses the relationship between Machine Learning and Artificial Intelligence, matching the core concepts of the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "3Wc6ywEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -1238,6 +1298,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "a4iQzQEACAAJ",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:49+00:00",
+        "rationale": "The book is a beginner-friendly guide covering artificial intelligence and machine learning, closely matching the query's intent despite the language difference."
+      },
+      {
+        "source": "google_books",
         "source_id": "aUr8ywEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -1258,6 +1328,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:12+00:00",
+        "rationale": "The book is a beginner-friendly introduction to AI and machine learning, closely matching the query's intent despite being in English."
+      },
+      {
+        "source": "google_books",
         "source_id": "jwikxAEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -1275,6 +1355,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:06+00:00",
         "rationale": "The book is a beginner-friendly guide to machine learning and artificial intelligence, closely matching the query's intent for an introductory AI book for beginners, though it focuses on machine learning rather than a general AI introduction."
+      },
+      {
+        "source": "google_books",
+        "source_id": "qv9azwEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:20+00:00",
+        "rationale": "The book is a beginner-friendly introduction covering machine learning and artificial intelligence topics, closely matching the query, though it focuses on machine learning rather than AI broadly and is in English."
       },
       {
         "source": "google_books",
@@ -1575,6 +1665,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:07+00:00",
+        "rationale": "The book covers machine learning broadly, including language-related pattern recognition topics, but it is not specifically about natural language processing with transformers, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "DScszgEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -1582,6 +1682,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:11+00:00",
         "rationale": "The book covers machine learning and AI in general with a business focus, but the description never mentions natural language processing or transformers, so it only tangentially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "WCypDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:08+00:00",
+        "rationale": "The book covers machine learning and AI broadly, but it does not specifically address natural language processing or transformers, so it is only somewhat relevant."
       },
       {
         "source": "google_books",
@@ -1625,6 +1735,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "m_FLEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:25+00:00",
+        "rationale": "The book covers AI and machine learning in systems engineering broadly, but does not focus on natural language processing or transformers, making it only somewhat relevant."
+      },
+      {
+        "source": "google_books",
         "source_id": "nxUfzgEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -1642,6 +1762,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:24+00:00",
         "rationale": "The book covers AI and machine learning for business, which is broadly related but does not specifically address natural language processing or transformers, so it is only somewhat relevant."
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:32+00:00",
+        "rationale": "The book broadly covers machine learning and AI but does not specifically address natural language processing or transformers, so it is only tangentially related to the query."
       }
     ]
   },
@@ -1914,6 +2044,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:23+00:00",
+        "rationale": "The book is a beginner-friendly machine learning introduction that uses simple examples to explain the math behind learning algorithms, matching the query's intent, though it is not specifically focused on avoiding advanced mathematics."
+      },
+      {
+        "source": "google_books",
         "source_id": "3Wc6ywEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -1934,6 +2074,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "5RP_zQEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:37+00:00",
+        "rationale": "The book is a beginner-friendly introduction to machine learning algorithms that avoids technical depth, matching the query's request for machine learning without advanced math, though it is more of a general overview than a focused algorithms text."
+      },
+      {
+        "source": "google_books",
         "source_id": "7ohSEQAAQBAJ",
         "relevance": 1,
         "judge": "llm",
@@ -1941,6 +2091,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:19+00:00",
         "rationale": "The book covers machine learning algorithms and fundamentals, but it explicitly includes mathematical foundations, which contradicts the query's specific requirement for learning machine learning without advanced mathematics."
+      },
+      {
+        "source": "google_books",
+        "source_id": "8TFTzwEACAAJ",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:33+00:00",
+        "rationale": "The book directly explains machine learning and AI in accessible terms, explicitly avoiding advanced mathematics, which matches the query perfectly despite the language difference."
       },
       {
         "source": "google_books",
@@ -2024,6 +2184,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "a4iQzQEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:52+00:00",
+        "rationale": "This beginner's machine learning guide matches the query's intent for accessible ML learning without advanced math, but it doesn't explicitly emphasize avoiding advanced mathematics, so it's not perfectly relevant."
+      },
+      {
+        "source": "google_books",
         "source_id": "aLhQEAAAQBAJ",
         "relevance": 2,
         "judge": "llm",
@@ -2064,6 +2234,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:13+00:00",
+        "rationale": "The book is an introductory guide to machine learning and AI, which matches the query's intent for accessible learning, but it does not specifically promise an approach avoiding advanced mathematics, so it is relevant rather than perfectly relevant."
+      },
+      {
+        "source": "google_books",
         "source_id": "ghKMEAAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -2091,6 +2271,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:18+00:00",
         "rationale": "The book explains machine learning algorithms clearly without calculus or matrix algebra, directly matching the query for ML algorithms without advanced math, though it is in English and industrially focused."
+      },
+      {
+        "source": "google_books",
+        "source_id": "jWTvDwAAQBAJ",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:01+00:00",
+        "rationale": "The book is an introductory, application-based guide to machine learning designed for beginners, which aligns perfectly with the query's request for learning algorithms without advanced mathematics."
       },
       {
         "source": "google_books",
@@ -2365,6 +2555,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "aLhQEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:31+00:00",
+        "rationale": "The book covers deep learning and AI applications broadly, but neither the title, description, nor table of contents mentions reinforcement learning or robotics specifically."
+      },
+      {
+        "source": "google_books",
         "source_id": "bvntEAAAQBAJ",
         "relevance": 1,
         "judge": "llm",
@@ -2392,6 +2592,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:25+00:00",
         "rationale": "This is a general machine learning book from 1990 that only tangentially touches on robot learning in one part, without focusing on reinforcement learning or robotics applications as the query requests."
+      },
+      {
+        "source": "google_books",
+        "source_id": "m_FLEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:31+00:00",
+        "rationale": "The book covers AI/ML systems engineering broadly, but the description does not specifically mention reinforcement learning or robotics applications, only autonomy and human-machine teams."
       }
     ]
   },
@@ -2638,6 +2848,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:32+00:00",
+        "rationale": "The book is about machine learning and touches on data science, but the query specifically seeks a tutorial on the Python libraries pandas and numpy, which are not mentioned."
+      },
+      {
+        "source": "google_books",
         "source_id": "PEZixgEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -2645,6 +2865,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:32+00:00",
         "rationale": "The book covers data science and machine learning for beginners, but does not specifically teach pandas or numpy, the key tools in the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "_QPnywEACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:37+00:00",
+        "rationale": "The book covers Python and data-related machine learning topics, but it doesn't specifically address pandas, NumPy, or data science tutorials, which are the core focus of the query."
       },
       {
         "source": "google_books",
@@ -2675,6 +2905,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:30+00:00",
         "rationale": "The book is a beginner machine learning guide that mentions Python and data analysis but does not specifically cover pandas, numpy, or data science tutorials, making it only somewhat relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:30+00:00",
+        "rationale": "The book covers machine learning broadly but does not specifically address pandas, numpy, or a data science tutorial focus."
       }
     ]
   },
@@ -2905,6 +3145,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "7ohSEQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:53+00:00",
+        "rationale": "The book uses Python for data analysis/modeling in an AI/ML context, but its focus is artificial intelligence and deep learning rather than programming in Python specifically for data analysis, making it only partially aligned with the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "NUikAgAAQBAJ",
         "relevance": 1,
         "judge": "llm",
@@ -2925,6 +3175,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:13+00:00",
+        "rationale": "The book is relevant because it covers programming concepts and includes key libraries like Pandas, Keras, and TensorFlow, which are essential tools for data analysis and machine learning."
+      },
+      {
+        "source": "google_books",
         "source_id": "byACzgEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -2932,6 +3192,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:35+00:00",
         "rationale": "The book covers Python, data science, and data analysis topics, but its main focus is machine learning rather than Python programming for data analysis, making it relevant but not a perfect match."
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:44:00+00:00",
+        "rationale": "The book uses Python programming but focuses on AI and machine learning rather than data analysis, making it only partially related to the query."
       },
       {
         "source": "google_books",
@@ -3150,6 +3420,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:07+00:00",
+        "rationale": "The book is a broad AI/ML conference proceedings collection that only tangentially touches on image processing, with no focus on computer vision, OpenCV, or beginner guidance."
+      },
+      {
+        "source": "google_books",
         "source_id": "3Wc6ywEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -3170,6 +3450,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:41+00:00",
+        "rationale": "The book covers machine learning generally with no focus on computer vision, OpenCV, or beginner-level guidance for those topics, making it only tangentially related."
+      },
+      {
+        "source": "google_books",
         "source_id": "DScszgEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -3177,6 +3467,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:37+00:00",
         "rationale": "The book covers machine learning and AI for business, but says nothing about computer vision or OpenCV, so it only tangentially matches a beginner tech topic."
+      },
+      {
+        "source": "google_books",
+        "source_id": "NUikAgAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:40+00:00",
+        "rationale": "The book covers machine learning and data mining broadly, but does not address computer vision or OpenCV specifically, so it only tangentially relates to the query."
       },
       {
         "source": "google_books",
@@ -3200,6 +3500,36 @@
       },
       {
         "source": "google_books",
+        "source_id": "duoaEQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:33+00:00",
+        "rationale": "The book is an AI/robotics conference proceedings collection with no focus on computer vision, OpenCV, or beginner-level guidance, so it only tangentially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:17+00:00",
+        "rationale": "The book covers AI and machine learning generally but makes no mention of computer vision or OpenCV, so it only tangentially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "gNjsDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:17+00:00",
+        "rationale": "The book covers machine learning and image processing but is not a beginner guide focused on computer vision or OpenCV, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "iNtizwEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -3207,6 +3537,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:33+00:00",
         "rationale": "The book covers neural networks and AI for beginners, but nothing about computer vision or OpenCV, so it only marginally overlaps with the query topic."
+      },
+      {
+        "source": "google_books",
+        "source_id": "nINSDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:33+00:00",
+        "rationale": "The book covers AI broadly but not computer vision or OpenCV specifically, so it is only tangentially related to the query."
       },
       {
         "source": "google_books",
@@ -3439,6 +3779,26 @@
       },
       {
         "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:12+00:00",
+        "rationale": "The book covers deep learning approaches broadly and may touch on convolutional neural networks within computer vision, but it is a general AI/deep learning collection rather than a focused resource on convolutional neural networks with practical examples."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:08+00:00",
+        "rationale": "The book covers AI/ML and deep learning applications broadly, but is not specifically focused on convolutional neural networks or practical examples, making it only somewhat relevant."
+      },
+      {
+        "source": "google_books",
         "source_id": "52whvwEACAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -3446,6 +3806,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:40+00:00",
         "rationale": "The query asks for practical examples of convolutional neural networks, and this Python/TensorFlow book covers CNNs and image classification hands-on, though it is a broad machine learning book rather than focused specifically on CNNs."
+      },
+      {
+        "source": "google_books",
+        "source_id": "69GwtAEACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:31+00:00",
+        "rationale": "The book covers deep learning and TensorFlow with hands-on practical implementations, which relates to convolutional neural networks, but it is a general AI book not specifically focused on CNNs with practical examples."
       },
       {
         "source": "google_books",
@@ -3466,6 +3836,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:40+00:00",
         "rationale": "The book covers machine learning broadly, which is related but only loosely connected to convolutional neural networks, and it predates deep learning (1983), with no Spanish or practical examples indicated."
+      },
+      {
+        "source": "google_books",
+        "source_id": "E7k0EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:20+00:00",
+        "rationale": "The book covers machine learning and deep learning but focuses on reinforcement learning and control, not convolutional neural networks or practical examples of them."
       },
       {
         "source": "google_books",
@@ -3516,6 +3896,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:47+00:00",
         "rationale": "The book covers machine learning and deep learning applications broadly, but the query specifically asks for convolutional neural networks with practical examples, which are not mentioned in the title or description."
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_L4EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:38+00:00",
+        "rationale": "The book covers practical deep learning optimization including image models, but it is a general AI/ML optimization guide rather than one specifically focused on convolutional neural networks with practical examples."
+      },
+      {
+        "source": "google_books",
+        "source_id": "g_o8EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:33+00:00",
+        "rationale": "The book covers neural networks and practical machine learning applications, but only partially touches convolutional neural networks without focusing on them, making it somewhat relevant."
       },
       {
         "source": "google_books",
@@ -3715,6 +4115,26 @@
         "source_id": "CVrmzgEACAAJ",
         "relevance": 0,
         "judge": "original"
+      },
+      {
+        "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:13+00:00",
+        "rationale": "The book covers machine learning broadly, but only in the healthcare domain and with no indication of TensorFlow, Keras, or project-based deep learning content."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:26+00:00",
+        "rationale": "The book covers AI and deep learning applications broadly, but the title and description do not specifically mention TensorFlow, Keras, or hands-on projects, so it is only somewhat relevant to the query."
       },
       {
         "source": "google_books",
@@ -4047,6 +4467,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:24+00:00",
+        "rationale": "The book covers machine learning in healthcare analytics but has no focus on GPT or large language models, so it only marginally matches the query's topic."
+      },
+      {
+        "source": "google_books",
         "source_id": "0jS3tQEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -4054,6 +4484,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:54+00:00",
         "rationale": "The book is about general deep learning and AI implementation on Azure, which is related to the field of LLMs, but it does not specifically explain GPT or large language models, making it only somewhat relevant."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:35+00:00",
+        "rationale": "The book covers AI, machine learning, and deep learning broadly but does not specifically address GPT or large language models, making it only somewhat relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:46+00:00",
+        "rationale": "The book covers AI and machine learning applications broadly but does not specifically address GPT or large language models, so it only partially matches the query."
       },
       {
         "source": "google_books",
@@ -4067,6 +4517,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "6YmbEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:55+00:00",
+        "rationale": "The book is about machine learning broadly, but it does not specifically cover GPT or large language models, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "8wzUugEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -4074,6 +4534,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:42:42+00:00",
         "rationale": "The book is about recommender systems, not GPT or large language models, so it does not address the query's topic."
+      },
+      {
+        "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:32+00:00",
+        "rationale": "The book covers machine learning broadly, which is related to large language models, but it predates GPT and does not specifically explain GPT or LLMs."
       },
       {
         "source": "google_books",
@@ -4460,6 +4930,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "M9R1pwAACAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:28+00:00",
+        "rationale": "The title 'Cara al sol' is the famous Falangist anthem and the 1939 date aligns with the end of the Spanish Civil War, strongly suggesting the book deals with that period, though the lack of a description and categories limited only to 'Spain' prevent certainty."
+      },
+      {
+        "source": "google_books",
         "source_id": "Mi97G2LTpqsC",
         "relevance": 1,
         "judge": "llm",
@@ -4487,6 +4967,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:03+00:00",
         "rationale": "This is a 19th-century Spanish novel about the Black Prince, unrelated to the Spanish Civil War, though it is at least a Spanish-language novel."
+      },
+      {
+        "source": "google_books",
+        "source_id": "zbUpQwAACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:34+00:00",
+        "rationale": "The title 'Cara al sol' (the Falangist anthem) and the 1939 Spanish publication suggest a connection to the Spanish Civil War era, but with no description or categories it cannot be confirmed as a novel about the war, so the relevance is uncertain."
       }
     ]
   },
@@ -4799,6 +5289,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:20+00:00",
+        "rationale": "The title suggests a historical novel set in medieval Spain (1072), matching the medieval Europe theme, though without a description it's unclear if it's fiction or how prominently kings and queens feature, making it relevant but not perfectly matching all query terms."
+      },
+      {
+        "source": "google_books",
         "source_id": "dZbE0HTJIegC",
         "relevance": 2,
         "judge": "llm",
@@ -5087,6 +5587,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:30+00:00",
+        "rationale": "This is a 19th-century Spanish-language literary history with no connection to the Spanish Civil War or English translation, so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "2rBDAAAAIAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -5134,6 +5644,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:03+00:00",
         "rationale": "The book is a 19th-century Spanish literary history in Spanish, not a novel about the Spanish Civil War nor an English translation, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "CGbnYuzNWOsC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:40+00:00",
+        "rationale": "This is a Spanish-language critical essay collection about the historical novel genre, not an English-translated novel about the Spanish Civil War."
       },
       {
         "source": "google_books",
@@ -5264,6 +5784,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:13+00:00",
         "rationale": "The book is about comparative linguistics, not a novel about the Spanish Civil War, and the query specifically asks for English translations."
+      },
+      {
+        "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:15+00:00",
+        "rationale": "This 1835 Spanish-language novel about the year 1072 has no connection to the Spanish Civil War (1936–1939) and is not an English translation, so it fails the query's key criteria."
       },
       {
         "source": "google_books",
@@ -5584,6 +6114,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "M9R1pwAACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:42+00:00",
+        "rationale": "Only the title and category indicate a connection to Spain, but nothing suggests the Spanish Inquisition, so relevance is speculative at best."
+      },
+      {
+        "source": "google_books",
         "source_id": "Mi97G2LTpqsC",
         "relevance": 1,
         "judge": "llm",
@@ -5621,6 +6161,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:26+00:00",
         "rationale": "The book is a general history of Spanish literature, not a novel about the Spanish Inquisition, so it only tangentially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:27+00:00",
+        "rationale": "This is a Spanish novel, but set in 1072, well before the Spanish Inquisition existed, so it only marginally matches the query."
       },
       {
         "source": "google_books",
@@ -5731,6 +6281,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:28+00:00",
         "rationale": "This is a nonfiction literary history textbook, not a novel about the Spanish Inquisition, so it only marginally matches the query's topic."
+      },
+      {
+        "source": "google_books",
+        "source_id": "zbUpQwAACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:46+00:00",
+        "rationale": "The title refers to the Falangist anthem and there is no description or category information indicating any connection to the Spanish Inquisition, so relevance cannot be established."
       }
     ]
   },
@@ -5783,6 +6343,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:42+00:00",
+        "rationale": "The book is a history of Spanish literature, not a historical novel about the Roman Empire, so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "9xRJAQAAMAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -5823,6 +6393,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "FtAHAQAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:19+00:00",
+        "rationale": "This book is about Spanish literary history in general, not historical novels set in the Roman Empire, so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "HjezZZViDssC",
         "relevance": 0,
         "judge": "llm",
@@ -5830,6 +6410,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:44+00:00",
         "rationale": "The book is a seafood cookbook, completely unrelated to Roman Empire historical novels."
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:03+00:00",
+        "rationale": "The book is a Spanish literary criticism anthology with no connection to the Roman Empire or historical novels, so it does not match the query."
       },
       {
         "source": "google_books",
@@ -5913,6 +6503,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:28+00:00",
+        "rationale": "This is a Spanish historical novel, but it is set in 1072 (medieval Spain), not the Roman Empire, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "dZbE0HTJIegC",
         "relevance": 1,
         "judge": "llm",
@@ -5970,6 +6570,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:36+00:00",
         "rationale": "This is a literary history of Spanish literature, not a historical novel set in the Roman Empire, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:54+00:00",
+        "rationale": "The book is a history of Spanish literature, not a historical novel about the Roman Empire, so it does not match the query's intent."
       },
       {
         "source": "google_books",
@@ -6055,6 +6665,16 @@
         "source_id": "CGbnYuzNWOsC",
         "relevance": 1,
         "judge": "original"
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:44:02+00:00",
+        "rationale": "The book is about Spanish literary history, not historical fiction about the conquest of America, so it only tangentially matches the query terms."
       },
       {
         "source": "google_books",
@@ -6401,6 +7021,36 @@
       },
       {
         "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:24+00:00",
+        "rationale": "The book is a history of Spanish literature with no connection to Victorian era mystery or detective fiction."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:33+00:00",
+        "rationale": "This is a 19th-century Spanish literary history textbook with no connection to Victorian-era detective fiction, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2rBDAAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:37+00:00",
+        "rationale": "This is a historical-critical overview of Spanish literature, not a Victorian-era mystery or detective novel, so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "5dU4AQAAMAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -6411,6 +7061,26 @@
       },
       {
         "source": "google_books",
+        "source_id": "7QBCAAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:14+00:00",
+        "rationale": "This book is a history of Spanish literature with no apparent connection to Victorian-era mystery or detective fiction."
+      },
+      {
+        "source": "google_books",
+        "source_id": "9xRJAQAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:09+00:00",
+        "rationale": "This 1877 Spanish literature textbook bears no connection to Victorian-era detective fiction, so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "AfNCygAACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -6418,6 +7088,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:43:57+00:00",
         "rationale": "The book is about 19th-century Spanish historical novels, not Victorian-era detective or mystery fiction, so it only tangentially matches the period but not the genre."
+      },
+      {
+        "source": "google_books",
+        "source_id": "BA83AQAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:02+00:00",
+        "rationale": "The book is a 19th-century Spanish literary history with no connection to Victorian-era detective or mystery fiction."
       },
       {
         "source": "google_books",
@@ -6438,6 +7118,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:00+00:00",
         "rationale": "The book is about artificial intelligence and machine learning, with no connection to Victorian era mystery or detective stories."
+      },
+      {
+        "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:01+00:00",
+        "rationale": "This is a general history of Spanish literature with no connection to Victorian-era mystery or detective fiction."
       },
       {
         "source": "google_books",
@@ -6478,6 +7168,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:00+00:00",
         "rationale": "This is a general study of Western literature with no indication of Victorian era mystery or detective content."
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:34+00:00",
+        "rationale": "This is a Spanish literary history compendium, not a Victorian-era mystery or detective novel, so it does not match the query."
       },
       {
         "source": "google_books",
@@ -6708,6 +7408,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:03+00:00",
         "rationale": "The book is about artificial intelligence and technology, with no connection to Victorian era mysteries or detective stories, so it does not match the query at all."
+      },
+      {
+        "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:34+00:00",
+        "rationale": "The book is a general history of Spanish literature, not Victorian-era mystery or detective fiction, and covers only tangential literary history."
       }
     ]
   },
@@ -6737,6 +7447,26 @@
         "source_id": "J1HMoAEACAAJ",
         "relevance": 1,
         "judge": "original"
+      },
+      {
+        "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:09+00:00",
+        "rationale": "This is a literary history of Spanish literature, not a novel set on the Camino de Santiago, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:20+00:00",
+        "rationale": "This is a 19th-century literary history textbook with no connection to novels set on the Camino de Santiago."
       },
       {
         "source": "google_books",
@@ -7103,6 +7833,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "AfNCygAACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:56+00:00",
+        "rationale": "This is an academic study of 19th-century Spanish historical novels, not WWII fiction about resistance fighters, so it shares no connection with the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "AnKroAEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -7150,6 +7890,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:25+00:00",
         "rationale": "The title suggests a general work on Western literature with no indication of World War II fiction or resistance fighters, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "M9R1pwAACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:39+00:00",
+        "rationale": "Despite the WWII-era Spanish setting, this 1939 book (whose title is the Falangist anthem) shows no indication of being fiction about resistance fighters, with no description to support relevance."
       },
       {
         "source": "google_books",
@@ -7210,6 +7960,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:46+00:00",
         "rationale": "The book is about comparative linguistics with no connection to World War II fiction or resistance fighters."
+      },
+      {
+        "source": "google_books",
+        "source_id": "bI7QbvIwIVAC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:22+00:00",
+        "rationale": "This 1835 Spanish historical novel about the year 1072 has no connection to World War II or resistance fighters."
       },
       {
         "source": "google_books",
@@ -7340,6 +8100,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:44:58+00:00",
         "rationale": "The book is about the 8th-century Reconquista, which is a completely different historical period than the World War II specified in the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "zbUpQwAACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:44+00:00",
+        "rationale": "The title 'Cara al sol' (a Falangist anthem) and the 1939 Spanish publication give no indication of World War II resistance fiction, so with no description or relevant categories there is no evidence of relevance to the query."
       }
     ]
   },
@@ -7731,6 +8501,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:34+00:00",
+        "rationale": "The book is an anthropological study of food and culture, not a vegetarian cookbook with healthy meat-free recipes."
+      },
+      {
+        "source": "google_books",
         "source_id": "fJzX0AEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -8026,6 +8806,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:20+00:00",
+        "rationale": "The book is about food and culture from an anthropological perspective, not a cookbook with easy no-bake homemade desserts, so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "sBAPAAAAYAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -8231,6 +9021,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "RTyXEAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:44:03+00:00",
+        "rationale": "This is a biography with no connection to Italian pasta recipes or homemade sauce, so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "VBAhAQAAIAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -8268,6 +9068,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:45:11+00:00",
         "rationale": "The book is categorized under comparative linguistics, which is completely unrelated to the query about Italian pasta recipes."
+      },
+      {
+        "source": "google_books",
+        "source_id": "bjrmAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:35+00:00",
+        "rationale": "The book is a collection of essays and journalism by Fernando del Paso with no apparent connection to Italian pasta or cooking, so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:15+00:00",
+        "rationale": "This Spanish-language anthropology book about food and culture has no connection to Italian pasta recipes or homemade sauce."
       },
       {
         "source": "google_books",
@@ -8386,6 +9206,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:14+00:00",
+        "rationale": "The book is about machine learning in healthcare, completely unrelated to Spanish cuisine, tapas, or pinchos."
+      },
+      {
+        "source": "google_books",
         "source_id": "-kQ-5OCdi48C",
         "relevance": 0,
         "judge": "llm",
@@ -8393,6 +9223,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:45:35+00:00",
         "rationale": "The book is a 19th-century Spanish bibliography dictionary, not a cookbook about tapas or pinchos, so it only matches the query superficially through the word 'española'."
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:43+00:00",
+        "rationale": "The book is about deep learning and AI on Azure, completely unrelated to Spanish cuisine, tapas, or pinchos."
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:36+00:00",
+        "rationale": "The book is about machine learning and has no connection to Spanish cuisine, tapas, or pinchos."
       },
       {
         "source": "google_books",
@@ -8596,6 +9446,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:29+00:00",
+        "rationale": "The book concerns food and culture in Spanish but has no indication it covers Spanish cuisine, tapas, or pinchos specifically, making it only tangentially related to the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "dZbE0HTJIegC",
         "relevance": 0,
         "judge": "llm",
@@ -8739,6 +9599,26 @@
       },
       {
         "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:35+00:00",
+        "rationale": "The book is about caloric restriction and longevity, not about baking or sourdough bread, so it does not match the query at all."
+      },
+      {
+        "source": "google_books",
+        "source_id": "AC3GDQAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:31+00:00",
+        "rationale": "The book is a general Mexican cookbook with no focus on baking, bread, or sourdough, so it only marginally touches the query's topic."
+      },
+      {
+        "source": "google_books",
         "source_id": "C3jIAwAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -8876,6 +9756,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:45:40+00:00",
         "rationale": "The book 'Montevideanos' is a history book about Uruguay with no connection to baking, bread, or sourdough, making it completely irrelevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:23+00:00",
+        "rationale": "The book is about food and culture in a social science context, with no connection to baking bread or sourdough for beginners."
       },
       {
         "source": "google_books",
@@ -9393,6 +10283,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:50+00:00",
+        "rationale": "The book is about caloric restriction and longevity, not Asian cuisine or wok stir-fry techniques."
+      },
+      {
+        "source": "google_books",
         "source_id": "9prPDQAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -9513,6 +10413,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "bjrmAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:44:04+00:00",
+        "rationale": "The book is a collection of essays and journalistic works by Fernando del Paso, with no connection to Asian cuisine, wok cooking, or stir fry techniques."
+      },
+      {
+        "source": "google_books",
         "source_id": "bqwmEQAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -9530,6 +10440,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:46:22+00:00",
         "rationale": "This book is about machine learning and cognitive science, with no connection to Asian cuisine, wok cooking, or stir fry techniques."
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:27+00:00",
+        "rationale": "The book is about food and culture from a social science/anthropology perspective, with no indication of Asian cuisine, wok cooking, or stir-fry techniques."
       },
       {
         "source": "google_books",
@@ -9937,6 +10857,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:36+00:00",
+        "rationale": "The book is about Spanish literature history, with no connection to French pastry or professional dessert techniques."
+      },
+      {
+        "source": "google_books",
         "source_id": "-c9cEAAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -9947,6 +10877,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-kQ-5OCdi48C",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:42+00:00",
+        "rationale": "This 1870 Spanish bibliography dictionary has no connection to French pastry or desserts."
+      },
+      {
+        "source": "google_books",
         "source_id": "0jS3tQEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -9954,6 +10894,46 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:46:34+00:00",
         "rationale": "The book is about deep learning and AI on Azure, with no connection to French pastry or desserts."
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:50+00:00",
+        "rationale": "The book is about machine learning and computers, with no connection to French pastry or desserts, so it is completely irrelevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:55+00:00",
+        "rationale": "The book is about artificial intelligence and data analytics, completely unrelated to French pastry or desserts, so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:05+00:00",
+        "rationale": "This 1872 Spanish literature book has no connection to French pastry or professional dessert techniques."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:34+00:00",
+        "rationale": "The book is about artificial intelligence and machine learning, with no connection to French pastry or dessert techniques."
       },
       {
         "source": "google_books",
@@ -9994,6 +10974,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:46:36+00:00",
         "rationale": "The book is about machine learning and recommender systems, with no connection to French pastry or dessert-making techniques, so it does not match the query at all."
+      },
+      {
+        "source": "google_books",
+        "source_id": "9AA3DwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:37+00:00",
+        "rationale": "The book is about caloric restriction and longevity, with no connection to French pastry or professional dessert techniques."
       },
       {
         "source": "google_books",
@@ -10104,6 +11094,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:46:56+00:00",
         "rationale": "The query is about French pastry techniques, while the book is entirely focused on Machine Learning and Cognitive Science, making them completely unrelated."
+      },
+      {
+        "source": "google_books",
+        "source_id": "byACzgEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:36+00:00",
+        "rationale": "The book is about machine learning and software development, with no connection to French pastry or desserts, so it does not match the query at all."
+      },
+      {
+        "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:30+00:00",
+        "rationale": "The book is about food and culture from a social science perspective, with no connection to French pastry or professional dessert techniques."
       },
       {
         "source": "google_books",
@@ -10585,6 +11595,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "ahUsAAAAYAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:02+00:00",
+        "rationale": "The book is categorized under History, matching the query 'historia', though the title gives no further confirmation."
+      },
+      {
+        "source": "google_books",
         "source_id": "dWc5Iry8DUIC",
         "relevance": 3,
         "judge": "llm",
@@ -10632,6 +11652,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:46:37+00:00",
         "rationale": "The title 'Historia de la literatura española' contains the exact query word 'historia' and the book is a historical work, making it a strong match for the broad query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "uAkIEAAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:11+00:00",
+        "rationale": "The book discusses the history and multicultural development of Transylvania, but it is primarily a travel book rather than a dedicated history work, making it somewhat relevant to the query 'historia'."
       },
       {
         "source": "google_books",
@@ -10838,6 +11868,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "cPuBAAAAMAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:24+00:00",
+        "rationale": "The book is about food and culture from a social science/anthropology perspective, not a cookbook with easy recipes, so it only tangentially matches the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "ghKMEAAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -10928,6 +11968,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:34+00:00",
         "rationale": "The book is about machine learning and AI, with no mention of Java, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "52whvwEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:26+00:00",
+        "rationale": "The book is about Python and machine learning, with no connection to Java, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "7f11xQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:31+00:00",
+        "rationale": "The book is about Python and machine learning with no connection to Java, so it only tangentially matches a programming-language query."
       },
       {
         "source": "google_books",
@@ -11081,6 +12141,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "_QPnywEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:00+00:00",
+        "rationale": "The query is for the Java programming language, but the book is specifically about Machine Learning using Python, making it not relevant to the search."
+      },
+      {
+        "source": "google_books",
         "source_id": "ahUsAAAAYAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -11171,6 +12241,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "mh0bU6NXrBgC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:15+00:00",
+        "rationale": "The book is about Python and Linux, not Java, so it does not match the query at all."
+      },
+      {
+        "source": "google_books",
         "source_id": "nINSDwAAQBAJ",
         "relevance": 0,
         "judge": "llm",
@@ -11221,6 +12301,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "uGCdzAEACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:51+00:00",
+        "rationale": "The book is about Python programming, not Java, so it only shares the general programming topic with the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "uO3aEAAAQBAJ",
         "relevance": 1,
         "judge": "llm",
@@ -11262,6 +12352,96 @@
       },
       {
         "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:29+00:00",
+        "rationale": "The book is about Spanish literature and has no apparent connection to the query 'apple', so it is not relevant."
+      },
+      {
+        "source": "google_books",
+        "source_id": "-c9cEAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:35+00:00",
+        "rationale": "The book is about machine learning in healthcare and has no connection to apples or Apple Inc., so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "-kQ-5OCdi48C",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:45+00:00",
+        "rationale": "This Spanish bibliography dictionary has no apparent connection to"
+      },
+      {
+        "source": "google_books",
+        "source_id": "0jS3tQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:41+00:00",
+        "rationale": "The query 'apple' likely refers to Apple products or the fruit, but this book is about Microsoft's Azure AI platform, which is a competitor and unrelated to Apple."
+      },
+      {
+        "source": "google_books",
+        "source_id": "0qZ8wAEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:47+00:00",
+        "rationale": "The book is about machine learning and has no connection to apples, the fruit or the company, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2K73DwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:05+00:00",
+        "rationale": "The book is a technical text about Artificial Intelligence and Machine Learning, and there is no mention or thematic connection to the keyword 'apple' (the fruit or the company) in the title, categories, or description."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2X92zG9P2IIC",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:29+00:00",
+        "rationale": "The book is about Spanish literature and has no connection to the query 'apple' (fruit or company)."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2Xk6EAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:24+00:00",
+        "rationale": "The book is a technical text about Artificial Intelligence and Machine Learning applications, and the query 'apple' is too broad and does not relate to the book's specific content."
+      },
+      {
+        "source": "google_books",
+        "source_id": "2rBDAAAAIAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:28+00:00",
+        "rationale": "The book is a Spanish literature history with no connection to apples or Apple, so it is not relevant."
+      },
+      {
+        "source": "google_books",
         "source_id": "2sT73IyYmSQC",
         "relevance": 0,
         "judge": "llm",
@@ -11282,6 +12462,26 @@
       },
       {
         "source": "google_books",
+        "source_id": "5LrmDwAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:36+00:00",
+        "rationale": "The book is about artificial intelligence, not apples, so the query 'apple' does not match its subject matter."
+      },
+      {
+        "source": "google_books",
+        "source_id": "5RP_zQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:56+00:00",
+        "rationale": "The book is about machine learning and has no connection to apples (fruit) or Apple (company), so it does not match the query."
+      },
+      {
+        "source": "google_books",
         "source_id": "7f11xQEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -11289,6 +12489,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:04+00:00",
         "rationale": "The book is about machine learning and Python, with no connection to 'apple' (fruit or Apple company), so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "8TFTzwEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:15+00:00",
+        "rationale": "The book is about AI and machine learning, with no connection to 'apple' (the fruit or the company), so it is not relevant to the query."
       },
       {
         "source": "google_books",
@@ -11452,6 +12662,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "ZaL8zQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:39+00:00",
+        "rationale": "The book is about machine learning and big tech companies like Google, Facebook and Amazon, with no connection to 'apple' as a fruit or the Apple company."
+      },
+      {
+        "source": "google_books",
         "source_id": "_O2LzgEACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -11459,6 +12679,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:57+00:00",
         "rationale": "The query 'apple' refers to the fruit or company, and this book about explainable artificial intelligence has no meaningful connection to it."
+      },
+      {
+        "source": "google_books",
+        "source_id": "a4iQzQEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:12+00:00",
+        "rationale": "The query \"apple\" most likely refers to the fruit or the technology company, but this book is about machine learning and contains no mention of apples, making it irrelevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:52+00:00",
+        "rationale": "The book is about AI and machine learning, not about Apple, so it does not match the query."
       },
       {
         "source": "google_books",
@@ -11509,6 +12749,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:27+00:00",
         "rationale": "The book is about artificial intelligence with no apparent connection to apples (fruit or Apple company), so it is not relevant to the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "fhEcEAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:44:06+00:00",
+        "rationale": "The query 'apple' likely refers to the company or fruit, and this AI/ML book has no connection to it."
       },
       {
         "source": "google_books",
@@ -11632,6 +12882,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "yRY6EAAAQBAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:45+00:00",
+        "rationale": "The book is about machine learning and curation systems, which has no thematic connection to the keyword 'apple'."
+      },
+      {
+        "source": "google_books",
         "source_id": "zbUpQwAACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -11747,6 +13007,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "AGQ4DQAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:01+00:00",
+        "rationale": "The book is about machine learning and only mentions neural networks as one topic, so it is only somewhat relevant to a query on networks."
+      },
+      {
+        "source": "google_books",
         "source_id": "AnKroAEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -11797,6 +13067,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "NUikAgAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:47+00:00",
+        "rationale": "The book is about machine learning and data mining, not networks specifically, though as a computer science text it may cover related topics like neural networks only marginally."
+      },
+      {
+        "source": "google_books",
         "source_id": "PEZixgEACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -11804,6 +13084,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:26+00:00",
         "rationale": "The book is about machine learning in general and only mentions neural networks as a subtopic, so it is only somewhat relevant to the query 'networks'."
+      },
+      {
+        "source": "google_books",
+        "source_id": "PnjMwQEACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:31+00:00",
+        "rationale": "The book is about AI in e-learning and only mentions social networks as one of several methods, so it is not primarily about networks."
       },
       {
         "source": "google_books",
@@ -11964,6 +13254,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:37+00:00",
         "rationale": "The book is primarily about AI and machine learning, with only one of three bundled sections covering computer networking, so it only partially matches the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "ybyxDwAAQBAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:37+00:00",
+        "rationale": "The book is about AI and machine learning, with no focus on networks, though neural networks may be tangentially mentioned, so it is only somewhat related to the query."
       }
     ]
   },
@@ -12035,6 +13335,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:47:39+00:00",
         "rationale": "The query 'learning' matches this book's core subject of machine learning and deep learning, which appears throughout the title context, categories, and description, making it a strong match for a user searching about learning in the technical sense."
+      },
+      {
+        "source": "google_books",
+        "source_id": "5RP_zQEACAAJ",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:40+00:00",
+        "rationale": "The query 'learning' is broadly matched by this book about machine learning, which directly addresses learning as a core topic, making it perfectly relevant."
       },
       {
         "source": "google_books",
@@ -12175,6 +13485,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:48:34+00:00",
         "rationale": "The query is generic and this book directly covers 'learning' in its core subject matter—Deep Learning and Machine Learning—making it a strong match, though it focuses on a specific subfield rather than learning in general."
+      },
+      {
+        "source": "google_books",
+        "source_id": "aUr8ywEACAAJ",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:04+00:00",
+        "rationale": "The query 'learning' matches the book's core subject of machine learning directly, making it highly relevant."
       },
       {
         "source": "google_books",
@@ -12510,6 +13830,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "-XhDAAAAYAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:27+00:00",
+        "rationale": "The book is a history of Spanish literature and likely covers classic literary works, making it relevant to the query 'classic', though it is not itself a classic literary work."
+      },
+      {
+        "source": "google_books",
         "source_id": "-kQ-5OCdi48C",
         "relevance": 0,
         "judge": "llm",
@@ -12600,6 +13930,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "BA83AQAAMAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:54+00:00",
+        "rationale": "This 19th-century scholarly work on Spanish literature is a classic text itself and covers classic literature, but the vague query 'classic' and the missing description make a perfect match uncertain."
+      },
+      {
+        "source": "google_books",
         "source_id": "BQNMAQAACAAJ",
         "relevance": 0,
         "judge": "llm",
@@ -12630,6 +13970,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "F2KBGOdAATcC",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:06+00:00",
+        "rationale": "The book is a history of Spanish literature that likely covers classic works, but the query 'classic' is vague and the book's focus is literary history rather than classic literature specifically."
+      },
+      {
+        "source": "google_books",
         "source_id": "FtAHAQAAIAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -12657,6 +14007,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:48:10+00:00",
         "rationale": "The book is a scholarly study on Spanish historical fiction, not itself a classic novel, though it relates to literary tradition, making it only somewhat relevant."
+      },
+      {
+        "source": "google_books",
+        "source_id": "KYk2AAAAIAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:15+00:00",
+        "rationale": "The book is a study of Spanish literature through critical texts, which plausibly covers classic literary works, but the query 'classic' is generic and the book's focus is literary criticism rather than classics specifically."
+      },
+      {
+        "source": "google_books",
+        "source_id": "M0QvAAAAYAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:30+00:00",
+        "rationale": "The query 'classic' is vague, but this 19th-century Spanish literature compendium plausibly relates to classic literature, making it somewhat relevant rather than clearly relevant."
       },
       {
         "source": "google_books",
@@ -12720,6 +14090,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "WZ4KAAAAQAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:39+00:00",
+        "rationale": "This 1877 book on the general principles and history of Spanish literature likely covers classic literary works, making it somewhat but not directly relevant to the generic query 'classic'."
+      },
+      {
+        "source": "google_books",
         "source_id": "WboAAAAAMAAJ",
         "relevance": 2,
         "judge": "llm",
@@ -12780,6 +14160,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "dWc5Iry8DUIC",
+        "relevance": 3,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:18+00:00",
+        "rationale": "The book is a foundational and historical work on Spanish literature, making it a classic text within its academic field."
+      },
+      {
+        "source": "google_books",
         "source_id": "dZbE0HTJIegC",
         "relevance": 1,
         "judge": "llm",
@@ -12807,6 +14197,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:48:14+00:00",
         "rationale": "This is a Nicaraguan cookbook from 1981, not a literary classic, and only its age weakly connects it to the query 'classic', so it is not relevant."
+      },
+      {
+        "source": "google_books",
+        "source_id": "njBMAQAAIAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:50+00:00",
+        "rationale": "The query 'classic' is a broad keyword that could relate to Spanish literature classics, but this is a general history of Spanish literature rather than a classic work or collection of classics, so the connection is weak."
+      },
+      {
+        "source": "google_books",
+        "source_id": "qUFAAAAAYAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:09+00:00",
+        "rationale": "The book covers the history of Spanish literature, which likely encompasses literary classics, but it is not itself a classic work or a direct match to the query, making it somewhat relevant."
       },
       {
         "source": "google_books",
@@ -12870,6 +14280,16 @@
       },
       {
         "source": "google_books",
+        "source_id": "zLiZAAAAIAAJ",
+        "relevance": 2,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:06+00:00",
+        "rationale": "The book is a history of Spanish literature, which necessarily covers and discusses the classic works of the 18th, 19th, and 20th centuries."
+      },
+      {
+        "source": "google_books",
         "source_id": "zbUpQwAACAAJ",
         "relevance": 1,
         "judge": "llm",
@@ -12918,6 +14338,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:49:12+00:00",
         "rationale": "The book is a cod recipe cookbook with no connection to war ('guerra') in title, categories, or any other field."
+      },
+      {
+        "source": "google_books",
+        "source_id": "5JTjwQEACAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:57+00:00",
+        "rationale": "The book is a Spanish historical novel anthology, which may include war-related themes, but nothing in the title, categories, or fields specifically indicates it is about war ('guerra')."
       },
       {
         "source": "google_books",
@@ -13008,6 +14438,16 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:48:23+00:00",
         "rationale": "This is a travel guide about Romania with no meaningful connection to war, so it does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "J1HMoAEACAAJ",
+        "relevance": 0,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:52+00:00",
+        "rationale": "The book is a study of the Spanish historical novel with no evident connection to war, so it does not match the query 'guerra'."
       },
       {
         "source": "google_books",
@@ -13158,6 +14598,26 @@
         "prompt_version": "v1.0",
         "date": "2026-11-11T15:49:30+00:00",
         "rationale": "The title, categories, and description give no indication of any connection to war, so the book does not match the query."
+      },
+      {
+        "source": "google_books",
+        "source_id": "hCvRRWcwSzoC",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:42:49+00:00",
+        "rationale": "The book concerns German historical novels about the Spanish Habsburgs written in the interwar period, only tangentially touching on war themes, so it is somewhat relevant to the query 'guerra'."
+      },
+      {
+        "source": "google_books",
+        "source_id": "nrcqAQAAIAAJ",
+        "relevance": 1,
+        "judge": "llm",
+        "model": "z-ai/glm-5.3-flash",
+        "prompt_version": "v1.0",
+        "date": "2026-11-11T16:43:40+00:00",
+        "rationale": "The book is a literary study of 19th-century Spanish novels, which may contain war themes, but it is not directly about the topic of war."
       },
       {
         "source": "google_books",

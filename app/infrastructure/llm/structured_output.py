@@ -41,18 +41,22 @@ def structured_output_method(llm: Any) -> Optional[str]:
     return None
 
 
-def with_structured_output(llm: Any, schema: Any) -> Any:
+def with_structured_output(llm: Any, schema: Any, *, include_raw: bool = False) -> Any:
     """
     llm.with_structured_output(schema) with the method of llm's client class.
 
     Args:
         llm: LangChain chat model
         schema: Pydantic model the answer must follow
+        include_raw: Also return the model's message (LangChain's
+            include_raw: a dict with "raw", "parsed" and "parsing_error"),
+            e.g. to read the token usage of the call
 
     Returns:
-        A runnable that returns an instance of schema
+        A runnable that returns an instance of schema (or the include_raw dict)
     """
     method = structured_output_method(llm)
+    extra = {"include_raw": True} if include_raw else {}
     if method is None:
-        return llm.with_structured_output(schema)
-    return llm.with_structured_output(schema, method=method)
+        return llm.with_structured_output(schema, **extra)
+    return llm.with_structured_output(schema, method=method, **extra)

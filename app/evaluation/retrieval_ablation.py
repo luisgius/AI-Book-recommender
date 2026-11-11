@@ -837,13 +837,22 @@ class ModelStack:
         self._reranker = None
         self.costs: Dict[str, Dict[str, Any]] = {}
 
-    def searcher_for(self, spec: SystemSpec) -> Searcher:
-        """Build (or reuse) the components of a system and return its search function."""
+    def searcher_for(self, spec: SystemSpec, reranker=None) -> Searcher:
+        """
+        Build (or reuse) the components of a system and return its search function.
+
+        Args:
+            spec: The system
+            reranker: An already built Reranker to use instead of loading
+                spec.reranker, for rerankers that are not cross-encoders
+                (the LLM reranker of V07); None loads spec.reranker, if any
+        """
         self._reranker = None  # one reranker at a time
         lexical = self._lexical(spec.lexical) if spec.lexical else None
         if spec.embedding:
             self._load_embedding_model(spec.embedding)
-        reranker = self._load_reranker(spec.reranker) if spec.reranker else None
+        if reranker is None and spec.reranker:
+            reranker = self._load_reranker(spec.reranker)
         return make_searcher(spec, lexical=lexical, vector=self._vector, embeddings=self._embeddings,
                              reranker=reranker)
 
