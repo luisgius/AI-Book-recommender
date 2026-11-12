@@ -370,6 +370,7 @@ button[aria-busy="true"] { cursor: progress; }
 .dg-edges path { fill: none; stroke: var(--accent); stroke-width: 1.4; marker-end: url(#arrow); }
 .dg-arrowhead { fill: var(--accent); }
 .dg-edges .dg-fallback { stroke-dasharray: 4 3; }
+.dg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .pipeline.graph { max-width: 20rem; }
 .how-title { font: 600 1rem/1.3 var(--serif); margin: 2rem 0 0.8rem; }
 .how-grid-wide { grid-template-columns: 20rem 1fr; }

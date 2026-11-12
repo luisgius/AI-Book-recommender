@@ -262,3 +262,39 @@ def test_ui_explains_the_assistant_graph_with_an_inline_diagram():
         assert node in page.split('id="graph-title"')[1].split("</svg>")[0]
     for name in ("Enrutar", "Preguntar", "Buscar", "Responder", "Verificar", "Agente", "Fuera de ámbito"):
         assert f"<strong>{name}" in page
+
+
+# ---------------------------------------------------------------------------
+# Candidate mode (SEARCH_CANDIDATES): the page describes what the server runs
+# ---------------------------------------------------------------------------
+
+
+def _how_variant(page: str, mode: str) -> str:
+    """The block of the "Cómo funciona" section that describes one candidate mode."""
+    start = page.index(f'<div class="how-grid" data-candidates="{mode}"')
+    return page[start:page.index("</ol>", start)]
+
+
+def test_ui_describes_both_candidate_modes_and_picks_the_one_health_reports():
+    page, script = _static("index.html"), _static("app.js")
+    vector, hybrid = _how_variant(page, "vector"), _how_variant(page, "hybrid")
+    # Vector mode: no fusion stage; keyword search is drawn and listed as the fallback only
+    assert "RRF" not in vector and "fusion" not in vector.lower() and "Fusión" not in vector
+    assert "solo si falla" in vector and "dg-fallback" in vector and "Reordenador" in vector
+    # Hybrid mode keeps the published pipeline, hidden until /health asks for it
+    assert "Fusión RRF" in hybrid and 'data-candidates="hybrid" hidden' in page
+    # The mode comes from /health; a server that does not report it is an older, hybrid one
+    assert "health.profile.candidates" in script and ': "hybrid";' in script
+    assert "showPipeline(candidateMode)" in script
+    # The arrowhead lives outside both diagrams, so it renders whichever one is shown
+    assert page.count('<marker id="arrow"') == 1 and 'class="dg-defs"' in page
+
+
+def test_ui_why_row_and_status_do_not_claim_a_keyword_search_in_vector_mode():
+    page, script = _static("index.html"), _static("app.js")
+    assert 'searchMode === "vector_only" ? "no se usó"' in script
+    assert 'response.search_mode === "vector_only"' in script
+    assert '"Puntuación de recuperación (final_score)"' in script
+    assert "híbrid" not in page.split('id="how"')[0] and "Búsqueda híbrida" not in script
+    # The assistant's results use the server's mode, not a fixed "hybrid"
+    assert 'candidateMode === "hybrid" ? "hybrid" : "vector_only"' in script

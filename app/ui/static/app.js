@@ -40,7 +40,7 @@ const FILTER_NAMES = { language: "idioma", category: "categoría", min_year: "de
 
 // Agent tools (app/infrastructure/llm/agents/search_agent.py) and their arguments.
 const TOOL_NAMES = {
-  search_books: "Búsqueda híbrida",
+  search_books: "Búsqueda de libros",
   get_book_details: "Ficha completa de un libro",
   find_similar_books: "Libros similares",
 };
@@ -87,6 +87,10 @@ const COLD_START_HINT = "Si el servidor estaba inactivo, la primera petición pu
 
 // Health of the server, filled at start-up (null until known).
 let health = null;
+// Where this server's search takes its candidates (profile.candidates of /health):
+// "vector" (vector search, BM25 only as the fallback) or "hybrid" (BM25 and vector
+// fused with RRF). A server that does not report it predates the setting and fuses.
+let candidateMode = "vector";
 // The last search response, to go back to it from the similar-books view.
 let lastSearch = null;
 
@@ -362,8 +366,9 @@ function renderWhy(node, result, ranks, mode, searchMode) {
     const lex = ranks.lexical.get(id);
     const vec = ranks.vector.get(id);
     const rr = ranks.rerank.get(id);
+    // In vector mode BM25 runs only as the fallback: "no se usó", not "no lo encontró"
     trail.append(trailStep("Palabras clave", "BM25",
-      lex ? ordinal(lex) : "no lo encontró", Boolean(lex)));
+      searchMode === "vector_only" ? "no se usó" : lex ? ordinal(lex) : "no lo encontró", Boolean(lex)));
     trail.append(trailStep("Significado", "embeddings",
       searchMode === "lexical_only" ? "no se usó" : vec ? ordinal(vec) : "no lo encontró", Boolean(vec)));
     let rerankText = "no se usó";
@@ -375,7 +380,8 @@ function renderWhy(node, result, ranks, mode, searchMode) {
       ["BM25 (lexical_score)", formatRaw(result.lexical_score)],
       ["Similitud coseno (vector_score)", formatRaw(result.vector_score)],
       ["Reordenador (rerank_score)", formatRaw(result.rerank_score)],
-      ["Fusión RRF (final_score)", formatRaw(result.final_score, 6)],
+      [result.source === "hybrid" ? "Fusión RRF (final_score)" : "Puntuación de recuperación (final_score)",
+        formatRaw(result.final_score, 6)],
       ["Puesto final (rank)", String(result.rank)],
     );
     if (ranks.exact) {
@@ -580,8 +586,14 @@ function searchStatus(response) {
   if (n === 0) return "No hay resultados. Prueba con otras palabras, quita filtros o busca en otro idioma.";
   const parts = [`${n} ${n === 1 ? "resultado" : "resultados"} en ${(response.latency_ms / 1000).toFixed(1)} s`];
   const m = response.metadata;
-  if (m) parts.push(`candidatos: ${m.candidates_lexical} por palabras clave y ${m.candidates_vector} por significado`);
-  if (response.search_mode === "lexical_only") parts.push("solo palabras clave");
+  if (response.search_mode === "vector_only") {
+    if (m) parts.push(`candidatos: ${m.candidates_vector} por significado`);
+  } else if (response.search_mode === "lexical_only") {
+    if (m) parts.push(`candidatos: ${m.candidates_lexical} por palabras clave`);
+    parts.push("solo palabras clave");
+  } else if (m) {
+    parts.push(`candidatos: ${m.candidates_lexical} por palabras clave y ${m.candidates_vector} por significado, fusionados con RRF`);
+  }
   if (m && m.diversification_enabled) parts.push("diversificados con MMR");
   return parts.join(", ") + ".";
 }
@@ -808,7 +820,7 @@ function setOptionsEnabled(enabled) {
 function renderAssistantBooks(response) {
   const box = el("div", "assistant-books");
   const results = response.results || [];
-  const searchMode = response.degraded ? "lexical_only" : "hybrid";
+  const searchMode = response.degraded ? "lexical_only" : candidateMode === "hybrid" ? "hybrid" : "vector_only";
   const ranks = stageRanks(results);
   const byId = new Map(results.map((r) => [r.book.id, r]));
   const recommended = new Set();
@@ -1147,6 +1159,13 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Show the description of the pipeline this server runs (the elements marked data-candidates). */
+function showPipeline(mode) {
+  for (const node of document.querySelectorAll("#how [data-candidates]")) {
+    node.hidden = node.dataset.candidates !== mode;
+  }
+}
+
 async function loadHealth() {
   const box = $("health");
   try {
@@ -1157,8 +1176,14 @@ async function loadHealth() {
     box.textContent = parts.join(", ");
     box.classList.add(health.status === "ok" ? "ok" : "degraded");
 
+    candidateMode = health.profile && health.profile.candidates ? health.profile.candidates : "hybrid";
+    showPipeline(candidateMode);
+
     const config = [];
     config.push(health.profile && health.profile.name ? `Perfil ${health.profile.name}.` : "");
+    config.push(candidateMode === "hybrid"
+      ? "Candidatos: palabras clave y significado, fusionados con RRF."
+      : "Candidatos: búsqueda por significado; palabras clave solo si falla.");
     config.push(health.reranker && health.reranker.configured ? `Reordenador: ${health.reranker.model}.` : "Este servidor no usa reordenador.");
     config.push(health.llm.configured ? `LLM: ${health.llm.model}.` : "Este servidor no tiene LLM.");
     $("how-config").textContent = `En este servidor: ${config.filter(Boolean).join(" ")}`;

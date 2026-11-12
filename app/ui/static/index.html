@@ -13,7 +13,7 @@
 
   <header class="top">
     <div class="top-text">
-      <h1>Buscador híbrido de libros</h1>
+      <h1>Buscador inteligente de libros</h1>
       <p class="subtitle">Busca en lenguaje natural, en cualquier idioma del catálogo. Cada resultado muestra qué etapas
         del sistema lo encontraron y en qué puesto.</p>
     </div>
@@ -26,7 +26,7 @@
       <button type="button" role="tab" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false" tabindex="-1">Conversar con el asistente</button>
     </div>
 
-    <!-- Search mode: hybrid search with optional LLM steps -->
+    <!-- Search mode: the search with optional LLM steps -->
     <section id="panel-search" role="tabpanel" aria-labelledby="tab-search" class="mode-panel">
       <form id="search-form" class="query-form" autocomplete="off">
         <div class="query-row">
@@ -155,17 +155,62 @@
     <!-- How the pipeline works -->
     <details id="how" class="explainer">
       <summary>Cómo funciona</summary>
-      <div class="how-grid">
+      <!-- Arrowhead shared by every diagram; kept outside them so it renders while a diagram is hidden. -->
+      <svg class="dg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" class="dg-arrowhead"/>
+          </marker>
+        </defs>
+      </svg>
+      <!-- Two descriptions of the search; the page shows the one /health reports (profile.candidates). -->
+      <div class="how-grid" data-candidates="vector">
+        <svg class="pipeline" viewBox="0 0 300 362" role="img" aria-labelledby="pipeline-vector-title pipeline-vector-desc">
+          <title id="pipeline-vector-title">Etapas de la búsqueda</title>
+          <desc id="pipeline-vector-desc">La consulta pasa, opcionalmente, por el LLM; después la búsqueda por significado
+            encuentra los candidatos, el reordenador los ordena y, opcionalmente, el LLM explica los primeros resultados.
+            La búsqueda por palabras clave solo se usa si la búsqueda por significado falla.</desc>
+          <g class="dg-node"><rect x="90" y="8" width="120" height="36" rx="18"/><text x="150" y="31">Consulta</text></g>
+          <g class="dg-node dg-optional"><rect x="60" y="66" width="180" height="40" rx="6"/><text x="150" y="85">LLM: interpretar</text><text x="150" y="99" class="dg-small">opcional</text></g>
+          <g class="dg-node"><rect x="10" y="134" width="130" height="50" rx="6"/><text x="75" y="155">Significado</text><text x="75" y="172" class="dg-small">embeddings</text></g>
+          <g class="dg-node dg-optional"><rect x="160" y="134" width="130" height="50" rx="6"/><text x="225" y="151">Palabras clave</text><text x="225" y="165" class="dg-small">BM25</text><text x="225" y="178" class="dg-small dg-tiny">solo si falla</text></g>
+          <g class="dg-node"><rect x="60" y="212" width="180" height="40" rx="6"/><text x="150" y="237">Reordenador</text></g>
+          <g class="dg-node dg-optional"><rect x="60" y="280" width="180" height="40" rx="6"/><text x="150" y="299">LLM: explicar</text><text x="150" y="313" class="dg-small">opcional</text></g>
+          <g class="dg-edges">
+            <path d="M150 44 V64"/>
+            <path d="M120 106 L80 132"/>
+            <path class="dg-fallback" d="M140 159 H157"/>
+            <path d="M75 184 L120 210"/>
+            <path class="dg-fallback" d="M225 184 L180 210"/>
+            <path d="M150 252 V278"/>
+            <path d="M150 320 V356"/>
+          </g>
+          <text x="160" y="346" class="dg-small dg-left">resultados</text>
+        </svg>
+        <ol class="stages">
+          <li><strong>Consulta.</strong> Texto libre, en cualquier idioma del catálogo.</li>
+          <li><strong>LLM: interpretar</strong> <span class="tag">opcional</span>. Un modelo de lenguaje detecta la intención,
+            extrae filtros (idioma, años) y propone variantes de la consulta.</li>
+          <li><strong>Significado (embeddings).</strong> Convierte consulta y libros en vectores y toma como candidatos los más
+            cercanos, aunque no compartan palabras ni idioma.</li>
+          <li><strong>Reordenador.</strong> Un modelo que lee la consulta y cada libro a la vez decide el orden final de los
+            primeros candidatos.</li>
+          <li><strong>LLM: explicar</strong> <span class="tag">opcional</span>. Genera una explicación breve por libro con
+            citas que se comprueban contra los datos del libro (RAG).</li>
+          <li><strong>Palabras clave (BM25)</strong> <span class="tag">solo si falla</span>. Si la búsqueda por significado no
+            responde a tiempo, o se agota el límite diario de búsquedas con modelos, los candidatos salen de la búsqueda por
+            palabras clave y la página lo avisa.</li>
+        </ol>
+      </div>
+      <p class="field-note" data-candidates="vector">La fusión de las dos búsquedas (RRF) se evaluó sobre el catálogo de
+        50&nbsp;000 obras y quedó por debajo de la búsqueda por significado sola, con reordenador y sin él; por eso este
+        servidor no la usa y deja las palabras clave como respaldo.</p>
+      <div class="how-grid" data-candidates="hybrid" hidden>
         <svg class="pipeline" viewBox="0 0 300 430" role="img" aria-labelledby="pipeline-title pipeline-desc">
           <title id="pipeline-title">Etapas de la búsqueda</title>
           <desc id="pipeline-desc">La consulta pasa, opcionalmente, por el LLM; después la buscan en paralelo la búsqueda por
             palabras clave y la búsqueda por significado; sus listas se fusionan con RRF, el reordenador las ordena de nuevo
             y, opcionalmente, el LLM explica los primeros resultados.</desc>
-          <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0 L10 5 L0 10 z" class="dg-arrowhead"/>
-            </marker>
-          </defs>
           <g class="dg-node"><rect x="90" y="8" width="120" height="36" rx="18"/><text x="150" y="31">Consulta</text></g>
           <g class="dg-node dg-optional"><rect x="60" y="66" width="180" height="40" rx="6"/><text x="150" y="85">LLM: interpretar</text><text x="150" y="99" class="dg-small">opcional</text></g>
           <g class="dg-node"><rect x="10" y="134" width="130" height="50" rx="6"/><text x="75" y="155">Palabras clave</text><text x="75" y="172" class="dg-small">BM25</text></g>
@@ -240,8 +285,8 @@
           <li><strong>Enrutar</strong> <span class="tag">LLM</span>. Una llamada con salida estructurada elige el camino y el
             código la corrige: como mucho dos preguntas, filtros solo si el usuario los escribió y búsqueda si la salida no es válida.</li>
           <li><strong>Preguntar.</strong> Devuelve una pregunta con dos a cuatro respuestas sugeridas, sin buscar todavía.</li>
-          <li><strong>Buscar.</strong> Ejecuta la búsqueda evaluada (BM25, embeddings, RRF y reordenador) con la petición
-            resumida en una consulta.</li>
+          <li><strong>Buscar.</strong> Ejecuta la misma búsqueda que la pestaña «Buscar libros» (las etapas de arriba) con
+            la petición resumida en una consulta.</li>
           <li><strong>Responder</strong> <span class="tag">LLM</span>. Recomienda hasta tres de los libros recuperados y cita
             sus datos (RAG).</li>
           <li><strong>Verificar.</strong> Descarta los libros que no estaban entre los resultados y las citas que no aparecen
