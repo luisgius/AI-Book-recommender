@@ -1,0 +1,26 @@
+failures by rep and arm:
+  A0  [2, 20, 0]
+  A1  [8, 11, 2]
+  A2  [7, 10, 12]
+  A3  [0, 19, 1]
+  A4  [0, 9, 1]
+  A5  [0, 21, 1]
+  A6  [0, 1, 0]
+failures per 3-minute window (all qwen arms / calls):
+  13:42 [1, 8]
+  13:45 [5, 155]
+  13:48 [7, 118]
+  13:51 [6, 125]
+  13:54 [17, 78]
+  13:57 [26, 55]
+  14:00 [20, 78]
+  14:03 [19, 55]
+  14:06 [12, 108]
+  14:09 [7, 111]
+  14:12 [4, 165]
+  14:15 [0, 24]
+  A0 fails 22, A1 fails 21, both in same slot 6, expected if independent 2.6
+  A0 fails 22, A2 fails 29, both in same slot 4, expected if independent 3.5
+  A0 fails 22, A3 fails 20, both in same slot 16, expected if independent 2.4
+  A0 fails 22, A4 fails 10, both in same slot 8, expected if independent 1.2
+  A1 fails 21, A2 fails 29, both in same slot 2, expected if independent 3.4

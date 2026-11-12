@@ -1,0 +1,149 @@
+[
+ {
+  "arm": "A0 qwen deepinfra, deployed (3 s x2, 5 s)",
+  "calls": 180,
+  "failed": 22,
+  "fail_rate": 0.1222,
+  "median_s": 0.687,
+  "p95_s": 5.111,
+  "p99_s": 5.187,
+  "ok_median_s": 0.639,
+  "mean_requests_per_call": 1.13,
+  "queries_same_vector_all_reps": "27/60",
+  "min_cos_between_reps": 0.996888,
+  "share_matching_stored_variant": 0.741,
+  "min_cos_to_stored_variant": 0.996888,
+  "providers": {
+   "DeepInfra": 158
+  },
+  "errors": {
+   "timeout:ReadTimeout": 22
+  }
+ },
+ {
+  "arm": "A1 qwen nebius, deployed (3 s x2, 5 s)",
+  "calls": 180,
+  "failed": 21,
+  "fail_rate": 0.1167,
+  "median_s": 1.899,
+  "p95_s": 5.092,
+  "p99_s": 5.214,
+  "ok_median_s": 1.599,
+  "mean_requests_per_call": 1.27,
+  "queries_same_vector_all_reps": "1/59",
+  "min_cos_between_reps": 0.999839,
+  "share_matching_stored_variant": 0.0,
+  "min_cos_to_stored_variant": 0.99338,
+  "providers": {
+   "Nebius": 159
+  },
+  "errors": {
+   "timeout:ReadTimeout": 21
+  }
+ },
+ {
+  "arm": "A2 qwen siliconflow, deployed (3 s x2, 5 s)",
+  "calls": 180,
+  "failed": 29,
+  "fail_rate": 0.1611,
+  "median_s": 1.574,
+  "p95_s": 5.124,
+  "p99_s": 5.269,
+  "ok_median_s": 1.014,
+  "mean_requests_per_call": 1.32,
+  "queries_same_vector_all_reps": "2/58",
+  "min_cos_between_reps": 0.999775,
+  "share_matching_stored_variant": 0.0,
+  "min_cos_to_stored_variant": 0.993162,
+  "providers": {
+   "SiliconFlow": 151
+  },
+  "errors": {
+   "timeout:ReadTimeout": 29
+  }
+ },
+ {
+  "arm": "A3 qwen deepinfra, short attempts (1.5 s x3, 5 s)",
+  "calls": 180,
+  "failed": 20,
+  "fail_rate": 0.1111,
+  "median_s": 0.614,
+  "p95_s": 4.777,
+  "p99_s": 4.957,
+  "ok_median_s": 0.57,
+  "mean_requests_per_call": 1.31,
+  "queries_same_vector_all_reps": "27/60",
+  "min_cos_between_reps": 0.996792,
+  "share_matching_stored_variant": 0.7,
+  "min_cos_to_stored_variant": 0.996888,
+  "providers": {
+   "DeepInfra": 160
+  },
+  "errors": {
+   "timeout:ReadTimeout": 20
+  }
+ },
+ {
+  "arm": "A4 qwen deepinfra, hedged (2nd request at 1.0 s, max 3, 5 s)",
+  "calls": 180,
+  "failed": 10,
+  "fail_rate": 0.0556,
+  "median_s": 0.678,
+  "p95_s": 5.002,
+  "p99_s": 5.005,
+  "ok_median_s": 0.642,
+  "mean_requests_per_call": 1.46,
+  "queries_same_vector_all_reps": "23/60",
+  "min_cos_between_reps": 0.996199,
+  "share_matching_stored_variant": 0.724,
+  "min_cos_to_stored_variant": 0.996199,
+  "providers": {
+   "DeepInfra": 170
+  },
+  "errors": {
+   "deadline": 10
+  }
+ },
+ {
+  "arm": "A5 qwen deepinfra then nebius fallback (3 s x2, 5 s)",
+  "calls": 180,
+  "failed": 22,
+  "fail_rate": 0.1222,
+  "median_s": 0.644,
+  "p95_s": 5.101,
+  "p99_s": 5.228,
+  "ok_median_s": 0.573,
+  "mean_requests_per_call": 1.13,
+  "queries_same_vector_all_reps": "28/60",
+  "min_cos_between_reps": 0.996199,
+  "share_matching_stored_variant": 0.709,
+  "min_cos_to_stored_variant": 0.996199,
+  "providers": {
+   "DeepInfra": 158
+  },
+  "errors": {
+   "timeout:ReadTimeout": 22
+  }
+ },
+ {
+  "arm": "A6 bge-m3 deepinfra, deployed (3 s x2, 5 s)",
+  "calls": 180,
+  "failed": 1,
+  "fail_rate": 0.0056,
+  "median_s": 0.458,
+  "p95_s": 0.995,
+  "p99_s": 3.086,
+  "ok_median_s": 0.457,
+  "mean_requests_per_call": 1.01,
+  "queries_same_vector_all_reps": "60/60",
+  "min_cos_between_reps": 0.999998,
+  "share_matching_stored_variant": 1.0,
+  "min_cos_to_stored_variant": 0.999998,
+  "providers": {
+   "DeepInfra": 179
+  },
+  "errors": {
+   "{\"message\": \"HTTP 429: {\\\"error\\\":{\\\"mes": 1
+  }
+ }
+]

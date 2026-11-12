@@ -1,0 +1,64 @@
+[
+ {
+  "arm": "B0 qwen deepinfra, deployed (3 s x2, 5 s) [control]",
+  "calls": 360,
+  "failed": 2,
+  "fail_rate": 0.0056,
+  "median_s": 0.457,
+  "p95_s": 1.601,
+  "p99_s": 4.206,
+  "ok_median_s": 0.457,
+  "mean_requests_per_call": 1.02,
+  "queries_same_vector_all_reps": "5/60",
+  "min_cos_between_reps": 0.995601,
+  "share_matching_stored_variant": 0.623,
+  "min_cos_to_stored_variant": 0.995601,
+  "providers": {
+   "DeepInfra": 358
+  },
+  "errors": {
+   "timeout:ReadTimeout": 2
+  }
+ },
+ {
+  "arm": "B2 qwen hedge deepinfra 0 s / nebius 1.0 s / deepinfra 2.5 s, 5 s",
+  "calls": 360,
+  "failed": 0,
+  "fail_rate": 0.0,
+  "median_s": 0.498,
+  "p95_s": 1.573,
+  "p99_s": 2.505,
+  "ok_median_s": 0.498,
+  "mean_requests_per_call": 1.17,
+  "queries_same_vector_all_reps": "5/60",
+  "min_cos_between_reps": 0.995648,
+  "share_matching_stored_variant": 0.586,
+  "min_cos_to_stored_variant": 0.995601,
+  "providers": {
+   "DeepInfra": 354,
+   "Nebius": 6
+  },
+  "errors": {}
+ },
+ {
+  "arm": "B4 qwen hedge deepinfra 0 s / nebius 1.0 s / siliconflow 2.0 s, 5 s",
+  "calls": 360,
+  "failed": 0,
+  "fail_rate": 0.0,
+  "median_s": 0.463,
+  "p95_s": 1.455,
+  "p99_s": 2.524,
+  "ok_median_s": 0.463,
+  "mean_requests_per_call": 1.15,
+  "queries_same_vector_all_reps": "4/60",
+  "min_cos_between_reps": 0.994504,
+  "share_matching_stored_variant": 0.619,
+  "min_cos_to_stored_variant": 0.995508,
+  "providers": {
+   "Nebius": 9,
+   "DeepInfra": 350,
+   "SiliconFlow": 1
+  },
+  "errors": {}
+ }
+]

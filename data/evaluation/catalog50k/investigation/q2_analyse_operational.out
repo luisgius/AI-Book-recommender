@@ -1,0 +1,26 @@
+===== qwen__qwen3-embedding-8b 504
+error kinds: [('OpenRouterError: POST embeddings: ReadTimeout (after 2 attempts)', 51)]
+failed latency ms: [5069, 5069, 5070, 5074, 5074] ... [5228, 5238, 5257, 5266, 5304]
+by repetition: Counter({1: 22, 3: 20, 2: 9})
+first/last call: 2026-11-12T12:31:49 2026-11-12T12:43:03
+errors per 5-min: [('12:3x', 39), ('12:4x', 12)]
+calls per 5-min: [('12:3x', 344), ('12:4x', 160)]
+query chars: failed median 43, ok median 46
+errors by language: [('ar', 1), ('ca', 2), ('de', 7), ('en', 16), ('es', 12), ('fr', 3), ('it', 1), ('ja', 1), ('pt', 5), ('ru', 1), ('zh', 2)]
+ok latency median 399 p95 1977 p99 4490 max 4811; >3000ms ok: 6
+distinct vectors per query: {1: 36, 2: 111, 3: 21}
+min pairwise cosine among repetitions: quantiles [0.995447 0.996681 0.997486 0.997874 0.998503 1.      ]
+share of queries with a pair below 0.999: 0.7724550898203593 below 0.99: 0.0
+===== baai__bge-m3 504
+error kinds: [('OpenRouterError: POST embeddings: HTTP 429 HTTP 429: {"error":{"message":"Model busy, retry later","type":"inv', 4), ('OpenRouterError: POST embeddings: ReadTimeout (after 2 attempts)', 2)]
+failed latency ms: [1536, 1599, 1951, 2030, 5091] ... [1599, 1951, 2030, 5091, 5209]
+by repetition: Counter({3: 6})
+first/last call: 2026-11-12T12:31:32 2026-11-12T12:35:35
+errors per 5-min: [('12:3x', 6)]
+calls per 5-min: [('12:3x', 504)]
+query chars: failed median 72, ok median 46
+errors by language: [('de', 2), ('en', 1), ('es', 2), ('fr', 1)]
+ok latency median 398 p95 728 p99 1432 max 1712; >3000ms ok: 0
+distinct vectors per query: {1: 74, 2: 66, 3: 28}
+min pairwise cosine among repetitions: quantiles [0.999998 0.999999 0.999999 0.999999 1.       1.      ]
+share of queries with a pair below 0.999: 0.0 below 0.99: 0.0

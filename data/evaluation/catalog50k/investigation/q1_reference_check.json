@@ -1,0 +1,40 @@
+{
+ "reference": [
+  [
+   0.6265,
+   0.3477
+  ],
+  [
+   0.3499,
+   0.678
+  ]
+ ],
+ "deepinfra": {
+  "similarity": [
+   [
+    0.626,
+    0.348
+   ],
+   [
+    0.35,
+    0.6695
+   ]
+  ],
+  "dim": 1024,
+  "provider": "DeepInfra"
+ },
+ "parasail": {
+  "similarity": [
+   [
+    0.6259,
+    0.348
+   ],
+   [
+    0.3497,
+    0.6696
+   ]
+  ],
+  "dim": 1024,
+  "provider": "Parasail"
+ }
+}

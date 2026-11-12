@@ -1,0 +1,74 @@
+[
+ {
+  "query_id": "b-en-6",
+  "target": "Jane Eyre",
+  "E1_rank": 1,
+  "E2_rank": 14
+ },
+ {
+  "query_id": "b-es-6",
+  "target": "Cien años de soledad",
+  "E1_rank": 1,
+  "E2_rank": 2462
+ },
+ {
+  "query_id": "b-fr-6",
+  "target": "L'Étranger",
+  "E1_rank": 3,
+  "E2_rank": 14129
+ },
+ {
+  "query_id": "b-de-6",
+  "target": "Die Verwandlung",
+  "E1_rank": 1,
+  "E2_rank": 1
+ },
+ {
+  "query_id": "b-it-6",
+  "target": "I promessi sposi",
+  "E1_rank": 1,
+  "E2_rank": 2
+ },
+ {
+  "query_id": "b-pt-6",
+  "target": "Memórias Póstumas de Brás Cubas",
+  "E1_rank": 2,
+  "E2_rank": 71
+ },
+ {
+  "query_id": "b-ca-6",
+  "target": "La plaça del Diamant",
+  "E1_rank": 18,
+  "E2_rank": 22
+ },
+ {
+  "query_id": "b-nl-6",
+  "target": "Nooit meer slapen",
+  "E1_rank": 1,
+  "E2_rank": 1
+ },
+ {
+  "query_id": "b-ru-6",
+  "target": "Мастер и Маргарита",
+  "E1_rank": 1,
+  "E2_rank": 13
+ },
+ {
+  "query_id": "b-zh-6",
+  "target": "Dream of the Red Chamber",
+  "E1_rank": 1,
+  "E2_rank": 1
+ },
+ {
+  "query_id": "b-ja-6",
+  "target": "人間失格",
+  "E1_rank": 1,
+  "E2_rank": 1
+ },
+ {
+  "query_id": "b-ar-6",
+  "target": "الأيام",
+  "E1_rank": 11,
+  "E2_rank": 2
+ }
+]

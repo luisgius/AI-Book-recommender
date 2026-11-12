@@ -1,0 +1,1425 @@
+{
+ "summary": {
+  "bge-m3": {
+   "n": 200,
+   "hit@1": 0.975,
+   "hit@10": 0.995,
+   "hit@100": 1.0,
+   "mrr@100": 0.9807732426303855
+  },
+  "qwen3-8b": {
+   "n": 200,
+   "hit@1": 0.94,
+   "hit@10": 1.0,
+   "hit@100": 1.0,
+   "mrr@100": 0.9638888888888889
+  },
+  "frozen_vs_fresh_bge_cosine": {
+   "n": 168,
+   "min": 0.9999978812413932,
+   "median": 0.9999993301433379
+  }
+ },
+ "per_work": [
+  {
+   "i": 25247,
+   "title": "Der Nagel",
+   "chars": 275,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 49673,
+   "title": "Why the Whales Came",
+   "chars": 444,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 27562,
+   "title": "Topdog/Underdog",
+   "chars": 465,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 2653,
+   "title": "Good Morning, Holy Spirit",
+   "chars": 548,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 16968,
+   "title": "Descobrir",
+   "chars": 718,
+   "bge_rank": 3,
+   "qwen_rank": 1
+  },
+  {
+   "i": 33506,
+   "title": "Growth of the Soil",
+   "chars": 1165,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31845,
+   "title": "Los pueblos indígenas en la contemporaneidad: la vinculación comunitaria en la educación jurídica intercultural en México",
+   "chars": 1613,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 26537,
+   "title": "Amelia Peabody series",
+   "chars": 859,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 19877,
+   "title": "República Mista",
+   "chars": 1074,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31234,
+   "title": "Corazón : (diario de un niño)",
+   "chars": 718,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 23465,
+   "title": "Tres mujeres: La recompensa, Prueba de un alma, Amores románticos",
+   "chars": 1187,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 38232,
+   "title": "搜神記 volume 15-17",
+   "chars": 1172,
+   "bge_rank": 1,
+   "qwen_rank": 3
+  },
+  {
+   "i": 14315,
+   "title": "Feminist Theory: From Margin to Center",
+   "chars": 1135,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 33075,
+   "title": "Kobzar",
+   "chars": 1014,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 9127,
+   "title": "Color Me Dark",
+   "chars": 370,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 18470,
+   "title": "Eh Joe",
+   "chars": 1134,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 9158,
+   "title": "Kater Mikesch",
+   "chars": 387,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 49532,
+   "title": "Ain-i-Akbari",
+   "chars": 481,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6214,
+   "title": "Operación Jaque, la verdadera historia",
+   "chars": 282,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40525,
+   "title": "Historia del famoso predicador Fray Gerundio de Campazas, alias Zotes (1 de 2)",
+   "chars": 747,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 16417,
+   "title": "Black Flags: The Rise of ISIS",
+   "chars": 311,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 34902,
+   "title": "The Rámáyan of Válmíki, translated into English verse",
+   "chars": 1279,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 46214,
+   "title": "Boond Aur Samudra",
+   "chars": 237,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39446,
+   "title": "Sharpe's Eagle",
+   "chars": 522,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 9631,
+   "title": "Die Morgenlandfahrt",
+   "chars": 257,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 20325,
+   "title": "The Smartest Guys in the Room",
+   "chars": 929,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6472,
+   "title": "حياة المسيح",
+   "chars": 420,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47830,
+   "title": "RESET: Reflexiones antropológicas ante la pandemia de COVID-19",
+   "chars": 844,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4832,
+   "title": "O Mistério da Camioneta Fantasma",
+   "chars": 536,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44825,
+   "title": "La filla del mar",
+   "chars": 1201,
+   "bge_rank": 2,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21639,
+   "title": "Before Novels",
+   "chars": 299,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 30942,
+   "title": "1945–1979: History and the Present",
+   "chars": 1096,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 36687,
+   "title": "The Neanderthal Parallax",
+   "chars": 1072,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6599,
+   "title": "Maigret et la Grande Perche",
+   "chars": 408,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 23186,
+   "title": "Dragons of Summer Flame",
+   "chars": 757,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 28453,
+   "title": "Sucesos de las Islas Filipinas",
+   "chars": 757,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 20722,
+   "title": "Planet Pirates",
+   "chars": 933,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40035,
+   "title": "Kim Novak badete nie im See von Genezareth",
+   "chars": 375,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 41970,
+   "title": "Pioneers in Ingolstadt",
+   "chars": 396,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 13400,
+   "title": "جورو جرانث صاحب",
+   "chars": 1134,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 36210,
+   "title": "The Cherryh Odyssey",
+   "chars": 768,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31261,
+   "title": "Метро 2033: Питер",
+   "chars": 272,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 29012,
+   "title": "On Parables",
+   "chars": 336,
+   "bge_rank": 1,
+   "qwen_rank": 3
+  },
+  {
+   "i": 34167,
+   "title": "Five Peas from a Pod",
+   "chars": 393,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 17071,
+   "title": "Le Paysan parvenu",
+   "chars": 1236,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4081,
+   "title": "¡Jettatore!",
+   "chars": 997,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35959,
+   "title": "Magnus Chase and the Gods of Asgard",
+   "chars": 843,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 920,
+   "title": "في تحديث الثقافة العربية",
+   "chars": 654,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6112,
+   "title": "Federalist No. 64",
+   "chars": 618,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47166,
+   "title": "Hernani",
+   "chars": 862,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 26137,
+   "title": "Diálogos das grandezas do Brasil",
+   "chars": 671,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 46547,
+   "title": "Hiša Marije Pomočnice",
+   "chars": 283,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 43788,
+   "title": "Star Wars: Aftermath: Empire's End",
+   "chars": 1249,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40977,
+   "title": "Incendiamos las yeguas en la madrugada",
+   "chars": 690,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 74,
+   "title": "Wealth of the World's Waste Places and Oceania",
+   "chars": 1215,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40101,
+   "title": "The Misfit of Demon King Academy",
+   "chars": 434,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 32347,
+   "title": "Huasipungo",
+   "chars": 1143,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21832,
+   "title": "魔術師クノンは見えている",
+   "chars": 383,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 15984,
+   "title": "De Cock en de ganzen van de dood",
+   "chars": 396,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47859,
+   "title": "Il mulino del Po",
+   "chars": 818,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21312,
+   "title": "Technics and Time, 1",
+   "chars": 855,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 46113,
+   "title": "Recuerdos de una Misión en el Ejército Chileno",
+   "chars": 1245,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4127,
+   "title": "The Changeover",
+   "chars": 757,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12521,
+   "title": "Rosario Petix",
+   "chars": 377,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 37192,
+   "title": "The Official Stardew Valley Cookbook",
+   "chars": 280,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 14529,
+   "title": "The Right Attitude to Rain",
+   "chars": 320,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 15637,
+   "title": "Chronica de el-rei D. Affonso V (Vol. II)",
+   "chars": 1319,
+   "bge_rank": 1,
+   "qwen_rank": 3
+  },
+  {
+   "i": 9338,
+   "title": "Красная книга Республики Ингушетия",
+   "chars": 356,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35585,
+   "title": "El nacimiento de la Filosofía del derecho. De la Philosophia iuris a la Rechtsphilosophie",
+   "chars": 1313,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 29358,
+   "title": "Anecdotes of the Late Samuel Johnson",
+   "chars": 482,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5977,
+   "title": "The Sheep Eaters",
+   "chars": 1137,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5272,
+   "title": "When I Was Miss Dow",
+   "chars": 343,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 20975,
+   "title": "Revistas y redes en la conformación del campo intelectual latinoamericano",
+   "chars": 708,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 33288,
+   "title": "Jaime de Magalhães Lima",
+   "chars": 1119,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 32065,
+   "title": "韓詩外傳",
+   "chars": 596,
+   "bge_rank": 1,
+   "qwen_rank": 2
+  },
+  {
+   "i": 7147,
+   "title": "Zizhi Tongjian Xubian",
+   "chars": 395,
+   "bge_rank": 98,
+   "qwen_rank": 1
+  },
+  {
+   "i": 19755,
+   "title": "大つごもり (小説)",
+   "chars": 277,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 36127,
+   "title": "Fanny",
+   "chars": 672,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 19076,
+   "title": "Chicas muertas",
+   "chars": 893,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 46305,
+   "title": "The Mists of Avalon",
+   "chars": 1255,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 8179,
+   "title": "Les Palmes de monsieur Schutz",
+   "chars": 1080,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35877,
+   "title": "Хромая судьба",
+   "chars": 1172,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21807,
+   "title": "Tanzhi Jinglei",
+   "chars": 1008,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35408,
+   "title": "Van den ever",
+   "chars": 1176,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 13317,
+   "title": "Die Tyrannei des Schmetterlings",
+   "chars": 269,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39530,
+   "title": "The Animals in That Country",
+   "chars": 525,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35863,
+   "title": "Бирюк",
+   "chars": 262,
+   "bge_rank": 5,
+   "qwen_rank": 2
+  },
+  {
+   "i": 38510,
+   "title": "Hacia un modelo universitario: la Universidad Carlos III de Madrid",
+   "chars": 1241,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 18851,
+   "title": "Cuarenta años de trayectoria",
+   "chars": 245,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 29162,
+   "title": "Vaster Than Empires and More Slow",
+   "chars": 1217,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6005,
+   "title": "The Princeton Companion to Mathematics",
+   "chars": 516,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39078,
+   "title": "My Name Is Mina",
+   "chars": 374,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 25224,
+   "title": "Dodger",
+   "chars": 477,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 20777,
+   "title": "Quinteto de Buenos Aires",
+   "chars": 305,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 37725,
+   "title": "Americanas",
+   "chars": 328,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 15866,
+   "title": "Leben des Galilei",
+   "chars": 1242,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 19027,
+   "title": "Antarctica: The Battle for the Seventh Continent",
+   "chars": 592,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12050,
+   "title": "Les Cerfs-volants",
+   "chars": 322,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12411,
+   "title": "Patty Paradise - Le avventure di Patty Pravo",
+   "chars": 500,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12237,
+   "title": "Il ragazzo con la maglietta a strisce",
+   "chars": 327,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 2160,
+   "title": "The Fire on the Snow",
+   "chars": 280,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40158,
+   "title": "Matemática... ¿Estás ahí?",
+   "chars": 1179,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 43034,
+   "title": "To a Skylark",
+   "chars": 1196,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 17043,
+   "title": "Viúva, porém honesta",
+   "chars": 546,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31229,
+   "title": "Laatste verzen",
+   "chars": 943,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4527,
+   "title": "The Reivers",
+   "chars": 1047,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5886,
+   "title": "Or che l’aura mia dolce altrove spira",
+   "chars": 302,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44480,
+   "title": "Magpie Murders",
+   "chars": 352,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 49650,
+   "title": "Flight without End",
+   "chars": 667,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 8534,
+   "title": "O ensino da filosofia no limiar da contemporaneidade: o que faz o filósofo quando seu ofício é ser professor de filosofia?",
+   "chars": 805,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 9800,
+   "title": "E tu ne' carmi avrai perenne vita",
+   "chars": 397,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 2532,
+   "title": "教育科學研究",
+   "chars": 256,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5259,
+   "title": "La spigolatrice di Sapri",
+   "chars": 1192,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 45830,
+   "title": "Emotional Intelligence",
+   "chars": 655,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35428,
+   "title": "World of Warcraft: Illidan",
+   "chars": 292,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44793,
+   "title": "De Nederlanden",
+   "chars": 1122,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 25643,
+   "title": "Á ventura",
+   "chars": 1218,
+   "bge_rank": 1,
+   "qwen_rank": 3
+  },
+  {
+   "i": 46221,
+   "title": "Tuareg",
+   "chars": 476,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 34378,
+   "title": "Digueu-li Catalunya",
+   "chars": 1171,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 18063,
+   "title": "Rise and Kill First",
+   "chars": 643,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 34196,
+   "title": "La Joie",
+   "chars": 328,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 15433,
+   "title": "A Tiger for Malgudi",
+   "chars": 434,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 14103,
+   "title": "Abdullah-nameh",
+   "chars": 316,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44530,
+   "title": "The Forest of Anykščiai",
+   "chars": 641,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 38653,
+   "title": "Les Hirondelles de Kaboul",
+   "chars": 342,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 27487,
+   "title": "الإسلام وأصول الحكم",
+   "chars": 877,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 37990,
+   "title": "Dineros son calidad",
+   "chars": 1210,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 18036,
+   "title": "The Inverted World",
+   "chars": 748,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 29528,
+   "title": "K4 O Quadrado Azul",
+   "chars": 1223,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 32286,
+   "title": "Mitos e identidades en las autoras hispánicas contemporáneas",
+   "chars": 935,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 43269,
+   "title": "Maigret Gets Angry",
+   "chars": 1101,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 42021,
+   "title": "Justice as Fairness",
+   "chars": 1040,
+   "bge_rank": 1,
+   "qwen_rank": 2
+  },
+  {
+   "i": 45889,
+   "title": "Cuentos de amor",
+   "chars": 1256,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 23420,
+   "title": "Kid Lawyer",
+   "chars": 442,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5398,
+   "title": "Roteiro do Jazz na Lisboa dos Anos 20–50",
+   "chars": 678,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21254,
+   "title": "白兔記",
+   "chars": 1085,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40159,
+   "title": "Agrarian Law speeches",
+   "chars": 399,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 7559,
+   "title": "乃木若葉は勇者である",
+   "chars": 335,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31879,
+   "title": "Hot, Flat, and Crowded",
+   "chars": 857,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 38474,
+   "title": "Doña Rosita la soltera",
+   "chars": 550,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 41297,
+   "title": "The Emergence of Organizations and Markets",
+   "chars": 924,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21972,
+   "title": "Cuestiones sociojurídicas con enfoque de género : una perspectiva desde los semilleros de investigación",
+   "chars": 825,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12476,
+   "title": "Ananda Sutram",
+   "chars": 857,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 15927,
+   "title": "Jóvenes, católicos, contestatarios: Religión y política en Bahía Blanca (1968-1975)",
+   "chars": 897,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 1062,
+   "title": "Principles of Political Economy",
+   "chars": 1080,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47938,
+   "title": "The Golden Cage",
+   "chars": 478,
+   "bge_rank": 1,
+   "qwen_rank": 2
+  },
+  {
+   "i": 17762,
+   "title": "The World as Will and Idea (Vol. 1 of 3)",
+   "chars": 1243,
+   "bge_rank": 1,
+   "qwen_rank": 2
+  },
+  {
+   "i": 7676,
+   "title": "An Interpretation of Rumphius's Herbarium Amboinense",
+   "chars": 308,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 46224,
+   "title": "الإبانة عن معاني القراءات",
+   "chars": 893,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 14448,
+   "title": "L'Orphelin de Perdide",
+   "chars": 640,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 24383,
+   "title": "Small Is Beautiful",
+   "chars": 915,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 11172,
+   "title": "Heimliches Geld, heimliche Liebe",
+   "chars": 416,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 21793,
+   "title": "思いわずらうことなく愉しく生きよ",
+   "chars": 246,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 27926,
+   "title": "花間集",
+   "chars": 955,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4075,
+   "title": "Iesus Krist Gure Iaunaren Testamentu Berria",
+   "chars": 629,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6593,
+   "title": "Чаша бурь",
+   "chars": 1006,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 9591,
+   "title": "Análisis del derecho y derechos humanos",
+   "chars": 685,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 45722,
+   "title": "cant de Zaboi",
+   "chars": 354,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 14337,
+   "title": "Operación Koala",
+   "chars": 385,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 2964,
+   "title": "Bruto primo",
+   "chars": 371,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 37608,
+   "title": "Las ‘sectas’ protestantes y el espíritu del (anti-) imperialismo",
+   "chars": 1495,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 41563,
+   "title": "How I Found Livingstone",
+   "chars": 1281,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35009,
+   "title": "A Room in Chelsea Square",
+   "chars": 391,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39463,
+   "title": "Behind the Scenes at the Museum",
+   "chars": 1183,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44603,
+   "title": "The Paddington Mystery",
+   "chars": 422,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4849,
+   "title": "The Brave Adventures of Lapitch",
+   "chars": 265,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 1749,
+   "title": "Shadow on the Sand",
+   "chars": 480,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 8155,
+   "title": "A Cultura Brasileira — Introdução ao Estudo da Cultura no Brasil",
+   "chars": 473,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 41615,
+   "title": "Silly Asses",
+   "chars": 453,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12354,
+   "title": "Los jefes",
+   "chars": 519,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39736,
+   "title": "Circulaciones culturales : Lo afrocaribeño entre Cartagena, Veracruz y la Habana",
+   "chars": 1033,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 37745,
+   "title": "The Italian",
+   "chars": 1225,
+   "bge_rank": 1,
+   "qwen_rank": 3
+  },
+  {
+   "i": 7844,
+   "title": "Torch Song Trilogy",
+   "chars": 452,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 25638,
+   "title": "The Tortoise and the Birds",
+   "chars": 296,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 5998,
+   "title": "Uma ilha brasileira no campo literário alemão",
+   "chars": 1073,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 24257,
+   "title": "The Black Jacobins",
+   "chars": 1057,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 7605,
+   "title": "The Cage",
+   "chars": 1188,
+   "bge_rank": 9,
+   "qwen_rank": 9
+  },
+  {
+   "i": 2384,
+   "title": "The Stones of Venice",
+   "chars": 473,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 39682,
+   "title": "Tabaqat-i Nasiri",
+   "chars": 846,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 1417,
+   "title": "Many Moons",
+   "chars": 489,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 12752,
+   "title": "The Ninja",
+   "chars": 365,
+   "bge_rank": 1,
+   "qwen_rank": 2
+  },
+  {
+   "i": 12122,
+   "title": "Mérope",
+   "chars": 1140,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47062,
+   "title": "The Vaults of Yoh-Vombis",
+   "chars": 1017,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 8119,
+   "title": "In the Name of Tradition",
+   "chars": 1225,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 31407,
+   "title": "夏へのトンネル、さよならの出口",
+   "chars": 741,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 13800,
+   "title": "The Story of My Teeth",
+   "chars": 980,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 47654,
+   "title": "Godplayer",
+   "chars": 746,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4003,
+   "title": "Siege of the Unseen",
+   "chars": 259,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 44521,
+   "title": "Gli indifferenti",
+   "chars": 251,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 1493,
+   "title": "De Slavernij: Vervolg en Sleutel op De Negerhut",
+   "chars": 1253,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 35667,
+   "title": "The 48 Laws of Power",
+   "chars": 547,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 27893,
+   "title": "Promise of the Witch King",
+   "chars": 499,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 40671,
+   "title": "The Gospel According to Mark",
+   "chars": 254,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 6651,
+   "title": "El audaz",
+   "chars": 1204,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 17034,
+   "title": "Leon en Juliette",
+   "chars": 258,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4587,
+   "title": "A oeste das minas : escravos, índios e homens livres numa fronteira oitocentista Triângulo Mineiro (1750-1861)",
+   "chars": 505,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 14472,
+   "title": "The Gladiator",
+   "chars": 305,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 4716,
+   "title": "Sociedade industrial no Brasil",
+   "chars": 797,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 42396,
+   "title": "The Complaint: or Night-Thoughts on Life, Death, & Immortality",
+   "chars": 977,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  },
+  {
+   "i": 19730,
+   "title": "Blood and Gold",
+   "chars": 410,
+   "bge_rank": 1,
+   "qwen_rank": 1
+  }
+ ]
+}

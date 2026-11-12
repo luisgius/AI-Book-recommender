@@ -1,0 +1,8 @@
+index size 50000 unique 50000
+ids == loader ids sorted: True
+raw dim (50000, 1024) nan 0 norm min/med/max 0.9999999 1.0 1.0000001
+duplicate vector groups 1
+duplicate text groups 1
+queries 168 dims {1024} norm min/max 0.99999994 1.0000001
+queries whose brute-force top10 != E2 run top10: 0 of 168
+top1/top10/median cosine (first 20 queries): [0.515 0.47  0.273]

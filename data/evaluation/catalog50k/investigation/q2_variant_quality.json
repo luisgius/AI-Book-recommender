@@ -1,0 +1,40 @@
+{
+ "z-ai/glm-5.3-flash": {
+  "match": {
+   "calls": 162,
+   "ndcg10_mean": 0.6789,
+   "judged10_mean": 1.0,
+   "latency_median_ms": 710.45
+  },
+  "other": {
+   "calls": 144,
+   "ndcg10_mean": 0.6804,
+   "judged10_mean": 0.975,
+   "latency_median_ms": 305.65
+  },
+  "paired_other_minus_match": {
+   "queries": 81,
+   "mean": -0.0074,
+   "abs_mean": 0.015
+  }
+ },
+ "minimax/minimax-m3.1-flash": {
+  "match": {
+   "calls": 162,
+   "ndcg10_mean": 0.6952,
+   "judged10_mean": 1.0,
+   "latency_median_ms": 710.45
+  },
+  "other": {
+   "calls": 144,
+   "ndcg10_mean": 0.6966,
+   "judged10_mean": 0.975,
+   "latency_median_ms": 305.65
+  },
+  "paired_other_minus_match": {
+   "queries": 81,
+   "mean": -0.0075,
+   "abs_mean": 0.0146
+  }
+ }
+}

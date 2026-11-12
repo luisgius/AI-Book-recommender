@@ -1,0 +1,165 @@
+{
+ "data": {
+  "id": "qwen/qwen3-embedding-8b",
+  "name": "Qwen: Qwen3 Embedding 8B",
+  "created": 1761680622,
+  "description": "The Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks. This series inherits the exceptional multilingual capabilities, long-text...",
+  "architecture": {
+   "tokenizer": "Other",
+   "instruct_type": null,
+   "modality": "text->embeddings",
+   "input_modalities": [
+    "text"
+   ],
+   "output_modalities": [
+    "embeddings"
+   ]
+  },
+  "endpoints": [
+   {
+    "name": "Nebius | qwen/qwen3-embedding-8b",
+    "model_id": "qwen/qwen3-embedding-8b",
+    "model_name": "Qwen: Qwen3 Embedding 8B",
+    "context_length": 40960,
+    "pricing": {
+     "prompt": "0.00000001",
+     "completion": "0",
+     "discount": 0
+    },
+    "provider_name": "Nebius",
+    "tag": "nebius/bf16",
+    "service_tier": null,
+    "quantization": "bf16",
+    "max_completion_tokens": 32000,
+    "max_prompt_tokens": null,
+    "supported_parameters": [],
+    "supports_tool_choice": {
+     "none": true,
+     "auto": true,
+     "required": true,
+     "function": true
+    },
+    "status": 0,
+    "uptime_last_30m": 100,
+    "uptime_last_5m": 100,
+    "uptime_last_1d": 100,
+    "supports_implicit_caching": false,
+    "native_tools": {},
+    "supports_voice_cloning": false,
+    "supports_multiple_audio_references": false,
+    "supports_image_reference": false,
+    "supports_diarization": false,
+    "latency_last_30m": null,
+    "throughput_last_30m": null,
+    "perf_last_30m_by_workload": {
+     "embeddings": {
+      "latency": {
+       "p50": 2330.5,
+       "p75": 4096,
+       "p90": 6662.700000000002,
+       "p99": 12244.18
+      },
+      "throughput": null,
+      "request_count": 114658
+     }
+    }
+   },
+   {
+    "name": "DeepInfra | qwen/qwen3-embedding-8b",
+    "model_id": "qwen/qwen3-embedding-8b",
+    "model_name": "Qwen: Qwen3 Embedding 8B",
+    "context_length": 32768,
+    "pricing": {
+     "prompt": "0.00000001",
+     "completion": "0",
+     "discount": 0
+    },
+    "provider_name": "DeepInfra",
+    "tag": "deepinfra/us",
+    "service_tier": null,
+    "quantization": "unknown",
+    "max_completion_tokens": 29491,
+    "max_prompt_tokens": null,
+    "supported_parameters": [],
+    "supports_tool_choice": {
+     "none": true,
+     "auto": true,
+     "required": true,
+     "function": true
+    },
+    "status": 0,
+    "uptime_last_30m": 100,
+    "uptime_last_5m": 100,
+    "uptime_last_1d": 99.79035639412997,
+    "supports_implicit_caching": false,
+    "native_tools": {},
+    "supports_voice_cloning": false,
+    "supports_multiple_audio_references": false,
+    "supports_image_reference": false,
+    "supports_diarization": false,
+    "latency_last_30m": null,
+    "throughput_last_30m": null,
+    "perf_last_30m_by_workload": {
+     "embeddings": {
+      "latency": {
+       "p50": 916.5,
+       "p75": 2014.25,
+       "p90": 4125.800000000001,
+       "p99": 9799.980000000003
+      },
+      "throughput": null,
+      "request_count": 87710
+     }
+    }
+   },
+   {
+    "name": "SiliconFlow | qwen/qwen3-embedding-8b",
+    "model_id": "qwen/qwen3-embedding-8b",
+    "model_name": "Qwen: Qwen3 Embedding 8B",
+    "context_length": 32768,
+    "pricing": {
+     "prompt": "0.00000004",
+     "completion": "0",
+     "discount": 0
+    },
+    "provider_name": "SiliconFlow",
+    "tag": "siliconflow/fp8",
+    "service_tier": null,
+    "quantization": "fp8",
+    "max_completion_tokens": 29491,
+    "max_prompt_tokens": null,
+    "supported_parameters": [],
+    "supports_tool_choice": {
+     "none": true,
+     "auto": true,
+     "required": true,
+     "function": true
+    },
+    "status": 0,
+    "uptime_last_30m": 100,
+    "uptime_last_5m": 100,
+    "uptime_last_1d": 91.73611111111111,
+    "supports_implicit_caching": false,
+    "native_tools": {},
+    "supports_voice_cloning": false,
+    "supports_multiple_audio_references": false,
+    "supports_image_reference": false,
+    "supports_diarization": false,
+    "latency_last_30m": null,
+    "throughput_last_30m": null,
+    "perf_last_30m_by_workload": {
+     "embeddings": {
+      "latency": {
+       "p50": 920.5,
+       "p75": 2791.75,
+       "p90": 5334.100000000005,
+       "p99": 10318.250000000018
+      },
+      "throughput": null,
+      "request_count": 12311
+     }
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "data": {
+  "id": "baai/bge-m3",
+  "name": "BAAI: bge-m3",
+  "created": 1763424372,
+  "description": "The bge-m3 embedding model encodes sentences, paragraphs, and long documents into a 1024-dimensional dense vector space, delivering high-quality semantic embeddings optimized for multilingual retrieval, semantic search, and large-context applications.",
+  "architecture": {
+   "tokenizer": "Other",
+   "instruct_type": null,
+   "modality": "text->embeddings",
+   "input_modalities": [
+    "text"
+   ],
+   "output_modalities": [
+    "embeddings"
+   ]
+  },
+  "endpoints": [
+   {
+    "name": "Parasail | baai/bge-m3-20251117",
+    "model_id": "baai/bge-m3",
+    "model_name": "BAAI: bge-m3",
+    "context_length": 8194,
+    "pricing": {
+     "prompt": "0.00000001",
+     "completion": "0",
+     "discount": 0
+    },
+    "provider_name": "Parasail",
+    "tag": "parasail",
+    "service_tier": null,
+    "quantization": "unknown",
+    "max_completion_tokens": 7374,
+    "max_prompt_tokens": null,
+    "supported_parameters": [],
+    "supports_tool_choice": {
+     "none": true,
+     "auto": true,
+     "required": true,
+     "function": true
+    },
+    "status": 0,
+    "uptime_last_30m": 100,
+    "uptime_last_5m": 100,
+    "uptime_last_1d": 100,
+    "supports_implicit_caching": false,
+    "native_tools": {},
+    "supports_voice_cloning": false,
+    "supports_multiple_audio_references": false,
+    "supports_image_reference": false,
+    "supports_diarization": false,
+    "latency_last_30m": null,
+    "throughput_last_30m": null,
+    "perf_last_30m_by_workload": {
+     "embeddings": {
+      "latency": {
+       "p50": 468,
+       "p75": 905.25,
+       "p90": 1857.7000000000016,
+       "p99": 10068.620000000003
+      },
+      "throughput": null,
+      "request_count": 37633
+     }
+    }
+   },
+   {
+    "name": "DeepInfra | baai/bge-m3-20251117",
+    "model_id": "baai/bge-m3",
+    "model_name": "BAAI: bge-m3",
+    "context_length": 8192,
+    "pricing": {
+     "prompt": "0.00000001",
+     "completion": "0",
+     "discount": 0
+    },
+    "provider_name": "DeepInfra",
+    "tag": "deepinfra/fp32",
+    "service_tier": null,
+    "quantization": "fp32",
+    "max_completion_tokens": 7372,
+    "max_prompt_tokens": null,
+    "supported_parameters": [],
+    "supports_tool_choice": {
+     "none": true,
+     "auto": true,
+     "required": true,
+     "function": true
+    },
+    "status": 0,
+    "uptime_last_30m": 100,
+    "uptime_last_5m": 100,
+    "uptime_last_1d": 100,
+    "supports_implicit_caching": false,
+    "native_tools": {},
+    "supports_voice_cloning": false,
+    "supports_multiple_audio_references": false,
+    "supports_image_reference": false,
+    "supports_diarization": false,
+    "latency_last_30m": null,
+    "throughput_last_30m": null,
+    "perf_last_30m_by_workload": {
+     "embeddings": {
+      "latency": {
+       "p50": 314,
+       "p75": 525,
+       "p90": 840.9000000000005,
+       "p99": 3305.630000000001
+      },
+      "throughput": null,
+      "request_count": 30282
+     }
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,5 @@
+# regenerable, large: dump_texts.py and fetch_pool_qwen_vectors.py
+work_texts.jsonl
+pool_qwen_doc_vectors.npy
+pool_qwen_doc_vectors.ids.json
+__pycache__/

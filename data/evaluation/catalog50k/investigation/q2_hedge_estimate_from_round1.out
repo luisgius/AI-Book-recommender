@@ -1,0 +1,5 @@
+slots 180
+A0 (deepinfra) fails 22
+A0 and A1 (deepinfra and nebius) both fail 6
+A0, A1, A2 all fail 1
+episode window 13:54-14:08 slots 62 A0 fails 20 A0&A1 fail 5 A0&A1&A2 1

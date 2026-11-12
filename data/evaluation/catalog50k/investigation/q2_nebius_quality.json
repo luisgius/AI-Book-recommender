@@ -1,0 +1,34 @@
+{
+ "A1|z-ai/glm-5.3-flash": {
+  "queries": 60,
+  "AB_queries": 39,
+  "ndcg10_arm_AB": 0.6889,
+  "ndcg10_E1_same_queries_AB": 0.6819,
+  "judged10_arm": 0.985,
+  "top10_overlap_with_E1": 0.952
+ },
+ "A2|z-ai/glm-5.3-flash": {
+  "queries": 60,
+  "AB_queries": 39,
+  "ndcg10_arm_AB": 0.6822,
+  "ndcg10_E1_same_queries_AB": 0.6819,
+  "judged10_arm": 0.985,
+  "top10_overlap_with_E1": 0.953
+ },
+ "A1|minimax/minimax-m3.1-flash": {
+  "queries": 60,
+  "AB_queries": 39,
+  "ndcg10_arm_AB": 0.6943,
+  "ndcg10_E1_same_queries_AB": 0.6901,
+  "judged10_arm": 0.985,
+  "top10_overlap_with_E1": 0.952
+ },
+ "A2|minimax/minimax-m3.1-flash": {
+  "queries": 60,
+  "AB_queries": 39,
+  "ndcg10_arm_AB": 0.6878,
+  "ndcg10_E1_same_queries_AB": 0.6901,
+  "judged10_arm": 0.985,
+  "top10_overlap_with_E1": 0.953
+ }
+}
