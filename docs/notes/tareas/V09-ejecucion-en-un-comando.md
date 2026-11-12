@@ -137,6 +137,10 @@ make clean                    # borra lo que creó make
 - Los tests nuevos de esta tarea: `pytest tests/api/test_without_api_key.py tests/api/test_search_api.py tests/api/test_ui.py tests/api/test_agent_api.py`.
 - Para activar el LLM, copiar `.env.example` a `.env` y poner `OPENROUTER_API_KEY`. La clave no se versiona.
 
+## Actualización: `make demo` y el LLM
+
+El mismo día se comprobó que `make demo` arrancaba con el LLM activado en un equipo cuyo `.env` tuviera una clave de OpenRouter, en contra de lo que dice esta nota. Desde el commit `4be8a66`, `make demo` se ejecuta sin LLM en cualquier equipo y `make demo LLM=on` lo activa. El detalle está en `V19-interfaz-web-y-chat.md`.
+
 ## Actualización: corrección de los problemas de reproducibilidad
 
 Los cinco problemas de la sección de límites se corrigieron el 2026-11-12 en el commit `99a941c`. Esta sección recoge qué se halló y qué resultó de cada uno.
