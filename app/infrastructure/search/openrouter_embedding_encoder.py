@@ -499,7 +499,12 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
         One usage record per request sent. The winner carries OpenRouter's
         tokens and cost; a failed or cancelled request has no usage in any
         answer, so it is recorded as an error without cost ("cancelled" for
-        the loser of a race).
+        the loser of a race). Cancelling does not reliably stop the charge:
+        in a live run of 300 hedged searches (2026-11-12) the key's usage
+        counter rose by 0.000214 USD against 0.000197 USD reported in the
+        answers, about what the 64 cancelled requests would cost. The
+        recorded cost can therefore be low by up to one embedding request per
+        cancelled leg (about 3e-7 USD each for a query).
         """
         for leg in legs:
             if not leg.sent or leg.error == NOT_SENT:
