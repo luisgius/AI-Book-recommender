@@ -18,13 +18,17 @@ const LICENSE_URLS = {
   "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
   "CC0 1.0": "https://creativecommons.org/publicdomain/zero/1.0/",
 };
-// Notices the API returns when a daily budget of the public demo is spent.
+// Notices the API returns when a daily budget of the public demo is spent,
+// or when the request asked for the LLM and this server has none.
 const NOTICE_TEXT = {
   search_budget_spent: "Se ha alcanzado el límite diario de búsquedas con modelos de esta demostración: "
     + "hasta las 00:00 UTC la búsqueda usa solo BM25, sin embeddings ni reordenación.",
   llm_budget_spent: "Se ha alcanzado el límite diario de peticiones al LLM de esta demostración: "
     + "hasta las 00:00 UTC no hay interpretación de la consulta ni explicaciones.",
+  llm_unavailable: "Este servidor no tiene un LLM configurado (falta OPENROUTER_API_KEY): "
+    + "la búsqueda funciona, pero sin interpretación de la consulta ni explicaciones.",
 };
+const NO_LLM_TITLE = "Sin LLM en este servidor: define OPENROUTER_API_KEY (ver .env.example)";
 
 function setStatus(text, isError = false) {
   const el = $("status");
@@ -243,7 +247,7 @@ async function loadHealth() {
     if (!health.llm.configured) {
       for (const id of ["use-understanding", "use-explanations"]) {
         $(id).disabled = true;
-        $(id).parentElement.title = "No hay LLM configurado (LLM_PROVIDER)";
+        $(id).parentElement.title = NO_LLM_TITLE;
       }
     }
   } catch (error) {

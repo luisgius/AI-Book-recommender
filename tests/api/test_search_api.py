@@ -141,6 +141,18 @@ def test_understanding_without_llm_degrades_to_default_intent(client_with):
     assert response.status_code == 200
     assert body["query_intent"]["confidence"] == 0.0
     assert body["results"]
+    assert body["notices"] == ["llm_unavailable"]
+
+
+def test_explanations_without_llm_return_results_and_say_why(client_with):
+    client = client_with(llm=None)
+
+    response = client.post("/api/v1/search", json={"text": "python", "use_explanations": True})
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["results"] and all(r["explanation"] is None for r in body["results"])
+    assert body["notices"] == ["llm_unavailable"]
 
 
 def test_plain_search_has_no_query_intent(client_with):

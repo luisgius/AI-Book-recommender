@@ -225,8 +225,10 @@ class SearchResponse(BaseModel):
         default_factory=list,
         description=(
             "Codes of steps skipped for this request: 'search_budget_spent' (the day's budget of "
-            "model-backed searches is spent: lexical search without re-ranking) and "
-            "'llm_budget_spent' (the day's LLM budget is spent: no understanding or explanations)"
+            "model-backed searches is spent: lexical search without re-ranking), "
+            "'llm_budget_spent' (the day's LLM budget is spent: no understanding or explanations) and "
+            "'llm_unavailable' (understanding or explanations were asked for but this server has no "
+            "LLM configured, e.g. no OPENROUTER_API_KEY: plain search)"
         ),
     )
 

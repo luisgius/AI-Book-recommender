@@ -1,4 +1,10 @@
-FROM python:3.12-slim
+# Container of the local profile with the shipped indexes (data/indexes:
+# all-MiniLM-L6-v2 embeddings, BM25 without the normalizing tokenizer) and no
+# re-ranking: the light configuration, not the evaluated one that `make demo`
+# builds (multilingual-e5-large-instruct + bge-reranker-v2-m3). Without
+# OPENROUTER_API_KEY (docker run -e ...) the LLM is off and search still works.
+# The embedding model is downloaded at the first request (about 90 MB).
+FROM python:3.13-slim
 
 # Install OS dependencies needed for C extensions and healthcheck
 RUN apt-get update \
@@ -11,9 +17,12 @@ RUN groupadd --gid 1000 appuser \
 
 WORKDIR /app
 
-# Layer caching: install Python deps first (changes rarely)
+# Layer caching: install Python deps first (changes rarely). The CPU-only torch
+# goes first: PyPI's Linux torch bundles several GB of CUDA libraries.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir "$(grep -E '^torch==' requirements.txt)" \
+        --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code (changes frequently)
 COPY app/ ./app/
@@ -28,11 +37,9 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
-# Environment variables
+# Environment variables (paths read by app/api/v1/dependencies.py)
 ENV DB_PATH=data/catalog.db \
     INDEXES_DIR=data/indexes \
-    LOG_LEVEL=INFO \
-    ENVIRONMENT=production \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 

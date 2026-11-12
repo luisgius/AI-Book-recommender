@@ -25,6 +25,8 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
 - [x] **V13** Integración del perfil nube (sin modelos en el proceso, embeddings por API en Postgres) y corrección del relleno de BM25
 - [x] **V17** Despliegue público: catálogo de 30.000 obras en Neon y backend en Vercel, con límites de gasto
+- [x] **V18** Ampliación del catálogo desplegado de 30.000 a 50.000 obras en el plan gratuito de Neon, con carga sin filas muertas
+- [x] **V09** Ejecución en un comando (`make demo`, `make test`, `make eval`), README para el tribunal, CI y arranque sin clave de API
 
 ## En curso
 
@@ -32,7 +34,6 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 ## Pendientes
 
 - [ ] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
-- [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI) y URL pública
 
 ## Aplazadas (con motivo)
 

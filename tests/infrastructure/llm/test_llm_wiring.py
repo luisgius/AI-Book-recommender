@@ -39,8 +39,8 @@ def build_client(**kwargs):
 
 
 class TestLLMSettings:
-    def test_defaults_target_local_ollama(self):
-        settings = LLMSettings.from_env({})
+    def test_ollama_defaults_when_named(self):
+        settings = LLMSettings.from_env({"LLM_PROVIDER": "ollama"})
         assert settings.provider == "ollama"
         assert settings.base_url == DEFAULT_OLLAMA_URL
         assert settings.reasoning is False
@@ -48,6 +48,24 @@ class TestLLMSettings:
         assert settings.max_explanations == 3
         assert (settings.max_tokens, settings.timeout_s) == (1024, 180.0)
         assert settings.enabled
+
+    @pytest.mark.parametrize("env", [{}, {"LLM_PROVIDER": ""}, {"OPENROUTER_API_KEY": "  "}])
+    def test_without_provider_or_key_the_llm_is_off(self, env):
+        """A fresh clone with no .env runs plain search: no key, no model server."""
+        settings = LLMSettings.from_env(env)
+        assert settings.provider == "none"
+        assert not settings.enabled
+
+    def test_without_provider_an_openrouter_key_selects_openrouter(self):
+        settings = LLMSettings.from_env({"OPENROUTER_API_KEY": "k-1"})
+        assert (settings.provider, settings.model) == ("openrouter", "deepseek/deepseek-v4.1-flash")
+        assert settings.enabled
+
+    def test_named_provider_wins_over_the_key(self):
+        env = {"LLM_PROVIDER": "none", "OPENROUTER_API_KEY": "k-1"}
+        assert LLMSettings.from_env(env).provider == "none"
+        env = {"LLM_PROVIDER": "ollama", "OPENROUTER_API_KEY": "k-1"}
+        assert LLMSettings.from_env(env).provider == "ollama"
 
     def test_hosted_provider_has_no_ollama_options(self):
         settings = LLMSettings.from_env({"LLM_PROVIDER": "openai"})

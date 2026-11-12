@@ -6,8 +6,10 @@ Kept as small frozen dataclasses (no framework) so the composition root can
 build the adapters from them and tests can construct them directly.
 
 LLM environment variables (all optional):
-    LLM_PROVIDER          "ollama" (default), "openrouter", "openai", "anthropic"
-                          or "none"
+    LLM_PROVIDER          "openrouter", "ollama", "openai", "anthropic" or "none".
+                          Unset: "openrouter" when OPENROUTER_API_KEY is set,
+                          otherwise "none" (no LLM: plain hybrid search, so the
+                          application runs without any key or model server)
     LLM_MODEL             model id; default depends on the provider
     LLM_BASE_URL          server URL (default http://127.0.0.1:11434 for Ollama,
                           https://openrouter.ai/api/v1 for OpenRouter)
@@ -181,6 +183,20 @@ def parse_reasoning(raw: str) -> Reasoning:
     return None
 
 
+def default_llm_provider(env: Mapping[str, str]) -> str:
+    """
+    The LLM provider used when LLM_PROVIDER is unset or empty.
+
+    The project's system LLM is a hosted model reached through OpenRouter
+    (author's decision of 2026-11-11), so with an OpenRouter key the LLM is
+    on. Without a key it is off ("none"): search works with no account, key
+    or model server, and the API says that understanding and explanations
+    are unavailable. Ollama and the other providers are used only when
+    LLM_PROVIDER names them.
+    """
+    return "openrouter" if env.get(OPENROUTER_API_KEY_VAR, "").strip() else "none"
+
+
 def _check_reasoning(reasoning: Reasoning, variable: str) -> None:
     if isinstance(reasoning, str) and reasoning not in REASONING_EFFORTS:
         raise ValueError(
@@ -211,7 +227,13 @@ def openrouter_api_key(env: Optional[Mapping[str, str]] = None) -> str:
 
 @dataclass(frozen=True)
 class LLMSettings:
-    """Settings needed to build the LLM client."""
+    """
+    Settings needed to build the LLM client.
+
+    The field defaults describe a local Ollama server when the class is built
+    directly (as tests do); from_env chooses the provider as the module
+    docstring says (unset LLM_PROVIDER: OpenRouter with a key, otherwise none).
+    """
 
     provider: str = "ollama"
     model: str = DEFAULT_MODELS["ollama"]
@@ -248,7 +270,7 @@ class LLMSettings:
     def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "LLMSettings":
         """Build settings from environment variables (see module docstring)."""
         env = os.environ if env is None else env
-        provider = env.get("LLM_PROVIDER", "ollama").strip().lower()
+        provider = env.get("LLM_PROVIDER", "").strip().lower() or default_llm_provider(env)
         is_ollama = provider == "ollama"
 
         reasoning_raw = env.get(
@@ -303,8 +325,9 @@ class JudgeSettings:
     def __post_init__(self) -> None:
         if self.provider not in SUPPORTED_PROVIDERS or self.provider == "none":
             raise ValueError(
-                "The relevance judge needs an LLM: JUDGE_PROVIDER (or LLM_PROVIDER) must be one of "
-                f"{tuple(p for p in SUPPORTED_PROVIDERS if p != 'none')}, got '{self.provider}'"
+                f"The relevance judge needs an LLM: set {OPENROUTER_API_KEY_VAR}, or set JUDGE_PROVIDER "
+                f"(or LLM_PROVIDER) to one of {tuple(p for p in SUPPORTED_PROVIDERS if p != 'none')}, "
+                f"got '{self.provider}'"
             )
         if not self.model.strip():
             raise ValueError("JUDGE_MODEL must not be empty")

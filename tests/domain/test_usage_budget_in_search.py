@@ -4,7 +4,8 @@ The daily budget of paid model calls inside SearchService (V17).
 With a UsageBudget wired, each search takes one model-search unit (without
 it: lexical-only, no re-ranking, no embedding call) and each request that
 uses the LLM takes one LLM unit (without it: no understanding, no
-explanations, a notice). Fakes only: no network, no database.
+explanations, a notice). Without an LLM at all, a request for the LLM gets
+its own notice. Fakes only: no network, no database.
 """
 
 from datetime import UTC, datetime
@@ -15,6 +16,7 @@ from app.domain.entities import Book, Explanation, SearchResult
 from app.domain.ports import BUDGET_LLM_REQUEST, BUDGET_MODEL_SEARCH
 from app.domain.services import (
     NOTICE_LLM_BUDGET,
+    NOTICE_LLM_UNAVAILABLE,
     NOTICE_SEARCH_BUDGET,
     SEARCH_BUDGET_REASON,
     SearchService,
@@ -220,6 +222,31 @@ def test_without_a_budget_nothing_changes():
     response = svc.search_with_fallback(SearchQuery(text="sea", max_results=3))
 
     assert response.search_mode == "hybrid" and response.notices == () and not response.degraded
+
+
+def test_explanations_without_an_llm_return_results_and_a_notice():
+    """No LLM configured (no key): the search works and says why there are no explanations."""
+    svc = service(None)
+
+    response = svc.search_with_fallback(SearchQuery(text="poems", max_results=2, use_explanations=True))
+
+    assert response.search_mode == "hybrid" and len(response.results) == 2
+    assert all(r.explanation is None for r in response.results)
+    assert response.notices == (NOTICE_LLM_UNAVAILABLE,)
+
+
+def test_a_plain_search_without_an_llm_has_no_notice():
+    response = service(None).search_with_fallback(SearchQuery(text="poems", max_results=2))
+
+    assert response.notices == ()
+
+
+def test_understanding_without_an_llm_falls_back_with_a_notice():
+    response, intent = service(None).search_with_understanding("dragons", max_results=2, use_explanations=True)
+
+    assert response.results and all(r.explanation is None for r in response.results)
+    assert response.notices == (NOTICE_LLM_UNAVAILABLE,)
+    assert intent.confidence == 0.0 and "not available" in intent.reasoning
 
 
 def test_stage_timings_are_reported():

@@ -47,3 +47,9 @@ def test_ui_attributes_sources_and_shows_budget_notices():
     assert 'class="attribution"' in page and 'id="about"' in page and 'id="notice"' in page
     assert "renderAttribution(book)" in script and "attribution_url" in script
     assert "search_budget_spent" in script and "llm_budget_spent" in script
+
+
+def test_ui_explains_a_server_without_llm():
+    """Without an LLM the UI names the missing key (notice and disabled LLM options)."""
+    script = (Path(UI_DIR) / "app.js").read_text(encoding="utf-8")
+    assert "llm_unavailable" in script and "OPENROUTER_API_KEY" in script

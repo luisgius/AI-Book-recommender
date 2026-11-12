@@ -63,7 +63,7 @@ class TestOpenRouterSettings:
         assert settings.reasoning == "low"
 
     def test_ollama_defaults_are_unchanged(self):
-        settings = LLMSettings.from_env({})
+        settings = LLMSettings.from_env({"LLM_PROVIDER": "ollama"})
         assert (settings.provider, settings.model, settings.base_url) == (
             "ollama", "qwen3.8:27b-mlx", DEFAULT_OLLAMA_URL,
         )
@@ -93,7 +93,7 @@ class TestOpenRouterJudgeSettings:
         assert not settings.same_as_system_llm
 
     def test_openrouter_judge_for_a_local_system_llm(self):
-        settings = JudgeSettings.from_env({"JUDGE_PROVIDER": "openrouter"})
+        settings = JudgeSettings.from_env({"JUDGE_PROVIDER": "openrouter", "LLM_PROVIDER": "ollama"})
         assert (settings.model, settings.base_url, settings.num_ctx) == (
             "z-ai/glm-5.3-flash", DEFAULT_OPENROUTER_URL, None,
         )
@@ -116,7 +116,7 @@ class TestOpenRouterJudgeSettings:
         assert settings.base_url == "http://proxy:1/v1"
 
     def test_ollama_judge_is_unchanged(self):
-        settings = JudgeSettings.from_env({})
+        settings = JudgeSettings.from_env({"LLM_PROVIDER": "ollama"})
         assert (settings.model, settings.reasoning) == ("qwen3.8:27b-mlx", False)
 
 

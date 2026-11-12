@@ -47,6 +47,8 @@ data/indices/*.pkl
 data/indices/*.faiss
 data/indices/*.index
 data/indexes_ablation/
+# Indexes built by `make demo` (Makefile)
+data/indexes_demo/
 
 # Jupyter
 .ipynb_checkpoints/

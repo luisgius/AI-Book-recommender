@@ -316,8 +316,10 @@ def get_llm_client() -> Optional[LLMClient]:
     """
     Provide the LLM client, or None when the LLM is disabled or cannot be built.
 
-    The LLM is optional: if LLM_PROVIDER=none or the client fails to
-    initialise, the API keeps serving plain hybrid search and logs why.
+    The LLM is optional: if it is off (LLM_PROVIDER=none, or LLM_PROVIDER
+    unset and no OPENROUTER_API_KEY) or the client fails to initialise, the
+    API keeps serving plain hybrid search and logs why; requests that ask
+    for understanding or explanations get the notice "llm_unavailable".
     The catalog categories are passed so filters extracted from queries are
     validated against real categories; they come from one aggregate query
     of the catalog (get_categories), not from reading every book.
@@ -329,7 +331,10 @@ def get_llm_client() -> Optional[LLMClient]:
 
     settings = get_llm_settings()
     if not settings.enabled:
-        logger.info("LLM disabled (LLM_PROVIDER=none): understanding and explanations off")
+        logger.info(
+            "LLM off (LLM_PROVIDER=none, or unset without OPENROUTER_API_KEY): search works; "
+            "query understanding, explanations and the agent are unavailable"
+        )
         return None
 
     try:

@@ -179,18 +179,30 @@ class TestLangChainRelevanceJudge:
 
 class TestJudgeSettings:
     def test_defaults_fall_back_to_the_system_llm(self):
-        settings = JudgeSettings.from_env({})
+        settings = JudgeSettings.from_env({"LLM_PROVIDER": "ollama"})
         assert (settings.provider, settings.model) == ("ollama", "qwen3.8:27b-mlx")
         assert settings.base_url == "http://127.0.0.1:11434" and settings.num_ctx == 8192
         assert settings.temperature == 0.0 and settings.reasoning is False
         assert settings.same_as_system_llm
 
     def test_each_value_falls_back_to_its_llm_variable(self):
-        settings = JudgeSettings.from_env({"LLM_MODEL": "m1", "LLM_BASE_URL": "http://h:1", "LLM_TIMEOUT_S": "30"})
+        settings = JudgeSettings.from_env({
+            "LLM_PROVIDER": "ollama", "LLM_MODEL": "m1", "LLM_BASE_URL": "http://h:1", "LLM_TIMEOUT_S": "30",
+        })
         assert (settings.model, settings.base_url, settings.timeout_s) == ("m1", "http://h:1", 30.0)
 
+    def test_without_any_llm_setting_the_judge_asks_for_a_key(self):
+        with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
+            JudgeSettings.from_env({})
+
+    def test_an_openrouter_key_alone_gives_the_default_openrouter_judge(self):
+        settings = JudgeSettings.from_env({"OPENROUTER_API_KEY": "k-1"})
+        assert (settings.provider, settings.model) == ("openrouter", "z-ai/glm-5.3-flash")
+
     def test_judge_variables_override(self):
-        settings = JudgeSettings.from_env({"JUDGE_MODEL": "other:7b", "JUDGE_BASE_URL": "http://judge:2"})
+        settings = JudgeSettings.from_env({
+            "LLM_PROVIDER": "ollama", "JUDGE_MODEL": "other:7b", "JUDGE_BASE_URL": "http://judge:2",
+        })
         assert (settings.provider, settings.model, settings.base_url) == ("ollama", "other:7b", "http://judge:2")
         assert not settings.same_as_system_llm
         assert settings.system_llm == "ollama/qwen3.8:27b-mlx"

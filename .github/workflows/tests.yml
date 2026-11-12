@@ -1,0 +1,38 @@
+# Runs the test suite on every push and pull request, with the same command an
+# examiner uses locally (make test: creates .venv, installs requirements.txt,
+# runs pytest). One Python version: 3.13, the one the project is developed with.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          # pip's download cache, keyed on requirements.txt
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      # About 60 tests load the small embedding model of the shipped index
+      # (sentence-transformers/all-MiniLM-L6-v2, 90 MB). Keeping the Hugging
+      # Face cache between runs avoids downloading it every time.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/huggingface
+          key: huggingface-all-MiniLM-L6-v2
+
+      # On Linux the Makefile installs the CPU-only build of torch first
+      # (PyPI's Linux build bundles several GB of CUDA libraries).
+      - name: Run the tests
+        run: make test

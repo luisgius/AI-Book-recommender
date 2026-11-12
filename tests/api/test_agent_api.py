@@ -48,9 +48,14 @@ def test_returns_answer_recommendations_and_trace(client):
     assert body["dropped_recommendations"] == 1
 
 
-def test_without_llm_returns_503(client):
+def test_without_llm_returns_503_with_how_to_enable_it(client):
     app.dependency_overrides[deps.get_search_agent] = lambda: None
-    assert client.post("/api/v1/agent/ask", json={"question": "a war novel"}).status_code == 503
+
+    response = client.post("/api/v1/agent/ask", json={"question": "a war novel"})
+
+    assert response.status_code == 503
+    assert "OPENROUTER_API_KEY" in response.json()["detail"]
+    assert "Plain search still works" in response.json()["detail"]
 
 
 def test_unreachable_llm_returns_503(client):

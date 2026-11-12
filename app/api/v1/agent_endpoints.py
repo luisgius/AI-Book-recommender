@@ -22,6 +22,11 @@ AGENT_BUDGET_MESSAGE = (
     "available until 00:00 UTC. Plain search still works."
 )
 
+AGENT_NO_LLM_MESSAGE = (
+    "The agent needs an LLM and none is configured on this server (set OPENROUTER_API_KEY, "
+    "see .env.example). Plain search still works."
+)
+
 
 def require_llm_allowance(http_request: Request) -> None:
     """
@@ -61,10 +66,7 @@ def ask_agent(
         503: No LLM is configured or it cannot be reached
     """
     if agent is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Agentic search needs an LLM (set LLM_PROVIDER and start the model server)",
-        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=AGENT_NO_LLM_MESSAGE)
     start = time.time()
     try:
         result = agent.answer(request.question)

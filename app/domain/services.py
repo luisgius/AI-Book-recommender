@@ -45,6 +45,10 @@ SEARCH_BUDGET_REASON = (
 )
 LLM_BUDGET_REASON = "The day's budget of LLM requests is spent until 00:00 UTC"
 
+# Notice returned when a request asks for query understanding or explanations
+# and no LLM is configured: the search runs without them.
+NOTICE_LLM_UNAVAILABLE = "llm_unavailable"
+
 
 def _elapsed_ms(started: float) -> float:
     """Milliseconds since `started` (a time.perf_counter() value), rounded."""
@@ -198,9 +202,12 @@ class SearchService:
         (when none is left it runs lexical-only without re-ranking, degraded
         with SEARCH_BUDGET_REASON) and a request for explanations takes one
         LLM unit (when none is left the results come without explanations
-        and NOTICE_LLM_BUDGET is returned).
+        and NOTICE_LLM_BUDGET is returned). Explanations asked for without a
+        configured LLM are skipped with NOTICE_LLM_UNAVAILABLE.
         """
         notices: List[str] = []
+        if query.use_explanations and self._llm_client is None:
+            notices.append(NOTICE_LLM_UNAVAILABLE)
         if query.use_explanations and self._llm_client is not None and not self._spend(BUDGET_LLM_REQUEST):
             query = replace(query, use_explanations=False)
             notices.append(NOTICE_LLM_BUDGET)
@@ -368,6 +375,8 @@ class SearchService:
         # Daily budget (V17): one LLM unit for the whole request (understanding
         # and explanations), one model-search unit for the retrieval.
         notices: List[str] = []
+        if self._llm_client is None:
+            notices.append(NOTICE_LLM_UNAVAILABLE)
         llm_allowed = self._llm_client is not None and self._spend(BUDGET_LLM_REQUEST)
         if self._llm_client is not None and not llm_allowed:
             notices.append(NOTICE_LLM_BUDGET)
