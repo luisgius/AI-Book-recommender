@@ -9,6 +9,9 @@ Load a SQLite catalog of this project into a Postgres schema (cloud profile, V12
     python -m scripts.load_postgres --schema eval177 --migrate-only   # schema only
     python -m scripts.load_postgres --schema eval177 --report         # sizes only
     python -m scripts.load_postgres --schema eval177 --drop           # delete the schema
+    SEARCH_PROFILE=cloud python -m scripts.load_postgres --from data/catalog_deploy/catalog.db \\
+        --schema catalog_deploy --no-gin --no-text-bodies --limit 10000 --max-database-mib 800
+        # the deployed catalog (V17): smaller footprint, loaded in stages under a size guard
 
 Uses the direct connection string (DATABASE_URL_UNPOOLED, falling back to
 DATABASE_URL), as Neon recommends for migrations, bulk loads and index
@@ -44,6 +47,7 @@ The source SQLite file is opened read-only.
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import json
 import sqlite3
 import sys
@@ -216,6 +220,59 @@ def _fmt_bytes(value: Optional[int]) -> str:
     return "n/a" if value is None else f"{value / 1024 / 1024:.2f} MiB"
 
 
+def encode_texts(encoder: Any, texts: List[str], batch: int, workers: int = 1) -> List[List[float]]:
+    """
+    Vectors of `texts` in input order, `batch` texts per encoder call.
+
+    With workers > 1 the calls run in a thread pool (for an API encoder the
+    time is spent waiting for the provider, so a few requests at once load
+    a large catalog several times faster; the order of the vectors is kept).
+    """
+    batches = [texts[j:j + batch] for j in range(0, len(texts), batch)]
+    if workers <= 1 or len(batches) <= 1:
+        parts = [encoder.generate_embeddings_batch(part) for part in batches]
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            parts = list(pool.map(encoder.generate_embeddings_batch, batches))
+    return [vector for part in parts for vector in part]
+
+
+def database_size(db: PostgresDatabase) -> int:
+    """pg_database_size of the current database, in bytes (what Neon's storage limit counts)."""
+    return int(db.query("SELECT pg_database_size(current_database()) AS size")[0]["size"])
+
+
+def catalog_contents_summary(source: Path) -> Optional[Dict[str, Any]]:
+    """
+    What a catalog holds, from the report written next to it by
+    `python -m scripts.build_catalog report` (None when there is no report):
+    works by language and by source, description languages and licences, and
+    the licence and attribution of each source, plus the selection rule when
+    the catalog is a selection. Recorded in catalog_info by the loader.
+    """
+    path = source.parent / "catalog_report.json"
+    if not path.is_file():
+        return None
+    report = json.loads(path.read_text(encoding="utf-8"))
+    descriptions = report.get("description_language", {})
+    summary: Dict[str, Any] = {
+        "report": str(path),
+        "total_works": report.get("total_works"),
+        "work_language": report.get("work_language", {}).get("distribution"),
+        "works_by_source_combination": report.get("works_by_source_combination"),
+        "works_with_source": {s["source"]: s.get("works_with_this_source") for s in report.get("sources", [])},
+        "works_with_a_description_in": descriptions.get("works_with_a_description_in"),
+        "primary_description_language": descriptions.get("primary_description_language"),
+        "descriptions_by_source": descriptions.get("descriptions_by_source"),
+        "descriptions_by_license": descriptions.get("descriptions_by_license"),
+        "source_licenses": {s["source"]: s.get("license") for s in report.get("sources", [])},
+    }
+    selection = report.get("selection")
+    if selection:
+        summary["selection"] = {key: selection.get(key) for key in ("size", "rule", "quotas", "source_catalog")}
+    return summary
+
+
 def print_report(db: PostgresDatabase, schema: str, log: Callable[[str], None] = _log) -> Dict[str, Any]:
     """Row counts and sizes per table and index; returns them."""
     sizes = relation_sizes(db, schema)
@@ -245,6 +302,12 @@ def load(
     upsert_batch: int = UPSERT_BATCH,
     embed_batch: int = EMBED_BATCH,
     log: Callable[[str], None] = _log,
+    gin_index: bool = True,
+    store_text_bodies: bool = True,
+    limit: Optional[int] = None,
+    embed_workers: int = 1,
+    max_database_bytes: Optional[int] = None,
+    catalog_contents: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Run the load steps (see the module docstring); returns what was done.
@@ -256,16 +319,51 @@ def load(
             its get_model_name() is the identity, its get_dimension() the
             halfvec dimension
 
+    Footprint and staging options (V17, the deployed catalog):
+        gin_index: build the GIN index (used only by the ts_rank_cd
+            comparison ranking); False drops it
+        store_text_bodies: keep the description texts in work_texts.body
+            (False keeps only their tsvectors; see PostgresBookCatalogRepository)
+        limit: load only the first `limit` works of the source by id, so a
+            catalog can be loaded in stages (each stage contains the previous
+            one, and stored vectors are kept)
+        max_database_bytes: stop with an error as soon as pg_database_size
+            exceeds this, checked after every write batch and after the
+            indexes, so a load stops before the plan's storage limit
+        catalog_contents: what the catalog holds (counts, licences), recorded
+            in catalog_info under "catalog_contents"
+        embed_workers: embedding requests sent at the same time (API encoder)
+
     Raises:
         ValueError: If the schema holds vectors of another encoder identity
             or dimension, or both or neither of embedding_model and encoder are given
+        RuntimeError: If the database grows past max_database_bytes
     """
     if (embedding_model is None) == (encoder is None):
         raise ValueError("Give either embedding_model (local model) or encoder")
+    if limit is not None and limit < 1:
+        raise ValueError(f"limit must be >= 1, got {limit}")
     started = time.perf_counter()
     catalog = ReadOnlySqliteCatalog(source)
     source_ids = catalog.all_ids()
-    log(f"Source {source}: {len(source_ids)} books")
+    if limit is not None and limit < len(source_ids):
+        log(f"Source {source}: {len(source_ids)} books; this stage loads the first {limit} by id")
+        source_ids = source_ids[:limit]
+    else:
+        log(f"Source {source}: {len(source_ids)} books")
+    in_stage = set(source_ids)
+    size_log: List[Dict[str, Any]] = []
+
+    def check_size(step: str) -> int:
+        """pg_database_size now; raises when over max_database_bytes (see the docstring)."""
+        size = database_size(db)
+        size_log.append({"step": step, "database_bytes": size})
+        if max_database_bytes is not None and size > max_database_bytes:
+            raise RuntimeError(
+                f"Database is {size / 2**20:.1f} MiB after {step}, over the limit of "
+                f"{max_database_bytes / 2**20:.0f} MiB: stopped before the plan's storage limit"
+            )
+        return size
 
     # 1. Encoder identity, embedding dimension (from the encoder, a reusable
     #    index, the schema or the local model) and schema.
@@ -307,18 +405,23 @@ def load(
                                     "embedding_identity": identity_record(identity, dim, encoder)})
 
     # 2. Works and texts.
-    repo = PostgresBookCatalogRepository(db, schema)
+    check_size("the schema")
+    repo = PostgresBookCatalogRepository(db, schema, store_text_bodies=store_text_bodies)
     t0 = time.perf_counter()
     changed = 0
     batch = []
     for book in catalog.iter_all(batch_size=upsert_batch):
+        if book.id not in in_stage:
+            break  # iter_all is ordered by id, so the stage's works come first
         batch.append(book)
         if len(batch) >= upsert_batch:
             changed += repo.upsert_many(batch)
             batch = []
+            check_size(f"works up to {book.id}")
             log(f"  upserted up to {book.id} ({changed} new or changed so far)")
     changed += repo.upsert_many(batch)
     upsert_seconds = time.perf_counter() - t0
+    check_size("the works")
     log(f"Works: {changed} new or changed ({upsert_seconds:.1f} s)")
 
     # 3. Prune works that left the source.
@@ -352,11 +455,10 @@ def load(
         books = catalog.get_many(ids)
         texts = [books[i].get_searchable_text() for i in ids]
         e0 = time.perf_counter()
-        vectors = []
-        for j in range(0, len(texts), embed_batch):
-            vectors.extend(get_encoder().generate_embeddings_batch(texts[j:j + embed_batch]))
+        vectors = encode_texts(get_encoder(), texts, embed_batch, embed_workers)
         encode_seconds += time.perf_counter() - e0
         store.store_embeddings_batch(ids, vectors)
+        check_size(f"{min(start + len(ids), len(to_encode))} vectors")
         log(f"  encoded {min(start + len(ids), len(to_encode))}/{len(to_encode)}")
     embed_seconds = time.perf_counter() - t0
     if missing:
@@ -370,17 +472,20 @@ def load(
     needs_build = (
         rebuild_indexes
         or info.get("indexes_stale", True)
-        or not index_exists(db, schema, GIN_INDEX)
+        or index_exists(db, schema, GIN_INDEX) != gin_index
         or (has_bm25 and not index_exists(db, schema, BM25_INDEX))
         or not index_exists(db, schema, VECTOR_INDEX)
         or current_vector != vector_index
     )
     build_seconds: Dict[str, float] = dict(info.get("build_seconds") or {})
+    if not gin_index:
+        build_seconds.pop(GIN_INDEX, None)
     vacuum_seconds = None
     if needs_build:
         log("Building indexes")
         db.execute(f"DROP INDEX IF EXISTS {schema}.{GIN_INDEX}")
-        build_seconds.update(build_lexical_indexes(db, schema, k1=BM25_K1, b=BM25_B))
+        build_seconds.update(build_lexical_indexes(db, schema, k1=BM25_K1, b=BM25_B, gin=gin_index))
+        check_size("the lexical indexes")
         build_seconds[f"{VECTOR_INDEX} ({vector_index})"] = build_vector_index(db, schema, vector_index)
         vacuum_seconds = vacuum_analyze(db, schema)
         for name, seconds in build_seconds.items():
@@ -388,6 +493,7 @@ def load(
         log(f"  VACUUM ANALYZE: {vacuum_seconds:.2f} s")
     else:
         log("Indexes are up to date")
+    check_size("the indexes and VACUUM")
 
     # 6. catalog_info and report.
     counts = db.query(
@@ -410,7 +516,13 @@ def load(
         "build_seconds": build_seconds,
         "source_catalog": str(source),
         "loaded_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "gin_index": gin_index,
+        "text_bodies_stored": store_text_bodies,
+        "stage_limit": limit,
+        "database_size_log": size_log,
     }
+    if catalog_contents is not None:
+        facts["catalog_contents"] = dict(catalog_contents)
     if needs_build:
         facts["vacuum_seconds"] = vacuum_seconds
     if changed or missing:
@@ -441,6 +553,16 @@ def build_parser() -> argparse.ArgumentParser:
                         help="ANN index (default lakebase_ann when available, else hnsw)")
     parser.add_argument("--reuse-index", type=Path, default=None, help="FAISS index directory whose vectors to reuse")
     parser.add_argument("--rebuild-indexes", action="store_true", help="rebuild the indexes even if up to date")
+    parser.add_argument("--no-gin", action="store_true",
+                        help="leave out the GIN index (only the ts_rank_cd comparison ranking uses it)")
+    parser.add_argument("--no-text-bodies", action="store_true",
+                        help="keep only the tsvector of each description in work_texts (the texts stay in works)")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="load only the first N works of the source by id (staged loads)")
+    parser.add_argument("--embed-workers", type=int, default=1,
+                        help="embedding requests sent at the same time (API encoder; default 1)")
+    parser.add_argument("--max-database-mib", type=float, default=None,
+                        help="stop when pg_database_size exceeds this many MiB (checked after every batch)")
     parser.add_argument("--migrate-only", action="store_true", help="apply the schema and stop (needs --dim)")
     parser.add_argument("--dim", type=int, default=None, help="embedding dimension for --migrate-only")
     parser.add_argument("--report", action="store_true", help="print sizes of the schema and stop")
@@ -489,6 +611,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             vector_index=vector_index,
             reuse_index=args.reuse_index,
             rebuild_indexes=args.rebuild_indexes,
+            gin_index=not args.no_gin,
+            store_text_bodies=not args.no_text_bodies,
+            limit=args.limit,
+            embed_workers=args.embed_workers,
+            max_database_bytes=int(args.max_database_mib * 2**20) if args.max_database_mib else None,
+            catalog_contents=catalog_contents_summary(args.source),
         )
         total = recorder.summary()["total"]
         if total["calls"]:

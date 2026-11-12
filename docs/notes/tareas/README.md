@@ -24,6 +24,7 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V15** Servidor MCP de solo lectura sobre el buscador
 - [x] **V16** Modelos por API (embeddings y reranker) y regla de selección velocidad-calidad, también para el LLM
 - [x] **V13** Integración del perfil nube (sin modelos en el proceso, embeddings por API en Postgres) y corrección del relleno de BM25
+- [x] **V17** Despliegue público: catálogo de 30.000 obras en Neon y backend en Vercel, con límites de gasto
 
 ## En curso
 
@@ -31,7 +32,6 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 ## Pendientes
 
 - [ ] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
-- [ ] **V17** Despliegue del perfil nube y carga del catálogo grande en Neon
 - [ ] **V09** Ejecución en un comando (README, Makefile, demo, CI) y URL pública
 
 ## Aplazadas (con motivo)

@@ -4,15 +4,16 @@ In-process rate limit for the public MCP endpoint.
 A sliding window per client address: at most `max_requests` requests in any
 `window_seconds`. The state lives in this process only, so with several
 workers or replicas each one counts on its own, and behind a reverse proxy the
-client address is the proxy's unless uvicorn runs with --proxy-headers. A
-shared limit (Redis, or the platform's own limiter) is the next step if that
-matters.
+client address is the proxy's unless uvicorn runs with --proxy-headers or a
+trusted header names the client (CLIENT_IP_HEADER, e.g. x-real-ip on Vercel).
+A shared limit (Redis, or the platform's own limiter) is the next step if that
+matters; the hard ceiling on spending is the daily budget (V17).
 """
 
 import math
 import time
 from collections import deque
-from typing import Callable, Deque, Dict
+from typing import Callable, Deque, Dict, Optional
 
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
@@ -79,17 +80,33 @@ class SlidingWindowRateLimiter:
 class RateLimitMiddleware:
     """ASGI wrapper that answers 429 Too Many Requests above the limit."""
 
-    def __init__(self, app: ASGIApp, limiter: SlidingWindowRateLimiter) -> None:
+    def __init__(self, app: ASGIApp, limiter: SlidingWindowRateLimiter, client_ip_header: Optional[str] = None) -> None:
+        """
+        Args:
+            app: The wrapped ASGI app
+            limiter: The limiter requests are counted in
+            client_ip_header: Header with the client address set by a trusted
+                proxy (lower case); None counts by the connection's address
+        """
         self.app = app
         self.limiter = limiter
+        self.client_ip_header = client_ip_header.lower().encode("latin-1") if client_ip_header else None
+
+    def client_key(self, scope: Scope) -> str:
+        """The address this request is counted under."""
+        if self.client_ip_header is not None:
+            for name, value in scope.get("headers") or []:
+                if name.lower() == self.client_ip_header and value:
+                    return value.decode("latin-1").split(",")[0].strip()
+        client = scope.get("client")
+        return client[0] if client else "unknown"
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
 
-        client = scope.get("client")
-        key = client[0] if client else "unknown"
+        key = self.client_key(scope)
         retry_after = self.limiter.check(key)
         if retry_after > 0:
             seconds = max(1, math.ceil(retry_after))

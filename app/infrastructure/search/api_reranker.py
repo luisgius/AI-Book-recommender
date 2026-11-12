@@ -31,6 +31,8 @@ Same contract as CrossEncoderReranker:
   every search still tries the request.
 - Every request is recorded in an optional UsageRecorder under the
   operation "rerank" (latency, tokens, reported cost, errors).
+- A user waits for every rerank request, so the cloud profile gives it a
+  short timeout, one retry and a deadline (ApiQuerySettings, V17).
 
 This module imports no model library (no torch).
 """
@@ -43,7 +45,7 @@ import httpx
 
 from app.domain.entities import Book, SearchResult
 from app.domain.ports import Reranker
-from app.infrastructure.config.settings import DEFAULT_OPENROUTER_URL, RerankerSettings
+from app.infrastructure.config.settings import ApiQuerySettings, DEFAULT_OPENROUTER_URL, RerankerSettings
 from app.infrastructure.usage_recording import RERANK_OPERATION, UsageRecorder
 from app.infrastructure.search.openrouter_http import (
     DEFAULT_TIMEOUT_S,
@@ -103,6 +105,7 @@ class ApiReranker(Reranker):
         max_retries: int = DEFAULT_RERANK_RETRIES,
         transport: Optional[httpx.BaseTransport] = None,
         http: Optional[OpenRouterHttp] = None,
+        deadline_s: Optional[float] = None,
     ) -> None:
         """
         Args:
@@ -114,6 +117,8 @@ class ApiReranker(Reranker):
             api_key, base_url, timeout_s, max_retries, transport: HTTP options
                 (see OpenRouterHttp); ignored when `http` is given
             http: An already built client (tests and evaluation)
+            deadline_s: Most seconds for one rerank call, its retry included
+                (None: no deadline beyond the attempts' timeouts)
         """
         if not model or not model.strip():
             raise ValueError("model must not be empty")
@@ -128,16 +133,32 @@ class ApiReranker(Reranker):
             max_retries=max_retries, transport=transport,
         )
         self._last_error: Optional[BaseException] = None
+        self._call: Dict[str, Any] = {"deadline_s": deadline_s} if deadline_s is not None else {}
 
     @classmethod
     def from_settings(
-        cls, settings: RerankerSettings, usage_recorder: Optional[UsageRecorder] = None
+        cls,
+        settings: RerankerSettings,
+        usage_recorder: Optional[UsageRecorder] = None,
+        query_settings: Optional[ApiQuerySettings] = None,
     ) -> "ApiReranker":
-        """Build the reranker of RERANKER_PROVIDER=openrouter (reads OPENROUTER_API_KEY)."""
+        """
+        Build the reranker of RERANKER_PROVIDER=openrouter (reads OPENROUTER_API_KEY).
+
+        query_settings: timeout, retries and deadline of each rerank call
+        (ApiQuerySettings); None keeps the defaults (30 s, 2 retries).
+        """
         if settings.provider != "openrouter" or settings.model is None:
             raise ValueError("ApiReranker needs RERANKER_PROVIDER=openrouter and a RERANKER_MODEL")
+        options: Dict[str, Any] = {}
+        if query_settings is not None:
+            if query_settings.timeout_s is not None:
+                options["timeout_s"] = query_settings.timeout_s
+            if query_settings.max_retries is not None:
+                options["max_retries"] = query_settings.max_retries
+            options["deadline_s"] = query_settings.deadline_s
         return cls(settings.model, upstream_provider=settings.openrouter_provider,
-                   usage_recorder=usage_recorder)
+                   usage_recorder=usage_recorder, **options)
 
     def document_text(self, book: Book) -> str:
         """Text of a book as sent to the reranker: its searchable text, cut."""
@@ -174,7 +195,7 @@ class ApiReranker(Reranker):
             return []
         body = self.request_body(query_text, [result.book for result in results])
         try:
-            response = self._http.post("rerank", body)
+            response = self._http.post("rerank", body, **self._call)
             scores = read_scores(response.body, len(results))
         except (OpenRouterError, ValueError, KeyError, TypeError) as error:
             self._last_error = error

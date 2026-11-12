@@ -21,17 +21,34 @@ from .value_objects import (
     RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
 )
 from .ports import (
+    BUDGET_LLM_REQUEST,
+    BUDGET_MODEL_SEARCH,
     LexicalSearchRepository,
     VectorSearchRepository,
     EmbeddingsStore,
     LLMClient,
     Reranker,
+    UsageBudget,
 )
 
 logger = logging.getLogger(__name__)
 
 # Default number of fused candidates sent to the optional reranker.
 DEFAULT_RERANK_DEPTH = 30
+
+# Notices returned in SearchResponse.notices when a daily budget is spent (V17).
+NOTICE_SEARCH_BUDGET = "search_budget_spent"
+NOTICE_LLM_BUDGET = "llm_budget_spent"
+SEARCH_BUDGET_REASON = (
+    "The day's budget of model-backed searches is spent: lexical search only, "
+    "without re-ranking, until 00:00 UTC"
+)
+LLM_BUDGET_REASON = "The day's budget of LLM requests is spent until 00:00 UTC"
+
+
+def _elapsed_ms(started: float) -> float:
+    """Milliseconds since `started` (a time.perf_counter() value), rounded."""
+    return round((time.perf_counter() - started) * 1000, 1)
 
 
 class SearchService:
@@ -59,6 +76,7 @@ class SearchService:
         max_explanations: int = 5,
         reranker: Reranker | None = None,
         rerank_depth: int = DEFAULT_RERANK_DEPTH,
+        usage_budget: UsageBudget | None = None,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -75,6 +93,13 @@ class SearchService:
             rerank_depth: How many top fused results the reranker scores.
                 Retrieval then supplies at least this many candidates, even
                 when fewer results are requested.
+            usage_budget: Optional daily allowance of paid model calls (V17).
+                Each search takes one BUDGET_MODEL_SEARCH unit (the query
+                embedding and the re-ranking are API calls in the cloud
+                profile); without one it runs lexical-only and is not
+                re-ranked. Each request that uses the LLM takes one
+                BUDGET_LLM_REQUEST unit; without one the LLM steps are
+                skipped and a notice is returned. None (default): no limit.
         """
         if max_explanations < 0:
             raise ValueError(f"max_explanations must be >= 0, got {max_explanations}")
@@ -88,6 +113,22 @@ class SearchService:
         self._max_explanations = max_explanations
         self._reranker = reranker
         self._rerank_depth = rerank_depth
+        self._usage_budget = usage_budget
+
+    def _spend(self, kind: str) -> bool:
+        """
+        One unit of the daily budget of `kind`: True without a budget or when granted.
+
+        A budget that fails is treated as spent (fail closed): a paid call
+        is never made without a counted unit.
+        """
+        if self._usage_budget is None:
+            return True
+        try:
+            return bool(self._usage_budget.try_consume(kind))
+        except Exception as e:  # noqa: BLE001 - the search must go on without the paid step
+            logger.warning(f"Usage budget unavailable, treating '{kind}' as spent: {e}")
+            return False
 
     def has_llm(self) -> bool:
         """True if an LLM client is wired (query understanding and explanations available)."""
@@ -152,6 +193,35 @@ class SearchService:
 
         Returns:
             SearchResponse with results and degradation metadata
+
+        With a usage budget (V17), the search takes one model-search unit
+        (when none is left it runs lexical-only without re-ranking, degraded
+        with SEARCH_BUDGET_REASON) and a request for explanations takes one
+        LLM unit (when none is left the results come without explanations
+        and NOTICE_LLM_BUDGET is returned).
+        """
+        notices: List[str] = []
+        if query.use_explanations and self._llm_client is not None and not self._spend(BUDGET_LLM_REQUEST):
+            query = replace(query, use_explanations=False)
+            notices.append(NOTICE_LLM_BUDGET)
+        use_models = self._spend(BUDGET_MODEL_SEARCH)
+        if not use_models:
+            notices.append(NOTICE_SEARCH_BUDGET)
+        response = self._search_with_fallback(query, rerank_query_text, use_models=use_models)
+        return replace(response, notices=tuple(notices))
+
+    def _search_with_fallback(
+        self,
+        query: SearchQuery,
+        rerank_query_text: Optional[str] = None,
+        *,
+        use_models: bool = True,
+    ) -> SearchResponse:
+        """
+        The search of search_with_fallback, after the budget was checked.
+
+        use_models=False runs lexical-only without re-ranking (no model API
+        call), the degraded mode of a spent daily budget.
         """
         start_time = time.time()
         degraded = False
@@ -163,7 +233,24 @@ class SearchService:
         # Check if vector search is available
         vector_available = self._vector_search.is_ready() and self._embeddings_store.is_ready()
 
-        if not vector_available:
+        if not use_models:
+            degraded = True
+            degradation_reason = SEARCH_BUDGET_REASON
+            search_mode = "lexical_only"
+            try:
+                results, meta = self._search_lexical_only_with_debug(query, rerank_text, use_reranker=False)
+            except Exception as e:
+                logger.error(f"Lexical search failed: {e}")
+                raise RuntimeError("Lexical search unavailable") from e
+            metadata = SearchMetadata(
+                fusion_method="none",
+                rrf_k=None,
+                diversification_enabled=bool(query.use_diversification),
+                candidates_lexical=meta.get("candidates_lexical", 0),
+                candidates_vector=0,
+                timings_ms=meta.get("timings_ms", {}),
+            )
+        elif not vector_available:
             # Graceful degradation: use lexical search only
             logger.warning("Vector search unavailable, degrading to lexical-only search")
             degraded = True
@@ -178,6 +265,7 @@ class SearchService:
                     diversification_enabled=bool(query.use_diversification),
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=0,
+                    timings_ms=meta.get("timings_ms", {}),
                 )
             except Exception as e:
                 logger.error(f"Lexical search also failed: {e}")
@@ -192,6 +280,7 @@ class SearchService:
                     diversification_enabled=bool(query.use_diversification),
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=meta.get("candidates_vector", 0),
+                    timings_ms=meta.get("timings_ms", {}),
                 )
             except Exception as e:
                 logger.warning(f"Hybrid search failed, falling back to lexical: {e}")
@@ -205,6 +294,7 @@ class SearchService:
                     diversification_enabled=bool(query.use_diversification),
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=0,
+                    timings_ms=meta.get("timings_ms", {}),
                 )
 
         latency_ms = (time.time() - start_time) * 1000
@@ -275,9 +365,25 @@ class SearchService:
 
         logger.info(f"Executing search with understanding for: '{query_text[:50]}...'")
 
+        # Daily budget (V17): one LLM unit for the whole request (understanding
+        # and explanations), one model-search unit for the retrieval.
+        notices: List[str] = []
+        llm_allowed = self._llm_client is not None and self._spend(BUDGET_LLM_REQUEST)
+        if self._llm_client is not None and not llm_allowed:
+            notices.append(NOTICE_LLM_BUDGET)
+            use_explanations = False
+        use_models = self._spend(BUDGET_MODEL_SEARCH)
+        if not use_models:
+            notices.append(NOTICE_SEARCH_BUDGET)
+
         # 2. Extract query intent using LLM
-        if self._llm_client is None:
-            logger.warning("LLM client not available, using basic search without understanding")
+        if not llm_allowed:
+            reason = (
+                "LLM client not available - using default exploratory intent"
+                if self._llm_client is None
+                else f"{LLM_BUDGET_REASON} - using default exploratory intent"
+            )
+            logger.warning(f"Search without understanding: {reason}")
             # Fallback: create a basic QueryIntent with defaults
             query_intent = QueryIntent(
                 intent_type="exploratory",
@@ -285,7 +391,7 @@ class SearchService:
                 reformulated_query=query_text,
                 extracted_filters=SearchFilters(),
                 confidence=0.0,
-                reasoning="LLM client not available - using default exploratory intent"
+                reasoning=reason,
             )
         else:
             try:
@@ -348,7 +454,7 @@ class SearchService:
             self._vector_search.is_ready() and self._embeddings_store.is_ready()
         )
 
-        if vector_available:
+        if vector_available and use_models:
             try:
                 results, meta = self._multi_query_search(
                     variations=variations,
@@ -388,6 +494,7 @@ class SearchService:
                     diversification_enabled=adjusted_diversification,
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=meta.get("candidates_vector", 0),
+                    timings_ms=meta.get("timings_ms", {}),
                 )
                 response = SearchResponse(
                     results=results,
@@ -400,9 +507,11 @@ class SearchService:
                 logger.warning(f"Multi-query search failed, falling back: {e}")
                 response = self._fallback_with_original_explanations(search_query, query_text)
         else:
-            # Graceful degradation: vector unavailable, use lexical fallback
-            logger.warning("Vector search unavailable, using fallback for understanding search")
-            response = self._fallback_with_original_explanations(search_query, query_text)
+            # Graceful degradation: vector unavailable (or no model-search
+            # budget left), use the lexical fallback
+            logger.warning("Vector search unavailable or budget spent, using fallback for understanding search")
+            response = self._fallback_with_original_explanations(search_query, query_text, use_models=use_models)
+        response = replace(response, notices=tuple(notices))
 
         # 8. Log timing
         total_time_ms = (time.time() - start_time) * 1000
@@ -414,29 +523,32 @@ class SearchService:
         return response, query_intent
 
     def _fallback_with_original_explanations(
-        self, search_query: SearchQuery, original_query_text: str
+        self, search_query: SearchQuery, original_query_text: str, use_models: bool = True
     ) -> SearchResponse:
         """
-        Run search_with_fallback for the understanding path.
+        Run the fallback search for the understanding path.
 
         The fallback searches with the reformulated query, but re-ranking and
         explanations must answer the user's original wording: the original
         text is passed to the reranker, and explanations are generated here
-        instead of inside the fallback search.
+        instead of inside the fallback search. The budget was already checked
+        by the caller, so the fallback does not take another unit.
         """
-        response = self.search_with_fallback(
+        response = self._search_with_fallback(
             replace(search_query, use_explanations=False),
-            rerank_query_text=original_query_text,
+            original_query_text,
+            use_models=use_models,
         )
         if search_query.use_explanations and self._llm_client is not None:
             self._add_explanations(original_query_text, response.results)
         return response
 
     def _search_lexical_only_with_debug(
-        self, query: SearchQuery, rerank_text: Optional[str] = None
+        self, query: SearchQuery, rerank_text: Optional[str] = None, use_reranker: bool = True
     ) -> tuple[List[SearchResult], Dict]:
-        results = self._search_lexical_only(query, rerank_text)
-        return results, {"candidates_lexical": len(results)}
+        timings: Dict[str, float] = {}
+        results = self._search_lexical_only(query, rerank_text, use_reranker=use_reranker, timings=timings)
+        return results, {"candidates_lexical": len(results), "timings_ms": timings}
 
     def _search_hybrid_with_debug(
         self, query: SearchQuery, rerank_text: Optional[str] = None
@@ -452,21 +564,28 @@ class SearchService:
         logger.info(f"Executing hybrid search for query: '{query.text}'")
 
         candidate_limit = self._retrieval_size(query.max_results) * 2
+        timings: Dict[str, float] = {}
 
         logger.debug("Executing lexical (BM25) search")
+        started = time.perf_counter()
         lexical_results = self._lexical_search.search(
             query_text=query.text,
             max_results=candidate_limit,
             filters=query.filters
         )
+        timings["lexical"] = _elapsed_ms(started)
 
         logger.debug("Generating query embedding and executing vector search")
+        started = time.perf_counter()
         query_embedding = self._embeddings_store.generate_query_embedding(query.text)
+        timings["embedding"] = _elapsed_ms(started)
+        started = time.perf_counter()
         vector_results = self._vector_search.search(
             query_embedding=query_embedding,
             max_results=candidate_limit,
             filters=query.filters,
         )
+        timings["vector"] = _elapsed_ms(started)
 
         logger.debug(
             f"Retrieved {len(lexical_results)} lexical results, "
@@ -484,15 +603,20 @@ class SearchService:
 
         filtered_results = self._apply_filters(fused_results, query.filters)
 
+        started = time.perf_counter()
         filtered_results = self._rerank(rerank_text or query.text, filtered_results)
+        if self._reranker is not None:
+            timings["rerank"] = _elapsed_ms(started)
 
         if query.use_diversification:
             logger.debug(f"Applying MMR diversification with lambda={query.diversity_lambda}")
+            started = time.perf_counter()
             final_results = self._apply_mmr_diversification(
                 results=filtered_results,
                 top_k=query.max_results,
                 lambda_param=query.diversity_lambda,
             )
+            timings["mmr"] = _elapsed_ms(started)
         else:
             final_results = filtered_results[: query.max_results]
             for i, result in enumerate(final_results, start=1):
@@ -502,9 +626,12 @@ class SearchService:
 
         if query.use_explanations and self._llm_client is not None:
             logger.debug("Generating explanations for top results")
+            started = time.perf_counter()
             final_results = self._add_explanations(query.text, final_results)
+            timings["explanations"] = _elapsed_ms(started)
 
         return final_results, {
+            "timings_ms": timings,
             "fusion_method": "rrf",
             "rrf_k": rrf_k,
             "candidates_lexical": len(lexical_results),
@@ -512,30 +639,45 @@ class SearchService:
         }
 
     def _search_lexical_only(
-        self, query: SearchQuery, rerank_text: Optional[str] = None
+        self,
+        query: SearchQuery,
+        rerank_text: Optional[str] = None,
+        *,
+        use_reranker: bool = True,
+        timings: Optional[Dict[str, float]] = None,
     ) -> List[SearchResult]:
         """
         Execute lexical-only search (fallback mode).
 
         Used when vector search is unavailable for graceful degradation.
-        The reranker does not depend on the vector index, so it still runs.
+        The reranker does not depend on the vector index, so it still runs,
+        unless use_reranker is False (the daily model budget is spent).
 
         Args:
             query: The search query
             rerank_text: Text for the reranker (defaults to query.text)
+            use_reranker: Re-rank the results when a reranker is configured
+            timings: Filled with the milliseconds of each stage, if given
 
         Returns:
             List of SearchResult from BM25 search only
         """
         logger.info(f"Executing lexical-only search for query: '{query.text}'")
+        timings = timings if timings is not None else {}
+        rerank = use_reranker and self._reranker is not None
 
+        started = time.perf_counter()
         results = self._lexical_search.search(
             query_text=query.text,
-            max_results=self._retrieval_size(query.max_results),
+            max_results=self._retrieval_size(query.max_results) if rerank else query.max_results,
             filters=query.filters,
         )
+        timings["lexical"] = _elapsed_ms(started)
 
-        results = self._rerank(rerank_text or query.text, results)
+        if rerank:
+            started = time.perf_counter()
+            results = self._rerank(rerank_text or query.text, results)
+            timings["rerank"] = _elapsed_ms(started)
 
         # Apply diversification if requested (uses embeddings if available)
         if query.use_diversification and len(results) > 1:
@@ -558,7 +700,9 @@ class SearchService:
 
         # Degraded mode still honours explanation requests (RAG over BM25 results)
         if query.use_explanations and self._llm_client is not None:
+            started = time.perf_counter()
             results = self._add_explanations(query.text, results)
+            timings["explanations"] = _elapsed_ms(started)
 
         return results
 

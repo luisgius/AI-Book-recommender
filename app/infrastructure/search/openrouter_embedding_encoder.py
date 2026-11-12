@@ -45,6 +45,10 @@ Design decisions:
   a provider that answers with JSON numbers is read as well.
 - Every request is recorded in an optional UsageRecorder under the
   operation "embedding" (latency, input tokens, reported cost, errors).
+- Query embeddings are computed while a user waits, so they can have their
+  own short timeout, retries and deadline (query_call; the cloud profile
+  sets them from ApiQuerySettings, V17); document batches keep the client's
+  long defaults.
 - Vectors are returned as the API sends them (unit length for the supported
   models); the store normalizes before indexing, as with the local encoder.
 """
@@ -56,7 +60,7 @@ from typing import Any, Dict, List, Mapping, Optional
 
 import httpx
 
-from app.infrastructure.config.settings import DEFAULT_OPENROUTER_URL, EmbeddingSettings
+from app.infrastructure.config.settings import ApiQuerySettings, DEFAULT_OPENROUTER_URL, EmbeddingSettings
 from app.infrastructure.usage_recording import EMBEDDING_OPERATION, UsageRecorder
 from app.infrastructure.search.openrouter_http import (
     DEFAULT_MAX_RETRIES,
@@ -144,6 +148,7 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
         max_retries: int = DEFAULT_MAX_RETRIES,
         transport: Optional[httpx.BaseTransport] = None,
         http: Optional[OpenRouterHttp] = None,
+        query_call: Optional[Mapping[str, Any]] = None,
     ) -> None:
         """
         Args:
@@ -158,6 +163,8 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
             api_key, base_url, timeout_s, max_retries, transport: HTTP options
                 (see OpenRouterHttp); ignored when `http` is given
             http: An already built client (tests and evaluation)
+            query_call: Options of OpenRouterHttp.post for query embeddings
+                (timeout_s, max_retries, deadline_s); None keeps the client's
 
         Raises:
             ValueError: Unknown model, a dimension the model does not support,
@@ -204,12 +211,21 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
             api_key=api_key, base_url=base_url, timeout_s=timeout_s,
             max_retries=max_retries, transport=transport,
         )
+        self._query_call: Dict[str, Any] = dict(query_call or {})
 
     @classmethod
     def from_settings(
-        cls, settings: EmbeddingSettings, usage_recorder: Optional[UsageRecorder] = None
+        cls,
+        settings: EmbeddingSettings,
+        usage_recorder: Optional[UsageRecorder] = None,
+        query_settings: Optional[ApiQuerySettings] = None,
     ) -> "OpenRouterEmbeddingEncoder":
-        """Build the encoder of EMBEDDING_PROVIDER=openrouter (reads OPENROUTER_API_KEY)."""
+        """
+        Build the encoder of EMBEDDING_PROVIDER=openrouter (reads OPENROUTER_API_KEY).
+
+        query_settings: deadlines of query embeddings (ApiQuerySettings); None
+        keeps the long document deadlines for queries too.
+        """
         if settings.provider != "openrouter":
             raise ValueError(f"EMBEDDING_PROVIDER is '{settings.provider}', not 'openrouter'")
         return cls(
@@ -217,6 +233,7 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
             dimensions=settings.dimensions,
             upstream_provider=settings.openrouter_provider,
             usage_recorder=usage_recorder,
+            query_call=query_settings.call_options() if query_settings is not None else None,
         )
 
     # -- the request -------------------------------------------------------------
@@ -230,10 +247,10 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
             body["provider"] = {"order": [self._upstream], "allow_fallbacks": False}
         return body
 
-    def _embed(self, inputs: List[str]) -> List[List[float]]:
+    def _embed(self, inputs: List[str], call: Optional[Mapping[str, Any]] = None) -> List[List[float]]:
         """One request: vectors of `inputs` (already prefixed), in input order."""
         try:
-            response = self._http.post("embeddings", self.request_body(inputs))
+            response = self._http.post("embeddings", self.request_body(inputs), **dict(call or {}))
             vectors = self._read_vectors(response.body, len(inputs))
         except (OpenRouterError, ValueError, KeyError, TypeError) as error:
             latency = getattr(error, "latency_s", None)
@@ -284,7 +301,7 @@ class OpenRouterEmbeddingEncoder(TextEncoder):
     def generate_query_embedding(self, text: str) -> List[float]:
         """Vector of one query (the model's query prefix or instruction is added)."""
         self._check_text(text)
-        return self._embed([self._convention.query_prefix + text])[0]
+        return self._embed([self._convention.query_prefix + text], self._query_call)[0]
 
     def batches(self, inputs: List[str]) -> List[List[str]]:
         """Split inputs into requests: at most batch_size texts and max_batch_chars characters each."""

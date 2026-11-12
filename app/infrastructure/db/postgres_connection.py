@@ -192,6 +192,15 @@ class PostgresDatabase:
         with self._connection() as conn:
             conn.execute(sql)
 
+    def ping(self) -> bool:
+        """
+        True if the database answers a trivial statement (health checks).
+
+        Raises:
+            RuntimeError: If the database cannot be reached
+        """
+        return bool(self.query("SELECT 1 AS ok"))
+
     def close(self) -> None:
         """Close every pooled connection."""
         if self._opened:

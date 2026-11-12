@@ -1,0 +1,108 @@
+# Deployment of the cloud profile on Vercel (V17). Local work does not use
+# this file: it keeps requirements.txt (pip freeze of the full environment).
+#
+# Why a pyproject.toml: Vercel's Python builder looks for the dependency list
+# in pyproject.toml first, then Pipfile, then requirements*.txt, so this file
+# makes the deployed function install the slim cloud list instead of the full
+# requirements.txt (torch, FAISS, sentence-transformers: several GB). The pins
+# below are exactly those of requirements-cloud.txt, and
+# tests/test_requirements_cloud.py fails if the two lists differ. Keep them in
+# step: edit requirements-cloud.txt, then copy its pins here.
+#
+# vercel.json cannot hold comments; its settings are explained here:
+# - "regions": ["fra1"]: Frankfurt, the region of the Neon database
+#   (aws-eu-central-1), so each query to Postgres stays inside one city
+#   (a Hobby project runs its functions in a single region).
+# - "functions" -> "app/main.py" (the entrypoint file below):
+#   - "maxDuration": 120 seconds, under the 300 s ceiling of the Hobby plan and
+#     above the slowest legitimate request (a search with three LLM
+#     explanations, each LLM call at most LLM_TIMEOUT_S=15 s with one retry,
+#     plus at most 5 s for each model API call of the search).
+#   - No "excludeFiles": .vercelignore is an allowlist, so only app/ (with
+#     app/ui/static, the web UI), this file and vercel.json are uploaded; data,
+#     tests, docs, evaluation outputs and local tooling never reach the bundle.
+#   - Memory is not set: on the Hobby plan it is fixed (2 GB, 1 vCPU) and,
+#     with Fluid compute, vercel.json cannot set it.
+# - "git": {"deploymentEnabled": false}: no deployment is triggered from a
+#   Git push; the project is deployed from this directory with the CLI
+#   (vercel deploy --prod), so what is published is always a deliberate step.
+
+[project]
+name = "ai-book-recommender"
+version = "1.0.0"
+description = "Hybrid book search and recommendation (BM25 + embeddings + LLM), cloud profile"
+# Python 3.13, the version of the local environment and of the tests.
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "annotated-types==0.7.0",
+    "anyio==4.12.0",
+    "attrs==25.4.0",
+    "certifi==2026.10.23",
+    "cffi==2.1.1",
+    "charset-normalizer==3.4.4",
+    "click==8.3.1",
+    "cryptography==50.0.2",
+    "distro==1.9.0",
+    "fastapi==0.115.6",
+    "h11==0.16.0",
+    "httpcore==1.0.9",
+    "httpcore2==2.16.0",
+    "httpx==0.28.1",
+    "httpx2==2.16.0",
+    "idna==3.20",
+    "jiter==0.18.0",
+    "jsonpatch==1.33",
+    "jsonpointer==3.0.0",
+    "jsonschema==4.26.0",
+    "jsonschema-specifications==2025.9.1",
+    "langchain==1.4.8",
+    "langchain-core==1.7.4",
+    "langchain-openai==1.7.3",
+    "langchain-protocol==0.0.20",
+    "langgraph==1.2.19",
+    "langgraph-checkpoint==4.3.1",
+    "langgraph-prebuilt==1.1.1",
+    "langgraph-sdk==0.4.11",
+    "langsmith==0.14.17",
+    "mcp==2.3.0",
+    "mcp-types==2.3.0",
+    "openai==3.42.1",
+    "opentelemetry-api==1.45.2",
+    "orjson==3.11.5",
+    "ormsgpack==1.13.0",
+    "packaging==24.2",
+    "psycopg==3.3.8",
+    "psycopg-binary==3.3.8",
+    "psycopg-pool==3.3.3",
+    "pycparser==3.12",
+    "pydantic==2.14.3",
+    "pydantic_core==2.50.4",
+    "PyJWT==2.15.1",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.33",
+    "PyYAML==6.0.3",
+    "referencing==0.37.0",
+    "regex==2025.11.3",
+    "requests==2.32.5",
+    "requests-toolbelt==1.0.0",
+    "rpds-py==2026.9.1",
+    "sniffio==1.3.1",
+    "sse-starlette==3.0.3",
+    "starlette==0.41.3",
+    "tenacity==9.1.2",
+    "tiktoken==0.12.0",
+    "truststore==0.10.5",
+    "typing-inspection==0.4.5",
+    "typing_extensions==4.16.0",
+    "urllib3==2.6.1",
+    "uuid_utils==0.19.0",
+    "uvicorn==0.34.0",
+    "websockets==15.0.1",
+    "xxhash==4.0.2",
+    "zstandard==0.25.0",
+]
+
+[tool.vercel]
+# The FastAPI application object (app/main.py, variable app). Vercel also
+# finds it there by convention; naming it removes any doubt.
+entrypoint = "app.main:app"

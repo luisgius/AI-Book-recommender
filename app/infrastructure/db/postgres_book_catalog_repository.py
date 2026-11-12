@@ -40,14 +40,20 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
     Args:
         db: Database (pooled connection string for the API, direct for loads)
         schema: Catalog schema, created beforehand by postgres_schema.apply_schema
+        store_text_bodies: Keep each description's text in work_texts.body
+            after its tsvector is computed (default). False stores NULL
+            there: the searches read only the tsvector, and the texts stay
+            in works (description and metadata), so a deployed catalog
+            saves the space of a second copy (V17).
     """
 
     SAVE_CHUNK_SIZE = 500
     """Books per write transaction in save_many"""
 
-    def __init__(self, db: PostgresDatabase, schema: str) -> None:
+    def __init__(self, db: PostgresDatabase, schema: str, *, store_text_bodies: bool = True) -> None:
         self._db = db
         self._schema = validate_schema_name(schema)
+        self._store_text_bodies = store_text_bodies
         self._configs: Optional[Set[str]] = None
         self._categories: Optional[List[str]] = None  # cached by get_categories, reset by writes
 
@@ -216,7 +222,9 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
 
         # created_at keeps its first value, as in the SQLite catalog. The
         # embedding survives an update only if its input text is unchanged.
+        # Without stored bodies the text is dropped once its tsvector exists.
         updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in WORK_INSERT_COLUMNS if c not in ("id", "created_at"))
+        drop_body = "" if self._store_text_bodies else ",\n    body = NULL"
         sql = f"""
 INSERT INTO {s}.works AS cur ({", ".join(WORK_INSERT_COLUMNS)})
 VALUES {", ".join(work_rows)}
@@ -226,7 +234,7 @@ DELETE FROM {s}.work_texts WHERE work_id = ANY(%(ids)s::uuid[]);
 INSERT INTO {s}.work_texts (work_id, language, ts_config, body) VALUES {", ".join(texts)};
 UPDATE {s}.work_texts t
 SET tsv = to_tsvector('{s}.{SIMPLE_CONFIG}'::regconfig, {lexical_header_sql("w")})
-          || to_tsvector(t.ts_config::regconfig, coalesce(t.body, ''))
+          || to_tsvector(t.ts_config::regconfig, coalesce(t.body, '')){drop_body}
 FROM {s}.works w
 WHERE w.id = t.work_id AND t.work_id = ANY(%(ids)s::uuid[]);
 INSERT INTO {s}.catalog_info AS info (key, value)

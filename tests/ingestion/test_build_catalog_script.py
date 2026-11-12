@@ -70,6 +70,24 @@ def test_ingest_report_and_select(tmp_path, downloads):
     selection = json.loads((small.parent / "selection.json").read_text())
     assert selection["size"] == 1 and selection["language_mix"] == {"es": 1}
 
+    # V17: the licence records travel with the selection, so its report lists them
+    assert build_catalog.main(["report", "--out", str(small)]) == 0
+    small_report = json.loads((small.parent / "catalog_report.json").read_text())
+    assert [s["source"] for s in small_report["sources"]] == ["gutenberg", "doab"]
+    assert all(s["license"] for s in small_report["sources"])
+    assert small_report["selection"]["size"] == 1
+    markdown = (small.parent / "CATALOG_REPORT.md").read_text()
+    assert "This catalog is a selection of 1 works" in markdown and "## Licences and attribution" in markdown
+
+
+def test_reading_build_sources_of_a_catalog_without_them(tmp_path):
+    import sqlite3
+
+    plain = tmp_path / "plain.db"
+    sqlite3.connect(plain).execute("CREATE TABLE books (id TEXT)").connection.close()
+
+    assert build_catalog.read_build_sources(plain) == []
+
 
 def test_refuses_to_write_the_original_catalog(downloads):
     with pytest.raises(SystemExit, match="original catalog"):

@@ -8,6 +8,24 @@ const $ = (id) => document.getElementById(id);
 const FIELD_NAMES = { title: "título", description: "descripción", categories: "categorías", authors: "autores" };
 const INTENT_NAMES = { recommendation: "recomendación", factual: "factual", exploratory: "exploratoria" };
 
+// Names of the catalog sources and the licence deeds the attribution links to.
+const SOURCE_NAMES = {
+  wikipedia: "Wikipedia", wikidata: "Wikidata", gutenberg: "Project Gutenberg",
+  doab: "DOAB", open_library: "Open Library", google_books: "Google Books",
+};
+const LICENSE_URLS = {
+  "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
+  "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "CC0 1.0": "https://creativecommons.org/publicdomain/zero/1.0/",
+};
+// Notices the API returns when a daily budget of the public demo is spent.
+const NOTICE_TEXT = {
+  search_budget_spent: "Se ha alcanzado el límite diario de búsquedas con modelos de esta demostración: "
+    + "hasta las 00:00 UTC la búsqueda usa solo BM25, sin embeddings ni reordenación.",
+  llm_budget_spent: "Se ha alcanzado el límite diario de peticiones al LLM de esta demostración: "
+    + "hasta las 00:00 UTC no hay interpretación de la consulta ni explicaciones.",
+};
+
 function setStatus(text, isError = false) {
   const el = $("status");
   el.textContent = text;
@@ -50,6 +68,52 @@ async function callApi(path, options = {}) {
   return body;
 }
 
+// A link built with DOM properties (never HTML); only http(s) URLs are linked.
+function link(text, url) {
+  if (!url || !/^https?:\/\//.test(url)) return document.createTextNode(text);
+  const a = document.createElement("a");
+  a.href = url;
+  a.textContent = text;
+  a.rel = "noopener";
+  a.target = "_blank";
+  return a;
+}
+
+// Where the description and the record come from, with the licence and the
+// link each source asks for (Wikipedia text is CC BY-SA: article and licence).
+function renderAttribution(book) {
+  const parts = [];
+  const desc = book.description_source;
+  if (desc) {
+    const name = SOURCE_NAMES[desc.source] || desc.source;
+    const label = desc.source === "wikipedia" ? `Extracto del artículo de ${name}` : `Descripción: ${name}`;
+    parts.push(link(desc.language ? `${label} (${desc.language})` : label, desc.attribution_url));
+    if (desc.license) {
+      parts.push(document.createTextNode(", "));
+      parts.push(link(desc.license, LICENSE_URLS[desc.license]));
+    }
+    if (desc.auto_generated) parts.push(document.createTextNode(", resumen generado automáticamente"));
+  }
+  const records = (book.provenance || []).filter((r) => r.source !== "wikipedia");
+  if (records.length) {
+    parts.push(document.createTextNode(parts.length ? " · Ficha: " : "Ficha: "));
+    records.forEach((record, i) => {
+      if (i) parts.push(document.createTextNode(", "));
+      const name = SOURCE_NAMES[record.source] || record.source;
+      parts.push(link(record.source === "doab" ? name : `${name} ${record.record_id}`, record.url));
+    });
+  }
+  if (!parts.length) parts.push(document.createTextNode(`Fuente: ${SOURCE_NAMES[book.source] || book.source}`));
+  return parts;
+}
+
+function showNotices(response) {
+  const el = $("notice");
+  const lines = (response.notices || []).map((code) => NOTICE_TEXT[code] || code);
+  el.textContent = lines.join(" ");
+  el.hidden = lines.length === 0;
+}
+
 function formatScore(value) {
   return value === null || value === undefined ? "–" : value.toFixed(4);
 }
@@ -67,6 +131,7 @@ function renderResult(result, { showScores = true } = {}) {
   const description = book.description || "";
   node.querySelector(".description").textContent =
     description.length > 320 ? description.slice(0, 317) + "…" : description;
+  node.querySelector(".attribution").replaceChildren(...renderAttribution(book));
 
   node.querySelector(".scores").textContent = showScores
     ? `final ${formatScore(result.final_score)} · BM25 ${formatScore(result.lexical_score)} · vector ${formatScore(result.vector_score)} · fuente ${result.source}`
@@ -132,10 +197,12 @@ async function runSearch(event) {
   const usesLlm = request.use_understanding || request.use_explanations;
   $("search-button").disabled = true;
   $("similar-banner").hidden = true;
-  setStatus(usesLlm ? "Buscando… (con LLM local puede tardar un minuto)" : "Buscando…");
+  setStatus(usesLlm ? "Buscando… (con LLM puede tardar varios segundos)" : "Buscando…");
+  $("notice").hidden = true;
 
   try {
     const response = await callApi("/search", { method: "POST", body: JSON.stringify(request) });
+    showNotices(response);
     renderIntent(response.query_intent);
     $("results").replaceChildren(...response.results.map((r) => renderResult(r)));
     const degraded = response.degraded ? ` · modo degradado: ${response.degradation_reason}` : "";

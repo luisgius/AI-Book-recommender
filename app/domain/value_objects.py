@@ -8,7 +8,7 @@ of the domain with no conceptual identity.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Literal, Tuple
+from typing import Dict, List, Optional, Literal, Tuple
 
 
 class RetrievalStrategy(Enum):
@@ -394,6 +394,10 @@ class SearchMetadata:
     candidates_vector: int = 0
     """Number of candidates retrieved from vector search"""
 
+    timings_ms: Dict[str, float] = field(default_factory=dict)
+    """Milliseconds spent in each stage (lexical, embedding, vector, fusion,
+    rerank, mmr, explanations), so latency can be split by stage (V17)"""
+
     def __post_init__(self) -> None:
         """Validate metadata constraints."""
         valid_fusion_methods = {"rrf", "none"}
@@ -439,6 +443,10 @@ class SearchResponse:
 
     metadata: Optional[SearchMetadata] = None
     """Optional debug/telemetry metadata about the search execution"""
+
+    notices: Tuple[str, ...] = ()
+    """Short messages for the user about features that were skipped (for
+    example, explanations refused because the day's LLM budget is spent)"""
 
     def __post_init__(self) -> None:
         """Validate response constraints."""

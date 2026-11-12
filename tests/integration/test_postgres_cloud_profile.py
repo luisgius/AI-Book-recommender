@@ -333,3 +333,50 @@ def test_batch_embeddings_and_categories_in_one_statement_each(setup):
         assert found[book.id] == pytest.approx(store.get_embedding(book.id), abs=1e-3)
     repo = PostgresBookCatalogRepository(setup["db"], setup["schema"])
     assert repo.get_categories() == ["Computers", "Fiction", "Poetry"]
+
+
+# --- the deployed catalog's footprint options and staged loads (V17) --------------
+
+
+def test_staged_load_without_gin_or_text_bodies_still_searches(setup):
+    from app.infrastructure.db.postgres_schema import GIN_INDEX, drop_schema, index_exists
+    from app.infrastructure.search.postgres_lexical_search_repository import PostgresLexicalSearchRepository
+    from scripts.load_postgres import load
+
+    direct = setup["direct"]
+    schema = f"it_v17_{uuid4().hex[:8]}"
+    options = dict(embedding_model=MODEL, device=None, vector_index=setup["vector_index"],
+                   reuse_index=setup["index_dir"], log=lambda message: None, gin_index=False, store_text_bodies=False)
+    try:
+        stage = load(direct, setup["source"], schema, limit=3, **options)
+        full = load(direct, setup["source"], schema, **options)
+
+        assert stage["facts"]["works"] == 3 and stage["facts"]["stage_limit"] == 3
+        assert full["facts"]["works"] == 5 and full["facts"]["last_load"]["works_changed"] == 2
+        assert full["facts"]["gin_index"] is False and full["facts"]["text_bodies_stored"] is False
+        assert full["facts"]["database_size_log"][-1]["database_bytes"] > 0
+        assert not index_exists(direct, schema, GIN_INDEX)
+        counts = direct.query(f"SELECT count(*) FILTER (WHERE body IS NOT NULL) AS bodies, "
+                              f"count(*) FILTER (WHERE tsv IS NULL) AS no_tsv FROM {schema}.work_texts")[0]
+        assert counts == {"bodies": 0, "no_tsv": 0}
+        if setup["has_bm25"]:
+            lexical = PostgresLexicalSearchRepository(setup["db"], schema, ranking="bm25")
+            assert _titles(lexical.search("novelas de caballeria", max_results=3))[0] == "Don Quijote de la Mancha"
+    finally:
+        drop_schema(direct, schema)
+
+
+def test_load_stops_when_the_database_passes_the_size_limit(setup):
+    from app.infrastructure.db.postgres_schema import drop_schema
+    from scripts.load_postgres import load
+
+    direct = setup["direct"]
+    schema = f"it_v17_{uuid4().hex[:8]}"
+    try:
+        with pytest.raises(RuntimeError, match="over the limit"):
+            load(direct, setup["source"], schema, embedding_model=MODEL, device=None,
+                 vector_index=setup["vector_index"], reuse_index=setup["index_dir"], log=lambda message: None,
+                 max_database_bytes=1)
+        assert direct.query(f"SELECT count(*) AS n FROM {schema}.works")[0]["n"] == 0  # stopped before writing
+    finally:
+        drop_schema(direct, schema)

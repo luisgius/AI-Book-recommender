@@ -32,5 +32,18 @@ def test_ui_never_renders_api_data_as_html():
 
 
 def test_ui_has_no_external_assets():
+    """Scripts, styles and images are served by the app; only plain links (licences) point outside."""
+    import re
+
     page = (Path(UI_DIR) / "index.html").read_text(encoding="utf-8")
-    assert "http://" not in page and "https://" not in page
+    assets = re.findall(r"<(?:script|link|img|iframe)\b[^>]*>", page)
+    assert assets and not [tag for tag in assets if "http://" in tag or "https://" in tag]
+
+
+def test_ui_attributes_sources_and_shows_budget_notices():
+    """Each result names its source and licence (Wikipedia text is CC BY-SA), and budget notices are shown."""
+    page = (Path(UI_DIR) / "index.html").read_text(encoding="utf-8")
+    script = (Path(UI_DIR) / "app.js").read_text(encoding="utf-8")
+    assert 'class="attribution"' in page and 'id="about"' in page and 'id="notice"' in page
+    assert "renderAttribution(book)" in script and "attribution_url" in script
+    assert "search_budget_spent" in script and "llm_budget_spent" in script

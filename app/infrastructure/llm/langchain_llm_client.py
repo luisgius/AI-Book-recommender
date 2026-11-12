@@ -106,9 +106,15 @@ def build_chat_model(
     max_tokens: Optional[int] = None,
     timeout_s: Optional[float] = None,
     usage_recorder: Optional[LLMUsageRecorder] = None,
+    client_max_retries: Optional[int] = None,
 ):
     """
     Build a LangChain chat model with the provider-specific options.
+
+    client_max_retries: retries of the provider's own HTTP client (hosted
+    providers; the OpenAI client used for OpenRouter retries twice by
+    default). None keeps the library default; a public deployment sets 0 so
+    the only retries are LangChainLLMClient's (V17).
 
     Shared by LangChainLLMClient and the relevance judge
     (relevance_judge.py), so both talk to a model in the same way.
@@ -157,6 +163,8 @@ def build_chat_model(
             model_kwargs["max_tokens"] = max_tokens
         if timeout_s:
             model_kwargs["timeout"] = timeout_s
+        if client_max_retries is not None:
+            model_kwargs["max_retries"] = client_max_retries
     if provider == "openrouter":
         model_kwargs.update(openrouter_options(base_url, reasoning))
         return init_chat_model(model=model_name, model_provider="openai", **model_kwargs)
@@ -211,6 +219,7 @@ class LangChainLLMClient(LLMClient):
         apply_extracted_category: bool = False,
         max_tokens: Optional[int] = None,
         timeout_s: Optional[float] = None,
+        client_max_retries: Optional[int] = None,
     ):
         """
         Initialize the LLM client.
@@ -243,6 +252,8 @@ class LangChainLLMClient(LLMClient):
             max_tokens: Cap on generated tokens per call. Without it a model
                 stuck in a repetition loop can generate for minutes
             timeout_s: HTTP timeout per LLM call, in seconds
+            client_max_retries: Retries of the provider's HTTP client under
+                each attempt (None: the library default; see build_chat_model)
             apply_extracted_category: Use the category inferred by the LLM as
                 a hard filter. Off by default: the topic already shapes the
                 reformulated query, and an inferred category that merely
@@ -282,6 +293,7 @@ class LangChainLLMClient(LLMClient):
                 max_tokens=max_tokens,
                 timeout_s=timeout_s,
                 usage_recorder=self.usage_recorder,
+                client_max_retries=client_max_retries,
             )
         except Exception as e:
             logger.error(f"Failed to initialize {provider} model {model_name}: {e}")

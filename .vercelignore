@@ -1,0 +1,20 @@
+# Files uploaded to Vercel for the deployed backend (V17). An allowlist: the
+# first rule ignores everything at the top level, the "!" rules bring back
+# only what the FastAPI function needs at run time.
+#
+# Kept out: data/ (local catalogs, indexes, evaluation outputs: several GB;
+# the deployed catalog lives in Neon), tests/, docs/, review/, scripts/
+# (loaders run from this machine), requirements.txt (the full local
+# environment; the function installs the pins of pyproject.toml), .env and
+# every other local file (tooling, caches, editor settings, node_modules).
+/*
+!/app
+!/pyproject.toml
+!/vercel.json
+
+# Inside app/: the evaluation package (code and relevance judgments) only
+# serves POST /evaluate, which the deployment switches off.
+/app/evaluation
+**/__pycache__
+**/*.pyc
+.DS_Store

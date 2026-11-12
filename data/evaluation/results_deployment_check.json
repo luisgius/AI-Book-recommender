@@ -1,0 +1,3413 @@
+{
+  "base_url": "https://ai-book-recommender-one.vercel.app",
+  "started_at": "2026-11-11T22:38:37+00:00",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "profile": {
+        "name": "cloud",
+        "schema": "catalog_deploy",
+        "lexical_ranking": "bm25",
+        "vector_search": "approximate"
+      },
+      "database": {
+        "reachable": true,
+        "latency_ms": 2.7
+      },
+      "budget": {
+        "model_search": 400,
+        "llm_request": 60
+      },
+      "uptime_s": 3.5,
+      "components": {
+        "lexical_search": true,
+        "vector_search": true,
+        "embeddings_store": true
+      },
+      "llm": {
+        "configured": true,
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-v4.1-flash"
+      },
+      "reranker": {
+        "configured": true,
+        "model": "qwen/qwen3-reranker-8b",
+        "ready": true
+      },
+      "overall": true
+    },
+    "vercel_id": "arn1::fra1::78qqk-1794436717910-1a23b07a45cf"
+  },
+  "ui": {
+    "/ui/": {
+      "status": 200,
+      "bytes": 5212,
+      "cache": "HIT",
+      "has_search_form": true
+    },
+    "/ui/app.js": {
+      "status": 200,
+      "bytes": 10551,
+      "cache": "HIT",
+      "has_search_form": null
+    },
+    "/ui/styles.css": {
+      "status": 200,
+      "bytes": 4613,
+      "cache": "HIT",
+      "has_search_form": null
+    },
+    "/": {
+      "status": 200,
+      "bytes": 118,
+      "cache": "MISS",
+      "has_search_form": null
+    }
+  },
+  "warmup": {
+    "status": 200,
+    "wall_ms": 2518.6,
+    "vercel_id": "arn1::fra1::qjwsf-1794436723724-a132ccd87254",
+    "server_ms": 2395.4,
+    "search_mode": "hybrid",
+    "degraded": false,
+    "degradation_reason": null,
+    "notices": [],
+    "timings_ms": {
+      "lexical": 946.9,
+      "embedding": 625.4,
+      "vector": 210.0,
+      "rerank": 611.7
+    },
+    "reranked": true,
+    "top": [
+      {
+        "id": "c1997ec9-ee9e-51ca-8c38-b00ac8a98c1c",
+        "title": "The Sea",
+        "authors": [
+          "John Banville"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "wikipedia",
+          "language": "es",
+          "license": "CC BY-SA 3.0",
+          "attribution_url": "https://es.wikipedia.org/wiki/El_mar",
+          "auto_generated": false
+        },
+        "explanation": null,
+        "grounded": null
+      },
+      {
+        "id": "71ff2f9e-f4d6-565e-80ca-527d718a63c7",
+        "title": "The Sea, the Sea",
+        "authors": [
+          "Iris Murdoch"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "wikipedia",
+          "language": "es",
+          "license": "CC BY-SA 3.0",
+          "attribution_url": "https://es.wikipedia.org/wiki/El_mar%2C_el_mar",
+          "auto_generated": false
+        },
+        "explanation": null,
+        "grounded": null
+      },
+      {
+        "id": "a3a22091-c360-50af-a2c1-de4bda4a6c3d",
+        "title": "By the Sea",
+        "authors": [
+          "Abdulrazak Gurnah"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "wikipedia",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "attribution_url": "https://en.wikipedia.org/wiki/By_the_Sea_%28novel%29",
+          "auto_generated": false
+        },
+        "explanation": null,
+        "grounded": null
+      }
+    ],
+    "results": 10
+  },
+  "rounds": [
+    [
+      {
+        "status": 200,
+        "wall_ms": 1724.7,
+        "vercel_id": "arn1::fra1::4dkp4-1794436729509-36112dfa7873",
+        "server_ms": 1553.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 423.9,
+          "embedding": 476.0,
+          "vector": 111.1,
+          "rerank": 540.7
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+            "title": "Los cipreses creen en Dios",
+            "authors": [
+              "José María Gironella"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Los_cipreses_creen_en_Dios",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "3526e35b-dcf2-5ee7-a640-ce69be2dc709",
+            "title": "A sangre y fuego. Héroes, bestias y mártires de España",
+            "authors": [
+              "Manuel Chaves Nogales"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/A_sangre_y_fuego._H%C3%A9roes%2C_bestias_y_m%C3%A1rtires_de_Espa%C3%B1a",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "b923efaa-6795-5772-bacc-687e330dbdc6",
+            "title": "Las figuras de cera: novela",
+            "authors": [
+              "Pío Baroja"
+            ],
+            "language": "es",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/63680",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "novelas sobre la guerra civil española",
+        "language": "es",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 2539.8,
+        "vercel_id": "arn1::fra1::xrcml-1794436734369-b786f56e8aae",
+        "server_ms": 2423.2,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 446.7,
+          "embedding": 1241.8,
+          "vector": 175.8,
+          "rerank": 557.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "bf05f502-2186-5f43-b028-f87d33e1be5c",
+            "title": "Introducción a la filosofía",
+            "authors": [
+              "Luis Cuéllar"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Introducci%C3%B3n_a_la_filosof%C3%ADa",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "31b46e9c-3447-5a9d-8bcf-d12a6c44aaab",
+            "title": "Historia de la filosofía sin temor ni temblor",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historia_de_la_filosof%C3%ADa_sin_temor_ni_temblor",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "d1e66b2c-c690-5b47-aefd-33b416eccfa5",
+            "title": "Ética para Amador",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/%C3%89tica_para_Amador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "libros de filosofía para principiantes",
+        "language": "es",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1891.7,
+        "vercel_id": "arn1::fra1::dxqnv-1794436740129-2d4260ccde09",
+        "server_ms": 1754.9,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 494.4,
+          "embedding": 623.3,
+          "vector": 108.9,
+          "rerank": 527.0
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "0b15d0a1-8cb5-532c-8746-1907932e2509",
+            "title": "Cien años de soledad",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "f1a269c0-90ef-5153-854e-b9efc459f80e",
+            "title": "La hojarasca",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/La_hojarasca",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "957d4ce0-7f30-55b1-9b64-e90726bf56e7",
+            "title": "Vivir para contarla",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Vivir_para_contarla",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Cien años de soledad",
+        "language": "es",
+        "kind": "exact",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1515.1,
+        "vercel_id": "arn1::fra1::zw4m4-1794436745210-7563a979c8f9",
+        "server_ms": 1407.4,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 414.5,
+          "embedding": 344.4,
+          "vector": 107.6,
+          "rerank": 539.2
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "c7e40f1f-7e51-5117-a62b-ccbbca283f6a",
+            "title": "Robopocalypse",
+            "authors": [
+              "Daniel H. Wilson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Robopocalypse",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2ddd9e91-2763-581d-a05e-11fd891790ee",
+            "title": "Neuromancer",
+            "authors": [
+              "William Gibson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Neuromancer",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "481bb769-a596-57b2-9bc9-20af18e749ef",
+            "title": "The Invincible",
+            "authors": [
+              "Stanisław Lem"
+            ],
+            "language": "pl",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_Invincible",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "science fiction novels about artificial intelligence",
+        "language": "en",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1763.2,
+        "vercel_id": "arn1::fra1::828md-1794436749964-60f44ed6b05a",
+        "server_ms": 1611.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 350.8,
+          "embedding": 644.6,
+          "vector": 85.3,
+          "rerank": 529.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "60ea68df-78ac-59be-ae51-a8174f5d5757",
+            "title": "The History of the Decline and Fall of the Roman Empire",
+            "authors": [
+              "Edward Gibbon"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_History_of_the_Decline_and_Fall_of_the_Roman_Empire",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "66ee26f9-3332-556f-8640-071687fbcc15",
+            "title": "Annals",
+            "authors": [
+              "Tacitus"
+            ],
+            "language": "la",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Annals_%28Tacitus%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c5e10fc0-b487-55be-ac92-000e946fa54e",
+            "title": "Römische Geschichte",
+            "authors": [
+              "Theodor Mommsen"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/R%C3%B6mische_Geschichte_%28Theodor_Mommsen%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "history of the Roman Empire",
+        "language": "en",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 2012.8,
+        "vercel_id": "arn1::fra1::6qmxn-1794436754986-da2218237719",
+        "server_ms": 1766.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 277.0,
+          "embedding": 304.3,
+          "vector": 83.6,
+          "rerank": 1099.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "f6d1215b-b8f1-517e-857a-69333484fa2c",
+            "title": "The Complete Project Gutenberg Works of Jane Austen: A Linked Index of all PG Editions of Jane Austen",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/31100",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c915a593-bb39-504d-bd3f-34db87b87693",
+            "title": "A Memoir of Jane Austen",
+            "authors": [
+              "James Edward Austen-Leigh"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/A_Memoir_of_Jane_Austen",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "fd52a19f-218b-5c60-b18b-746c7d5713ee",
+            "title": "Pride and Prejudice",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Pride_and_Prejudice",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Jane Austen",
+        "language": "en",
+        "kind": "exact",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 3027.4,
+        "vercel_id": "arn1::fra1::x4jrh-1794436760129-3d1567e19714",
+        "server_ms": 2894.6,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 448.0,
+          "embedding": 212.7,
+          "vector": 90.0,
+          "rerank": 2142.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "3856923b-aacf-576c-b69b-35ed07b3ced2",
+            "title": "L'Ombre chinoise",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/L%27Ombre_chinoise",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "30b2ac91-9ca7-586e-a96b-44163cb91112",
+            "title": "La Tête d'un homme",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/La_T%C3%AAte_d%27un_homme",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2f367974-76ea-531a-ada6-d4ac0987859e",
+            "title": "The Mysteries of Paris",
+            "authors": [
+              "Eugène Sue"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Les_Myst%C3%A8res_de_Paris",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romans policiers qui se déroulent à Paris",
+        "language": "fr",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1890.7,
+        "vercel_id": "arn1::fra1::67cwt-1794436766350-ee4ce9862670",
+        "server_ms": 1761.4,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 409.0,
+          "embedding": 721.9,
+          "vector": 73.3,
+          "rerank": 555.7
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "dd02c1a0-5b16-565b-ad5e-38f54a400020",
+            "title": "Clérambault",
+            "authors": [
+              "Romain Rolland"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Cl%C3%A9rambault_%28novel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "be700687-7945-576e-bbbc-948ed63c3009",
+            "title": "All quiet on the Western Front",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/75011",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "df9cf786-1ef4-5866-adec-91fd7066f295",
+            "title": "Im Westen nichts Neues",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/Im_Westen_nichts_Neues",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Romane über den Ersten Weltkrieg",
+        "language": "de",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1511.2,
+        "vercel_id": "arn1::fra1::zb74d-1794436771474-2da1756a9986",
+        "server_ms": 1360.2,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 468.8,
+          "embedding": 324.9,
+          "vector": 89.2,
+          "rerank": 475.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "5cfa84de-bfe8-5248-a7ee-31d8628e8fa9",
+            "title": "Romola",
+            "authors": [
+              "George Eliot"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Romola",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "8f75d9ec-3c1d-50fb-a72a-81be39bcda57",
+            "title": "Historias florentinas",
+            "authors": [
+              "Francesco Guicciardini"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historias_florentinas",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e3c3c184-c844-5d15-8965-05380b83455e",
+            "title": "Florentine Histories",
+            "authors": [
+              "Niccolò Machiavelli"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Histoire_de_Florence_%28Machiavel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romanzi storici ambientati a Firenze",
+        "language": "it",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1267.7,
+        "vercel_id": "arn1::fra1::zw4m4-1794436776154-3b3aed32a174",
+        "server_ms": 1150.6,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 276.7,
+          "embedding": 259.2,
+          "vector": 84.0,
+          "rerank": 529.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "fcc6d2ac-df27-504d-ab59-54bd4738c1f1",
+            "title": "The Sound of Waves",
+            "authors": [
+              "Yukio Mishima"
+            ],
+            "language": "ja",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "ja",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://ja.wikipedia.org/wiki/%E6%BD%AE%E9%A8%92_%28%E5%B0%8F%E8%AA%AC%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "14db8030-cfcc-5325-a533-950f063231f5",
+            "title": "O Filho do Pescador",
+            "authors": [
+              "Antônio Gonçalves Teixeira e Sousa"
+            ],
+            "language": "pt",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "pt",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://pt.wikipedia.org/wiki/O_Filho_do_Pescador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "ad1aec0c-accc-5ae3-92d3-8f6ca7f37227",
+            "title": "Pêcheur d'Islande",
+            "authors": [
+              "Pierre Loti"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/An_Iceland_Fisherman",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romances sobre o mar e os pescadores",
+        "language": "pt",
+        "kind": "topic",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1319.0,
+        "vercel_id": "arn1::fra1::j7vv2-1794436780619-37f4e32c1110",
+        "server_ms": 1208.5,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 281.9,
+          "embedding": 241.7,
+          "vector": 127.1,
+          "rerank": 556.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "a8bdee26-410d-5814-96db-bc837e9dc7ce",
+            "title": "PANA",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/PANA",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "35491b0a-4a1e-5a8f-aff9-d6eb2d45e92b",
+            "title": "Frascati Manual",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Frascati_Manual",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "7529bcc7-4eaf-5b93-ac81-f811ba7254ec",
+            "title": "Manual de Merck",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Manual_de_Merck",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "manual de reparación del motor de un Seat Ibiza de 2004",
+        "language": "es",
+        "kind": "no_answer",
+        "round": 1
+      },
+      {
+        "status": 200,
+        "wall_ms": 1629.8,
+        "vercel_id": "arn1::fra1::xrcml-1794436785149-0f13eb21e770",
+        "server_ms": 1516.3,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 270.3,
+          "embedding": 531.0,
+          "vector": 206.1,
+          "rerank": 507.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "428ca0dc-e0c6-55b3-a17e-aad8d7bc58dc",
+            "title": "Fundamentación de un modelo de gestión del conocimiento para la Universidad Católica Luis Amigó",
+            "authors": [
+              "Jaime Alberto Beltrán Ríos",
+              "José Antonio López Giraldo"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/48196",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e5dff874-71a0-5f2d-baab-933c6299a13f",
+            "title": "Análisis estratégico en salud y gestión a través de la escucha",
+            "authors": [
+              "Viviana Martinovich",
+              "Francisco Javier Uribe Rivera"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/40799",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "08acd22f-29d0-5cda-a828-c0bce00a5970",
+            "title": "La gobernanza de los puertos atlánticos, siglos xiv-xx : Políticas y estructuras portuarias",
+            "authors": [
+              "Amélia Polónia",
+              "Ana María Rivera Medina"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/48730",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "how to configure a Kubernetes ingress controller",
+        "language": "en",
+        "kind": "no_answer",
+        "round": 1
+      }
+    ],
+    [
+      {
+        "status": 200,
+        "wall_ms": 1267.1,
+        "vercel_id": "arn1::fra1::zw4m4-1794436789994-31f551e0afbf",
+        "server_ms": 1065.6,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 33.5,
+          "embedding": 483.9,
+          "vector": 15.6,
+          "rerank": 531.2
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+            "title": "Los cipreses creen en Dios",
+            "authors": [
+              "José María Gironella"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Los_cipreses_creen_en_Dios",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "3526e35b-dcf2-5ee7-a640-ce69be2dc709",
+            "title": "A sangre y fuego. Héroes, bestias y mártires de España",
+            "authors": [
+              "Manuel Chaves Nogales"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/A_sangre_y_fuego._H%C3%A9roes%2C_bestias_y_m%C3%A1rtires_de_Espa%C3%B1a",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "b923efaa-6795-5772-bacc-687e330dbdc6",
+            "title": "Las figuras de cera: novela",
+            "authors": [
+              "Pío Baroja"
+            ],
+            "language": "es",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/63680",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "novelas sobre la guerra civil española",
+        "language": "es",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 1079.8,
+        "vercel_id": "arn1::fra1::65mw5-1794436794449-e6bf42e38cf0",
+        "server_ms": 844.9,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 28.2,
+          "embedding": 267.0,
+          "vector": 17.6,
+          "rerank": 531.0
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "bf05f502-2186-5f43-b028-f87d33e1be5c",
+            "title": "Introducción a la filosofía",
+            "authors": [
+              "Luis Cuéllar"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Introducci%C3%B3n_a_la_filosof%C3%ADa",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "31b46e9c-3447-5a9d-8bcf-d12a6c44aaab",
+            "title": "Historia de la filosofía sin temor ni temblor",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historia_de_la_filosof%C3%ADa_sin_temor_ni_temblor",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "d1e66b2c-c690-5b47-aefd-33b416eccfa5",
+            "title": "Ética para Amador",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/%C3%89tica_para_Amador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "libros de filosofía para principiantes",
+        "language": "es",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 968.7,
+        "vercel_id": "arn1::fra1::j7vv2-1794436798730-741eafaf5088",
+        "server_ms": 869.8,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 28.0,
+          "embedding": 236.2,
+          "vector": 17.5,
+          "rerank": 586.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "0b15d0a1-8cb5-532c-8746-1907932e2509",
+            "title": "Cien años de soledad",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "f1a269c0-90ef-5153-854e-b9efc459f80e",
+            "title": "La hojarasca",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/La_hojarasca",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "957d4ce0-7f30-55b1-9b64-e90726bf56e7",
+            "title": "Vivir para contarla",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Vivir_para_contarla",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Cien años de soledad",
+        "language": "es",
+        "kind": "exact",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 911.8,
+        "vercel_id": "arn1::fra1::qjwsf-1794436802911-dc1220a1ce6a",
+        "server_ms": 804.9,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 40.4,
+          "embedding": 235.1,
+          "vector": 21.0,
+          "rerank": 506.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "c7e40f1f-7e51-5117-a62b-ccbbca283f6a",
+            "title": "Robopocalypse",
+            "authors": [
+              "Daniel H. Wilson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Robopocalypse",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2ddd9e91-2763-581d-a05e-11fd891790ee",
+            "title": "Neuromancer",
+            "authors": [
+              "William Gibson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Neuromancer",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "481bb769-a596-57b2-9bc9-20af18e749ef",
+            "title": "The Invincible",
+            "authors": [
+              "Stanisław Lem"
+            ],
+            "language": "pl",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_Invincible",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "science fiction novels about artificial intelligence",
+        "language": "en",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 1198.6,
+        "vercel_id": "arn1::fra1::j7vv2-1794436807049-658551d407a3",
+        "server_ms": 1044.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 35.0,
+          "embedding": 490.0,
+          "vector": 17.1,
+          "rerank": 500.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "60ea68df-78ac-59be-ae51-a8174f5d5757",
+            "title": "The History of the Decline and Fall of the Roman Empire",
+            "authors": [
+              "Edward Gibbon"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_History_of_the_Decline_and_Fall_of_the_Roman_Empire",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "66ee26f9-3332-556f-8640-071687fbcc15",
+            "title": "Annals",
+            "authors": [
+              "Tacitus"
+            ],
+            "language": "la",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Annals_%28Tacitus%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c5e10fc0-b487-55be-ac92-000e946fa54e",
+            "title": "Römische Geschichte",
+            "authors": [
+              "Theodor Mommsen"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/R%C3%B6mische_Geschichte_%28Theodor_Mommsen%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "history of the Roman Empire",
+        "language": "en",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 1349.2,
+        "vercel_id": "arn1::fra1::zw4m4-1794436811432-c7d10168c2c6",
+        "server_ms": 1178.8,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 25.9,
+          "embedding": 590.9,
+          "vector": 20.6,
+          "rerank": 539.9
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "f6d1215b-b8f1-517e-857a-69333484fa2c",
+            "title": "The Complete Project Gutenberg Works of Jane Austen: A Linked Index of all PG Editions of Jane Austen",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/31100",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c915a593-bb39-504d-bd3f-34db87b87693",
+            "title": "A Memoir of Jane Austen",
+            "authors": [
+              "James Edward Austen-Leigh"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/A_Memoir_of_Jane_Austen",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "fd52a19f-218b-5c60-b18b-746c7d5713ee",
+            "title": "Pride and Prejudice",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Pride_and_Prejudice",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Jane Austen",
+        "language": "en",
+        "kind": "exact",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 894.3,
+        "vercel_id": "arn1::fra1::j7vv2-1794436815974-8b2c0b7faa6e",
+        "server_ms": 796.4,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 32.4,
+          "embedding": 223.0,
+          "vector": 18.1,
+          "rerank": 521.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "3856923b-aacf-576c-b69b-35ed07b3ced2",
+            "title": "L'Ombre chinoise",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/L%27Ombre_chinoise",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "30b2ac91-9ca7-586e-a96b-44163cb91112",
+            "title": "La Tête d'un homme",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/La_T%C3%AAte_d%27un_homme",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2f367974-76ea-531a-ada6-d4ac0987859e",
+            "title": "The Mysteries of Paris",
+            "authors": [
+              "Eugène Sue"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Les_Myst%C3%A8res_de_Paris",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romans policiers qui se déroulent à Paris",
+        "language": "fr",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 1096.8,
+        "vercel_id": "arn1::fra1::xrcml-1794436820075-5a59a4d70a4b",
+        "server_ms": 981.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 32.3,
+          "embedding": 390.9,
+          "vector": 19.1,
+          "rerank": 537.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "dd02c1a0-5b16-565b-ad5e-38f54a400020",
+            "title": "Clérambault",
+            "authors": [
+              "Romain Rolland"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Cl%C3%A9rambault_%28novel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "be700687-7945-576e-bbbc-948ed63c3009",
+            "title": "All quiet on the Western Front",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/75011",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "df9cf786-1ef4-5866-adec-91fd7066f295",
+            "title": "Im Westen nichts Neues",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/Im_Westen_nichts_Neues",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Romane über den Ersten Weltkrieg",
+        "language": "de",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 4357.8,
+        "vercel_id": "arn1::fra1::kmptz-1794436824384-a639e12e2892",
+        "server_ms": 4036.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 31.9,
+          "embedding": 1198.6,
+          "vector": 17.0,
+          "rerank": 2787.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "5cfa84de-bfe8-5248-a7ee-31d8628e8fa9",
+            "title": "Romola",
+            "authors": [
+              "George Eliot"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Romola",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "8f75d9ec-3c1d-50fb-a72a-81be39bcda57",
+            "title": "Historias florentinas",
+            "authors": [
+              "Francesco Guicciardini"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historias_florentinas",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e3c3c184-c844-5d15-8965-05380b83455e",
+            "title": "Florentine Histories",
+            "authors": [
+              "Niccolò Machiavelli"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Histoire_de_Florence_%28Machiavel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romanzi storici ambientati a Firenze",
+        "language": "it",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 2033.5,
+        "vercel_id": "arn1::fra1::q94h9-1794436831945-479309c08c7b",
+        "server_ms": 1920.5,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 28.4,
+          "embedding": 771.6,
+          "vector": 15.5,
+          "rerank": 1103.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "fcc6d2ac-df27-504d-ab59-54bd4738c1f1",
+            "title": "The Sound of Waves",
+            "authors": [
+              "Yukio Mishima"
+            ],
+            "language": "ja",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "ja",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://ja.wikipedia.org/wiki/%E6%BD%AE%E9%A8%92_%28%E5%B0%8F%E8%AA%AC%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "14db8030-cfcc-5325-a533-950f063231f5",
+            "title": "O Filho do Pescador",
+            "authors": [
+              "Antônio Gonçalves Teixeira e Sousa"
+            ],
+            "language": "pt",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "pt",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://pt.wikipedia.org/wiki/O_Filho_do_Pescador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "ad1aec0c-accc-5ae3-92d3-8f6ca7f37227",
+            "title": "Pêcheur d'Islande",
+            "authors": [
+              "Pierre Loti"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/An_Iceland_Fisherman",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romances sobre o mar e os pescadores",
+        "language": "pt",
+        "kind": "topic",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 937.0,
+        "vercel_id": "arn1::fra1::25s6q-1794436837175-3f15e882ce7e",
+        "server_ms": 830.9,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 31.1,
+          "embedding": 210.4,
+          "vector": 27.6,
+          "rerank": 560.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "a8bdee26-410d-5814-96db-bc837e9dc7ce",
+            "title": "PANA",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/PANA",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "35491b0a-4a1e-5a8f-aff9-d6eb2d45e92b",
+            "title": "Frascati Manual",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Frascati_Manual",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "7529bcc7-4eaf-5b93-ac81-f811ba7254ec",
+            "title": "Manual de Merck",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Manual_de_Merck",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "manual de reparación del motor de un Seat Ibiza de 2004",
+        "language": "es",
+        "kind": "no_answer",
+        "round": 2
+      },
+      {
+        "status": 200,
+        "wall_ms": 2237.2,
+        "vercel_id": "arn1::fra1::x4jrh-1794436841464-bf5bd2aa6a29",
+        "server_ms": 1989.8,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 28.8,
+          "embedding": 272.7,
+          "vector": 97.2,
+          "rerank": 1589.7
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "428ca0dc-e0c6-55b3-a17e-aad8d7bc58dc",
+            "title": "Fundamentación de un modelo de gestión del conocimiento para la Universidad Católica Luis Amigó",
+            "authors": [
+              "Jaime Alberto Beltrán Ríos",
+              "José Antonio López Giraldo"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/48196",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e5dff874-71a0-5f2d-baab-933c6299a13f",
+            "title": "Análisis estratégico en salud y gestión a través de la escucha",
+            "authors": [
+              "Viviana Martinovich",
+              "Francisco Javier Uribe Rivera"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/40799",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "08acd22f-29d0-5cda-a828-c0bce00a5970",
+            "title": "La gobernanza de los puertos atlánticos, siglos xiv-xx : Políticas y estructuras portuarias",
+            "authors": [
+              "Amélia Polónia",
+              "Ana María Rivera Medina"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/48730",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "how to configure a Kubernetes ingress controller",
+        "language": "en",
+        "kind": "no_answer",
+        "round": 2
+      }
+    ],
+    [
+      {
+        "status": 200,
+        "wall_ms": 1248.8,
+        "vercel_id": "arn1::fra1::x4jrh-1794436846770-03137f2ea02c",
+        "server_ms": 1112.1,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 31.2,
+          "embedding": 469.2,
+          "vector": 15.1,
+          "rerank": 595.3
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+            "title": "Los cipreses creen en Dios",
+            "authors": [
+              "José María Gironella"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Los_cipreses_creen_en_Dios",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "3526e35b-dcf2-5ee7-a640-ce69be2dc709",
+            "title": "A sangre y fuego. Héroes, bestias y mártires de España",
+            "authors": [
+              "Manuel Chaves Nogales"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/A_sangre_y_fuego._H%C3%A9roes%2C_bestias_y_m%C3%A1rtires_de_Espa%C3%B1a",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "b923efaa-6795-5772-bacc-687e330dbdc6",
+            "title": "Las figuras de cera: novela",
+            "authors": [
+              "Pío Baroja"
+            ],
+            "language": "es",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/63680",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "novelas sobre la guerra civil española",
+        "language": "es",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1133.1,
+        "vercel_id": "arn1::fra1::78qqk-1794436851254-0e68155d9604",
+        "server_ms": 960.1,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 27.9,
+          "embedding": 378.0,
+          "vector": 14.3,
+          "rerank": 538.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "bf05f502-2186-5f43-b028-f87d33e1be5c",
+            "title": "Introducción a la filosofía",
+            "authors": [
+              "Luis Cuéllar"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Introducci%C3%B3n_a_la_filosof%C3%ADa",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "31b46e9c-3447-5a9d-8bcf-d12a6c44aaab",
+            "title": "Historia de la filosofía sin temor ni temblor",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historia_de_la_filosof%C3%ADa_sin_temor_ni_temblor",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "d1e66b2c-c690-5b47-aefd-33b416eccfa5",
+            "title": "Ética para Amador",
+            "authors": [
+              "Fernando Savater"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/%C3%89tica_para_Amador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "libros de filosofía para principiantes",
+        "language": "es",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1081.7,
+        "vercel_id": "arn1::fra1::fb7dl-1794436855549-e88f24d8069a",
+        "server_ms": 939.4,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 77.9,
+          "embedding": 293.5,
+          "vector": 15.4,
+          "rerank": 551.2
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "0b15d0a1-8cb5-532c-8746-1907932e2509",
+            "title": "Cien años de soledad",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "f1a269c0-90ef-5153-854e-b9efc459f80e",
+            "title": "La hojarasca",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/La_hojarasca",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "957d4ce0-7f30-55b1-9b64-e90726bf56e7",
+            "title": "Vivir para contarla",
+            "authors": [
+              "Gabriel García Márquez"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Vivir_para_contarla",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Cien años de soledad",
+        "language": "es",
+        "kind": "exact",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 2023.5,
+        "vercel_id": "arn1::fra1::6qmxn-1794436859835-d1e78d40d150",
+        "server_ms": 1890.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 37.4,
+          "embedding": 1346.5,
+          "vector": 19.6,
+          "rerank": 485.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "c7e40f1f-7e51-5117-a62b-ccbbca283f6a",
+            "title": "Robopocalypse",
+            "authors": [
+              "Daniel H. Wilson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Robopocalypse",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2ddd9e91-2763-581d-a05e-11fd891790ee",
+            "title": "Neuromancer",
+            "authors": [
+              "William Gibson"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Neuromancer",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "481bb769-a596-57b2-9bc9-20af18e749ef",
+            "title": "The Invincible",
+            "authors": [
+              "Stanisław Lem"
+            ],
+            "language": "pl",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_Invincible",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "science fiction novels about artificial intelligence",
+        "language": "en",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 3000.2,
+        "vercel_id": "arn1::fra1::4dkp4-1794436865061-4b0c8d7c9519",
+        "server_ms": 2851.5,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 32.3,
+          "embedding": 268.7,
+          "vector": 18.4,
+          "rerank": 2530.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "60ea68df-78ac-59be-ae51-a8174f5d5757",
+            "title": "The History of the Decline and Fall of the Roman Empire",
+            "authors": [
+              "Edward Gibbon"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/The_History_of_the_Decline_and_Fall_of_the_Roman_Empire",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "66ee26f9-3332-556f-8640-071687fbcc15",
+            "title": "Annals",
+            "authors": [
+              "Tacitus"
+            ],
+            "language": "la",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Annals_%28Tacitus%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c5e10fc0-b487-55be-ac92-000e946fa54e",
+            "title": "Römische Geschichte",
+            "authors": [
+              "Theodor Mommsen"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/R%C3%B6mische_Geschichte_%28Theodor_Mommsen%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "history of the Roman Empire",
+        "language": "en",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1045.5,
+        "vercel_id": "arn1::fra1::6kffz-1794436871269-17feb03140ee",
+        "server_ms": 931.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 25.9,
+          "embedding": 335.7,
+          "vector": 18.5,
+          "rerank": 549.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "f6d1215b-b8f1-517e-857a-69333484fa2c",
+            "title": "The Complete Project Gutenberg Works of Jane Austen: A Linked Index of all PG Editions of Jane Austen",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/31100",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "c915a593-bb39-504d-bd3f-34db87b87693",
+            "title": "A Memoir of Jane Austen",
+            "authors": [
+              "James Edward Austen-Leigh"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/A_Memoir_of_Jane_Austen",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "fd52a19f-218b-5c60-b18b-746c7d5713ee",
+            "title": "Pride and Prejudice",
+            "authors": [
+              "Jane Austen"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Pride_and_Prejudice",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Jane Austen",
+        "language": "en",
+        "kind": "exact",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1156.5,
+        "vercel_id": "arn1::fra1::zb74d-1794436875549-8014d5556eb5",
+        "server_ms": 1006.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 34.2,
+          "embedding": 454.8,
+          "vector": 18.4,
+          "rerank": 497.8
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "3856923b-aacf-576c-b69b-35ed07b3ced2",
+            "title": "L'Ombre chinoise",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/L%27Ombre_chinoise",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "30b2ac91-9ca7-586e-a96b-44163cb91112",
+            "title": "La Tête d'un homme",
+            "authors": [
+              "Georges Simenon"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/La_T%C3%AAte_d%27un_homme",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "2f367974-76ea-531a-ada6-d4ac0987859e",
+            "title": "The Mysteries of Paris",
+            "authors": [
+              "Eugène Sue"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Les_Myst%C3%A8res_de_Paris",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romans policiers qui se déroulent à Paris",
+        "language": "fr",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1680.3,
+        "vercel_id": "arn1::fra1::lwjj5-1794436879874-5ce7ecfd8196",
+        "server_ms": 1564.7,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 33.1,
+          "embedding": 970.2,
+          "vector": 18.3,
+          "rerank": 541.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "dd02c1a0-5b16-565b-ad5e-38f54a400020",
+            "title": "Clérambault",
+            "authors": [
+              "Romain Rolland"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Cl%C3%A9rambault_%28novel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "be700687-7945-576e-bbbc-948ed63c3009",
+            "title": "All quiet on the Western Front",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "en",
+            "source": "gutenberg",
+            "description_source": {
+              "source": "gutenberg",
+              "language": "en",
+              "license": "Project Gutenberg catalog (no explicit licence)",
+              "attribution_url": "https://www.gutenberg.org/ebooks/75011",
+              "auto_generated": true
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "df9cf786-1ef4-5866-adec-91fd7066f295",
+            "title": "Im Westen nichts Neues",
+            "authors": [
+              "Erich Maria Remarque"
+            ],
+            "language": "de",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "de",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://de.wikipedia.org/wiki/Im_Westen_nichts_Neues",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "Romane über den Ersten Weltkrieg",
+        "language": "de",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 3276.4,
+        "vercel_id": "arn1::fra1::cjbf8-1794436884851-d9125f4e2544",
+        "server_ms": 3083.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 31.2,
+          "embedding": 2403.8,
+          "vector": 16.9,
+          "rerank": 629.5
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "5cfa84de-bfe8-5248-a7ee-31d8628e8fa9",
+            "title": "Romola",
+            "authors": [
+              "George Eliot"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Romola",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "8f75d9ec-3c1d-50fb-a72a-81be39bcda57",
+            "title": "Historias florentinas",
+            "authors": [
+              "Francesco Guicciardini"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Historias_florentinas",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e3c3c184-c844-5d15-8965-05380b83455e",
+            "title": "Florentine Histories",
+            "authors": [
+              "Niccolò Machiavelli"
+            ],
+            "language": "it",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "fr",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://fr.wikipedia.org/wiki/Histoire_de_Florence_%28Machiavel%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romanzi storici ambientati a Firenze",
+        "language": "it",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1726.2,
+        "vercel_id": "arn1::fra1::fb7dl-1794436891245-5e99f9c96446",
+        "server_ms": 1615.0,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 30.4,
+          "embedding": 1016.9,
+          "vector": 14.7,
+          "rerank": 551.4
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "fcc6d2ac-df27-504d-ab59-54bd4738c1f1",
+            "title": "The Sound of Waves",
+            "authors": [
+              "Yukio Mishima"
+            ],
+            "language": "ja",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "ja",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://ja.wikipedia.org/wiki/%E6%BD%AE%E9%A8%92_%28%E5%B0%8F%E8%AA%AC%29",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "14db8030-cfcc-5325-a533-950f063231f5",
+            "title": "O Filho do Pescador",
+            "authors": [
+              "Antônio Gonçalves Teixeira e Sousa"
+            ],
+            "language": "pt",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "pt",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://pt.wikipedia.org/wiki/O_Filho_do_Pescador",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "ad1aec0c-accc-5ae3-92d3-8f6ca7f37227",
+            "title": "Pêcheur d'Islande",
+            "authors": [
+              "Pierre Loti"
+            ],
+            "language": "fr",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/An_Iceland_Fisherman",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "romances sobre o mar e os pescadores",
+        "language": "pt",
+        "kind": "topic",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1173.2,
+        "vercel_id": "arn1::fra1::xdzlv-1794436896170-034b4916bc09",
+        "server_ms": 1059.5,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 98.5,
+          "embedding": 364.2,
+          "vector": 14.9,
+          "rerank": 580.6
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "a8bdee26-410d-5814-96db-bc837e9dc7ce",
+            "title": "PANA",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 4.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/PANA",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "35491b0a-4a1e-5a8f-aff9-d6eb2d45e92b",
+            "title": "Frascati Manual",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "en",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "en",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://en.wikipedia.org/wiki/Frascati_Manual",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "7529bcc7-4eaf-5b93-ac81-f811ba7254ec",
+            "title": "Manual de Merck",
+            "authors": [
+              "Unknown"
+            ],
+            "language": "es",
+            "source": "wikidata",
+            "description_source": {
+              "source": "wikipedia",
+              "language": "es",
+              "license": "CC BY-SA 3.0",
+              "attribution_url": "https://es.wikipedia.org/wiki/Manual_de_Merck",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "manual de reparación del motor de un Seat Ibiza de 2004",
+        "language": "es",
+        "kind": "no_answer",
+        "round": 3
+      },
+      {
+        "status": 200,
+        "wall_ms": 1116.1,
+        "vercel_id": "arn1::fra1::65mw5-1794436900574-0cd071474f1c",
+        "server_ms": 986.2,
+        "search_mode": "hybrid",
+        "degraded": false,
+        "degradation_reason": null,
+        "notices": [],
+        "timings_ms": {
+          "lexical": 27.9,
+          "embedding": 195.5,
+          "vector": 38.4,
+          "rerank": 722.9
+        },
+        "reranked": true,
+        "top": [
+          {
+            "id": "428ca0dc-e0c6-55b3-a17e-aad8d7bc58dc",
+            "title": "Fundamentación de un modelo de gestión del conocimiento para la Universidad Católica Luis Amigó",
+            "authors": [
+              "Jaime Alberto Beltrán Ríos",
+              "José Antonio López Giraldo"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/48196",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "4694ce3f-4154-5ecb-a906-e94df95a2868",
+            "title": "Consideraciones para implementar programas de Educación Virtual",
+            "authors": [
+              "RAMIREZ GARCIA",
+              "Cruz"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "en",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/150890.2",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          },
+          {
+            "id": "e5dff874-71a0-5f2d-baab-933c6299a13f",
+            "title": "Análisis estratégico en salud y gestión a través de la escucha",
+            "authors": [
+              "Viviana Martinovich",
+              "Francisco Javier Uribe Rivera"
+            ],
+            "language": "es",
+            "source": "doab",
+            "description_source": {
+              "source": "doab",
+              "language": "es",
+              "license": "CC0 1.0",
+              "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/40799",
+              "auto_generated": false
+            },
+            "explanation": null,
+            "grounded": null
+          }
+        ],
+        "results": 10,
+        "query": "how to configure a Kubernetes ingress controller",
+        "language": "en",
+        "kind": "no_answer",
+        "round": 3
+      }
+    ]
+  ],
+  "book": {
+    "id": "0b15d0a1-8cb5-532c-8746-1907932e2509",
+    "status": 200,
+    "title": "Cien años de soledad",
+    "description_source": {
+      "source": "wikipedia",
+      "language": "es",
+      "license": "CC BY-SA 3.0",
+      "attribution_url": "https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad",
+      "auto_generated": false
+    }
+  },
+  "similar": {
+    "status": 200,
+    "titles": [
+      "El coronel no tiene quien le escriba",
+      "El amor en los tiempos del cólera",
+      "Memoria de mis putas tristes",
+      "Vivir para contarla",
+      "The Autumn of the Patriarch"
+    ]
+  },
+  "explanations": {
+    "status": 200,
+    "wall_ms": 26277.7,
+    "vercel_id": "arn1::fra1::5s6lf-1794436908385-9e73098466dd",
+    "server_ms": 26174.0,
+    "search_mode": "hybrid",
+    "degraded": false,
+    "degradation_reason": null,
+    "notices": [],
+    "timings_ms": {
+      "lexical": 215.5,
+      "embedding": 1656.3,
+      "vector": 210.6,
+      "rerank": 568.4,
+      "explanations": 23521.6
+    },
+    "reranked": true,
+    "top": [
+      {
+        "id": "99bdb53e-3696-5c81-8242-712674e69b1a",
+        "title": "The Murder Room",
+        "authors": [
+          "P. D. James"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "wikipedia",
+          "language": "en",
+          "license": "CC BY-SA 3.0",
+          "attribution_url": "https://en.wikipedia.org/wiki/The_Murder_Room",
+          "auto_generated": false
+        },
+        "explanation": "El libro pertenece a las categorías de literatura criminal y ficción de misterio [CITE: categories], lo que responde al género de 'novelas de misterio' solicitado. Además, la descripción indica explícitamente que es una novela detectivesca y que la acción transcurre en Londres [CITE: description], coincidiendo con la ambientación londinense pedida. También se confirma que forma parte de una serie detectivesca, reforzando su carácter de misterio [CITE: description].",
+        "grounded": true
+      },
+      {
+        "id": "359d348e-01ad-5077-8a9f-2d99f20f0f58",
+        "title": "A Silent Witness",
+        "authors": [
+          "R. Austin Freeman"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "gutenberg",
+          "language": "en",
+          "license": "Project Gutenberg catalog (no explicit licence)",
+          "attribution_url": "https://www.gutenberg.org/ebooks/76796",
+          "auto_generated": true
+        },
+        "explanation": "La novela es relevante porque pertenece al género de ficción detectivesca y misterio [CITE: categories]. Además, la trama está claramente ambientada en Londres, con escenarios como Hampstead y Millfield Lane [CITE: description], y la ciudad aparece también como tema en las categorías [CITE: categories]. La historia gira en torno a una investigación forense dirigida por el Dr. John Thorndyke [CITE: description], lo que confirma su carácter de novela de misterio.",
+        "grounded": true
+      },
+      {
+        "id": "6aeba90e-b12b-5ba6-8102-f38b74984611",
+        "title": "The Man in the Brown Suit",
+        "authors": [
+          "Agatha Christie"
+        ],
+        "language": "en",
+        "source": "wikidata",
+        "description_source": {
+          "source": "wikipedia",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "attribution_url": "https://en.wikipedia.org/wiki/The_Man_in_the_Brown_Suit",
+          "auto_generated": false
+        },
+        "explanation": "La obra pertenece al género de misterio y ficción detectivesca, como indican sus categorías [CITE: categories]. Además, la descripción confirma que es una novela de misterio [CITE: description] y que parte de la acción está ambientada en Londres, ya que 'The setting for the early chapters is London' [CITE: description]. También se menciona que hay un asesinato en Inglaterra, lo que refuerza el componente de misterio y crimen [CITE: description].",
+        "grounded": true
+      }
+    ],
+    "results": 3
+  },
+  "disabled": {
+    "POST /api/v1/evaluate": 404,
+    "GET /api/v1/usage": 404
+  },
+  "rate_limit_detail": "Too many searches from this client: at most 20 per minute. Retry in 58 s.",
+  "rate_limit": {
+    "requests": 25,
+    "ok": 20,
+    "limited": 5,
+    "first_429_at": 21,
+    "retry_after_s": "58"
+  },
+  "finished_at": "2026-11-11T22:43:22+00:00",
+  "deployment": {
+    "Public URL": "https://ai-book-recommender-one.vercel.app (web UI at /ui/, MCP at /mcp, API docs at /docs)",
+    "Date": "2026-11-11",
+    "Vercel project": "ai-book-recommender (team luis-projects-f5315dfc, Hobby plan), framework preset FastAPI, no Git repository connected: deployed from the working directory with `vercel deploy --prod`",
+    "Function": "one Python function from app/main.py (variable app): python3.13, region fra1 (Frankfurt, the region of the Neon database), maxDuration 120 s, memory 2048 MB / 1 vCPU (fixed on Hobby), Fluid compute (default of new projects); bundle 49.8 MB; build 10 s, 95 files uploaded",
+    "Dependencies": "pyproject.toml (the 66 pins of requirements-cloud.txt); requirements.txt is not uploaded",
+    "Static files": "app/ui/static is promoted to Vercel's CDN at build time (x-vercel-cache: HIT on /ui/)",
+    "Deployment protection": "Vercel Authentication (Hobby default) on the per-deployment URLs; the production alias is public",
+    "Environment variables (production; names only)": "SEARCH_PROFILE, DATABASE_SCHEMA, DATABASE_URL (secret, pooled), OPENROUTER_API_KEY (secret), LLM_PROVIDER, LLM_MODEL, LLM_TIMEOUT_S, LLM_MAX_RETRIES, LLM_CLIENT_MAX_RETRIES, DAILY_SEARCH_LIMIT, DAILY_LLM_LIMIT, BUDGET_SCHEMA, SEARCH_RATE_LIMIT_PER_MINUTE, LLM_RATE_LIMIT_PER_MINUTE, CLIENT_IP_HEADER, MCP_ALLOWED_HOSTS, MCP_ALLOWED_ORIGINS, MCP_RATE_LIMIT_PER_MINUTE, EVALUATE_ENDPOINT_ENABLED, USAGE_ENDPOINT_ENABLED",
+    "Database": "Neon project twilight-poetry-45310085, branch production, schema catalog_deploy (30000 works) and usage_budget (daily counters); database size 423.9 MiB"
+  },
+  "extra_sections": [
+    {
+      "title": "Web UI in a browser",
+      "lines": [
+        "Opened https://ai-book-recommender-one.vercel.app/ui/ in a browser, typed \"novelas de Gabriel García Márquez\" and pressed Buscar:",
+        "",
+        "- First attempt, right after the rate-limit check above: the page showed \"Error en la búsqueda: 429: Too many searches from this client: at most 20 per minute. Retry in 39 s.\" (the limit is visible to a user).",
+        "- Second attempt a minute later: \"10 resultados en 1401 ms (hybrid) · candidatos BM25 60, vector 60\"; the health box read \"Índices listos · LLM deepseek/deepseek-v4.1-flash\"; the language filter lists the twelve catalog languages; the \"Sobre los datos\" section is present.",
+        "- Attribution under the first three results (with links to the article, the licence deed and the Wikidata item):",
+        "  - Cien años de soledad (Gabriel García Márquez, 1967): \"Extracto del artículo de Wikipedia (es), CC BY-SA 3.0 · Ficha: Wikidata Q178869\"",
+        "  - En agosto nos vemos (2024): \"Extracto del artículo de Wikipedia (en), CC BY-SA 4.0 · Ficha: Wikidata Q123133089\"",
+        "  - La mala hora (1962): \"Extracto del artículo de Wikipedia (en), CC BY-SA 3.0 · Ficha: Wikidata Q1630561\""
+      ]
+    },
+    {
+      "title": "Deployed catalog",
+      "lines": [
+        "Selection: `Score = Wikipedia editions + Gutenberg downloads/1000. Quotas for 30000 works: en 12000, es 7500, fr 1050, de 1050, it 1050, pt 1050, ca 1050, nl 1050, ru 1050, zh 1050, ja 1050, ar 1050. Within a language, works whose language is stated by a source first, then highest score (ties: more description languages, then id); unused places go to the best remaining works of any language.`",
+        "",
+        "| Language of the work | Works |",
+        "|---|---|",
+        "| en | 12,000 |",
+        "| es | 7,231 |",
+        "| ru | 1,050 |",
+        "| it | 1,050 |",
+        "| pt | 1,050 |",
+        "| zh | 1,050 |",
+        "| ja | 1,050 |",
+        "| nl | 1,050 |",
+        "| de | 1,050 |",
+        "| ar | 1,050 |",
+        "| fr | 1,050 |",
+        "| ca | 971 |",
+        "| la | 134 |",
+        "| other (33 languages) | 214 |",
+        "",
+        "| Sources of the work | Works |",
+        "|---|---|",
+        "| wikidata | 23,821 |",
+        "| gutenberg + wikidata | 2,438 |",
+        "| gutenberg | 2,095 |",
+        "| doab | 1,642 |",
+        "| doab + wikidata | 3 |",
+        "| doab + gutenberg | 1 |",
+        "",
+        "| Description language | Works with a description in it | Works whose primary description is in it |",
+        "|---|---|---|",
+        "| en | 19,652 | 15,300 |",
+        "| es | 12,596 | 5,727 |",
+        "| fr | 8,351 | 1,202 |",
+        "| de | 6,282 | 1,083 |",
+        "| it | 8,309 | 1,045 |",
+        "| pt | 5,617 | 933 |",
+        "| ca | 3,400 | 918 |",
+        "| nl | 3,803 | 945 |",
+        "| ru | 6,779 | 969 |",
+        "| zh | 2,104 | 279 |",
+        "| ja | 2,328 | 631 |",
+        "| ar | 5,338 | 968 |",
+        "",
+        "Descriptions by licence: CC BY-SA 3.0 57,232, CC BY-SA 4.0 23,215, Project Gutenberg catalog (no explicit licence) 2,465, CC0 1.0 1,647.",
+        "",
+        "Licences and attribution per source (verified 2026-11-11, V11): Wikidata CC0 1.0 (no attribution needed); Wikipedia text CC BY-SA 3.0 (via DBpedia) or 4.0 (API), attributed per record with the article URL, shown under every result in the UI with a link to the licence; Project Gutenberg catalog metadata without an explicit licence (attributed with the link to the book); DOAB metadata CC0 1.0 (each record links its DOAB page).",
+        "",
+        "The same counts, the selection rule and the licence of each source are stored in the database (`catalog_deploy.catalog_info`, key `catalog_contents`)."
+      ]
+    },
+    {
+      "title": "Footprint and sizes",
+      "lines": [
+        "| Measure | Value |",
+        "|---|---|",
+        "| Database before the load (after dropping `catalog_small`) | 18.8 MiB (178.6 MiB before) |",
+        "| Stage 1 (5,000 works, GIN and texts kept) after VACUUM FULL | 20,401 bytes per work |",
+        "| GIN index (only ts_rank_cd uses it) | 13.0 MiB for 5,000 works = 2,726 bytes per work saved |",
+        "| Stored description texts in `work_texts.body` | 9.8 MiB for 5,000 works = 2,048 bytes per work saved |",
+        "| Dead rows left by the load (insert then tsvector update) | 13.8 MiB for 5,000 works, removed by VACUUM FULL |",
+        "| Stage 2 (15,000 works, without GIN and texts) | database 256.2 MiB |",
+        "| Stage 3 (30,000 works) before VACUUM FULL | database 462.1 MiB |",
+        "| Final, after VACUUM FULL | database 423.9 MiB, schema 405.1 MiB, 14,158 bytes per work |",
+        "| Extrapolated saving at 30,000 works | GIN about 78 MiB, texts about 59 MiB |",
+        "| Embeddings (qwen/qwen3-embedding-8b, 1024 d, DeepInfra) | 5,603,598 tokens, 0.0560 USD reported by OpenRouter (1,403 requests) |"
+      ]
+    },
+    {
+      "title": "Budget guard (end to end)",
+      "lines": [
+        "Run against a temporary Neon branch (`v17-it`, a copy of production with the deployed catalog) with the API started locally in the cloud configuration and tiny limits (DAILY_SEARCH_LIMIT=2, DAILY_LLM_LIMIT=1, BUDGET_SCHEMA=usage_budget_e2e), real OpenRouter calls; the production day's budget was not touched.",
+        "",
+        "| Step | Status | Mode | Notices | Explanations | Re-ranked | Wall ms |",
+        "|---|---|---|---|---|---|---|",
+        "| 1 plain search | 200 | hybrid | - | 0 | True | 4579 |",
+        "| 2 search with explanations | 200 | hybrid | - | 3 | True | 10193 |",
+        "| 3 plain search after the search budget | 200 | lexical_only | search_budget_spent | 0 | False | 379 |",
+        "| 4 search with explanations after both budgets | 200 | lexical_only | llm_budget_spent, search_budget_spent | 0 | False | 468 |",
+        "| 5 agent after the LLM budget | 429 | - | - | - | - | - |",
+        "",
+        "Agent answer: The day's budget of LLM requests of this public demo is spent, so the agent is not available until 00:00 UTC. Plain search still works.",
+        "",
+        "Counter table afterwards: model_search 2, llm_request 1 (2026-11-11). The integration tests (`tests/integration/test_postgres_usage_budget.py`, same branch) add six instances asking at once: exactly the limit (25 of 60) was granted."
+      ]
+    },
+    {
+      "title": "MCP endpoint",
+      "lines": [
+        "`python -m scripts.mcp_demo --url https://ai-book-recommender-one.vercel.app/mcp` (protocol 2026-07-28), run at the end of the check:",
+        "",
+        "```",
+        "Connected to https://ai-book-recommender-one.vercel.app/mcp",
+        "  server: ai-book-recommender 1.0.0 | protocol: 2026-07-28 | 347 ms",
+        "",
+        "tools/list (164 ms)",
+        "  - search_books(query, max_results?, language?, min_year?, max_year?, category?)  read-only=True",
+        "      Search this server's book catalog and return the best matches, best first. Retrieval is hybrid: BM25 keywor...",
+        "  - get_book(book_id)  read-only=True",
+        "      Get the full catalog record of one book by its book_id (a UUID returned by search_books or similar_books): ...",
+        "  - similar_books(book_id, max_results?)  read-only=True",
+        "      Find books similar in content to a given catalog book (item-to-item recommendation by the cosine similarity...",
+        "",
+        "search_books(query='introduction to machine learning with python', max_results=3)  (2695 ms)",
+        "  mode=hybrid reranked=True results=3",
+        "     1. The Master Algorithm                                         Pedro Domingos         2015 en  score=0.0274",
+        "     2. Artificial Intelligence: A Modern Approach                   Stuart J. Russell      1995 en  score=0.0154",
+        "     3. Introduction to Algorithms                                   Clifford Stein         1990 en  score=0.0255",
+        "",
+        "get_book(book_id=86ca64b9-bab6-53e3-bc46-c15205810b10)  (133 ms)",
+        "  The Master Algorithm | Pedro Domingos | 2015-01-01 | en | wikidata:Q21428158",
+        "  publisher=None isbn13=None pages=None",
+        "  description (222 chars): The Master Algorithm: How the Quest for the Ultimate Learning Machine Will Remake Our World is a book by Pe...",
+        "",
+        "similar_books(book_id=86ca64b9-bab6-53e3-bc46-c15205810b10, max_results=3)  (225 ms)",
+        "     1. Artificial Intelligence: A Modern Approach                   Stuart J. Russell      1995 en  similarity=0.5980",
+        "     2. Weapons of Math Destruction                                  Cathy O'Neil           2016 en  similarity=0.5861",
+        "     3. The Alignment Problem                                        Brian Christian        ---- en  similarity=0.5858",
+        "",
+        "get_book(unknown id)  (198 ms)  is_error=True",
+        "  Error executing tool get_book: No book with id 00000000-0000-0000-0000-000000000000 in the catalog. Use search_books ...",
+        "```",
+        "",
+        "Two earlier runs at 20:40 UTC, sent at the same moment in both protocol modes (`--mode legacy` negotiates 2025-11-25), completed every call, but their search degraded to lexical-only during a provider overload (see the last section). The legacy run's first lines:",
+        "",
+        "```",
+        "Connected to https://ai-book-recommender-one.vercel.app/mcp",
+        "  server: ai-book-recommender 1.0.0 | protocol: 2025-11-25 | 376 ms",
+        "",
+        "```",
+        "",
+        "MCP Inspector CLI:",
+        "",
+        "```",
+        "$ npx @modelcontextprotocol/inspector@2.14.0 --cli --server-url https://ai-book-recommender-one.vercel.app/mcp --transport http --method tools/list",
+        "  search_books  readOnlyHint=True",
+        "  get_book  readOnlyHint=True",
+        "  similar_books  readOnlyHint=True",
+        "$ ... --method tools/call --tool-name search_books --tool-args-json '{\"query\":\"novelas de caballerías\",\"max_results\":3,\"language\":\"es\"}'",
+        "  isError=False search_mode=hybrid reranked=True",
+        "  1. Libros de Rocinante | Unknown | es",
+        "  2. Le Romant des Romans | Unknown | es",
+        "  3. Romances de materia caballeresca | Martí de Riquer i Morera | es",
+        "```"
+      ]
+    },
+    {
+      "title": "Protections",
+      "lines": [
+        "| Guard | Setting in production | When it is hit | What it cannot prevent |",
+        "|---|---|---|---|",
+        "| Daily budget of model-backed searches (Postgres counter, one atomic statement per search, shared by every instance) | DAILY_SEARCH_LIMIT=400 per UTC day | the search runs lexical-only without re-ranking (no model call), `degraded` with the reason and the notice `search_budget_spent`; the UI shows a notice | it does not stop database traffic (lexical searches still wake Neon and use compute hours); MCP searches share the same budget |",
+        "| Daily budget of LLM requests | DAILY_LLM_LIMIT=60 per UTC day (one unit per request with understanding or explanations, one per agent question) | understanding and explanations are skipped with the notice `llm_budget_spent`; `POST /agent/ask` answers 429 with a message | an agent question makes several LLM calls for one unit; a budget that cannot be read counts as spent (fail closed) |",
+        "| Per-client rate limit, REST | SEARCH_RATE_LIMIT_PER_MINUTE=20 (search, similar books), LLM_RATE_LIMIT_PER_MINUTE=4 (LLM options, agent), client = `x-real-ip` (set by Vercel, not forgeable) | 429 with Retry-After | counters live in each instance's memory: several instances give a client several allowances, and many clients together are not limited; the daily budget is the hard ceiling |",
+        "| Per-client rate limit, MCP | MCP_RATE_LIMIT_PER_MINUTE=30, same client header | 429 (JSON-RPC error) | same as above; assistants such as Claude call from shared provider addresses, so their users share one counter |",
+        "| Model API deadlines | API_QUERY_* cloud defaults: 3 s per attempt, 1 retry, 5 s per call; LLM 15 s, 1 retry, provider client retries 0 | embedding failure: lexical-only; rerank failure: fused order; LLM failure: results without explanations | a slow provider still costs a search up to about 5 s per call |",
+        "| Disabled endpoints | EVALUATE_ENDPOINT_ENABLED=false, USAGE_ENDPOINT_ENABLED=false | 404 | - |",
+        "| Function duration | maxDuration 120 s | the platform ends the request | - |",
+        "",
+        "Worst case of the model spending per day with these limits: 400 searches x about 0.0015 USD (embedding and re-ranking, measured in V13) + 60 LLM requests x about 0.002 USD at most (three explanations or an agent question with DeepSeek V4.1 Flash at 0.051 / 0.567 USD per million input / output tokens) = about 0.72 USD; the agent's own searches take search units, so they are inside the 400.",
+        "The owner should also set a credit limit on the OpenRouter key."
+      ]
+    },
+    {
+      "title": "Commands",
+      "lines": [
+        "Redeploy (from the repository root, linked to the project in `.vercel/`):",
+        "",
+        "```",
+        "vercel deploy --prod --yes",
+        "```",
+        "",
+        "Change a setting: `printf '%s' VALUE | vercel env add NAME production --force --yes`, then redeploy.",
+        "",
+        "Reload the catalog (idempotent: unchanged works keep their vectors; `--limit N` loads in stages):",
+        "",
+        "```",
+        "python -m scripts.build_catalog select --size 30000 --from data/catalog_core/catalog.db --out data/catalog_deploy/catalog.db",
+        "python -m scripts.build_catalog report --out data/catalog_deploy/catalog.db",
+        "SEARCH_PROFILE=cloud python -m scripts.load_postgres --from data/catalog_deploy/catalog.db --schema catalog_deploy \\",
+        "    --no-gin --no-text-bodies --embed-workers 4 --max-database-mib 800",
+        "python -m scripts.load_postgres --schema catalog_deploy --report",
+        "```",
+        "",
+        "Check the deployment again: `python -m scripts.deployment_check run --base-url https://ai-book-recommender-one.vercel.app`, after 10+ idle minutes `... cold --base-url ...`, then `python -m scripts.deployment_check report`.",
+        "",
+        "Switch it off:",
+        "",
+        "```",
+        "vercel project pause ai-book-recommender      # visitors get an error page; undo: vercel project resume ai-book-recommender",
+        "vercel project delete ai-book-recommender     # removes the project and its deployments",
+        "python -m scripts.load_postgres --schema catalog_deploy --drop   # drops the deployed catalog (direct connection of .env)",
+        "python -m scripts.load_postgres --schema usage_budget --drop     # drops the daily counters",
+        "```"
+      ]
+    },
+    {
+      "title": "Behaviour on Vercel compared with local runs",
+      "lines": [
+        "- Provider overload: at 20:40 UTC two MCP searches sent at the same moment (the demo client in both protocol modes) degraded to lexical-only after 11 s, because the pinned embedding provider (DeepInfra) answered HTTP 429 \"Model busy, retry later\" and then timed out (Vercel runtime log: \"Hybrid search failed, falling back to lexical: POST embeddings: ... (after 2 attempts)\"). The re-ranking still ran. A REST search a minute later was hybrid, and none of the 36 measured searches degraded. Locally (V13) the same provider was seen busy; the deadlines now bound the wait to about 5 s per call instead of minutes.",
+        "- LLM explanations are slow on the deployment: three explanations took 23.5 s in sequence (about 8 s each with DeepSeek V4.1 Flash on OpenRouter), inside LLM_TIMEOUT_S=15 and the 120 s function limit.",
+        "- The function runs in fra1 next to the database: `SELECT 1` from /health takes 1.5 to 2.4 ms. Requests from the measuring machine enter Vercel's network at arn1 (Stockholm) and are routed to fra1 (`x-vercel-id: arn1::fra1::...`).",
+        "- Fluid compute often serves a request with a recently started instance (/health reported uptimes of a few seconds between checks, and a /health a minute after the second cold observation took 5.8 s on a new instance), so the first request on each instance pays the app start and a new Postgres connection, and in-memory rate-limit counters reset often: the per-client limit triggered at the 21st request of 25 sent within seconds, as configured, but it is not a guarantee across instances.",
+        "- The web UI files are copied to Vercel's CDN at build time (`x-vercel-cache: HIT` on /ui/); the API and /mcp run in the function.",
+        "- Queries with no good answer in the catalog (an engine repair manual, Kubernetes) still return ten results (the vector side always finds neighbours); their top results are unrelated, as expected.",
+        "- Requests from the measuring machine sometimes hung on its side: one check attempt aborted on a client TCP timeout (Errno 60) in round 2, another stalled, and a cold-start search never reached Vercel. The script now records a client network error and goes on; the run reported here had none.",
+        "- Before a demonstration, open the page (or call /api/v1/health) a minute ahead: the first request after an idle period paid 12.6 s and 22.3 s in the two cold observations.",
+        "- `vercel link` appended `.vercel` and `.env*` to .gitignore and wrote `.env.local` (a Vercel OIDC token, already ignored by `.env.local`); the .gitignore lines were removed again, so `.vercel/` (project and team ids, no secret) shows as untracked and must not be committed."
+      ]
+    }
+  ],
+  "cold_runs": [
+    {
+      "status": 200,
+      "wall_ms": 12601.6,
+      "vercel_id": "arn1::fra1::fw592-1794438037856-8685df9abbbe",
+      "server_ms": 6654.3,
+      "search_mode": "lexical_only",
+      "degraded": true,
+      "degradation_reason": "Vector search failed (POST embeddings: ReadTimeout (after 2 attempts)) - using lexical search only",
+      "notices": [],
+      "timings_ms": {
+        "lexical": 23.4,
+        "rerank": 590.9
+      },
+      "reranked": true,
+      "top": [
+        {
+          "id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+          "title": "Los cipreses creen en Dios",
+          "authors": [
+            "José María Gironella"
+          ],
+          "language": "es",
+          "source": "wikidata",
+          "description_source": {
+            "source": "wikipedia",
+            "language": "es",
+            "license": "CC BY-SA 4.0",
+            "attribution_url": "https://es.wikipedia.org/wiki/Los_cipreses_creen_en_Dios",
+            "auto_generated": false
+          },
+          "explanation": null,
+          "grounded": null
+        },
+        {
+          "id": "bc1f2568-8c86-5666-960e-16584979eff6",
+          "title": "Una mujer en la guerra de España",
+          "authors": [
+            "Carlota O'Neill"
+          ],
+          "language": "es",
+          "source": "wikidata",
+          "description_source": {
+            "source": "wikipedia",
+            "language": "es",
+            "license": "CC BY-SA 4.0",
+            "attribution_url": "https://es.wikipedia.org/wiki/Una_mujer_en_la_guerra_de_Espa%C3%B1a",
+            "auto_generated": false
+          },
+          "explanation": null,
+          "grounded": null
+        },
+        {
+          "id": "e912649b-8238-5714-bb32-68a9d4a19c3f",
+          "title": "La guerra civil española en los juegos y entornos lúdicos",
+          "authors": [
+            "Daniela Kuschel"
+          ],
+          "language": "es",
+          "source": "doab",
+          "description_source": {
+            "source": "doab",
+            "language": "en",
+            "license": "CC0 1.0",
+            "attribution_url": "https://directory.doabooks.org/handle/20.500.12854/132270",
+            "auto_generated": false
+          },
+          "explanation": null,
+          "grounded": null
+        }
+      ],
+      "results": 10,
+      "at": "2026-11-11T23:00:50+00:00",
+      "instance_uptime_s_after": 10.4,
+      "database_after": {
+        "reachable": true,
+        "latency_ms": 2.5
+      },
+      "idle_minutes": 16.0,
+      "notes": [
+        "Split from the Vercel runtime log of this request: the function instance started and ran the app's startup (the MCP session manager) about 2.2 s after the request reached Vercel; building the search service took about 3.5 s more (the Postgres connection to the resumed Neon compute, the catalog facts and the categories query, and the LLM client: 0.8 s); then the search itself took the 6.65 s the backend reports: the BM25 query, two embedding attempts that timed out (3 s, then 1 s left of the 5 s deadline after a 1 s wait), the lexical-only fallback (23 ms) and the re-ranking (591 ms). The embedding failure was the provider's (ReadTimeout from OpenRouter/DeepInfra on the first call after the idle period), not the platform's; the search degraded as designed."
+      ]
+    },
+    {
+      "at": "2026-11-11T23:54:01+00:00",
+      "idle_minutes": 53,
+      "status": 200,
+      "wall_ms": 22343.8,
+      "server_ms": null,
+      "search_mode": "GET /api/v1/health (no search)",
+      "degraded": false,
+      "timings_ms": {},
+      "instance_uptime_s_after": null,
+      "notes": [
+        "A second cold search, sent at 23:31 UTC after 30 idle minutes, never reached the function: the request hung on the measuring machine's side (no runtime log entry; the client was stopped after more than 20 minutes), as one earlier check attempt did. The next request, GET /api/v1/health with curl at 23:54 after 53 idle minutes, took 22.3 s: its runtime log shows the instance starting the app at 23:54:03.96 and the LLM client being built at 23:54:22.98, so about 19 s went into the first Postgres query of the search service (the categories) while Neon resumed the suspended compute and the connection was opened (connect timeout 10 s, one retry). V12 measured 1.8 s for the same resume from the local machine; this one is a single observation."
+      ]
+    }
+  ]
+}

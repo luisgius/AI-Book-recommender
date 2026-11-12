@@ -968,3 +968,46 @@ class SearchAgent(Protocol):
             RuntimeError: If the LLM cannot be reached
         """
         ...
+
+
+# Kinds of paid work counted by a UsageBudget (V17).
+BUDGET_MODEL_SEARCH = "model_search"
+"""One search that may call the embedding and re-ranking model APIs"""
+
+BUDGET_LLM_REQUEST = "llm_request"
+"""One request that uses the LLM (query understanding, explanations, the agent)"""
+
+
+class UsageBudget(Protocol):
+    """
+    Port for a daily allowance of paid model calls (V17).
+
+    A public deployment lets anyone trigger calls to paid model APIs. Before
+    each paid step the search service (and the agent endpoint) asks the
+    budget for one unit of that kind; when the day's allowance is spent the
+    step is skipped and the response says so: a search falls back to
+    lexical-only without re-ranking, and LLM features are refused.
+
+    Implementations must count atomically, because many processes (one per
+    serverless instance) share the allowance; where the count lives (a table
+    in the catalog's database, memory) is an infrastructure detail.
+    """
+
+    def try_consume(self, kind: str) -> bool:
+        """
+        Take one unit of `kind` from today's allowance.
+
+        Args:
+            kind: BUDGET_MODEL_SEARCH or BUDGET_LLM_REQUEST
+
+        Returns:
+            True if the unit was granted (and counted); False if today's
+            allowance of that kind is spent. Implementations should return
+            False when the count cannot be read (fail closed: no paid call
+            without a counted unit).
+        """
+        ...
+
+    def limits(self) -> Dict[str, int]:
+        """Daily allowance per kind (kinds without a limit are not listed)."""
+        ...

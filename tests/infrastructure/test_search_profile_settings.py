@@ -108,9 +108,10 @@ def test_cloud_profile_without_a_database_url_fails_clearly(monkeypatch):
         deps.reset_dependencies()
 
 
-def test_health_reports_the_profile(cloud):
+def test_health_reports_the_profile(cloud, monkeypatch):
     from fastapi.testclient import TestClient
 
+    from app.api.v1 import search_endpoints
     from app.domain.services import SearchService
     from app.main import app
 
@@ -118,6 +119,8 @@ def test_health_reports_the_profile(cloud):
         def is_ready(self):
             return True
 
+    # The database check (SELECT 1, V17) would wait for the unreachable test address
+    monkeypatch.setattr(search_endpoints, "database_health", lambda: {"reachable": True, "latency_ms": 1.0})
     app.dependency_overrides[deps.get_search_service] = lambda: SearchService(Ready(), Ready(), Ready())
     try:
         body = TestClient(app).get("/api/v1/health").json()
@@ -125,3 +128,4 @@ def test_health_reports_the_profile(cloud):
         app.dependency_overrides.clear()
     assert body["profile"] == {"name": "cloud", "schema": "eval177", "lexical_ranking": "ts_rank_cd",
                                "vector_search": "exact"}
+    assert body["database"] == {"reachable": True, "latency_ms": 1.0} and body["status"] == "ok"

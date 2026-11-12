@@ -67,7 +67,11 @@ opencode.json
 /data/downloads/
 /data/catalog_v2/
 /data/catalog_core/
+/data/catalog_deploy/
 !/data/catalog_small/catalog.db
 
 # Neon CLI project link (local)
 .neon
+
+# Vercel CLI project link (local ids, no secrets)
+.vercel

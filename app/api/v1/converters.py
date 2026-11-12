@@ -23,6 +23,24 @@ def domain_book_to_api(book: domain.Book) -> api.Book:
         API Book model
     """
     book_dict = asdict(book)
+    metadata = book.metadata
+    descriptions = getattr(metadata, "descriptions", ()) or ()
+    primary = descriptions[0] if descriptions else None
+    book_dict["description_source"] = (
+        api.DescriptionSource(
+            source=primary.source,
+            language=primary.language,
+            license=primary.license,
+            attribution_url=primary.attribution_url,
+            auto_generated=primary.auto_generated,
+        )
+        if primary is not None
+        else None
+    )
+    book_dict["provenance"] = [
+        api.ProvenanceRecord(source=r.source, record_id=r.record_id, license=r.license, url=r.url)
+        for r in getattr(metadata, "provenance", ()) or ()
+    ]
     return api.Book(**book_dict)
 
 
@@ -93,6 +111,7 @@ def domain_metadata_to_api(metadata: domain_vo.SearchMetadata) -> api.SearchMeta
         diversification_enabled=metadata.diversification_enabled,
         candidates_lexical=metadata.candidates_lexical,
         candidates_vector=metadata.candidates_vector,
+        timings_ms=dict(metadata.timings_ms),
     )
 
 
@@ -156,6 +175,7 @@ def domain_response_to_api(
         query_intent=(
             domain_query_intent_to_api(query_intent) if query_intent is not None else None
         ),
+        notices=list(response.notices),
     )
 
 

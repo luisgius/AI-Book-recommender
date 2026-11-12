@@ -5,8 +5,10 @@ This module defines the FastAPI routes for searching books and retrieving
 book details. It handles HTTP concerns and delegates to domain services.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import time
 from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.domain.ports import BookCatalogRepository
 from app.domain.services import SearchService
@@ -16,7 +18,11 @@ from app.api.v1.converters import (
     domain_response_to_api,
     domain_book_to_api,
 )
+from app.api.rate_limiting import LLM, SEARCH
 from app.api.v1.dependencies import (
+    database_health,
+    get_budget_settings,
+    get_rest_rate_limits,
     get_search_service,
     get_catalog_repository,
     get_llm_settings,
@@ -25,10 +31,15 @@ from app.api.v1.dependencies import (
 
 router = APIRouter()
 
+# When this process started (health reports the uptime, which tells whether a
+# request was served by a freshly started serverless instance).
+PROCESS_STARTED = time.time()
+
 
 @router.post("/search", response_model=api.SearchResponse)
 def search_books(
     request: api.SearchRequest,
+    http_request: Request,
     service: SearchService = Depends(get_search_service),
 ) -> api.SearchResponse:
     """
@@ -50,7 +61,16 @@ def search_books(
     Returns:
         SearchResponse with ranked results, optional metadata and, when the
         LLM path is used, the understood query intent
+
+    A public deployment limits searches per client (SEARCH_RATE_LIMIT_PER_MINUTE)
+    and, for searches that use the LLM, LLM requests per client
+    (LLM_RATE_LIMIT_PER_MINUTE): above them the answer is 429. The daily budget
+    may degrade the search; `notices` then says which step was skipped.
     """
+    limits = get_rest_rate_limits()
+    limits.enforce(SEARCH, http_request)
+    if request.use_understanding or request.use_explanations:
+        limits.enforce(LLM, http_request)
     try:
         include_metadata = bool(request.include_metadata)
 
@@ -133,13 +153,22 @@ def health_check(
 
     "profile" names the adapters in use: "local" (SQLite, BM25, FAISS) or
     "cloud" (Postgres schema, lexical ranking and vector search mode).
+    "database" (cloud profile) says whether Postgres answers a SELECT 1 now;
+    "budget" lists the daily limits of a public deployment (None: no limit);
+    "uptime_s" is the age of this process.
     """
     health_status = service.get_health_status()
     llm_settings = get_llm_settings()
+    database = database_health()
+    budget = get_budget_settings()
 
+    overall = health_status["overall"] and (database is None or database["reachable"])
     return {
-        "status": "ok" if health_status["overall"] else "degraded",
+        "status": "ok" if overall else "degraded",
         "profile": get_search_profile_settings().describe(),
+        "database": database,
+        "budget": budget.limits() if budget.enabled else None,
+        "uptime_s": round(time.time() - PROCESS_STARTED, 1),
         "components": {
             "lexical_search": health_status["lexical_search"],
             "vector_search": health_status["vector_search"],
@@ -155,5 +184,5 @@ def health_check(
             "model": service.get_reranker_model_name(),
             "ready": health_status["reranker"],
         },
-        "overall": health_status["overall"],
+        "overall": overall,
     }

@@ -91,6 +91,10 @@ class FakeDatabase:
             return [w for w in WORKS if w["id"] == UUID(str(params["id"]))]
         raise AssertionError(f"unexpected statement: {sql[:120]}")
 
+    def ping(self) -> bool:
+        self.calls += 1
+        return True
+
     def execute(self, sql, params=None, *, settings=None):
         raise AssertionError("the API must not write")
 
@@ -98,9 +102,17 @@ class FakeDatabase:
         pass
 
 
-def _fake_post(self, path, body):
+def _fake_post(self, path, body, **call_options):
     """OpenRouterHttp.post without network: embeddings and rerank answers."""
     from app.infrastructure.search.openrouter_http import ApiResponse
+
+    # The cloud profile gives the calls a user waits for short deadlines (V17):
+    # per call for the query embedding, per client (plus the deadline) for the reranker.
+    if path == "embeddings":
+        assert call_options == {"timeout_s": 3.0, "max_retries": 1, "deadline_s": 5.0}, call_options
+    else:
+        assert call_options == {"deadline_s": 5.0}, call_options
+        assert (self._timeout_s, self._max_retries) == (3.0, 1)
 
     if path == "embeddings":
         assert body.get("dimensions") == DIM and body["provider"]["order"] == ["deepinfra"]

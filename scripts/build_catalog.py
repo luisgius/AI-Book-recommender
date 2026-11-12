@@ -26,6 +26,7 @@ import argparse
 from dataclasses import asdict
 import json
 import logging
+import sqlite3
 import sys
 import time
 from pathlib import Path
@@ -190,9 +191,61 @@ def step_report(args: argparse.Namespace) -> int:
         "Quality filter: title, author, and a description of at least 200 characters (after markup is "
         "stripped, truncated to about 1,200) in one of: " + ", ".join(args.languages) + ".",
     ]
+    selection = selection_summary(out)
+    if selection is not None:
+        report["selection"] = selection
+        extra.append(
+            f"This catalog is a selection of {selection['size']:,} works from `{selection['source_catalog']}` "
+            "(`python -m scripts.build_catalog select`). In \"Records per source\" the columns Read, Kept, New "
+            "works and Merged describe the ingestion of that source catalog; \"Works containing it\" counts this "
+            f"selection. Selection rule: {selection['rule']}"
+        )
+        (out.parent / "catalog_report.json").write_text(
+            json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     (out.parent / "CATALOG_REPORT.md").write_text(render_markdown(report, extra=extra), encoding="utf-8")
     logger.info("Report written to %s", out.parent / "CATALOG_REPORT.md")
     return 0
+
+
+def read_build_sources(db_path: Path) -> List[Dict]:
+    """
+    The per-source ingestion records of a catalog, read without writing to it.
+
+    Returns an empty list when the catalog has no such table (e.g. the original catalog).
+    """
+    conn = sqlite3.connect(db_path.resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'catalog_build_sources'"
+        ).fetchone()
+        if not exists:
+            return []
+        rows = conn.execute(
+            "SELECT source, stats, license FROM catalog_build_sources ORDER BY position"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [
+        {"source": source, "stats": json.loads(stats) if stats else {}, "license": json.loads(lic) if lic else {}}
+        for source, stats, lic in rows
+    ]
+
+
+def copy_build_sources(source_db: Path, out: Path) -> int:
+    """Copy the per-source records (counters and licence) of source_db into out; returns how many."""
+    records = read_build_sources(source_db)
+    state = SqliteCatalogBuildState(out)
+    for position, record in enumerate(records):
+        state.mark_started(record["source"], position)
+        state.mark_done(record["source"], record["stats"], record["license"])
+    return len(records)
+
+
+def selection_summary(db_path: Path) -> Optional[Dict]:
+    """The selection summary written next to a selected catalog, or None for a built one."""
+    name = "selection.json" if db_path.stem == "catalog" else f"{db_path.stem}.selection.json"
+    path = db_path.parent / name
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
 
 
 def step_select(args: argparse.Namespace) -> int:
@@ -214,6 +267,10 @@ def step_select(args: argparse.Namespace) -> int:
         chunk = ids[start:start + 1000]
         books = large.get_many(chunk)
         small.save_many([books[i] for i in chunk if i in books])
+
+    # The per-source licence records travel with the selection, so the report
+    # step run on the selected catalog lists licences and attribution too.
+    copy_build_sources(source_db, out)
 
     mix = language_mix(selected)
     summary = {

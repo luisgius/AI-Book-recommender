@@ -10,7 +10,7 @@
   <header class="top">
     <div>
       <h1>Buscador híbrido de libros</h1>
-      <p class="subtitle">BM25 + embeddings (FAISS) fusionados con RRF, con comprensión de la consulta y explicaciones mediante LLM</p>
+      <p class="subtitle">BM25 + embeddings fusionados con RRF y reordenados, con comprensión de la consulta y explicaciones mediante LLM</p>
     </div>
     <div id="health" class="health" aria-live="polite">Comprobando estado…</div>
   </header>
@@ -41,6 +41,16 @@
             <option value="">cualquiera</option>
             <option value="es">español</option>
             <option value="en">inglés</option>
+            <option value="fr">francés</option>
+            <option value="de">alemán</option>
+            <option value="it">italiano</option>
+            <option value="pt">portugués</option>
+            <option value="ca">catalán</option>
+            <option value="nl">neerlandés</option>
+            <option value="ru">ruso</option>
+            <option value="zh">chino</option>
+            <option value="ja">japonés</option>
+            <option value="ar">árabe</option>
           </select>
         </label>
         <label class="inline">Categoría <input type="text" id="category" placeholder="p. ej. fiction"></label>
@@ -50,9 +60,29 @@
     </form>
 
     <p id="status" class="status" aria-live="polite"></p>
+    <p id="notice" class="notice" aria-live="polite" hidden></p>
     <section id="intent" class="panel intent" hidden></section>
     <section id="similar-banner" class="panel banner" hidden></section>
     <ol id="results" class="results"></ol>
+
+    <details id="about" class="panel about">
+      <summary>Sobre los datos</summary>
+      <p>El catálogo de esta demostración reúne unas 30&nbsp;000 obras en doce idiomas, seleccionadas por popularidad
+        con cuotas por idioma, de tres fuentes abiertas:</p>
+      <ul>
+        <li><strong>Wikidata</strong> (datos estructurados, <a href="https://creativecommons.org/publicdomain/zero/1.0/" rel="noopener">CC0 1.0</a>)
+          y <strong>Wikipedia</strong>: los resúmenes son extractos de los artículos, bajo
+          <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="noopener">CC BY-SA 3.0</a> o
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>; cada resultado enlaza su artículo.</li>
+        <li><strong>Project Gutenberg</strong>: catálogo de libros de dominio público (sin licencia explícita para los metadatos);
+          sus resúmenes los genera automáticamente Project Gutenberg. Cada resultado enlaza su ficha.</li>
+        <li><strong>DOAB</strong> (Directory of Open Access Books): metadatos
+          <a href="https://creativecommons.org/publicdomain/zero/1.0/" rel="noopener">CC0 1.0</a>; cada resultado enlaza su ficha.</li>
+      </ul>
+      <p>Las búsquedas usan modelos de embeddings y de reordenación por API, y las opciones con LLM llaman a un modelo de lenguaje.
+        Al ser una demostración pública tiene un límite diario de uso: al alcanzarse, la búsqueda sigue funcionando solo con
+        BM25 y las funciones con LLM se desactivan hasta las 00:00 UTC.</p>
+    </details>
   </main>
 
   <template id="result-template">
@@ -65,6 +95,7 @@
         </div>
       </div>
       <p class="description"></p>
+      <p class="attribution"></p>
       <p class="scores"></p>
       <div class="explanation" hidden>
         <p class="explanation-text"></p>

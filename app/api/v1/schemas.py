@@ -52,6 +52,25 @@ class BookMetadata(BaseModel):
     page_count: int | None = None
     publisher: str | None = None
 
+
+class DescriptionSource(BaseModel):
+    """Origin and licence of the description shown for a book (attribution, V17)."""
+    source: str = Field(description="Source of the text (e.g. 'wikipedia', 'gutenberg', 'doab')")
+    language: str | None = Field(default=None, description="ISO 639-1 code of the text")
+    license: str | None = Field(default=None, description="Licence of the text (e.g. 'CC BY-SA 4.0')")
+    attribution_url: str | None = Field(
+        default=None, description="Page to cite for the text (e.g. the Wikipedia article)"
+    )
+    auto_generated: bool = Field(default=False, description="True when the source generated the text automatically")
+
+
+class ProvenanceRecord(BaseModel):
+    """One source record that contributed to a book (e.g. its Wikidata item)."""
+    source: str
+    record_id: str
+    license: str | None = None
+    url: str | None = None
+
 class Book(BaseModel):
     """
     API representation of a Book entity.
@@ -74,6 +93,13 @@ class Book(BaseModel):
     source: str = Field(default="unknown", description="External source (e.g., 'google_books')")
     source_id: str | None = Field(default=None, description="ID in the external source system")
     metadata: BookMetadata | None = Field(default=None, description="Additional optional metadata")
+    description_source: DescriptionSource | None = Field(
+        default=None,
+        description="Source, licence and attribution link of the description (multi-source catalog)",
+    )
+    provenance: list[ProvenanceRecord] = Field(
+        default_factory=list, description="Source records the book was built from, with their licences"
+    )
     created_at: AwareDatetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         description="When this book was added to our catalog"
@@ -155,6 +181,10 @@ class SearchMetadata(BaseModel):
     diversification_enabled: bool = Field(default=False, description="Whether MMR was applied")
     candidates_lexical: int = Field(default=0, ge=0, description="Candidates from BM25")
     candidates_vector: int = Field(default=0, ge=0, description="Candidates from vector search")
+    timings_ms: dict[str, float] = Field(
+        default_factory=dict,
+        description="Milliseconds per stage (lexical, embedding, vector, rerank, mmr, explanations)",
+    )
 
 
 class QueryIntent(BaseModel):
@@ -190,6 +220,14 @@ class SearchResponse(BaseModel):
     query_intent: QueryIntent | None = Field(
         default=None,
         description="Query understanding result (use_understanding=true)"
+    )
+    notices: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Codes of steps skipped for this request: 'search_budget_spent' (the day's budget of "
+            "model-backed searches is spent: lexical search without re-ranking) and "
+            "'llm_budget_spent' (the day's LLM budget is spent: no understanding or explanations)"
+        ),
     )
 
 # ---------------------------------------------------------------------------

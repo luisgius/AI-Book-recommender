@@ -25,6 +25,11 @@ Behaviour:
   the error it carries.
 - The latency returned is the wall clock of the whole call, retries and
   waits included. Error messages never contain the key.
+- Per-call overrides (V17): post() can take a shorter attempt timeout, fewer
+  retries and a deadline for the whole call (attempts and waits). Calls
+  made while a user waits (the query embedding, the re-ranking) use them,
+  so a failing provider costs a search a few seconds, not minutes; a retry
+  is attempted only if it can still finish before the deadline.
 
 This module imports no model library, so the cloud profile can use it in a
 process without torch.
@@ -48,6 +53,7 @@ DEFAULT_TIMEOUT_S = 30.0
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_BACKOFF_S = 1.0
 MAX_WAIT_S = 30.0  # longest wait between attempts, also for Retry-After
+MIN_ATTEMPT_S = 0.5  # a retry needs at least this long before the call's deadline
 
 
 class OpenRouterError(RuntimeError):
@@ -102,6 +108,7 @@ class OpenRouterHttp:
         backoff_s: float = DEFAULT_BACKOFF_S,
         transport: Optional[httpx.BaseTransport] = None,
         sleep: Callable[[float], None] = time.sleep,
+        clock: Callable[[], float] = time.perf_counter,
     ) -> None:
         """
         Args:
@@ -112,6 +119,7 @@ class OpenRouterHttp:
             backoff_s: First wait between attempts (doubles each retry)
             transport: httpx transport (tests pass a fake one; None = network)
             sleep: Wait function (tests pass one that does not wait)
+            clock: Seconds clock for timeouts and deadlines (tests pass a fake one)
         """
         if timeout_s <= 0:
             raise ValueError(f"timeout_s must be > 0, got {timeout_s}")
@@ -122,6 +130,7 @@ class OpenRouterHttp:
         self._max_retries = max_retries
         self._backoff_s = backoff_s
         self._sleep = sleep
+        self._clock = clock
         self._client = httpx.Client(
             base_url=base_url.rstrip("/") + "/",
             timeout=timeout_s,
@@ -139,47 +148,74 @@ class OpenRouterHttp:
                 pass
         return min(self._backoff_s * (2 ** (attempt - 1)), MAX_WAIT_S)
 
-    def post(self, path: str, body: Mapping[str, Any]) -> ApiResponse:
+    def post(
+        self,
+        path: str,
+        body: Mapping[str, Any],
+        *,
+        timeout_s: Optional[float] = None,
+        max_retries: Optional[int] = None,
+        deadline_s: Optional[float] = None,
+    ) -> ApiResponse:
         """
         POST `body` as JSON to `path` (relative to the API root).
+
+        Args:
+            path: Endpoint path, e.g. "embeddings"
+            body: JSON body
+            timeout_s: Timeout of one attempt for this call (default: the client's)
+            max_retries: Retries for this call (default: the client's)
+            deadline_s: Most seconds for the whole call, attempts and waits
+                included (default: none). Each attempt is cut to the time
+                left, and no retry starts with less than MIN_ATTEMPT_S left.
 
         Returns:
             The parsed JSON body, the wall clock of the call and the attempts made
 
         Raises:
-            OpenRouterError: On a non-transient error, or when the retries are spent
+            OpenRouterError: On a non-transient error, or when the retries or
+                the deadline are spent
         """
-        started = time.perf_counter()
+        attempt_timeout = self._timeout_s if timeout_s is None else timeout_s
+        retries = self._max_retries if max_retries is None else max_retries
+        started = self._clock()
+        deadline = None if deadline_s is None else started + deadline_s
         attempt = 0
         while True:
             attempt += 1
+            limit = attempt_timeout if deadline is None else max(0.01, min(attempt_timeout, deadline - self._clock()))
             response: Optional[httpx.Response] = None
             try:
-                response = self._post_once(path, body)
+                response = self._post_once(path, body, limit)
             except (httpx.TimeoutException, httpx.TransportError) as error:
                 failure = OpenRouterError(f"POST {path}: {type(error).__name__}", transient=True)
             else:
                 failure = self._check(path, response)
                 if failure is None:
-                    return ApiResponse(response.json(), time.perf_counter() - started, attempt)
-            failure.latency_s = time.perf_counter() - started
-            if not failure.transient or attempt > self._max_retries:
-                if attempt > 1:
-                    failure.args = (f"{failure.args[0]} (after {attempt} attempts)",)
-                raise failure
+                    return ApiResponse(response.json(), self._clock() - started, attempt)
+            failure.latency_s = self._clock() - started
             wait = self._wait_s(attempt, response)
+            out_of_time = deadline is not None and deadline - self._clock() - wait < MIN_ATTEMPT_S
+            if not failure.transient or attempt > retries or out_of_time:
+                note = f"after {attempt} attempts" if attempt > 1 else ""
+                if out_of_time and failure.transient and attempt <= retries:
+                    note = (note + ", " if note else "") + f"no time left within the {deadline_s:g} s deadline"
+                if note:
+                    failure.args = (f"{failure.args[0]} ({note})",)
+                raise failure
             logger.warning("OpenRouter %s failed (%s); retrying in %.1f s", path, failure, wait)
             self._sleep(wait)
 
-    def _post_once(self, path: str, body: Mapping[str, Any]) -> httpx.Response:
+    def _post_once(self, path: str, body: Mapping[str, Any], timeout_s: Optional[float] = None) -> httpx.Response:
         """
         One attempt, abandoned once it has lasted timeout_s (see the module docstring).
 
         Raises:
             httpx.ReadTimeout: When the whole response has not arrived in time
         """
-        deadline = time.perf_counter() + self._timeout_s
-        with self._client.stream("POST", path, json=dict(body)) as streamed:
+        timeout_s = self._timeout_s if timeout_s is None else timeout_s
+        deadline = self._clock() + timeout_s
+        with self._client.stream("POST", path, json=dict(body), timeout=timeout_s) as streamed:
             if streamed.is_stream_consumed:  # already read into memory (in-memory test transports)
                 return streamed
             chunks = []
@@ -187,8 +223,8 @@ class OpenRouterHttp:
             # with the response's own Content-Encoding header.
             for chunk in streamed.iter_raw():
                 chunks.append(chunk)
-                if time.perf_counter() > deadline:
-                    raise httpx.ReadTimeout(f"no complete response within {self._timeout_s:.0f} s",
+                if self._clock() > deadline:
+                    raise httpx.ReadTimeout(f"no complete response within {timeout_s:g} s",
                                             request=streamed.request)
             return httpx.Response(streamed.status_code, headers=streamed.headers, content=b"".join(chunks),
                                   request=streamed.request)

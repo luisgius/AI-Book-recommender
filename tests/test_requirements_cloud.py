@@ -44,3 +44,28 @@ def test_cloud_list_has_the_backend_and_no_model_library():
 
     assert {"fastapi", "psycopg", "psycopg-binary", "psycopg-pool", "httpx", "mcp", "python-dotenv"} <= set(cloud)
     assert FORBIDDEN.isdisjoint(cloud)
+
+
+def test_vercel_installs_exactly_the_cloud_list():
+    """pyproject.toml (read by Vercel's builder before requirements.txt) pins the same packages (V17)."""
+    import tomllib
+
+    project = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    deployed: Dict[str, str] = {}
+    for requirement in project["project"]["dependencies"]:
+        match = re.fullmatch(r"([A-Za-z0-9_.\-]+)==([^\s;]+)", requirement.strip())
+        assert match, f"pyproject.toml: not an exact pin: {requirement!r}"
+        deployed[re.sub(r"[-_.]+", "-", match.group(1)).lower()] = match.group(2)
+
+    assert deployed == pins(REPO_ROOT / "requirements-cloud.txt")
+    assert project["tool"]["vercel"]["entrypoint"] == "app.main:app"
+
+
+def test_vercel_upload_is_an_allowlist_without_data_or_the_full_requirements():
+    """.vercelignore uploads app/ and the deployment files only (no data/, tests/, requirements.txt)."""
+    rules = [line.strip() for line in (REPO_ROOT / ".vercelignore").read_text(encoding="utf-8").splitlines()
+             if line.strip() and not line.startswith("#")]
+    assert rules[0] == "/*"
+    assert {"!/app", "!/pyproject.toml", "!/vercel.json"} <= set(rules)
+    assert not any(rule.startswith("!") and ("data" in rule or "tests" in rule or "requirements" in rule)
+                   for rule in rules)

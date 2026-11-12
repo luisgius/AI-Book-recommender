@@ -164,16 +164,23 @@ def vector_index_type(db: PostgresDatabase, schema: str) -> Optional[str]:
 # =============================================================================
 
 
-def build_lexical_indexes(db: PostgresDatabase, schema: str, *, k1: float = BM25_K1, b: float = BM25_B) -> Dict[str, float]:
+def build_lexical_indexes(
+    db: PostgresDatabase, schema: str, *, k1: float = BM25_K1, b: float = BM25_B, gin: bool = True
+) -> Dict[str, float]:
     """
     (Re)build the GIN index and, when lakebase_text is installed, the BM25 index.
 
     The BM25 index is always rebuilt (its corpus statistics are frozen at
-    build time). Returns seconds per index.
+    build time). The GIN index serves only the ts_rank_cd comparison ranking
+    (matching with @@), not BM25, so a deployed catalog can leave it out
+    (gin=False drops an existing one); ts_rank_cd still works without it,
+    by scanning every text row. Returns seconds per index.
     """
     seconds: Dict[str, float] = {}
     schema = validate_schema_name(schema)
-    if not index_exists(db, schema, GIN_INDEX):
+    if not gin:
+        db.execute(f"DROP INDEX IF EXISTS {schema}.{GIN_INDEX}")
+    elif not index_exists(db, schema, GIN_INDEX):
         started = time.perf_counter()
         db.execute(_section("lexical_index_gin", schema))
         seconds[GIN_INDEX] = time.perf_counter() - started

@@ -106,3 +106,51 @@ def test_load_needs_exactly_one_encoder_source(tmp_path):
     with pytest.raises(ValueError, match="either embedding_model"):
         load(None, tmp_path / "x.db", "s", embedding_model="m", encoder=object(),  # type: ignore[arg-type]
              vector_index="hnsw", reuse_index=None)
+
+
+def test_encode_texts_keeps_the_input_order_with_several_workers():
+    """Concurrent embedding requests (V17) return the vectors in input order."""
+    import threading
+    import time
+
+    from scripts.load_postgres import encode_texts
+
+    class SlowFirstEncoder:
+        def __init__(self):
+            self.threads = set()
+
+        def generate_embeddings_batch(self, texts):
+            self.threads.add(threading.get_ident())
+            if texts[0] == "t0":
+                time.sleep(0.05)  # the first batch finishes last
+            return [[float(t[1:])] for t in texts]
+
+    texts = [f"t{i}" for i in range(10)]
+    encoder = SlowFirstEncoder()
+
+    assert encode_texts(encoder, texts, batch=3, workers=4) == [[float(i)] for i in range(10)]
+    assert len(encoder.threads) > 1
+    assert encode_texts(SlowFirstEncoder(), texts, batch=3, workers=1) == [[float(i)] for i in range(10)]
+
+
+def test_catalog_contents_come_from_the_report_next_to_the_catalog(tmp_path):
+    from scripts.load_postgres import catalog_contents_summary
+
+    source = tmp_path / "catalog.db"
+    assert catalog_contents_summary(source) is None
+    (tmp_path / "catalog_report.json").write_text(json.dumps({
+        "total_works": 2,
+        "work_language": {"distribution": {"es": 1, "en": 1}},
+        "works_by_source_combination": {"wikidata": 2},
+        "sources": [{"source": "wikidata", "works_with_this_source": 2,
+                     "license": {"license": "CC0 1.0", "attribution": "Article URL per description"}}],
+        "description_language": {"descriptions_by_license": {"CC BY-SA 4.0": 2}},
+        "selection": {"size": 2, "rule": "popularity", "quotas": {"es": 1}, "source_catalog": "x", "extra": 1},
+    }))
+
+    summary = catalog_contents_summary(source)
+
+    assert summary["total_works"] == 2 and summary["work_language"] == {"es": 1, "en": 1}
+    assert summary["source_licenses"]["wikidata"]["license"] == "CC0 1.0"
+    assert summary["descriptions_by_license"] == {"CC BY-SA 4.0": 2}
+    assert summary["selection"] == {"size": 2, "rule": "popularity", "quotas": {"es": 1}, "source_catalog": "x"}

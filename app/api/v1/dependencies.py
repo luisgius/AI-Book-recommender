@@ -32,13 +32,18 @@ from app.domain.ports import (
     LLMClient,
     Reranker,
     SearchAgent,
+    UsageBudget,
 )
 from app.domain.services import SearchService
 from app.infrastructure.config.settings import (
+    ApiQuerySettings,
     EmbeddingSettings,
+    EvaluateEndpointSettings,
     LLMSettings,
+    RateLimitSettings,
     RerankerSettings,
     SearchProfileSettings,
+    UsageBudgetSettings,
     UsageEndpointSettings,
     database_url,
 )
@@ -70,6 +75,13 @@ _reranker_initialized: bool = False
 _usage_recorder: Optional[UsageRecorder] = None
 _usage_since: Optional[str] = None
 _usage_settings: Optional[UsageEndpointSettings] = None
+_api_query_settings: Optional[ApiQuerySettings] = None
+_budget_settings: Optional[UsageBudgetSettings] = None
+_usage_budget: Optional[UsageBudget] = None
+_budget_initialized: bool = False
+_rate_limit_settings: Optional[RateLimitSettings] = None
+_rest_rate_limits = None  # RestRateLimits (app/api/rate_limiting.py), built on first use
+_evaluate_settings: Optional[EvaluateEndpointSettings] = None
 
 
 def get_search_profile_settings() -> SearchProfileSettings:
@@ -176,19 +188,35 @@ def get_usage_recorder() -> UsageRecorder:
     return _usage_recorder
 
 
-def build_query_encoder(settings: EmbeddingSettings, usage_recorder: Optional[UsageRecorder] = None):
+def get_api_query_settings() -> ApiQuerySettings:
+    """Deadlines of the model API calls a user waits for (cloud defaults: 3 s, 1 retry, 5 s per call)."""
+    global _api_query_settings
+    if _api_query_settings is None:
+        load_dotenv()
+        _api_query_settings = ApiQuerySettings.from_env()
+    return _api_query_settings
+
+
+def build_query_encoder(
+    settings: EmbeddingSettings,
+    usage_recorder: Optional[UsageRecorder] = None,
+    query_settings: Optional[ApiQuerySettings] = None,
+):
     """
     The encoder the cloud profile's embeddings store uses (no FAISS index).
 
     "openrouter" gives OpenRouterEmbeddingEncoder (no model in this process;
-    its requests are recorded in usage_recorder). "local" gives the local
+    its requests are recorded in usage_recorder; query embeddings use the
+    deadlines of query_settings). "local" gives the local
     sentence-transformers model through EmbeddingsStoreFaiss, used only to
     encode (this one imports torch).
     """
     if settings.provider == "openrouter":
         from app.infrastructure.search.openrouter_embedding_encoder import OpenRouterEmbeddingEncoder
 
-        return OpenRouterEmbeddingEncoder.from_settings(settings, usage_recorder=usage_recorder)
+        return OpenRouterEmbeddingEncoder.from_settings(
+            settings, usage_recorder=usage_recorder, query_settings=query_settings
+        )
     from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
 
     return EmbeddingsStoreFaiss(model_name=settings.model, device=settings.device)
@@ -232,7 +260,9 @@ def get_embeddings_store() -> EmbeddingsStore:
         if profile.is_cloud:
             from app.infrastructure.search.postgres_embeddings_store import PostgresEmbeddingsStore
 
-            encoder = build_query_encoder(settings, usage_recorder=get_usage_recorder())
+            encoder = build_query_encoder(
+                settings, usage_recorder=get_usage_recorder(), query_settings=get_api_query_settings()
+            )
             _embeddings_store = PostgresEmbeddingsStore(encoder, get_postgres_database(), profile.schema)
             return _embeddings_store
         store = build_embeddings_store(settings, usage_recorder=get_usage_recorder())
@@ -319,6 +349,7 @@ def get_llm_client() -> Optional[LLMClient]:
             apply_extracted_category=settings.apply_extracted_category,
             max_tokens=settings.max_tokens,
             timeout_s=settings.timeout_s,
+            client_max_retries=settings.client_max_retries,
         )
     except Exception as e:
         logger.warning(f"LLM client unavailable ({settings.provider}/{settings.model}): {e}")
@@ -392,7 +423,9 @@ def get_reranker() -> Optional[Reranker]:
             # OpenRouter's rerank API: no model in this process
             from app.infrastructure.search.api_reranker import ApiReranker
 
-            _reranker = ApiReranker.from_settings(settings, usage_recorder=get_usage_recorder())
+            _reranker = ApiReranker.from_settings(
+                settings, usage_recorder=get_usage_recorder(), query_settings=get_api_query_settings()
+            )
             return _reranker
         from app.infrastructure.search.cross_encoder_reranker import CrossEncoderReranker
 
@@ -401,6 +434,69 @@ def get_reranker() -> Optional[Reranker]:
         logger.warning(f"Reranker unavailable ({settings.model}): {e}")
         _reranker = None
     return _reranker
+
+
+def get_budget_settings() -> UsageBudgetSettings:
+    """Daily allowance settings (DAILY_SEARCH_LIMIT, DAILY_LLM_LIMIT, BUDGET_SCHEMA)."""
+    global _budget_settings
+    if _budget_settings is None:
+        load_dotenv()
+        _budget_settings = UsageBudgetSettings.from_env()
+    return _budget_settings
+
+
+def get_usage_budget() -> Optional[UsageBudget]:
+    """
+    Provide the daily budget of paid model calls, or None without limits (V17).
+
+    Cloud profile: PostgresUsageBudget, a counter table in the catalog's
+    database shared by every serverless instance. Local profile: an
+    in-memory counter (one process). Unset limits (the default): None.
+    """
+    global _usage_budget, _budget_initialized
+    if _budget_initialized:
+        return _usage_budget
+    _budget_initialized = True
+    settings = get_budget_settings()
+    if not settings.enabled:
+        return None
+    if get_search_profile_settings().is_cloud:
+        from app.infrastructure.db.postgres_usage_budget import PostgresUsageBudget
+
+        _usage_budget = PostgresUsageBudget(get_postgres_database(), settings.schema, settings.limits())
+    else:
+        from app.infrastructure.usage_budget import InMemoryUsageBudget
+
+        _usage_budget = InMemoryUsageBudget(settings.limits())
+    return _usage_budget
+
+
+def get_rate_limit_settings() -> RateLimitSettings:
+    """Per-client limits of the REST endpoints and the trusted client-address header."""
+    global _rate_limit_settings
+    if _rate_limit_settings is None:
+        load_dotenv()
+        _rate_limit_settings = RateLimitSettings.from_env()
+    return _rate_limit_settings
+
+
+def get_rest_rate_limits():
+    """The per-client sliding-window limiters of the REST endpoints (one set per process)."""
+    global _rest_rate_limits
+    if _rest_rate_limits is None:
+        from app.api.rate_limiting import RestRateLimits
+
+        _rest_rate_limits = RestRateLimits(get_rate_limit_settings())
+    return _rest_rate_limits
+
+
+def get_evaluate_settings() -> EvaluateEndpointSettings:
+    """Switch of POST /evaluate (EVALUATE_ENDPOINT_ENABLED)."""
+    global _evaluate_settings
+    if _evaluate_settings is None:
+        load_dotenv()
+        _evaluate_settings = EvaluateEndpointSettings.from_env()
+    return _evaluate_settings
 
 
 def get_search_service() -> SearchService:
@@ -415,8 +511,28 @@ def get_search_service() -> SearchService:
             max_explanations=get_llm_settings().max_explanations,
             reranker=get_reranker(),
             rerank_depth=get_reranker_settings().depth,
+            usage_budget=get_usage_budget(),
         )
     return _search_service
+
+
+def database_health() -> Optional[Dict[str, Any]]:
+    """
+    Whether the cloud profile's database answers (one SELECT 1), or None in the local profile.
+
+    Returns {"reachable": bool, "latency_ms": float}; never raises.
+    """
+    if not get_search_profile_settings().is_cloud:
+        return None
+    import time
+
+    started = time.perf_counter()
+    try:
+        reachable = get_postgres_database().ping()
+    except Exception as e:  # noqa: BLE001 - health must answer
+        logger.warning(f"Database health check failed: {e}")
+        reachable = False
+    return {"reachable": reachable, "latency_ms": round((time.perf_counter() - started) * 1000, 1)}
 
 
 def get_usage_settings() -> UsageEndpointSettings:
@@ -460,6 +576,8 @@ def reset_dependencies() -> None:
     global _reranker_settings, _reranker, _reranker_initialized
     global _profile_settings, _postgres_database
     global _usage_recorder, _usage_since, _usage_settings
+    global _api_query_settings, _budget_settings, _usage_budget, _budget_initialized
+    global _rate_limit_settings, _rest_rate_limits, _evaluate_settings
 
     if _postgres_database is not None:
         _postgres_database.close()
@@ -482,3 +600,10 @@ def reset_dependencies() -> None:
     _usage_recorder = None
     _usage_since = None
     _usage_settings = None
+    _api_query_settings = None
+    _budget_settings = None
+    _usage_budget = None
+    _budget_initialized = False
+    _rate_limit_settings = None
+    _rest_rate_limits = None
+    _evaluate_settings = None

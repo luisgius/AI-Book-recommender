@@ -24,6 +24,9 @@ LLM environment variables (all optional):
                           LLM as a hard filter (default "false": soft signal)
     LLM_MAX_TOKENS        cap on generated tokens per call (default 1024)
     LLM_TIMEOUT_S         HTTP timeout per call in seconds (default 180)
+    LLM_CLIENT_MAX_RETRIES  retries of the provider's own HTTP client under each
+                          attempt (default: the library's; a public deployment
+                          sets 0 so LLM_MAX_RETRIES is the only retry, V17)
     OPENROUTER_API_KEY    API key, required by the "openrouter" provider (read
                           only when the chat model is built, never stored here)
 
@@ -221,6 +224,7 @@ class LLMSettings:
     apply_extracted_category: bool = False
     max_tokens: Optional[int] = 1024
     timeout_s: Optional[float] = 180.0
+    client_max_retries: Optional[int] = None
 
     def __post_init__(self) -> None:
         if self.provider not in SUPPORTED_PROVIDERS:
@@ -264,6 +268,7 @@ class LLMSettings:
             apply_extracted_category=env.get("LLM_APPLY_CATEGORY_FILTER", "false").strip().lower() == "true",
             max_tokens=int(env.get("LLM_MAX_TOKENS", "1024")),
             timeout_s=float(env.get("LLM_TIMEOUT_S", "180")),
+            client_max_retries=_optional_int(env.get("LLM_CLIENT_MAX_RETRIES", ""), "LLM_CLIENT_MAX_RETRIES"),
         )
 
 
@@ -631,6 +636,9 @@ class MCPSettings:
         MCP_RATE_LIMIT_PER_MINUTE  requests per minute per client address (default 60,
                                    0 disables the limit)
         MCP_MAX_RESPONSE_BYTES     largest JSON payload of one tool result (default 40000)
+        CLIENT_IP_HEADER           header with the client address set by a trusted
+                                   proxy (e.g. x-real-ip on Vercel), used by the rate
+                                   limit; default: the connection's address
     """
 
     enabled: bool = True
@@ -638,6 +646,7 @@ class MCPSettings:
     allowed_origins: tuple[str, ...] = DEFAULT_MCP_ALLOWED_ORIGINS
     rate_limit_per_minute: int = DEFAULT_MCP_RATE_LIMIT_PER_MINUTE
     max_response_bytes: int = DEFAULT_MCP_MAX_RESPONSE_BYTES
+    client_ip_header: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.rate_limit_per_minute < 0:
@@ -669,6 +678,7 @@ class MCPSettings:
             allowed_origins=_split_list(env.get("MCP_ALLOWED_ORIGINS", "")) or DEFAULT_MCP_ALLOWED_ORIGINS,
             rate_limit_per_minute=int(rate_limit) if rate_limit else DEFAULT_MCP_RATE_LIMIT_PER_MINUTE,
             max_response_bytes=int(max_bytes) if max_bytes else DEFAULT_MCP_MAX_RESPONSE_BYTES,
+            client_ip_header=env.get("CLIENT_IP_HEADER", "").strip().lower() or None,
         )
 
 
@@ -783,4 +793,206 @@ class SearchProfileSettings:
             schema=env.get("DATABASE_SCHEMA", "").strip() or DEFAULT_DATABASE_SCHEMA,
             lexical_ranking=env.get("PG_LEXICAL_RANKING", "").strip().lower() or "bm25",
             vector_search=env.get("PG_VECTOR_SEARCH", "").strip().lower() or "approximate",
+        )
+
+
+# --- Public deployment guards (V17) ------------------------------------------
+#
+# A public URL lets anyone trigger paid model calls. Every guard below is off
+# by default, so the local profile behaves as before; the deployment turns
+# them on through its environment (see .env.example, "Public deployment").
+
+
+def _optional_limit(env: Mapping[str, str], variable: str) -> Optional[int]:
+    """A non-negative integer limit, or None when the variable is unset or empty."""
+    value = _optional_int(env.get(variable, ""), variable)
+    if value is not None and value < 0:
+        raise ValueError(f"{variable} must be >= 0, got {value}")
+    return value
+
+
+def _flag(env: Mapping[str, str], variable: str, default: bool) -> bool:
+    """A true/false environment switch (unset or empty gives the default)."""
+    raw = env.get(variable, "").strip().lower()
+    if not raw:
+        return default
+    if raw not in _TRUE_VALUES + _FALSE_VALUES:
+        raise ValueError(f"{variable} must be true or false, got '{raw}'")
+    return raw in _TRUE_VALUES
+
+
+DEFAULT_BUDGET_SCHEMA = "usage_budget"
+
+
+@dataclass(frozen=True)
+class UsageBudgetSettings:
+    """
+    Daily allowance of paid model calls (UsageBudget port).
+
+    Environment variables (all optional; with neither limit set there is no guard):
+        DAILY_SEARCH_LIMIT  searches per UTC day that may call the embedding and
+                            re-ranking APIs; past it, searches run lexical-only
+                            without re-ranking (no model call)
+        DAILY_LLM_LIMIT     requests per UTC day that use the LLM (query
+                            understanding, explanations, the agent); past it
+                            those steps are refused with a message
+        BUDGET_SCHEMA       Postgres schema of the counter table in the cloud
+                            profile (default usage_budget); the local profile
+                            counts in memory
+    """
+
+    daily_search_limit: Optional[int] = None
+    daily_llm_limit: Optional[int] = None
+    schema: str = DEFAULT_BUDGET_SCHEMA
+
+    def __post_init__(self) -> None:
+        if not re.match(SCHEMA_NAME_PATTERN, self.schema):
+            raise ValueError(f"BUDGET_SCHEMA must be a lower-case identifier, got '{self.schema}'")
+
+    @property
+    def enabled(self) -> bool:
+        """True when at least one daily limit is set."""
+        return self.daily_search_limit is not None or self.daily_llm_limit is not None
+
+    def limits(self) -> dict:
+        """Units per day for each limited kind (keys as in app.domain.ports)."""
+        out = {}
+        if self.daily_search_limit is not None:
+            out["model_search"] = self.daily_search_limit
+        if self.daily_llm_limit is not None:
+            out["llm_request"] = self.daily_llm_limit
+        return out
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "UsageBudgetSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        return cls(
+            daily_search_limit=_optional_limit(env, "DAILY_SEARCH_LIMIT"),
+            daily_llm_limit=_optional_limit(env, "DAILY_LLM_LIMIT"),
+            schema=env.get("BUDGET_SCHEMA", "").strip() or DEFAULT_BUDGET_SCHEMA,
+        )
+
+
+@dataclass(frozen=True)
+class RateLimitSettings:
+    """
+    Per-client request limits of the REST search and LLM endpoints.
+
+    Counted per client address in each process (a sliding window of one
+    minute, as the MCP endpoint's limit): on a serverless platform every
+    instance counts on its own, so these limits slow down one client but are
+    not a hard ceiling; the daily budget (UsageBudgetSettings) is.
+
+    Environment variables (all optional):
+        SEARCH_RATE_LIMIT_PER_MINUTE  POST /search and GET /books/{id}/similar
+                                      per client (default 0: no limit)
+        LLM_RATE_LIMIT_PER_MINUTE     searches with understanding or
+                                      explanations and POST /agent/ask per
+                                      client (default 0: no limit)
+        CLIENT_IP_HEADER              request header holding the client address
+                                      when a trusted proxy sets it (Vercel:
+                                      x-real-ip, which it overwrites, so a client
+                                      cannot forge it); default: the connection's
+                                      address. Also used by the MCP endpoint.
+    """
+
+    search_per_minute: int = 0
+    llm_per_minute: int = 0
+    client_ip_header: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if self.search_per_minute < 0 or self.llm_per_minute < 0:
+            raise ValueError("Rate limits must be >= 0 (0 disables a limit)")
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "RateLimitSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        header = env.get("CLIENT_IP_HEADER", "").strip().lower()
+        return cls(
+            search_per_minute=_optional_limit(env, "SEARCH_RATE_LIMIT_PER_MINUTE") or 0,
+            llm_per_minute=_optional_limit(env, "LLM_RATE_LIMIT_PER_MINUTE") or 0,
+            client_ip_header=header or None,
+        )
+
+
+@dataclass(frozen=True)
+class EvaluateEndpointSettings:
+    """
+    Switch of POST /api/v1/evaluate (runs the whole test collection).
+
+    Environment variables (optional):
+        EVALUATE_ENDPOINT_ENABLED  "false" answers 404 (a public deployment);
+                                   default "true", as before
+    """
+
+    enabled: bool = True
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "EvaluateEndpointSettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        return cls(enabled=_flag(env, "EVALUATE_ENDPOINT_ENABLED", True))
+
+
+# Deadlines of the model API calls a user waits for, in the cloud profile.
+CLOUD_API_QUERY_TIMEOUT_S = 3.0
+CLOUD_API_QUERY_MAX_RETRIES = 1
+CLOUD_API_QUERY_DEADLINE_S = 5.0
+
+
+@dataclass(frozen=True)
+class ApiQuerySettings:
+    """
+    Timeouts of the model API calls made while a user waits: the query
+    embedding and the re-ranking request (V17).
+
+    The document embeddings of a catalog load keep the long defaults of
+    openrouter_http.py (30 s per attempt, 3 retries): a load can wait, a
+    search cannot. With these settings a failing provider costs a search at
+    most `deadline_s` per call before it degrades (lexical-only without the
+    embedding, fused order without the re-ranking).
+
+    Environment variables (all optional):
+        API_QUERY_TIMEOUT_S    one attempt, seconds (cloud default 3)
+        API_QUERY_MAX_RETRIES  retries after a transient failure (cloud default 1)
+        API_QUERY_DEADLINE_S   the whole call with its retry (cloud default 5)
+
+    Outside the cloud profile each one defaults to None, which keeps the
+    behaviour of the evaluation runs (the long document deadlines).
+    """
+
+    timeout_s: Optional[float] = None
+    max_retries: Optional[int] = None
+    deadline_s: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        if self.timeout_s is not None and self.timeout_s <= 0:
+            raise ValueError(f"API_QUERY_TIMEOUT_S must be > 0, got {self.timeout_s}")
+        if self.max_retries is not None and self.max_retries < 0:
+            raise ValueError(f"API_QUERY_MAX_RETRIES must be >= 0, got {self.max_retries}")
+        if self.deadline_s is not None and self.deadline_s <= 0:
+            raise ValueError(f"API_QUERY_DEADLINE_S must be > 0, got {self.deadline_s}")
+
+    def call_options(self) -> dict:
+        """Keyword arguments for OpenRouterHttp.post (unset ones are left out)."""
+        options = {"timeout_s": self.timeout_s, "max_retries": self.max_retries, "deadline_s": self.deadline_s}
+        return {key: value for key, value in options.items() if value is not None}
+
+    @classmethod
+    def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "ApiQuerySettings":
+        """Build settings from environment variables (see class docstring)."""
+        env = os.environ if env is None else env
+        cloud = _is_cloud_profile(env)
+
+        def number(variable: str, default: Optional[float]) -> Optional[float]:
+            raw = env.get(variable, "").strip()
+            return float(raw) if raw else default
+
+        retries = _optional_int(env.get("API_QUERY_MAX_RETRIES", ""), "API_QUERY_MAX_RETRIES")
+        return cls(
+            timeout_s=number("API_QUERY_TIMEOUT_S", CLOUD_API_QUERY_TIMEOUT_S if cloud else None),
+            max_retries=retries if retries is not None else (CLOUD_API_QUERY_MAX_RETRIES if cloud else None),
+            deadline_s=number("API_QUERY_DEADLINE_S", CLOUD_API_QUERY_DEADLINE_S if cloud else None),
         )

@@ -294,6 +294,8 @@ def mount_mcp_server(
     endpoint = MCPEndpoint(server or create_mcp_server(settings), settings)
     handler: ASGIApp = endpoint
     if settings.rate_limit_per_minute > 0:
-        handler = RateLimitMiddleware(endpoint, SlidingWindowRateLimiter(settings.rate_limit_per_minute, 60.0))
+        handler = RateLimitMiddleware(
+            endpoint, SlidingWindowRateLimiter(settings.rate_limit_per_minute, 60.0), settings.client_ip_header
+        )
     app.add_route(MCP_PATH, handler, include_in_schema=False)
     return endpoint

@@ -83,3 +83,13 @@ button.similar { background: transparent; color: var(--accent); padding: 0.3rem 
   form.panel { grid-template-columns: 1fr; }
   .top { flex-direction: column; }
 }
+
+/* Source, licence and attribution of each result (V17) */
+.attribution { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.8rem; }
+.attribution a, .about a { color: var(--accent); }
+.notice {
+  margin: 0.5rem 0; padding: 0.5rem 0.75rem; border-radius: 6px;
+  background: #fff6e0; border: 1px solid #e8cf8f; color: var(--warn); font-size: 0.9rem;
+}
+.about { margin-top: 2rem; font-size: 0.9rem; }
+.about summary { cursor: pointer; font-weight: 600; }

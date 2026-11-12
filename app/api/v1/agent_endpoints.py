@@ -7,16 +7,44 @@ HTTP input/output and maps errors.
 
 import time
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from app.api.rate_limiting import LLM
 from app.api.v1 import schemas as api
 from app.api.v1.converters import domain_book_to_api
-from app.api.v1.dependencies import get_search_agent
+from app.api.v1.dependencies import get_rest_rate_limits, get_search_agent, get_usage_budget
+from app.domain.ports import BUDGET_LLM_REQUEST
 
 router = APIRouter()
 
+AGENT_BUDGET_MESSAGE = (
+    "The day's budget of LLM requests of this public demo is spent, so the agent is not "
+    "available until 00:00 UTC. Plain search still works."
+)
 
-@router.post("/agent/ask", response_model=api.AgentAskResponse)
+
+def require_llm_allowance(http_request: Request) -> None:
+    """
+    Per-client LLM rate limit and one unit of the day's LLM budget (V17).
+
+    Raises:
+        HTTPException: 429 when the client is over LLM_RATE_LIMIT_PER_MINUTE
+            or the day's LLM budget is spent (a budget that cannot be read
+            counts as spent)
+    """
+    get_rest_rate_limits().enforce(LLM, http_request)
+    budget = get_usage_budget()
+    if budget is None:
+        return
+    try:
+        granted = budget.try_consume(BUDGET_LLM_REQUEST)
+    except Exception:  # noqa: BLE001 - fail closed: no LLM call without a counted unit
+        granted = False
+    if not granted:
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=AGENT_BUDGET_MESSAGE)
+
+
+@router.post("/agent/ask", response_model=api.AgentAskResponse, dependencies=[Depends(require_llm_allowance)])
 def ask_agent(
     request: api.AgentAskRequest,
     agent=Depends(get_search_agent),
@@ -29,6 +57,7 @@ def ask_agent(
     tools returned. The response includes the tool-call trace.
 
     Raises:
+        429: The client is over its LLM rate limit, or the day's LLM budget is spent
         503: No LLM is configured or it cannot be reached
     """
     if agent is None:
