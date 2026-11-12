@@ -58,7 +58,8 @@ make demo
 construye los índices de la colección de evaluación de 177 libros
 (`data/catalog.db`, incluida en el repositorio) y arranca el servidor en
 **http://127.0.0.1:8000/ui/**. Ctrl+C lo detiene. No necesita clave de API ni
-fichero `.env`.
+fichero `.env`, y arranca siempre con el LLM apagado, aunque el `.env` de la
+máquina tenga una clave.
 
 Configuración que arranca: la del pipeline evaluado (BM25 con normalización
 léxica, embeddings `intfloat/multilingual-e5-large-instruct`, fusión RRF y
@@ -90,13 +91,17 @@ Opciones:
 - `make demo PORT=8001`: otro puerto, si el 8000 está ocupado.
 - `make demo PYTHON=/ruta/a/python3.13`: si `make` no encuentra un Python entre
   3.11 y 3.13 (macOS trae un `python3` 3.9 que no sirve).
+- `make demo LLM=on`: con el LLM de OpenRouter, usando `OPENROUTER_API_KEY` (y
+  `LLM_MODEL`, si está) del entorno o del `.env`; para crearlo, copiar
+  `.env.example` a `.env`, que describe todas las variables.
 
-**Sin clave de API el LLM está apagado**: la búsqueda funciona; la
-interpretación de la consulta, las explicaciones y el agente no están
-disponibles, la interfaz desactiva esas opciones y la API devuelve el aviso
-`llm_unavailable` (o un 503 con el motivo en `POST /api/v1/agent/ask`). Para
-activarlo, copiar `.env.example` a `.env` y poner una clave de OpenRouter en
-`OPENROUTER_API_KEY`. `.env.example` describe todas las variables.
+**Con el LLM apagado** (lo que tiene cualquier examinador sin clave) la búsqueda
+funciona; la interpretación de la consulta, las explicaciones y el agente no
+están disponibles, la interfaz desactiva esas opciones y la API devuelve el
+aviso `llm_unavailable` (o un 503 con el motivo en `POST /api/v1/agent/ask`).
+El asistente no falla: responde a cada mensaje con la búsqueda simple de su
+texto y el mismo aviso. `make demo LLM=on` sin clave arranca igual, con el LLM
+apagado.
 
 `make help` lista los objetivos y `make clean` borra lo que `make` ha creado
 (los índices de la demo y de la evaluación, y `.venv` si lo creó `make`).
@@ -158,7 +163,7 @@ flowchart LR
 | Capa | Dónde | Qué contiene |
 |---|---|---|
 | Dominio | `app/domain/` | Entidades, objetos valor, `SearchService` y los puertos (`ports.py`) |
-| Infraestructura | `app/infrastructure/` | Adaptadores: `db/` (SQLite, Postgres), `search/` (BM25, FAISS, pgvector, rerankers, embeddings por API), `llm/` (cliente LangChain, prompts, agente LangGraph, juez), `external/` (fuentes del catálogo) |
+| Infraestructura | `app/infrastructure/` | Adaptadores: `db/` (SQLite, Postgres), `search/` (BM25, FAISS, pgvector, rerankers, embeddings por API), `llm/` (cliente LangChain, prompts, asistente y agente LangGraph, juez), `external/` (fuentes del catálogo) |
 | Aplicación | `app/api/`, `app/ui/`, `app/main.py` | API REST, servidor MCP, interfaz web y composición de adaptadores (`app/api/v1/dependencies.py`) |
 
 Los dos perfiles comparten el mismo `SearchService`; `SEARCH_PROFILE` elige los
@@ -171,6 +176,52 @@ adaptadores:
 | Vectorial | FAISS, `multilingual-e5-large-instruct` | pgvector, `qwen/qwen3-embedding-8b` por API |
 | Reordenación | `BAAI/bge-reranker-v2-m3` en el proceso | `qwen/qwen3-reranker-8b` por API |
 | Papel | Evaluado (44 consultas, juicios de relevancia) | Desplegado (URL pública) |
+
+### El asistente conversacional
+
+`POST /api/v1/assistant/chat` es la entrada conversacional del sistema y la que
+usa el modo «Conversar con el asistente» de la interfaz. Un grafo LangGraph
+(`app/infrastructure/llm/graphs/assistant.py`) lleva cada mensaje por uno de
+cuatro caminos: `clarify` (una pregunta con dos a cuatro respuestas sugeridas,
+como mucho dos por conversación), `search` (la búsqueda evaluada y una respuesta
+que recomienda hasta tres libros con citas comprobadas), `agent` (el agente de
+herramientas, para peticiones de varios pasos; si falla, pasa a la búsqueda) u
+`out_of_scope` (respuesta fija). El servidor no guarda nada: el cliente envía la
+conversación completa en cada petición y copia en cada turno del asistente la
+`route` que recibió, que es como el servidor cuenta las preguntas ya hechas. La
+respuesta incluye el camino, el tiempo de cada nodo, si el código corrigió la
+ruta del modelo (`forced_route`), la consulta condensada, los filtros, los pasos
+del agente y el uso del LLM. Sin LLM, o con el límite diario agotado, hace la
+búsqueda simple del último mensaje y lo indica. `python -m
+scripts.print_assistant_graph` imprime el grafo:
+
+```mermaid
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	route(route)
+	clarify(clarify)
+	retrieve(retrieve)
+	answer(answer)
+	verify(verify)
+	agent(agent)
+	out_of_scope(out_of_scope)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> route;
+	agent -.-> __end__;
+	agent -.-> retrieve;
+	answer --> verify;
+	retrieve --> answer;
+	route -.-> agent;
+	route -.-> clarify;
+	route -.-> out_of_scope;
+	route -. &nbsp;search&nbsp; .-> retrieve;
+	clarify --> __end__;
+	out_of_scope --> __end__;
+	verify --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+```
 
 ## 5. Resultados principales
 

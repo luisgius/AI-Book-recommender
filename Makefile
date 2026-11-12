@@ -3,7 +3,8 @@
 #
 #   make help    list the targets
 #   make demo    install everything and start the web UI over the 177-book
-#                local profile (no API key needed)
+#                local profile, with the LLM off (no API key needed);
+#                make demo LLM=on uses OPENROUTER_API_KEY
 #   make test    run the test suite
 #   make eval    regenerate the evaluation reports from the cached judgments
 #                (no API call)
@@ -43,6 +44,12 @@ PORT := 8000
 EMBEDDING_MODEL := intfloat/multilingual-e5-large-instruct
 RERANKER := BAAI/bge-reranker-v2-m3
 
+# LLM of the demo. off (default): no LLM on any machine, even one whose .env
+# holds an OpenRouter key; this is what an examiner without a key gets.
+# on: the OpenRouter LLM, with OPENROUTER_API_KEY (and LLM_MODEL, if set) from
+# the environment or from .env.
+LLM := off
+
 # Folder of the demo indexes (built by make from data/catalog.db, ignored by git)
 DEMO_INDEXES := data/indexes_demo
 
@@ -57,11 +64,19 @@ TORCH_PIN := $(shell grep -E '^torch==' requirements.txt)
 
 # Environment of the demo server. Every value is set explicitly so that a .env
 # file (read by the application, never overriding these) cannot switch the demo
-# to another profile or model. The LLM is not set here: without
-# OPENROUTER_API_KEY it is off and the search works without it.
+# to another profile, model or LLM. LLM_PROVIDER=none keeps the LLM off even if
+# .env holds a key; with LLM=on it is openrouter and the key comes from the
+# environment or .env (without one the LLM stays off and the search works).
+ifeq ($(LLM),on)
+DEMO_LLM := LLM_PROVIDER=openrouter
+else ifeq ($(LLM),off)
+DEMO_LLM := LLM_PROVIDER=none
+else
+$(error LLM must be on or off, got '$(LLM)')
+endif
 DEMO_ENV := SEARCH_PROFILE=local DB_PATH=data/catalog.db INDEXES_DIR=$(DEMO_INDEXES) \
 	EMBEDDING_PROVIDER=local EMBEDDING_MODEL=$(EMBEDDING_MODEL) \
-	RERANKER_PROVIDER=local RERANKER_MODEL=$(RERANKER)
+	RERANKER_PROVIDER=local RERANKER_MODEL=$(RERANKER) $(DEMO_LLM)
 
 # Evaluation commands run with the Python of .venv from the repository root
 EVAL := $(VENV_PY) -m app.evaluation
@@ -76,11 +91,12 @@ EVAL := $(VENV_PY) -m app.evaluation
 help:
 	@echo "Targets (run from the repository root):"
 	@echo "  make demo    install, build the demo indexes and start the web UI at http://$(HOST):$(PORT)/ui/"
+	@echo "               (LLM off; make demo LLM=on uses OPENROUTER_API_KEY from the environment or .env)"
 	@echo "               (first run downloads about 3.6 GB; make demo RERANKER=none: about 1.3 GB)"
 	@echo "  make test    run the test suite (pytest)"
 	@echo "  make eval    regenerate the evaluation reports in data/evaluation/ from cached judgments, no API call"
 	@echo "  make clean   remove what make created (.venv if make made it, the demo and evaluation indexes)"
-	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none"
+	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none  LLM=on"
 	@echo "Python found for .venv: $(if $(PYTHON),$(PYTHON),none (need Python 3.11 to 3.13))"
 
 # ---------------------------------------------------------------------------
@@ -135,6 +151,7 @@ demo-notice:
 	@echo "   intfloat/multilingual-e5-large-instruct     1.14 GB (embeddings)"
 	@echo "   BAAI/bge-reranker-v2-m3                     2.29 GB (re-ranking; skip with RERANKER=none)"
 	@echo " Re-ranking: $(RERANKER)"
+	@echo " LLM: $(LLM)$(if $(filter off,$(LLM)), (make demo LLM=on uses OPENROUTER_API_KEY from the environment or .env),)"
 	@echo "=================================================================="
 
 # The demo indexes over data/catalog.db: BM25 (normalizing tokenizer) and a
@@ -157,8 +174,8 @@ serve: $(DEMO_INDEX_FILE)
 	@echo "Web UI:   http://$(HOST):$(PORT)/ui/"
 	@echo "API docs: http://$(HOST):$(PORT)/docs   Health: http://$(HOST):$(PORT)/api/v1/health"
 	@echo "The first search loads the models (several seconds). Stop the server with Ctrl+C."
-	@echo "Without OPENROUTER_API_KEY (in .env or the environment) the LLM is off:"
-	@echo "search works; query understanding, explanations and the agent are unavailable."
+	@echo "LLM $(LLM). Without the LLM the search works; query understanding, explanations and"
+	@echo "the agent are unavailable, and the assistant answers each message with a plain search."
 	@echo ""
 	$(DEMO_ENV) $(VENV_PY) -m uvicorn app.main:app --host $(HOST) --port $(PORT)
 
