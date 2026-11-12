@@ -142,7 +142,7 @@ def test_clarify_and_agent_replies(client_with):
                                                                      arguments={"book_id": "x"}, result_count=1)]),
                            recommendations=[AssistantRecommendation(book=BOOK, reason="Longer.")])
     body = client_with(FakeAssistant(agent)).post("/api/v1/assistant/chat", json=conversation("compare")).json()
-    assert body["steps"] == [{"tool": "get_book_details", "arguments": {"book_id": "x"}, "result_count": 1}]
+    assert body["steps"] == [{"tool": "get_book_details", "arguments": {"book_id": "x"}, "result_count": 1, "books": []}]
     assert body["recommendations"][0]["citations"] == []
 
 

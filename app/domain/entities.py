@@ -449,6 +449,14 @@ class Explanation:
 
 
 @dataclass(frozen=True)
+class AgentStepBook:
+    """A book a tool call returned, as the trace shows it (id and title only)."""
+
+    book_id: str
+    title: str
+
+
+@dataclass(frozen=True)
 class AgentStep:
     """One tool call made by the search agent (for transparency and evaluation)."""
 
@@ -460,6 +468,9 @@ class AgentStep:
 
     result_count: int
     """How many books the tool returned (0 on error)"""
+
+    books: List[AgentStepBook] = field(default_factory=list)
+    """The books the tool returned, in its order"""
 
 
 @dataclass(frozen=True)

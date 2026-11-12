@@ -291,11 +291,18 @@ class AgentAskRequest(BaseModel):
     question: str = Field(min_length=3, max_length=500, description="Book request in natural language")
 
 
+class AgentStepBook(BaseModel):
+    """A book one tool call returned."""
+    book_id: str
+    title: str
+
+
 class AgentStep(BaseModel):
     """One tool call made by the agent."""
     tool: str
     arguments: dict
     result_count: int = Field(ge=0, description="Books returned by the tool")
+    books: list[AgentStepBook] = Field(default_factory=list, description="The books returned, in the tool's order")
 
 
 class AgentRecommendation(BaseModel):

@@ -124,6 +124,9 @@ def test_react_loop_searches_then_recommends_verified_books():
     assert result.steps[0].tool == "search_books"
     assert result.steps[0].arguments == {"query": "war novel"}
     assert result.steps[0].result_count == 3
+    # each step names the books its tool returned, in the tool's order
+    assert [b.book_id for b in result.steps[0].books] == [str(b.id) for b in BOOKS[:3]]
+    assert [b.title for b in result.steps[0].books] == [b.title for b in BOOKS[:3]]
     # finalize sees the tool observations, not the agent's free text
     finalize_prompt = model.finals.inputs[0][0].content
     assert war in finalize_prompt and "Cookbook" in finalize_prompt
@@ -195,6 +198,8 @@ def test_details_tool_reports_unknown_books_without_failing():
     result = build_agent(model).answer("details please")
 
     assert result.steps[0].tool == "get_book_details" and result.steps[0].result_count == 0
+    assert result.steps[0].books == []  # the error object names no book
+    assert len(result.steps[1].books) == result.steps[1].result_count
     assert [r.book.title for r in result.recommendations] == ["Cookbook"]
 
 
@@ -211,3 +216,16 @@ def test_duplicate_recommendations_are_kept_once():
 def test_empty_question_is_rejected():
     with pytest.raises(ValueError):
         build_agent(FakeModel([], [])).answer("  ")
+
+
+def test_details_tool_step_names_the_one_book_it_returned():
+    book = BOOKS[0]
+    model = FakeModel(
+        turns=[tool_call("get_book_details", "c1", book_id=str(book.id)), AIMessage(content="ok")],
+        finals=[final("Done", str(book.id))],
+    )
+
+    result = build_agent(model).answer("tell me about it")
+
+    assert result.steps[0].result_count == 1
+    assert [(b.book_id, b.title) for b in result.steps[0].books] == [(str(book.id), book.title)]

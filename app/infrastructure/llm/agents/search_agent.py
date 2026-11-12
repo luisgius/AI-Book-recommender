@@ -33,7 +33,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from pydantic import BaseModel, Field
 
-from app.domain.entities import AgentAnswer, AgentRecommendation, AgentStep, Book
+from app.domain.entities import AgentAnswer, AgentRecommendation, AgentStep, AgentStepBook, Book
 from app.domain.ports import BookCatalogRepository
 from app.domain.services import SearchService
 from app.domain.value_objects import SearchFilters, SearchQuery
@@ -183,23 +183,33 @@ def _observed_books(messages: List[AnyMessage]) -> Dict[str, Dict[str, Any]]:
     return observed
 
 
+def _returned_books(message: ToolMessage) -> Optional[List[AgentStepBook]]:
+    """The books in one tool output (None when the output is not the tools' JSON)."""
+    try:
+        payload = json.loads(_tool_text(message))
+    except (TypeError, json.JSONDecodeError):
+        return None
+    items = payload if isinstance(payload, list) else [payload]
+    return [
+        AgentStepBook(book_id=str(item["book_id"]), title=str(item.get("title") or ""))
+        for item in items
+        if isinstance(item, dict) and "book_id" in item
+    ]
+
+
 def _tool_steps(messages: List[AnyMessage]) -> List[AgentStep]:
-    """Rebuild the tool-call trace (tool, arguments, number of books returned)."""
-    results_by_call: Dict[str, int] = {}
+    """Rebuild the tool-call trace (tool, arguments, books returned)."""
+    books_by_call: Dict[str, List[AgentStepBook]] = {}
     for message in messages:
         if isinstance(message, ToolMessage):
-            try:
-                payload = json.loads(_tool_text(message))
-                count = len(payload) if isinstance(payload, list) else int("book_id" in payload)
-            except (TypeError, json.JSONDecodeError):
-                count = 0
-            results_by_call[message.tool_call_id] = count
+            books_by_call[message.tool_call_id] = _returned_books(message) or []
     steps: List[AgentStep] = []
     for message in messages:
         if isinstance(message, AIMessage):
             for call in message.tool_calls:
+                books = books_by_call.get(call.get("id") or "", [])
                 steps.append(AgentStep(tool=call["name"], arguments=dict(call["args"]),
-                                       result_count=results_by_call.get(call.get("id") or "", 0)))
+                                       result_count=len(books), books=books))
     return steps
 
 

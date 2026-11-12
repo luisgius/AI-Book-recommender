@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.v1 import dependencies as deps
-from app.domain.entities import AgentAnswer, AgentRecommendation, AgentStep, Book
+from app.domain.entities import AgentAnswer, AgentRecommendation, AgentStep, AgentStepBook, Book
 from app.main import app
 
 
@@ -23,7 +23,8 @@ class FakeAgent:
         return AgentAnswer(
             question=question, answer="One book fits.",
             recommendations=[AgentRecommendation(book=book, reason="It is about war.")],
-            steps=[AgentStep(tool="search_books", arguments={"query": "war"}, result_count=3)],
+            steps=[AgentStep(tool="search_books", arguments={"query": "war"}, result_count=1,
+                             books=[AgentStepBook(book_id="b1", title="War Novel")])],
             model="fake", dropped_recommendations=1, reflections=0,
         )
 
@@ -44,7 +45,8 @@ def test_returns_answer_recommendations_and_trace(client):
     assert body["answer"] == "One book fits."
     assert body["recommendations"][0]["book"]["title"] == "War Novel"
     assert body["recommendations"][0]["reason"] == "It is about war."
-    assert body["steps"] == [{"tool": "search_books", "arguments": {"query": "war"}, "result_count": 3}]
+    assert body["steps"] == [{"tool": "search_books", "arguments": {"query": "war"}, "result_count": 1,
+                              "books": [{"book_id": "b1", "title": "War Novel"}]}]
     assert body["dropped_recommendations"] == 1
 
 

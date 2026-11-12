@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.api.rate_limiting import LLM
 from app.api.v1 import schemas as api
-from app.api.v1.converters import domain_book_to_api
+from app.api.v1.converters import domain_agent_step_to_api, domain_book_to_api
 from app.api.v1.dependencies import get_rest_rate_limits, get_search_agent, get_usage_budget
 from app.domain.ports import BUDGET_LLM_REQUEST
 
@@ -83,7 +83,7 @@ def ask_agent(
             for r in result.recommendations
         ],
         steps=[
-            api.AgentStep(tool=s.tool, arguments=s.arguments, result_count=s.result_count)
+            domain_agent_step_to_api(s)
             for s in result.steps
         ],
         model=result.model,

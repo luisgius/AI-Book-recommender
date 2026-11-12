@@ -98,6 +98,16 @@ def domain_search_result_to_api(result: domain.SearchResult) -> api.SearchResult
     )
 
 
+def domain_agent_step_to_api(step: domain.AgentStep) -> api.AgentStep:
+    """Convert one tool call of the agent, with the books it returned."""
+    return api.AgentStep(
+        tool=step.tool,
+        arguments=step.arguments,
+        result_count=step.result_count,
+        books=[api.AgentStepBook(book_id=b.book_id, title=b.title) for b in step.books],
+    )
+
+
 def domain_metadata_to_api(metadata: domain_vo.SearchMetadata) -> api.SearchMetadata:
     """
     Convert a domain SearchMetadata value object to an API SearchMetadata model.
@@ -266,7 +276,7 @@ def domain_reply_to_api(reply: domain.AssistantReply, latency_ms: float) -> api.
             for r in reply.recommendations
         ],
         steps=[
-            api.AgentStep(tool=s.tool, arguments=s.arguments, result_count=s.result_count)
+            domain_agent_step_to_api(s)
             for s in (reply.agent_answer.steps if reply.agent_answer is not None else [])
         ],
         notices=list(reply.notices),
