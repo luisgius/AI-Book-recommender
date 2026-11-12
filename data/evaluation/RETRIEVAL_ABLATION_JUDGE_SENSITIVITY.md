@@ -1,13 +1,14 @@
 # Sensitivity of the V06 ablation to the LLM judge
 
-- Date: 2026-11-11T15:54:00+00:00
-- Git commit: `b8d6ee3`
+- Date: 2026-11-12T11:11:31+00:00
+- Git commit: `b308017`
 - Old judge (V06): `qwen3.8:27b-mlx`, 919 LLM grades in
   `app/evaluation/relevance_judgments_extended.json`.
 - New judge: `z-ai/glm-5.3-flash` (OpenRouter), prompt `v1.0`, the same
   919 pairs, in `app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json` (cache
   `data/evaluation/llm_judgments/z-ai-glm-5.3-flash__prompt-v1.0.jsonl`).
 - Grading run of 2026-11-11T15:41:21+00:00: 919 pairs judged (0 already cached), 0 judge failures, 1.95 s per judgment (4 parallel judges, each one request at a time), real cost 0.0591 USD (OpenRouter).
+- Pair set pinned to the 919 pairs both judges graded for the V06 ablation pool (the old judge's LLM-graded pairs). The new judge's file now holds 1065 LLM grades: the other 146 were added later by other tasks for pairs the old judge never graded, so they are left out of the agreement and of the new ablation run (`retrieval_ablation --llm-pairs-from app/evaluation/relevance_judgments_extended.json`); the file itself is unchanged.
 - Both files hold the same 637 original judgments; only the LLM grades of the
   919 holes differ. Both ablation runs returned the same top 10 for every system and query, so only the judgments differ.
 - The re-run reproduces the V05 numbers on the original judgments (all match); its check on the V05 extended judgments reports a mismatch, as expected, because those numbers include the old judge's grades.
@@ -85,8 +86,8 @@ Not part of the conclusions (the V06 family is Holm-corrected), but worth knowin
 ## Reproduce
 
     python -m app.evaluation.judge_sensitivity grade --workers 4
-    python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json --output-json data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json --output-md ""
-    python -m app.evaluation.judge_sensitivity report
+    python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json --llm-pairs-from app/evaluation/relevance_judgments_extended.json --output-json data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json --output-md ""
+    python -m app.evaluation.judge_sensitivity report --judge-model z-ai/glm-5.3-flash
 
 The first command calls the judge set in `JUDGE_PROVIDER` / `JUDGE_MODEL` (see `.env.example`) and
 resumes from its cache; the other two call no LLM.

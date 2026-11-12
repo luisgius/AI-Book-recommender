@@ -5127,69 +5127,69 @@
   "latency": {
     "bm25_whitespace": {
       "n": 44,
-      "median_ms": 0.06706290878355503,
-      "p95_ms": 0.09499106090515852,
-      "warmup_ms": 0.1107498537749052
+      "median_ms": 0.07535459008067846,
+      "p95_ms": 0.10623111156746745,
+      "warmup_ms": 0.11537480168044567
     },
     "bm25_normalized": {
       "n": 44,
-      "median_ms": 0.06316660437732935,
-      "p95_ms": 0.08483288111165166,
-      "warmup_ms": 0.08216709829866886
+      "median_ms": 0.07412536069750786,
+      "p95_ms": 0.09335981449112296,
+      "warmup_ms": 0.08791615255177021
     },
     "vec_minilm": {
       "n": 44,
-      "median_ms": 3.5482289968058467,
-      "p95_ms": 16.67231874307618,
-      "warmup_ms": 26.801208965480328
+      "median_ms": 3.5593335051089525,
+      "p95_ms": 16.85235893819481,
+      "warmup_ms": 27.822249801829457
     },
     "hybrid_legacy": {
       "n": 44,
-      "median_ms": 3.7338545080274343,
-      "p95_ms": 4.4950688374228776,
-      "warmup_ms": 3.6400831304490566
+      "median_ms": 3.4821879817172885,
+      "p95_ms": 3.6817028769291937,
+      "warmup_ms": 3.6211658734828234
     },
     "hybrid_norm_minilm": {
       "n": 44,
-      "median_ms": 4.142916528508067,
-      "p95_ms": 4.828840319532901,
-      "warmup_ms": 3.753166878595948
+      "median_ms": 3.450729069299996,
+      "p95_ms": 3.685818542726338,
+      "warmup_ms": 3.490624949336052
     },
     "vec_e5": {
       "n": 44,
-      "median_ms": 12.436333461664617,
-      "p95_ms": 31.267408106941733,
-      "warmup_ms": 39.508874993771315
+      "median_ms": 11.032999958842993,
+      "p95_ms": 27.629010484088212,
+      "warmup_ms": 37.45045815594494
     },
     "hybrid_norm_e5": {
       "n": 44,
-      "median_ms": 12.38508359529078,
-      "p95_ms": 12.917143700178713,
-      "warmup_ms": 12.207790976390243
+      "median_ms": 11.162104434333742,
+      "p95_ms": 12.38251602044329,
+      "warmup_ms": 12.185458093881607
     },
     "hybrid_norm_e5_bge": {
       "n": 44,
-      "median_ms": 2304.3063749792054,
-      "p95_ms": 2428.684906323906,
-      "warmup_ms": 2317.2113748732954
+      "median_ms": 2246.849417104386,
+      "p95_ms": 2374.522427667398,
+      "warmup_ms": 2267.7987080533057
     },
     "hybrid_norm_e5_mmarco": {
       "n": 44,
-      "median_ms": 339.07564589753747,
-      "p95_ms": 390.0001974310726,
-      "warmup_ms": 394.9778750538826
+      "median_ms": 337.64074998907745,
+      "p95_ms": 392.45960167609155,
+      "warmup_ms": 377.08208290860057
     },
     "vec_qwen3": {
       "n": 44,
-      "median_ms": 18.85977096389979,
-      "p95_ms": 41.68617505347356,
-      "warmup_ms": 61.0688750166446
+      "median_ms": 19.18577100150287,
+      "p95_ms": 41.943837399594486,
+      "warmup_ms": 61.45029212348163
     },
     "hybrid_norm_qwen3": {
       "n": 44,
-      "median_ms": 18.762437510304153,
-      "p95_ms": 22.42483753943816,
-      "warmup_ms": 20.912041887640953
+      "median_ms": 18.849396496079862,
+      "p95_ms": 21.547937660943717,
+      "warmup_ms": 20.596166141331196
     }
   },
   "judgments": {
@@ -13093,12 +13093,12 @@
   "costs": {
     "bm25:whitespace": {
       "role": "lexical",
-      "index_build_seconds": 0.003958999877795577,
+      "index_build_seconds": 0.004339250037446618,
       "index_source": "built in memory from the catalog"
     },
     "bm25:normalized": {
       "role": "lexical",
-      "index_build_seconds": 0.009379792027175426,
+      "index_build_seconds": 0.010721042053774,
       "index_source": "built in memory from the catalog"
     },
     "all-MiniLM-L6-v2": {
@@ -13107,8 +13107,8 @@
       "dimension": 384,
       "index_metric": "l2",
       "size_on_disk_bytes": 91578415,
-      "load_seconds": 3.453302042093128,
-      "index_build_seconds": 0.4144329580012709,
+      "load_seconds": 2.636033667018637,
+      "index_build_seconds": 0.4252919580321759,
       "index_source": "shipped index data/indexes/faiss_index (read only); build time measured by a throwaway rebuild"
     },
     "intfloat/multilingual-e5-large-instruct": {
@@ -13117,15 +13117,15 @@
       "dimension": 1024,
       "index_metric": "inner_product",
       "size_on_disk_bytes": 1142121329,
-      "load_seconds": 5.619515584083274,
-      "index_build_seconds": 7.221320250071585,
-      "index_source": "loaded from data/indexes_ablation/intfloat_multilingual-e5-large-instruct/faiss_index (built 2026-11-11T13:44:09+00:00)"
+      "load_seconds": 4.553446083096787,
+      "index_build_seconds": 27.847600291017443,
+      "index_source": "loaded from data/indexes_ablation/intfloat_multilingual-e5-large-instruct/faiss_index (built 2026-11-12T10:08:29+00:00)"
     },
     "BAAI/bge-reranker-v2-m3": {
       "role": "reranker",
       "device": "mps",
       "size_on_disk_bytes": 2293242108,
-      "load_seconds": 3.107643541879952,
+      "load_seconds": 2.2128422500099987,
       "index_build_seconds": null,
       "index_source": null
     },
@@ -13133,7 +13133,7 @@
       "role": "reranker",
       "device": "mps",
       "size_on_disk_bytes": 492745974,
-      "load_seconds": 3.096722667105496,
+      "load_seconds": 1.6123227500356734,
       "index_build_seconds": null,
       "index_source": null
     },
@@ -13143,17 +13143,17 @@
       "dimension": 1024,
       "index_metric": "inner_product",
       "size_on_disk_bytes": 1207487354,
-      "load_seconds": 5.029640999855474,
-      "index_build_seconds": 18.649015916977078,
-      "index_source": "loaded from data/indexes_ablation/qwen_qwen3-embedding-0.6b/faiss_index (built 2026-11-11T13:47:19+00:00)"
+      "load_seconds": 5.273220540955663,
+      "index_build_seconds": 20.98483525007032,
+      "index_source": "loaded from data/indexes_ablation/qwen_qwen3-embedding-0.6b/faiss_index (built 2026-11-12T11:08:18+00:00)"
     }
   },
   "judge": null,
   "run": {
-    "date": "2026-11-11T15:49:52+00:00",
-    "git_commit": "b8d6ee3",
+    "date": "2026-11-12T11:08:26+00:00",
+    "git_commit": "b308017",
     "git_worktree_dirty": true,
-    "command": "python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json --output-json data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json --output-md ''",
+    "command": "python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json --llm-pairs-from app/evaluation/relevance_judgments_extended.json --output-json data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json --output-md ''",
     "reproduce": [
       "python -m app.evaluation.retrieval_ablation",
       "python -m app.evaluation.retrieval_ablation --no-judge"
@@ -13178,6 +13178,12 @@
     "extended_judgments_path": "app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json",
     "queries_sha256": "60f78e921b0b353490db57ac818d247b09325a16c37d90637076847eb00ebe6f",
     "judgments_sha256": "81bc727205d44f1c063f9f28222591593f11bf5dd3da68375fccf5adf241c31c",
-    "extended_judgments_sha256": "a4e4c814e95ff77a36123c8b04e031e398fb22ee9d15dd46676319b016d40b5b"
+    "extended_judgments_sha256": "e92185379347042b403fb5b33499f082cdc57c902f53f6ea0cbcf3c706e6e346",
+    "llm_pairs_pinning": {
+      "llm_pairs_from": "app/evaluation/relevance_judgments_extended.json",
+      "llm_pairs_from_sha256": "2382a4acc5db43d897ea8ec3b63558260e8e580c08748a5020c65fc38dc19030",
+      "llm_grades_excluded": 146,
+      "pinned_judgments_sha256": "a4e4c814e95ff77a36123c8b04e031e398fb22ee9d15dd46676319b016d40b5b"
+    }
   }
 }

@@ -19,8 +19,14 @@ CLI (from the repository root):
     python -m app.evaluation.judge_sensitivity grade --workers 4
     python -m app.evaluation.retrieval_ablation --no-judge \\
         --extended-judgments-path app/evaluation/relevance_judgments_extended_<judge-slug>.json \\
+        --llm-pairs-from app/evaluation/relevance_judgments_extended.json \\
         --output-json data/evaluation/results_retrieval_ablation_<judge-slug>.json --output-md ""
-    python -m app.evaluation.judge_sensitivity report
+    python -m app.evaluation.judge_sensitivity report --judge-model <judge-model>
+
+Both judges are compared on the same pair set: the pairs the old judge
+graded by LLM for the V06 pool. Grades that other tasks later added to the
+new judge's file (V07 added 146) are left out, by --llm-pairs-from in the
+ablation run and by build_document in the report.
 
 `grade` calls the judge (cached per model in data/evaluation/llm_judgments/,
 resumable); `report` calls no model and writes
@@ -248,6 +254,17 @@ def build_markdown(document: Mapping[str, Any]) -> str:
         + "its check on the V05 extended judgments reports a mismatch, as expected, because those "
           "numbers include the old judge's grades."
     )
+    excluded = new_judge.get("num_llm_excluded", 0)
+    pinning_line = (
+        f"- Pair set pinned to the {new_judge['num_llm']} pairs both judges graded for the V06 ablation pool "
+        f"(the old judge's LLM-graded pairs). The new judge's file now holds {new_judge.get('num_llm_in_file')} "
+        f"LLM grades: the other {excluded} were added later by other tasks for pairs the old judge never "
+        f"graded, so they are left out of the agreement and of the new ablation run "
+        f"(`retrieval_ablation --llm-pairs-from {old_judge['judgments_path']}`); the file itself is unchanged."
+        if excluded else
+        f"- Pair set: the {new_judge['num_llm']} pairs both judges graded for the V06 ablation pool "
+        f"(the new judge's file holds no other LLM grade)."
+    )
     runs_line = ("Both ablation runs returned the same top 10 for every system and query, so only the "
                  "judgments differ." if document["same_runs"] else
                  "**The two ablation runs did not return the same top 10** (catalog or index changed?); "
@@ -262,6 +279,7 @@ def build_markdown(document: Mapping[str, Any]) -> str:
 - New judge: `{new_judge["model"]}` (OpenRouter), prompt `{new_judge["prompt_version"]}`, the same
   {new_judge["num_llm"]} pairs, in `{new_judge["judgments_path"]}` (cache
   `{new_judge["cache_file"]}`).{grading_line}
+{pinning_line}
 - Both files hold the same {document["num_original"]} original judgments; only the LLM grades of the
   {overall["n"]} holes differ. {runs_line}{reproduction_line}
 - Contrasts, statistics and Holm family exactly as in `RETRIEVAL_ABLATION.md` (two-sided paired
@@ -303,8 +321,8 @@ In short: {len(holding)} of {len(rows)} conclusions hold under both judges
 ## Reproduce
 
     python -m app.evaluation.judge_sensitivity grade --workers 4
-    python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path {new_judge["judgments_path"]} --output-json {document["new_ablation_json"]} --output-md ""
-    python -m app.evaluation.judge_sensitivity report
+    python -m app.evaluation.retrieval_ablation --no-judge --extended-judgments-path {new_judge["judgments_path"]} --llm-pairs-from {old_judge["judgments_path"]} --output-json {document["new_ablation_json"]} --output-md ""
+    python -m app.evaluation.judge_sensitivity report --judge-model {new_judge["model"]}
 
 The first command calls the judge set in `JUDGE_PROVIDER` / `JUDGE_MODEL` (see `.env.example`) and
 resumes from its cache; the other two call no LLM.
@@ -449,9 +467,21 @@ def build_document(
     seed: int = 0,
 ) -> Dict[str, Any]:
     """The sensitivity document: judge agreement on the shared pairs and the contrasts side by side."""
-    old, new = llm_grades(old_raw), llm_grades(new_raw)
-    if set(old) != set(new):
-        raise ValueError(f"The two files grade different pairs ({len(set(old) ^ set(new))} differ)")
+    old, new_all = llm_grades(old_raw), llm_grades(new_raw)
+    missing = set(old) - set(new_all)
+    if missing:
+        raise ValueError(f"The new judge did not grade {len(missing)} pairs that the old judge graded")
+    # Pinned to the pairs both judges graded for the ablation pool (the old
+    # judge's pairs): grades the new judge's file received later for other
+    # tasks (V07 added 146) are left out of the agreement and of the ablation.
+    new = {k: new_all[k] for k in old}
+    excluded = len(new_all) - len(new)
+    pinned_llm = new_report.get("judgments", {}).get("num_llm_in_final_file")
+    if pinned_llm is not None and pinned_llm != len(old):
+        raise ValueError(
+            f"The new ablation run used {pinned_llm} LLM grades, not the {len(old)} pairs of the old judge; "
+            "re-run it with --llm-pairs-from " + paths["old_judgments"]
+        )
     keys = sorted(old)
     agreement = agreement_report(
         [old[k] for k in keys], [new[k] for k in keys], [query_languages.get(k[0]) for k in keys],
@@ -465,7 +495,8 @@ def build_document(
         "new_judge": {"model": new_model, "num_llm": len(new), "judgments_path": paths["new_judgments"],
                       "prompt_version": ", ".join(sorted({i.get("prompt_version") for items in new_raw.values()
                                                           for i in items if i.get("judge") == "llm"})),
-                      "cache_file": paths.get("cache_file", "")},
+                      "cache_file": paths.get("cache_file", ""),
+                      "num_llm_in_file": len(new_all), "num_llm_excluded": excluded},
         "num_original": num_original,
         "agreement": agreement,
         "agreement_note": "rows / 'original': old judge; columns / 'llm': new judge",

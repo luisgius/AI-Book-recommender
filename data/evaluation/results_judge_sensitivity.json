@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-11T15:54:00+00:00",
-  "git_commit": "b8d6ee3",
+  "date": "2026-11-12T11:11:31+00:00",
+  "git_commit": "b308017",
   "old_judge": {
     "models": [
       "qwen3.8:27b-mlx"
@@ -13,7 +13,9 @@
     "num_llm": 919,
     "judgments_path": "app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json",
     "prompt_version": "v1.0",
-    "cache_file": "data/evaluation/llm_judgments/z-ai-glm-5.3-flash__prompt-v1.0.jsonl"
+    "cache_file": "data/evaluation/llm_judgments/z-ai-glm-5.3-flash__prompt-v1.0.jsonl",
+    "num_llm_in_file": 1065,
+    "num_llm_excluded": 146
   },
   "num_original": 637,
   "agreement": {

@@ -1,11 +1,11 @@
 # Baseline comparison of the non-LLM retrieval systems
 
-- Date: 2026-11-11T10:17:47+00:00
-- Git commit: `1a1a9ad` (with uncommitted changes in tracked files)
+- Date: 2026-11-12T10:49:40+00:00
+- Git commit: `b308017` (with uncommitted changes in tracked files)
 - Reproduce: `python -m app.evaluation.comparison`
 - Collection: 44 queries (24 en, 20 es), 637 graded judgments (0-3),
   177-book catalog; see `QRELS_DATASHEET.md`. Judgments file SHA-256
-  `81bc727205d4`, queries file SHA-256 `76c4dcce85e2`.
+  `81bc727205d4`, queries file SHA-256 `60f78e921b0b`.
 - Depth: every system returns at most 10 results per query (`max_results`).
 
 Systems:

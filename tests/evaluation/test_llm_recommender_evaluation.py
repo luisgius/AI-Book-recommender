@@ -309,3 +309,24 @@ class TestReport:
         m.runs[ev.R1]["q1"] = m.runs[ev.R1]["q1"][:9] + [uuid4()]
         with pytest.raises(UnjudgedResultsError):
             ev.build_report(m, queries, judgments, info, n_resamples=50)
+
+
+# --- the system LLM a --no-llm run names ----------------------------------------------------
+
+
+class _Settings:
+    provider, model, reasoning = "openrouter", "deepseek/deepseek-v4.1-flash", "default"
+
+
+SAVED = {"models": {"system_llm": {"provider": "openrouter", "model": "qwen/qwen3.8-flash", "reasoning": False}}}
+
+
+def test_no_llm_run_names_the_llm_of_the_saved_results_not_the_environment():
+    assert ev.system_llm_identity(_Settings(), None, False, SAVED) == ("openrouter", "qwen/qwen3.8-flash", False)
+
+
+def test_live_run_or_explicit_model_uses_the_environment_and_the_argument():
+    assert ev.system_llm_identity(_Settings(), None, True, SAVED) == (
+        "openrouter", "deepseek/deepseek-v4.1-flash", "default")
+    assert ev.system_llm_identity(_Settings(), "qwen/other", False, SAVED)[1] == "qwen/other"
+    assert ev.system_llm_identity(_Settings(), None, False, {})[1] == "deepseek/deepseek-v4.1-flash"

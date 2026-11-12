@@ -115,15 +115,19 @@ los modelos locales y recalcula métricas, intervalos y tests. Tarda unos
 10 minutos en el portátil de la medida y la primera vez descarga cinco
 modelos locales (unos 5.2 GB; la lista se imprime al empezar). Después,
 `git diff` muestra solo fechas, commit, tiempos medidos (latencias, carga de
-modelos, construcción de índices), el origen de los índices y, en
-`COMPARISON_BASELINE.md`, el hash del fichero de consultas (el fichero cambió
-después de ese informe); las métricas no cambian.
+modelos, construcción de índices) y el origen de los índices; las métricas no
+cambian.
 
 | Qué hace `make eval` | Informes de `data/evaluation/` |
 |---|---|
-| Rehace las búsquedas y recalcula | `COMPARISON_BASELINE.md`, `RETRIEVAL_ABLATION.md`, `LLM_RECOMMENDER.md`, `API_MODELS.md`, `results_llm_path_k10.json`, `results_llm_path_k100.json` (resumidos a mano en `LLM_PATH_SUMMARY.md`) |
-| Recalcula las tablas desde las listas y medidas guardadas (las tres últimas necesitaron un servicio en vivo: Neon, el despliegue u OpenRouter) | `BM25_PADDING.md`, `PROFILE_PARITY.md`, `CLOUD_LIVE_CHECK.md`, `LLM_MODEL_SELECTION.md` |
-| No regenera | `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md`: el fichero de juicios del segundo juez recibió después 146 juicios más (V07) y el informe ya no se puede rehacer tal cual. `DEPLOYMENT_CHECK.md`: necesita el despliegue. `JUDGE_AGREEMENT.md` y `COMPARISON_EXTENDED_QRELS.md`: necesitan el juez LLM. `EVALUATION_SUMMARY.md` y `QRELS_DATASHEET.md`: escritos a mano |
+| Rehace las búsquedas y recalcula | `COMPARISON_BASELINE.md`, `RETRIEVAL_ABLATION.md`, `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md`, `LLM_RECOMMENDER.md`, `API_MODELS.md`, `BM25_PADDING.md`, `results_llm_path_k10.json`, `results_llm_path_k100.json` (resumidos a mano en `LLM_PATH_SUMMARY.md`) |
+| Recalcula las tablas desde las medidas guardadas (necesitaron un servicio en vivo: Neon, el despliegue u OpenRouter) | `PROFILE_PARITY.md`, `CLOUD_LIVE_CHECK.md`, `LLM_MODEL_SELECTION.md` |
+| No regenera | `DEPLOYMENT_CHECK.md`: necesita el despliegue. `JUDGE_AGREEMENT.md` y `COMPARISON_EXTENDED_QRELS.md`: necesitan el juez LLM. `EVALUATION_SUMMARY.md` y `QRELS_DATASHEET.md`: escritos a mano |
+
+El informe de sensibilidad al juez compara los dos jueces sobre los 919 pares
+que ambos calificaron para la ablación V06; los 146 juicios que V07 añadió
+después al fichero del segundo juez quedan fuera de esa comparación (`--llm-
+pairs-from`), y el fichero no se modifica.
 
 La integración continua (`.github/workflows/tests.yml`) ejecuta `make test` en
 cada push y pull request con Python 3.13.

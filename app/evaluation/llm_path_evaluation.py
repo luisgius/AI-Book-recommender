@@ -261,6 +261,34 @@ def _git_commit() -> Optional[str]:
         return None
 
 
+LLM_LABELS = ("llm_provider", "llm_model", "temperature", "apply_extracted_category")
+
+
+def cached_run_labels(output_path: Path, cache_path: Path, query_ids) -> Optional[Dict[str, Any]]:
+    """
+    The LLM labels of the saved results when this run needs no LLM.
+
+    When the intents cache holds every query, no LLM is called and the
+    intents are those of the model that wrote the cache; the saved results
+    for the same cache name that model (provider, model, temperature, the
+    category option). Taking them from there, not from the environment,
+    keeps a re-run from relabelling the published results.
+
+    Returns:
+        The labels, or None when an intent is missing or there are no saved results for this cache
+    """
+    try:
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))["intents"]
+        config = json.loads(output_path.read_text(encoding="utf-8"))["config"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        return None
+    if any(query_id not in cached for query_id in query_ids) or config.get("intents_cache") != str(cache_path):
+        return None
+    if any(label not in config for label in LLM_LABELS):
+        return None
+    return {label: config[label] for label in LLM_LABELS}
+
+
 def main() -> None:
     from dotenv import load_dotenv
 
@@ -297,8 +325,17 @@ def main() -> None:
 
     cache_path = Path(args.intents_cache or
                       f"data/evaluation/llm_intents_{settings.model.replace(':', '-').replace('/', '-')}.json")
+    queries = load_test_queries(DEFAULT_QUERIES_PATH)
+    cached_labels = None if args.refresh_intents else cached_run_labels(
+        Path(args.output), cache_path, [q.query_id for q in queries])
+    labels = cached_labels or {
+        "llm_provider": settings.provider, "llm_model": settings.model,
+        "temperature": settings.temperature, "apply_extracted_category": settings.apply_extracted_category,
+    }
+    if cached_labels:
+        print(f"Every intent is cached: no LLM client; LLM labels from the saved {args.output}")
     llm_client = None
-    if settings.enabled:
+    if settings.enabled and cached_labels is None:
         from app.infrastructure.llm.langchain_llm_client import LangChainLLMClient
         llm_client = LangChainLLMClient(
             provider=settings.provider, model_name=settings.model, temperature=settings.temperature,
@@ -309,17 +346,13 @@ def main() -> None:
         )
 
     started = datetime.now(UTC)
-    queries = load_test_queries(DEFAULT_QUERIES_PATH)
     intents = collect_intents(queries, llm_client, cache_path, refresh=args.refresh_intents)
     report = evaluate_llm_path(lexical_repo=bm25, vector_repo=vector, embeddings_store=embeddings,
                                catalog_repo=catalog, intents=intents, max_results=args.max_results)
     report["config"] = {
         "date": started.isoformat(),
         "git_commit": _git_commit(),
-        "llm_provider": settings.provider,
-        "llm_model": settings.model,
-        "temperature": settings.temperature,
-        "apply_extracted_category": settings.apply_extracted_category,
+        **labels,
         "filter_guards_version": FILTER_GUARDS_VERSION,
         "query_prompts_version": QUERY_PROMPTS_VERSION,
         "explanation_prompt_version": GROUNDED_EXPLANATION_PROMPT_VERSION,

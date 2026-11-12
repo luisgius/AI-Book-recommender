@@ -311,12 +311,23 @@ def run_measurement(args: argparse.Namespace, log: Callable[[str], None]) -> Dic
     # Judgments: the V12 file plus the judge's grades of the remaining holes.
     from app.evaluation.relevance_judge import JudgeTask, JudgmentCache, find_unjudged, merge_judgments
 
+    if args.no_judge:
+        # The grades of the holes are in the V13 file (written by the judging
+        # run); check against it and leave it as it is.
+        holes = find_unjudged(runs, resolve_grades(load_relevance_judgments(args.v13_judgments), books), DEPTH)
+        if holes:
+            raise SystemExit(f"{len(holes)} top-10 pairs have no judgment in {args.v13_judgments}; "
+                             "run without --no-judge to grade them")
+        judging = previous_judging(args.output_json, args.base_judgments, _sha256(args.base_judgments)) or {
+            "holes_at_start": len(find_unjudged(runs, resolve_grades(base_raw, books), DEPTH)),
+        }
+        log(f"--no-judge: every top-10 pair is judged in {args.v13_judgments} (file not rewritten)")
+        return _measurement(started, device, args, judging, runs, latency, books, texts, vector_scores, stack)
+
     current = resolve_grades(base_raw, books)
     holes = find_unjudged(runs, current, DEPTH)
     books_by_id = {book.id: book for book in books}
     judging: Dict[str, Any] = {"holes_at_start": len(holes)}
-    if holes and args.no_judge:
-        raise SystemExit(f"{len(holes)} top-10 pairs have no judgment; run without --no-judge to grade them")
     new_judgments = []
     if holes:
         from app.evaluation.judge_sensitivity import judge_in_parallel
@@ -345,7 +356,32 @@ def run_measurement(args: argparse.Namespace, log: Callable[[str], None]) -> Dic
     merged = merge_judgments(base_raw, new_judgments)
     Path(args.v13_judgments).write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     log(f"Wrote {args.v13_judgments} ({sum(len(e['judgments']) for e in merged)} judgments, {len(new_judgments)} new)")
+    return _measurement(started, device, args, judging, runs, latency, books, texts, vector_scores, stack)
 
+
+def previous_judging(output_json: str, base_file: str, base_sha256: str) -> Optional[Dict[str, Any]]:
+    """
+    The judging facts of the saved run, for a `run --no-judge` on the same base file.
+
+    A --no-judge run grades nothing; when the base judgments are byte for
+    byte those of the saved judging run (same SHA-256), that run's facts
+    (holes at the start, pairs graded, judge, cost) still describe the V13
+    file, so they are carried over and dated (as in retrieval_ablation).
+    """
+    try:
+        saved = json.loads(Path(output_json).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    judging = dict(saved.get("judgments") or {})
+    if judging.get("base_file") != base_file or judging.get("base_sha256") != base_sha256:
+        return None
+    for key in ("base_file", "base_sha256", "v13_file"):
+        judging.pop(key, None)
+    return {**judging, "carried_from_run_of": judging.get("carried_from_run_of") or saved.get("date")}
+
+
+def _measurement(started, device, args, judging, runs, latency, books, texts, vector_scores, stack) -> Dict[str, Any]:
+    """The saved-run document of `run` (rankings, latencies and judging facts)."""
     return {
         "date": started.isoformat(timespec="seconds"),
         "command": "python -m app.evaluation.bm25_padding " + " ".join(sys.argv[1:]),
@@ -448,7 +484,8 @@ def build_markdown(report: Mapping[str, Any]) -> str:
     later = (counts["v13"] - counts["base"] - graded_here) if counts.get("base") is not None else 0
     w(f"Judgments: `{j['v13_file']}` = `{j['base_file']}` (sha256 {j['base_sha256'][:12]}...) plus "
       f"{graded_here} pairs graded by {j.get('judge_model', 'the V12 judge')} for this measurement "
-      f"({j['holes_at_start']} holes at the start"
+      + (f"in its judging run of {j['carried_from_run_of']} " if j.get("carried_from_run_of") else "")
+      + f"({j['holes_at_start']} holes at the start"
       + (f"; grades 0/1/2/3: {' / '.join(str(g) for g in j['grade_distribution'])}" if j.get("grade_distribution") else "")
       + (f"; {_f(j['reported_cost_usd'], digits=4)} USD" if j.get("reported_cost_usd") is not None else "")
       + "). Every returned top-10 result of every system has a judgment."

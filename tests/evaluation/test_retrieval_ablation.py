@@ -13,6 +13,7 @@ reach 1.0.
 
 import json
 import math
+from pathlib import Path
 from typing import Dict, List, Sequence
 from uuid import UUID
 
@@ -464,3 +465,66 @@ def test_metrics_in_the_report_match_a_hand_computation(searchers):
     assert per_query["lex"]["per_query"]["q1"]["ndcg_at_10"] == pytest.approx(1.0)
     assert per_query["vec"]["per_query"]["q1"]["ndcg_at_10"] == pytest.approx(1 / math.log2(11))
     assert report["contrasts"]["final"]["K1"]["mean_difference"] == pytest.approx((1 / math.log2(11) - 1) / 2)
+
+
+# --- --llm-pairs-from: two judges on the same pair set (judge sensitivity) -----------------
+
+
+def _llm(source_id, grade, model="m"):
+    return {"source": "s", "source_id": source_id, "relevance": grade, "judge": "llm", "model": model}
+
+
+def _orig(source_id, grade):
+    return {"source": "s", "source_id": source_id, "relevance": grade, "judge": "original"}
+
+
+def test_pin_llm_pairs_keeps_originals_and_the_reference_pairs_in_file_order():
+    from app.evaluation.retrieval_ablation import pin_llm_pairs
+
+    extended = {"q1": [_orig("o1", 3), _llm("b1", 1), _llm("extra", 3), _llm("b2", 0)], "q2": [_llm("extra2", 2)]}
+    reference = {"q1": [_orig("o1", 3), _llm("b2", 2, "old"), _llm("b1", 0, "old")]}
+
+    pinned, excluded = pin_llm_pairs(extended, reference)
+
+    assert pinned == {"q1": [_orig("o1", 3), _llm("b1", 1), _llm("b2", 0)], "q2": []}  # the new judge's grades
+    assert excluded == 2
+
+
+def test_pin_llm_pairs_refuses_a_reference_pair_without_a_grade():
+    from app.evaluation.retrieval_ablation import pin_llm_pairs
+
+    with pytest.raises(ValueError, match="1 LLM-graded pairs"):
+        pin_llm_pairs({"q1": [_llm("b1", 1)]}, {"q1": [_llm("b1", 0), _llm("b2", 0)]})
+
+
+def test_judgments_sha256_matches_the_sha_of_a_file_written_the_same_way(tmp_path):
+    from app.evaluation.comparison import _sha256
+    from app.evaluation.retrieval_ablation import judgments_sha256
+
+    raw = {"q1": [_orig("o1", 3), _llm("b1", 1)], "q2": [_llm("é", 2)]}
+    path = tmp_path / "j.json"
+    path.write_text(json.dumps([{"query_id": q, "judgments": j} for q, j in raw.items()], ensure_ascii=False,
+                               indent=2) + "\n", encoding="utf-8")
+    assert judgments_sha256(raw) == _sha256(str(path))
+
+
+def test_pinning_the_second_judge_file_gives_the_file_of_the_published_sensitivity_run():
+    """
+    The committed second-judge file pinned to the V06 pool is byte for byte the
+    file the published sensitivity run used (its SHA-256 is recorded there).
+    """
+    from app.evaluation.evaluation_job import load_relevance_judgments
+    from app.evaluation.retrieval_ablation import judgments_sha256, pin_llm_pairs
+
+    root = Path(__file__).resolve().parents[2]
+    published = root / "data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json"
+    second = root / "app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json"
+    pool = root / "app/evaluation/relevance_judgments_extended.json"
+    if not (published.is_file() and second.is_file() and pool.is_file()):
+        pytest.skip("evaluation files not present")
+    run = json.loads(published.read_text(encoding="utf-8"))["run"]
+    expected = (run.get("llm_pairs_pinning") or {}).get("pinned_judgments_sha256") or run["extended_judgments_sha256"]
+
+    pinned, _ = pin_llm_pairs(load_relevance_judgments(str(second)), load_relevance_judgments(str(pool)))
+
+    assert judgments_sha256(pinned) == expected

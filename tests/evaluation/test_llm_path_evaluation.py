@@ -159,3 +159,35 @@ def test_cached_filters_are_revalidated_with_the_current_guards(tmp_path):
 
     assert report["per_query"][0]["extracted_filters"]["language"] is None  # what was evaluated
     assert report["modes"]["filters"]["mrr"] == report["modes"]["routing_only"]["mrr"]
+
+
+# --- LLM labels of a re-run from a complete intents cache -----------------------------------
+
+
+def _saved_run(tmp_path, cache, **config):
+    output = tmp_path / "results.json"
+    labels = {"llm_provider": "ollama", "llm_model": "qwen3.8:27b-mlx", "temperature": 0.0,
+              "apply_extracted_category": False}
+    output.write_text(json.dumps({"config": {**labels, "intents_cache": str(cache), **config}}))
+    return output, labels
+
+
+def test_labels_come_from_the_saved_results_when_every_intent_is_cached(tmp_path):
+    from app.evaluation.llm_path_evaluation import cached_run_labels
+
+    cache = tmp_path / "intents.json"
+    cache.write_text(json.dumps({"intents": {"q1": {}, "q2": {}}}))
+    output, labels = _saved_run(tmp_path, cache)
+    assert cached_run_labels(output, cache, ["q1", "q2"]) == labels
+
+
+def test_no_saved_labels_when_an_intent_is_missing_or_the_cache_differs(tmp_path):
+    from app.evaluation.llm_path_evaluation import cached_run_labels
+
+    cache = tmp_path / "intents.json"
+    cache.write_text(json.dumps({"intents": {"q1": {}}}))
+    output, _ = _saved_run(tmp_path, cache)
+    assert cached_run_labels(output, cache, ["q1", "q2"]) is None  # the LLM is needed: label from the environment
+    other, _ = _saved_run(tmp_path, tmp_path / "other.json")
+    assert cached_run_labels(other, cache, ["q1"]) is None
+    assert cached_run_labels(tmp_path / "missing.json", cache, ["q1"]) is None

@@ -1398,6 +1398,22 @@ def reproduction_check(
             "r0_ndcg_published": published}
 
 
+def system_llm_identity(settings: Any, model_arg: Optional[str], live: bool,
+                        previous: Mapping[str, Any]) -> Tuple[str, str, Any]:
+    """
+    Provider, model and reasoning setting of the system LLM the report names.
+
+    A live run uses the environment (LLM_PROVIDER, LLM_MODEL, LLM_REASONING).
+    A --no-llm run re-renders the outputs cached by the saved run, so,
+    unless --model is given, it names that run's LLM from the saved results
+    and not from the environment, which may describe another model.
+    """
+    saved = (previous.get("models") or {}).get("system_llm") or {}
+    if not live and model_arg is None and saved.get("model"):
+        return saved.get("provider"), saved["model"], saved.get("reasoning")
+    return settings.provider, model_arg or settings.model, settings.reasoning
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run the four systems, complete the judgments and write the reports."""
     raw_args = list(sys.argv[1:] if argv is None else argv)
@@ -1421,7 +1437,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     load_dotenv(Path(".env"))
     started = datetime.now(UTC)
     settings = LLMSettings.from_env()
-    model = args.model or settings.model
+    previous = _previous(args.output_json)
+    provider, model, reasoning = system_llm_identity(settings, args.model, live, previous)
     if live and (settings.provider != "openrouter" or model != settings.model):
         log("The live run uses the system LLM of the environment: LLM_PROVIDER=openrouter and LLM_MODEL (no --model).")
         return 2
@@ -1431,7 +1448,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     queries = load_test_queries(args.queries_path)
     original_raw = load_relevance_judgments(args.judgments_path)
     extended_raw = load_relevance_judgments(args.extended_judgments_path)
-    previous = _previous(args.output_json)
     cache_path = Path(args.cache_dir) / cache_file_name(model, RECOMMENDER_PROMPT_VERSION)
     cache = OutputCache(cache_path)
     meter = SpendMeter()
@@ -1521,8 +1537,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "prompts": {"version": RECOMMENDER_PROMPT_VERSION, "templates": prompt_texts(),
                     "book_entry_example": book_entry("B1", catalog[0]), "description_max_chars": DESCRIPTION_MAX_CHARS},
         "models": {
-            "system_llm": {"provider": settings.provider, "model": model, "temperature": 0.0,
-                           "reasoning": settings.reasoning, "reasoning_text": _reasoning_text(settings.reasoning),
+            "system_llm": {"provider": provider, "model": model, "temperature": 0.0,
+                           "reasoning": reasoning, "reasoning_text": _reasoning_text(reasoning),
                            "max_tokens": RECOMMENDER_MAX_TOKENS, "structured_output": "json_schema (strict)"},
             "judge": {"model": judge_model, "prompt_version": (judgments["llm_judge_prompt_versions"] or [None])[0]},
             "openrouter_model_info": model_info,

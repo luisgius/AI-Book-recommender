@@ -1777,8 +1777,8 @@
     "num_judgments_resolved_to_catalog": 637
   },
   "run": {
-    "date": "2026-11-11T10:17:47+00:00",
-    "git_commit": "1a1a9ad",
+    "date": "2026-11-12T10:49:40+00:00",
+    "git_commit": "b308017",
     "git_worktree_dirty": true,
     "command": "python -m app.evaluation.comparison",
     "depth": 10,
@@ -1788,7 +1788,7 @@
     "indexes_dir": "data/indexes",
     "queries_path": "app/evaluation/test_queries.json",
     "judgments_path": "app/evaluation/relevance_judgments.json",
-    "queries_sha256": "76c4dcce85e28a83358d2367c4d316d3e30deca581ded6e756f35d014039acea",
+    "queries_sha256": "60f78e921b0b353490db57ac818d247b09325a16c37d90637076847eb00ebe6f",
     "judgments_sha256": "81bc727205d44f1c063f9f28222591593f11bf5dd3da68375fccf5adf241c31c",
     "num_books": 177,
     "systems": {

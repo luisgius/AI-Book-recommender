@@ -9,14 +9,42 @@ Following Hexagonal Architecture principles, the domain layer depends only
 on these abstract protocols, never on concrete implementations.
 """
 
-from typing import Protocol, List, Optional, Dict, Any, Iterator, Tuple, TYPE_CHECKING
+from typing import Protocol, List, Optional, Dict, Any, Iterator, Tuple
 from uuid import UUID
 
 from .entities import AgentAnswer, Book, SearchResult, Explanation
 from .value_objects import SearchQuery, SearchFilters, QueryIntent, SourceLicense
 
-if TYPE_CHECKING:
-    from app.infrastructure.llm.schemas_judge import ExplanationJudgmentLLM
+
+class JudgmentScore(Protocol):
+    """One judged dimension of an explanation: a score from 1 to 5 and a short reason."""
+
+    @property
+    def score(self) -> int: ...
+
+    @property
+    def reasoning(self) -> str: ...
+
+
+class ExplanationJudgment(Protocol):
+    """
+    What LLMClient.judge_explanation returns, in domain terms.
+
+    The domain only needs the three judged dimensions; any object with these
+    read-only attributes satisfies it (the infrastructure's structured-output
+    schema, ExplanationJudgmentLLM, does), so the domain does not depend on
+    the LLM schema module.
+    """
+
+    @property
+    def groundedness(self) -> JudgmentScore: ...
+
+    @property
+    def clarity(self) -> JudgmentScore: ...
+
+    @property
+    def relevance(self) -> JudgmentScore: ...
+
 
 class BookCatalogRepository(Protocol):
     """
@@ -888,7 +916,7 @@ class LLMClient(Protocol):
     
     def judge_explanation(
         self, query_text: str, book: Book, explanation: Explanation
-    ) -> "ExplanationJudgmentLLM":
+    ) -> ExplanationJudgment:
         """
         Evaluate explanation quality using LLM-as-Judge (Block 3).
 
@@ -911,10 +939,11 @@ class LLMClient(Protocol):
             explanation: The Explanation entity to evaluate
 
         Returns:
-            ExplanationJudgmentLLM with:
-            - groundedness: JudgmentDimension (score 1-5, reasoning)
-            - clarity: JudgmentDimension (score 1-5, reasoning)
-            - relevance: JudgmentDimension (score 1-5, reasoning)
+            An ExplanationJudgment (the LLM adapter returns its
+            ExplanationJudgmentLLM schema, which satisfies it) with:
+            - groundedness: JudgmentScore (score 1-5, reasoning)
+            - clarity: JudgmentScore (score 1-5, reasoning)
+            - relevance: JudgmentScore (score 1-5, reasoning)
 
         Raises:
             ValueError: If inputs are invalid (empty query, None book/explanation)

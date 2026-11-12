@@ -1317,6 +1317,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--judgments-path", default=DEFAULT_JUDGMENTS_PATH, help="Original judgments (read only)")
     parser.add_argument("--extended-judgments-path", default=DEFAULT_EXTENDED_JUDGMENTS,
                         help="Extended judgments: read with --no-judge, written otherwise")
+    parser.add_argument("--llm-pairs-from", default=None,
+                        help="With --no-judge: keep only the LLM grades of the pairs this judgments file grades "
+                             "by LLM (compares two judges on the same pairs; see judge_sensitivity.py)")
     parser.add_argument("--cache-dir", default=DEFAULT_CACHE_DIR)
     parser.add_argument("--n-resamples", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=0)
@@ -1354,6 +1357,60 @@ def previous_judging_run(previous_json: str, extended_judgments_sha256: str) -> 
     return {**judging, "carried_from_run_of": judging.get("carried_from_run_of") or run.get("date")}
 
 
+def _llm_pair_keys(raw: Mapping[str, Sequence[Mapping[str, Any]]]) -> set:
+    """(query_id, source, source_id) of every LLM judgment of a judgments file."""
+    return {
+        (query_id, item["source"], item["source_id"])
+        for query_id, items in raw.items()
+        for item in items
+        if item.get("judge") == "llm"
+    }
+
+
+def pin_llm_pairs(
+    extended_raw: Mapping[str, Sequence[Mapping[str, Any]]],
+    reference_raw: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> Tuple[Dict[str, List[Mapping[str, Any]]], int]:
+    """
+    Keep only the LLM grades of the pairs that `reference_raw` grades by LLM.
+
+    Used to compare two judges on the same pair set (judge_sensitivity.py):
+    the second judge's file may hold grades added later by other tasks (V07
+    added 146 to the z-ai/glm-5.3-flash file); they change the ideal DCG and
+    so nDCG, but were never graded by the first judge. Non-LLM (original)
+    judgments are always kept and the order of the file is preserved.
+
+    Returns:
+        The pinned judgments and the number of LLM grades left out
+
+    Raises:
+        ValueError: if a pair of the reference has no LLM grade in extended_raw
+    """
+    reference = _llm_pair_keys(reference_raw)
+    missing = reference - _llm_pair_keys(extended_raw)
+    if missing:
+        raise ValueError(f"{len(missing)} LLM-graded pairs of the reference have no LLM grade in the file to pin")
+    pinned: Dict[str, List[Mapping[str, Any]]] = {}
+    excluded = 0
+    for query_id, items in extended_raw.items():
+        kept = [
+            item for item in items
+            if item.get("judge") != "llm" or (query_id, item["source"], item["source_id"]) in reference
+        ]
+        excluded += len(items) - len(kept)
+        pinned[query_id] = kept
+    return pinned, excluded
+
+
+def judgments_sha256(raw: Mapping[str, Sequence[Mapping[str, Any]]]) -> str:
+    """SHA-256 of judgments serialized as the judgments files are written (comparable with _sha256 of a file)."""
+    import hashlib
+
+    data = [{"query_id": query_id, "judgments": list(items)} for query_id, items in raw.items()]
+    text = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run the ablation and write the JSON and Markdown reports."""
     raw_args = list(sys.argv[1:] if argv is None else argv)
@@ -1372,8 +1429,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     judge = cache = extended_raw = None
     judge_info = None
+    pinning = None
+    if args.llm_pairs_from and not args.no_judge:
+        print("--llm-pairs-from needs --no-judge (it pins a file that is read, not written)")
+        return 2
     if args.no_judge:
         extended_raw = load_relevance_judgments(args.extended_judgments_path)
+        if args.llm_pairs_from:
+            extended_raw, excluded = pin_llm_pairs(extended_raw, load_relevance_judgments(args.llm_pairs_from))
+            pinning = {
+                "llm_pairs_from": args.llm_pairs_from,
+                "llm_pairs_from_sha256": _sha256(args.llm_pairs_from),
+                "llm_grades_excluded": excluded,
+                "pinned_judgments_sha256": judgments_sha256(extended_raw),
+            }
     else:
         settings, judge = _build_judge()
         cache = JudgmentCache.for_judge(args.cache_dir, judge.model_name, judge.prompt_version)
@@ -1428,6 +1497,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "judgments_sha256": _sha256(args.judgments_path),
         "extended_judgments_sha256": _sha256(args.extended_judgments_path),
     }
+    if pinning is not None:
+        report["run"]["llm_pairs_pinning"] = pinning
     if args.no_judge:
         report["judgments"]["judging_run"] = previous_judging_run(
             args.output_json, report["run"]["extended_judgments_sha256"]

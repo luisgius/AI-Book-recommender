@@ -196,26 +196,30 @@ eval: eval-notice $(INSTALLED)
 	$(EVAL).comparison
 	# V06 retrieval ablation, judgments of the first LLM judge (RETRIEVAL_ABLATION.md)
 	$(EVAL).retrieval_ablation --no-judge
-	# Not regenerated: RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md and
-	# results_retrieval_ablation_z-ai-glm-5.3-flash.json. They were computed when the
-	# second judge's file held 919 LLM grades; V07 later added 146 to the same file, so
-	# today the same commands give other nDCG values (same rankings) and the report
-	# refuses to run ("The two files grade different pairs").
-	# LLM search path from the cached query intents (results_llm_path_k10/k100.json). The
-	# LLM settings only label the cached intents; with every intent cached no LLM is called.
-	LLM_PROVIDER=ollama LLM_MODEL=qwen3.8:27b-mlx $(EVAL).llm_path_evaluation --max-results 10 \
+	# Sensitivity of the V06 ablation to the judge (RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md): the
+	# ablation on the second judge's grades, then the comparison. Both are pinned to the 919 pairs
+	# both judges graded for the V06 pool: V07 later added 146 grades for other pairs to the second
+	# judge's file, which stays as it is (other reports use them).
+	$(EVAL).retrieval_ablation --no-judge \
+		--extended-judgments-path app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json \
+		--llm-pairs-from app/evaluation/relevance_judgments_extended.json \
+		--output-json data/evaluation/results_retrieval_ablation_z-ai-glm-5.3-flash.json --output-md ""
+	$(EVAL).judge_sensitivity report --judge-model z-ai/glm-5.3-flash
+	# LLM search path from the cached query intents (results_llm_path_k10/k100.json). With every
+	# intent cached no LLM is called; the LLM labels come from the saved results, not the environment.
+	$(EVAL).llm_path_evaluation --max-results 10 \
 		--intents-cache data/evaluation/llm_intents_qwen3.8-27b-mlx.json --output data/evaluation/results_llm_path_k10.json
-	LLM_PROVIDER=ollama LLM_MODEL=qwen3.8:27b-mlx $(EVAL).llm_path_evaluation --max-results 100 \
+	$(EVAL).llm_path_evaluation --max-results 100 \
 		--intents-cache data/evaluation/llm_intents_qwen3.8-27b-mlx.json --output data/evaluation/results_llm_path_k100.json
-	# LLM as recommender from its cached outputs (LLM_RECOMMENDER.md); the variables name
-	# the system LLM whose outputs are cached, no request is made
-	LLM_PROVIDER=openrouter LLM_MODEL=qwen/qwen3.8-flash $(EVAL).llm_recommender_evaluation --no-llm
+	# LLM as recommender from its cached outputs (LLM_RECOMMENDER.md); no request is made and the
+	# system LLM is named from the saved results
+	$(EVAL).llm_recommender_evaluation --no-llm
 	# Embeddings and re-ranking by API from the cached responses (API_MODELS.md)
 	$(EVAL).api_models_evaluation --offline
-	# Re-rendered from saved rankings: the BM25 padding fix (BM25_PADDING.md; its
-	# `run --no-judge` counts holes against the file before the 22 grades of that run,
-	# so it always stops) and the reports of live services
-	$(EVAL).bm25_padding report
+	# BM25 padding fix (BM25_PADDING.md): the systems again, every top-10 pair checked against
+	# the V13 judgments file (not rewritten)
+	$(EVAL).bm25_padding run --no-judge
+	# Re-rendered from saved results: the reports of live services
 	$(EVAL).profile_parity report
 	$(EVAL).cloud_live_check report
 	$(EVAL).llm_model_selection report

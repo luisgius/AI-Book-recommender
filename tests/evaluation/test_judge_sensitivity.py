@@ -172,3 +172,41 @@ def test_unadjusted_crossings_are_reported_but_do_not_change_the_conclusion():
                               paths={"old_judgments": "", "new_judgments": "", "old_ablation": "", "new_ablation": ""})
     assert document["contrasts"][0]["holds"]
     assert "unadjusted p crosses 0.05 between the judges for C4a (0.045 to 0.070)" in build_markdown(document)
+
+
+class TestPinnedPairSet:
+    """The comparison is pinned to the pairs the old judge graded (V07 added grades to the new file)."""
+
+    PATHS = {"old_judgments": "old.json", "new_judgments": "new.json", "old_ablation": "", "new_ablation": ""}
+
+    def test_grades_the_new_file_received_later_are_left_out(self):
+        old_raw = judgments({("q1", "b1"): 0, ("q1", "b2"): 1}, "old")
+        new_raw = judgments({("q1", "b1"): 0, ("q1", "b2"): 1, ("q1", "b9"): 3, ("q2", "b8"): 2}, "new")
+        old_report = ablation_report({"C1": contrast(0.1, 0.001, 0.007)}, {"sys": 0.6})
+        new_report = {**old_report, "judgments": {"num_llm_in_final_file": 2}}  # a pinned ablation run
+        document = build_document(old_raw, new_raw, old_report, new_report, {}, new_model="new",
+                                  paths=self.PATHS, n_resamples=10)
+        assert document["agreement"]["overall"]["n"] == 2
+        assert document["agreement"]["overall"]["exact_agreement"] == pytest.approx(1.0)
+        assert document["new_judge"]["num_llm"] == 2
+        assert document["new_judge"]["num_llm_in_file"] == 4
+        assert document["new_judge"]["num_llm_excluded"] == 2
+        text = build_markdown(document)
+        assert "Pair set pinned to the 2 pairs both judges graded" in text
+        assert "holds 4 LLM grades: the other 2 were added later" in text
+        assert "--llm-pairs-from old.json" in text
+
+    def test_an_ablation_run_on_the_unpinned_file_is_rejected(self):
+        old_raw = judgments({("q1", "b1"): 0}, "old")
+        new_raw = judgments({("q1", "b1"): 0, ("q1", "b9"): 3}, "new")
+        report = ablation_report({}, {})
+        unpinned = {**report, "judgments": {"num_llm_in_final_file": 2}}
+        with pytest.raises(ValueError, match="--llm-pairs-from old.json"):
+            build_document(old_raw, new_raw, report, unpinned, {}, new_model="new", paths=self.PATHS)
+
+    def test_same_pair_set_says_so(self):
+        raw = judgments({("q1", "b1"): 0}, "m")
+        report = ablation_report({}, {})
+        document = build_document(raw, raw, report, report, {}, new_model="m", paths=self.PATHS, n_resamples=10)
+        assert document["new_judge"]["num_llm_excluded"] == 0
+        assert "the new judge's file holds no other LLM grade" in build_markdown(document)
