@@ -36,6 +36,11 @@ logger = logging.getLogger(__name__)
 # Default number of fused candidates sent to the optional reranker.
 DEFAULT_RERANK_DEPTH = 30
 
+# Explanations generated at the same time (one LLM call each). The calls only
+# wait on the network, so threads overlap them; the bound keeps a request from
+# opening more connections to the provider than results it explains.
+DEFAULT_EXPLANATION_WORKERS = 3
+
 # Notices returned in SearchResponse.notices when a daily budget is spent (V17).
 NOTICE_SEARCH_BUDGET = "search_budget_spent"
 NOTICE_LLM_BUDGET = "llm_budget_spent"
@@ -81,6 +86,7 @@ class SearchService:
         reranker: Reranker | None = None,
         rerank_depth: int = DEFAULT_RERANK_DEPTH,
         usage_budget: UsageBudget | None = None,
+        explanation_workers: int = DEFAULT_EXPLANATION_WORKERS,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -104,7 +110,11 @@ class SearchService:
                 re-ranked. Each request that uses the LLM takes one
                 BUDGET_LLM_REQUEST unit; without one the LLM steps are
                 skipped and a notice is returned. None (default): no limit.
+            explanation_workers: How many explanations are generated at the
+                same time (1 generates them one after another)
         """
+        if explanation_workers < 1:
+            raise ValueError(f"explanation_workers must be >= 1, got {explanation_workers}")
         if max_explanations < 0:
             raise ValueError(f"max_explanations must be >= 0, got {max_explanations}")
         if rerank_depth < 1:
@@ -115,6 +125,7 @@ class SearchService:
         self._embeddings_store = embeddings_store
         self._llm_client = llm_client
         self._max_explanations = max_explanations
+        self._explanation_workers = explanation_workers
         self._reranker = reranker
         self._rerank_depth = rerank_depth
         self._usage_budget = usage_budget
@@ -1243,7 +1254,12 @@ class SearchService:
         - For each result, generate an explanation via LLM
 
         Only the top `max_explanations` results are explained, because each
-        explanation is one LLM call.
+        explanation is one LLM call. The calls are independent, so up to
+        `explanation_workers` of them run at the same time; each explanation
+        is written to its own result, so the order of the results does not
+        change. A failed explanation leaves its result without one and does
+        not affect the others. The budget is not touched here: the caller
+        already took one LLM unit for the whole request.
 
         Args:
             query_text: The user's query the explanations must answer
@@ -1256,17 +1272,27 @@ class SearchService:
             logger.warning("LLM Client not available, skipping explanations")
             return results
 
-        for result in results[: self._max_explanations]:
+        llm_client = self._llm_client
+        to_explain = results[: self._max_explanations]
+
+        def explain(result: SearchResult) -> None:
             try:
-                explanation = self._llm_client.generate_grounded_explanation(
+                result.explanation = llm_client.generate_grounded_explanation(
                     query_text=query_text,
                     book=result.book,
                 )
-                result.explanation = explanation
             except Exception as e:
                 logger.error(f"Failed to generate explanation for book {result.book.id}: {e}")
                 # Continue with no explanation for this result
 
+        if len(to_explain) <= 1 or self._explanation_workers == 1:
+            for result in to_explain:
+                explain(result)
+            return results
+
+        workers = min(self._explanation_workers, len(to_explain))
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="explanation") as executor:
+            list(executor.map(explain, to_explain))  # waits for all; explain() never raises
         return results
 
     def _apply_mmr_diversification(
