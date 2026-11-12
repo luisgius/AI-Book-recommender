@@ -15,8 +15,9 @@ from uuid import UUID
 import logging
 import time
 
-from .entities import Book, SearchResult, Explanation
+from .entities import AssistantReply, Book, SearchResult, Explanation
 from .value_objects import (
+    ROUTE_SEARCH, ChatMessage, bound_conversation, count_clarifications, last_user_message,
     SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent,
     RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
 )
@@ -1438,3 +1439,43 @@ class SearchService:
             return 0.0
 
         return dot_product / (norm_a * norm_b)
+
+
+def plain_search_reply(
+    search_service: SearchService,
+    messages: List[ChatMessage],
+    max_results: int,
+    message: str,
+    notice: str,
+) -> AssistantReply:
+    """
+    The assistant's reply when no LLM may be used: a plain search of the last user message.
+
+    Used when no LLM is configured or the day's LLM budget is spent, so the
+    assistant endpoint degrades to the evaluated search instead of failing.
+
+    Args:
+        search_service: The search service
+        messages: The conversation (bounded here as the assistant would)
+        max_results: Results to return
+        message: Fixed text to show (chosen by the caller in the user's language)
+        notice: Why the LLM was skipped (NOTICE_LLM_UNAVAILABLE or NOTICE_LLM_BUDGET)
+
+    Raises:
+        ValueError: If the conversation does not end with a user message
+        RuntimeError: If the search is unavailable
+    """
+    conversation = bound_conversation(messages)
+    query_text = last_user_message(conversation)
+    started = time.perf_counter()
+    response = search_service.search_with_fallback(SearchQuery(text=query_text, max_results=max_results))
+    return AssistantReply(
+        route=ROUTE_SEARCH,
+        message=message,
+        search_query=query_text,
+        filters=SearchFilters(),
+        search_response=response,
+        notices=[notice, *response.notices],
+        timings_ms={"retrieve": _elapsed_ms(started)},
+        clarifications=count_clarifications(messages),
+    )

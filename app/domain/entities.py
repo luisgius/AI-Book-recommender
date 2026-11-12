@@ -10,7 +10,7 @@ from datetime import datetime, UTC
 from typing import Optional, List, Literal
 from uuid import UUID, uuid4
 
-from .value_objects import BookMetadata, SearchFilters
+from .value_objects import BookMetadata, SearchFilters, SearchResponse
 
 
 # Type alias for allowed book fields that can be cited
@@ -472,3 +472,53 @@ class AgentAnswer:
 
     reflections: int = 0
     """Times the agent was sent back to search after a failed verification"""
+
+
+@dataclass(frozen=True)
+class AssistantRecommendation:
+    """
+    A book the assistant recommends, with its reason and the evidence for it.
+
+    On the search route the citations passed the citation guardrail (each
+    snippet is a substring of the cited book field); on the agent route the
+    book is one a tool returned and there are no citations.
+    """
+
+    book: Book
+    reason: str
+    citations: List[Citation] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class AssistantReply:
+    """
+    Reply of the conversational assistant to the last user message.
+
+    route says which path ran: "clarify" (a question and suggested answers,
+    nothing searched), "search" (the evaluated search pipeline plus a short
+    grounded answer), "agent" (the tool-calling agent) or "out_of_scope".
+    """
+
+    route: str
+    message: str
+    options: List[str] = field(default_factory=list)
+    search_query: Optional[str] = None
+    """Standalone query the conversation was condensed into (search and agent routes)"""
+
+    filters: Optional[SearchFilters] = None
+    search_response: Optional[SearchResponse] = None
+    recommendations: List[AssistantRecommendation] = field(default_factory=list)
+    agent_answer: Optional[AgentAnswer] = None
+    notices: List[str] = field(default_factory=list)
+    timings_ms: dict = field(default_factory=dict)
+    """Milliseconds per graph node, in the order the nodes ran"""
+
+    forced_route: Optional[str] = None
+    """Why code overrode the route the model chose (e.g. 'clarification_cap'), or None"""
+
+    clarifications: int = 0
+    """Clarifying questions asked in the conversation, including this reply's"""
+
+    model: Optional[str] = None
+    usage: dict = field(default_factory=dict)
+    """LLM calls of this request: calls, input_tokens, output_tokens, cost_usd"""

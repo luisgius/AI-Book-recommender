@@ -12,8 +12,8 @@ on these abstract protocols, never on concrete implementations.
 from typing import Protocol, List, Optional, Dict, Any, Iterator, Tuple
 from uuid import UUID
 
-from .entities import AgentAnswer, Book, SearchResult, Explanation
-from .value_objects import SearchQuery, SearchFilters, QueryIntent, SourceLicense
+from .entities import AgentAnswer, AssistantReply, Book, SearchResult, Explanation
+from .value_objects import ChatMessage, SearchQuery, SearchFilters, QueryIntent, SourceLicense
 
 
 class JudgmentScore(Protocol):
@@ -995,6 +995,41 @@ class SearchAgent(Protocol):
         Raises:
             ValueError: If question is empty
             RuntimeError: If the LLM cannot be reached
+        """
+        ...
+
+
+class ConversationalAssistant(Protocol):
+    """
+    Port for the assistant that is the entry point of LLM requests.
+
+    It reads a short conversation and decides one route: ask one clarifying
+    question, run the evaluated search pipeline and recommend from its
+    results, hand a multi-step request to the SearchAgent, or say the request
+    is out of scope. The implementation (a LangGraph graph) is an
+    infrastructure detail.
+
+    Implementations MUST be stateless (the conversation arrives with every
+    request), MUST ask at most MAX_CLARIFYING_TURNS clarifying questions per
+    conversation, and MUST degrade to a plain search of the last user message
+    when the model's routing output is invalid.
+    """
+
+    def reply(self, messages: List[ChatMessage], max_results: int = 10) -> AssistantReply:
+        """
+        Reply to the last user message of a conversation.
+
+        Args:
+            messages: The conversation so far, oldest first, ending with a
+                user message (bounded by the implementation)
+            max_results: Results returned on the search route
+
+        Returns:
+            AssistantReply with the route, the message and what the route produced
+
+        Raises:
+            ValueError: If the conversation does not end with a user message
+            RuntimeError: If the search itself is unavailable
         """
         ...
 

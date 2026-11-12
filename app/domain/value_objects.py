@@ -571,3 +571,99 @@ class QueryIntent:
 
         # Note: intent_type is validated by Literal type hint at runtime
         # extracted_filters is validated by SearchFilters.__post_init__
+
+# =============================================================================
+# Conversation with the assistant (short clarification before recommending)
+# =============================================================================
+#
+# The server keeps no conversation: the client sends the whole history with
+# every request. These limits bound what one request can make the LLM read.
+
+MAX_CONVERSATION_MESSAGES = 10
+"""Messages kept from a conversation (the most recent ones); older ones are dropped.
+Ten messages are five exchanges, enough for two clarifying questions and a
+follow-up, while keeping the routing prompt short."""
+
+MAX_MESSAGE_CHARS = 500
+"""Characters kept from each message (the same limit as an agent question)."""
+
+MAX_CLARIFYING_TURNS = 2
+"""Clarifying questions the assistant may ask in one conversation; after them it searches."""
+
+ROUTE_CLARIFY = "clarify"
+ROUTE_SEARCH = "search"
+ROUTE_AGENT = "agent"
+ROUTE_OUT_OF_SCOPE = "out_of_scope"
+ASSISTANT_ROUTES = (ROUTE_CLARIFY, ROUTE_SEARCH, ROUTE_AGENT, ROUTE_OUT_OF_SCOPE)
+
+ChatRole = Literal["user", "assistant"]
+
+
+@dataclass(frozen=True)
+class ChatMessage:
+    """
+    One turn of a conversation with the assistant, as the client sends it back.
+
+    route is set on assistant turns: the route of the reply that produced the
+    turn (the client echoes it). It is what lets a stateless server count the
+    clarifying questions already asked.
+    """
+
+    role: ChatRole
+    content: str
+    route: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        """Validate the role and the route."""
+        if self.role not in ("user", "assistant"):
+            raise ValueError(f"role must be 'user' or 'assistant', got '{self.role}'")
+        if self.route is not None and self.route not in ASSISTANT_ROUTES:
+            raise ValueError(f"route must be one of {ASSISTANT_ROUTES}, got '{self.route}'")
+
+
+def bound_conversation(
+    messages: List[ChatMessage],
+    max_messages: int = MAX_CONVERSATION_MESSAGES,
+    max_chars: int = MAX_MESSAGE_CHARS,
+) -> List[ChatMessage]:
+    """
+    The part of a conversation the assistant reads.
+
+    Keeps the last max_messages messages, cuts each one to max_chars
+    characters and drops empty ones.
+
+    Raises:
+        ValueError: If no user message is left, or the last message is not
+            the user's (there is nothing to reply to)
+    """
+    kept = [
+        ChatMessage(role=m.role, content=m.content.strip()[:max_chars], route=m.route)
+        for m in messages
+        if m.content and m.content.strip()
+    ][-max_messages:]
+    if not kept or kept[-1].role != "user":
+        raise ValueError("the conversation must end with a user message")
+    return kept
+
+
+def count_clarifications(messages: List[ChatMessage]) -> int:
+    """
+    Clarifying questions the assistant already asked in this conversation.
+
+    Counted over every message the client sent (before bounding), so dropping
+    old turns cannot reopen the allowance. An assistant turn without a route
+    counts as a clarification: a client that does not echo routes gets fewer
+    questions, never more.
+    """
+    return sum(
+        1 for m in messages
+        if m.role == "assistant" and (m.route is None or m.route == ROUTE_CLARIFY)
+    )
+
+
+def last_user_message(messages: List[ChatMessage]) -> str:
+    """Text of the last user message ("" if there is none)."""
+    for message in reversed(messages):
+        if message.role == "user":
+            return message.content
+    return ""
