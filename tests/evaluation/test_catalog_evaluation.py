@@ -344,6 +344,14 @@ def test_offline_report_from_saved_files(tmp_path, monkeypatch):
     assert set(results["conclusions"]) >= {"H1", "H2", "H3", "H4", "H5", "H6"}
 
 
+def test_report_path_follows_the_data_directory(tmp_path):
+    from app.evaluation.catalog_evaluation.cli import build_parser
+
+    assert D.report_md(D.DATA_DIR) == D.REPORT_MD
+    assert D.report_md(tmp_path / "data") == tmp_path / D.REPORT_MD.name
+    assert build_parser().parse_args(["--data-dir", str(tmp_path / "data"), "report"]).output is None
+
+
 def test_hybrid_rule():
     s4_better = {"difference": -0.03, "p": 0.001, "p_holm": 0.002}
     unclear = {"difference": -0.03, "p": 0.2, "p_holm": 0.4}

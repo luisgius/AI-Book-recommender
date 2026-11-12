@@ -6,7 +6,8 @@ import time
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Sequence
 
-from app.evaluation.catalog_evaluation.design import DATA_DIR, REPORT_MD, SPEND_CAP_USD
+from app.evaluation.catalog_evaluation import design as D
+from app.evaluation.catalog_evaluation.design import SPEND_CAP_USD
 from app.evaluation.catalog_evaluation.ledger import LEDGER_FILE, SpendLedger
 
 
@@ -251,14 +252,16 @@ def cmd_report(args: argparse.Namespace) -> int:
     _write_json(args.data_dir / "results.json", {k: v for k, v in results.items() if k != "per_query"})
     _write_json(args.data_dir / "per_query_metrics.json", results["per_query"])
     meta = report_meta(results)
-    Path(args.output).write_text(build_markdown(results, meta), encoding="utf-8")
-    log(f"Wrote {args.output}")
+    # The report follows --data-dir unless given explicitly (see design.report_md).
+    output = D.report_md(args.data_dir) if args.output is None else args.output
+    output.write_text(build_markdown(results, meta), encoding="utf-8")
+    log(f"Wrote {output}")
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m app.evaluation.catalog_evaluation", description=__doc__)
-    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument("--data-dir", type=Path, default=D.DATA_DIR)
     sub = parser.add_subparsers(dest="stage", required=True)
     q = sub.add_parser("queries", help="stage 1: generate and check strata B, C, D")
     q.add_argument("--test-queries", default="app/evaluation/test_queries.json")
@@ -280,7 +283,8 @@ def build_parser() -> argparse.ArgumentParser:
     a.set_defaults(func=cmd_annotation_agreement)
     rp = sub.add_parser("report", help="results.json and the markdown report from saved files")
     rp.add_argument("--offline", action="store_true", help="no API call and no database connection (always true)")
-    rp.add_argument("--output", default=str(REPORT_MD))
+    rp.add_argument("--output", type=Path, default=None,
+                    help=f"default: {D.REPORT_MD.name} next to --data-dir ({D.REPORT_MD})")
     rp.set_defaults(func=cmd_report)
     return parser
 

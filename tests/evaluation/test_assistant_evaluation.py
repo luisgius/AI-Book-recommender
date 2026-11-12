@@ -335,6 +335,8 @@ def test_offline_report_needs_no_network(offline_dir, tmp_path, monkeypatch):
     assert primary["f"]["rows"][0]["precision_picks"] == 1.0 and primary["f"]["rows"][0]["precision_P"] == 1.0
     assert results["grounding"]["agent_in_assistant"]["dropped_not_from_tools"] == 1
     assert set(results["conclusions"]) == {"H7", "H8", "H9"}
+    # no re-measurement next to offline_dir: no second report, and the published one is not touched
+    assert not (tmp_path / D.V25_REPORT_MD.name).exists()
 
 
 # =============================================================================
@@ -481,6 +483,24 @@ def test_offline_report_covers_both_measurements(offline_dir, second_dir, tmp_pa
     assert counts["from_first_measurement"] == counts["measured_pairs"] and counts["judged_here"] == 0
     assert judging.first_measurement_cache(offline_dir, D.PRIMARY_JUDGE) is None
     assert "| second (V25) | 1 | 0 | [0] |" in text  # one answer call at the cap, no reasoning
+
+
+def test_report_outputs_default_to_the_published_paths_for_the_design_directories():
+    assert D.report_md(D.DATA_DIR) == D.REPORT_MD
+    assert D.second_data_dir(D.DATA_DIR) == D.V25_DIR
+    assert D.second_report_md(D.V25_DIR) == D.V25_REPORT_MD
+
+
+def test_report_outputs_follow_the_data_directory(offline_dir, second_dir, tmp_path):
+    """With only --data-dir, every output of the report is written next to the given directories."""
+    from app.evaluation.assistant_evaluation.cli import main
+
+    assert second_dir == D.second_data_dir(offline_dir)  # the fixture's layout is the default one
+    assert main(["--data-dir", str(offline_dir), "report", "--offline"]) == 0
+    for path in (tmp_path / D.REPORT_MD.name, tmp_path / D.V25_REPORT_MD.name, offline_dir / "results.json",
+                 offline_dir / "per_request.json", second_dir / "results.json", second_dir / "per_request.json"):
+        assert path.is_file(), path
+    assert "Re-measurement of the assistant" in (tmp_path / D.V25_REPORT_MD.name).read_text(encoding="utf-8")
 
 
 def test_offline_reports_ignore_environment_and_say_what_was_not_recorded(offline_dir, second_dir, tmp_path, monkeypatch):

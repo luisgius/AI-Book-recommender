@@ -140,6 +140,29 @@ def is_v25(data_dir: Path) -> bool:
     return Path(data_dir).resolve() == V25_DIR.resolve()
 
 
+# --- Outputs of the report, derived from the data directories ----------------------
+# The report command writes results.json and per_request.json into each data
+# directory and each markdown report next to it. The defaults are derived
+# from the directories when the command runs, so a report built from other
+# directories (a test's temporary ones) never writes over the published files.
+# With the default directories they are REPORT_MD, V25_DIR and V25_REPORT_MD.
+
+
+def report_md(data_dir: Path) -> Path:
+    """The first measurement's markdown report: REPORT_MD's name, next to data_dir."""
+    return Path(data_dir).parent / REPORT_MD.name
+
+
+def second_data_dir(first_dir: Path) -> Path:
+    """The re-measurement's data directory: V25_DIR's name, next to the first measurement's."""
+    return Path(first_dir).parent / V25_DIR.name
+
+
+def second_report_md(second_dir: Path) -> Path:
+    """The re-measurement's markdown report: V25_REPORT_MD's name, next to second_dir."""
+    return Path(second_dir).parent / V25_REPORT_MD.name
+
+
 def spend_cap(data_dir: Path) -> float:
     """The cap of the measurement stored in data_dir (section 9 of the protocol; section 6 of the addendum)."""
     return V25_SPEND_CAP_USD if is_v25(data_dir) else SPEND_CAP_USD

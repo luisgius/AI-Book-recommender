@@ -1644,17 +1644,17 @@
     "counts": {
       "z-ai/glm-5.3-flash": {
         "measured_pairs": 1795,
-        "from_v14": 0,
+        "from_v14": 1211,
         "judged_here": 63,
-        "unjudged": 1211,
+        "unjudged": 0,
         "from_first_measurement": 521,
         "cache_size_here": 63
       },
       "minimax/minimax-m3.1-flash": {
         "measured_pairs": 1795,
-        "from_v14": 0,
+        "from_v14": 1211,
         "judged_here": 63,
-        "unjudged": 1211,
+        "unjudged": 0,
         "from_first_measurement": 521,
         "cache_size_here": 63
       }
@@ -1693,27 +1693,27 @@
       "contrasts": {
         "H7": {
           "requests": 116,
-          "system_mean": 0.043846392035253125,
-          "reference_mean": 0.02556678230691645,
-          "difference": 0.01827960972833667,
+          "system_mean": 0.7563672011171015,
+          "reference_mean": 0.7901529895342972,
+          "difference": -0.03378578841719566,
           "ci": [
-            0.004645989997689513,
-            0.03511012116894884
+            -0.06782843440368876,
+            -0.006040369583619638
           ],
-          "p": 0.031796820317968204,
-          "p_holm": 0.0953904609539046
+          "p": 0.0484951504849515,
+          "p_holm": 0.1454854514548545
         },
         "H8": {
           "requests": 30,
-          "system_mean": 0.3939634373302646,
-          "reference_mean": 0.41089858098002097,
-          "difference": -0.016935143649756287,
+          "system_mean": 0.20582352967000217,
+          "reference_mean": 0.1280926147026048,
+          "difference": 0.07773091496739734,
           "ci": [
-            -0.07469350069811163,
-            0.029948732109941468
+            0.007873703855223542,
+            0.16662908761859568
           ],
-          "p": 0.5980401959804019,
-          "p_holm": 0.5980401959804019
+          "p": 0.0938906109389061,
+          "p_holm": 0.1454854514548545
         },
         "H9": {
           "requests": 20,
@@ -1725,82 +1725,82 @@
             0.23335416666666642
           ],
           "p": 0.06189381061893811,
-          "p_holm": 0.12378762123787622
+          "p_holm": 0.1454854514548545
         }
       },
       "h7": {
         "assistant": {
           "n": 116,
-          "mean": 0.043846392035253125,
+          "mean": 0.7563672011171015,
           "ci": [
-            0.020667673614938858,
-            0.0726322166977058
+            0.7164069370444658,
+            0.793469947620724
           ]
         },
         "P": {
           "n": 116,
-          "mean": 0.02556678230691645,
+          "mean": 0.7901529895342972,
           "ci": [
-            0.00724104990097893,
-            0.05098970751749522
+            0.7638102924069831,
+            0.8152106567059955
           ]
         },
         "by_group": {
           "A ambiguous": {
             "requests": 10,
-            "assistant": 0.0,
-            "P": 0.0
+            "assistant": 0.4620834879767681,
+            "P": 0.7689245888972789
           },
           "A other": {
             "requests": 34,
-            "assistant": 0.05741527648675874,
-            "P": 0.008501906656408466
+            "assistant": 0.7489029854116394,
+            "P": 0.775551142564458
           },
           "B": {
             "requests": 72,
-            "assistant": 0.043528639938049514,
-            "P": 0.037176137795616945
+            "assistant": 0.8007647075808385,
+            "P": 0.7999966951363072
           },
           "route clarify": {
             "requests": 4,
             "assistant": 0.0,
-            "P": 0.0
+            "P": 0.7671027523012769
           },
           "route out_of_scope": {
             "requests": 1,
             "assistant": 0.0,
-            "P": 0.0
+            "P": 1.0
           },
           "route search": {
             "requests": 111,
-            "assistant": 0.0458214547395438,
-            "P": 0.026718439167588363
+            "assistant": 0.7904377957620159,
+            "P": 0.7890931151060663
           }
         },
         "search_route_only": {
           "requests": 111,
-          "assistant": 0.0458214547395438,
-          "P": 0.026718439167588363,
+          "assistant": 0.7904377957620159,
+          "P": 0.7890931151060663,
           "test": {
             "requests": 111,
-            "system_mean": 0.0458214547395438,
-            "reference_mean": 0.026718439167588363,
-            "difference": 0.019103015571955442,
+            "system_mean": 0.7904377957620159,
+            "reference_mean": 0.7890931151060663,
+            "difference": 0.001344680655949657,
             "ci": [
-              0.004648408308720779,
-              0.037143585927347234
+              -0.0021494449268724416,
+              0.005296644675693901
             ],
-            "p": 0.0316968303169683
+            "p": 0.5228477152284772
           },
           "query_rewritten": 14,
-          "rewritten_mean_difference": 0.151459623463361,
-          "rewritten_changed_ndcg": 7,
+          "rewritten_mean_difference": 0.010661396629315137,
+          "rewritten_changed_ndcg": 12,
           "query_unchanged": 97
         },
         "recommendations": {
           "replies": 92,
-          "precision_assistant": 0.009057971014492752,
-          "precision_P_same_k": 0.010869565217391304
+          "precision_assistant": 0.8568840579710144,
+          "precision_P_same_k": 0.773550724637681
         }
       },
       "e": {
@@ -1824,77 +1824,77 @@
         },
         "ndcg_final": {
           "n": 30,
-          "mean": 0.3939634373302646,
+          "mean": 0.20582352967000217,
           "ci": [
-            0.2814721148986403,
-            0.5042705596343697
+            0.12830658374019216,
+            0.29706812580403
           ]
         },
         "ndcg_P_vague": {
           "n": 30,
-          "mean": 0.41089858098002097,
+          "mean": 0.1280926147026048,
           "ci": [
-            0.30465307863744145,
-            0.5192134829861547
+            0.0934450617469378,
+            0.16138213964775158
           ]
         },
         "ndcg_P_original": {
           "n": 30,
-          "mean": 0.006181164669478822,
+          "mean": 0.7762843045451577,
           "ci": [
-            0.0,
-            0.01684547148934105
+            0.7279217114018256,
+            0.823539436262642
           ]
         },
         "asked_rows": {
           "ndcg_final": {
             "n": 8,
-            "mean": 0.25310239550580627,
+            "mean": 0.4199452334141317,
             "ci": [
-              0.12216816645027051,
-              0.3910423398278235
+              0.19275635201148522,
+              0.6703302867561729
             ]
           },
           "ndcg_P_vague": {
             "n": 8,
-            "mean": 0.2655221390078917,
+            "mean": 0.10880620205467313,
             "ci": [
-              0.15590278142278843,
-              0.3905801610200743
+              0.05225629315065582,
+              0.16610661560045478
             ]
           },
           "ndcg_P_original": {
             "n": 8,
-            "mean": 0.01681178306393777,
+            "mean": 0.7342144033680083,
             "ci": [
-              0.0,
-              0.050435349191813306
+              0.6222621021015836,
+              0.838361623367985
             ]
           }
         },
         "not_asked_rows": {
           "ndcg_final": {
             "n": 22,
-            "mean": 0.44518563435734043,
+            "mean": 0.12796109194486413,
             "ci": [
-              0.3034084087367899,
-              0.5806952702065223
+              0.08649257380938989,
+              0.1698993133557934
             ]
           },
           "ndcg_P_vague": {
             "n": 22,
-            "mean": 0.4637627416971588,
+            "mean": 0.13510585566548905,
             "ci": [
-              0.3299418707713265,
-              0.5917823211647645
+              0.09475631974789613,
+              0.17527225750317615
             ]
           },
           "ndcg_P_original": {
             "n": 22,
-            "mean": 0.002315485253311932,
+            "mean": 0.7915824504277573,
             "ci": [
-              0.0,
-              0.006946455759935796
+              0.7414570227998221,
+              0.8421397460375533
             ]
           }
         },
@@ -1908,10 +1908,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7508679794281646,
-            "ndcg_first_turn": 0.7508679794281646,
-            "ndcg_P_vague": 0.7508679794281646,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.18295522042940773,
+            "ndcg_first_turn": 0.18295522042940773,
+            "ndcg_P_vague": 0.18295522042940773,
+            "ndcg_P_original": 0.6973915787600091,
             "final_query": "hedendaagse filosofie"
           },
           {
@@ -1926,7 +1926,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.9333889380711156,
             "final_query": "Nederlandse literatuur"
           },
           {
@@ -1941,7 +1941,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.44509037793241735,
             "final_query": "سير ذاتية لكتّاب"
           },
           {
@@ -1953,10 +1953,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.43888763374973794,
-            "ndcg_first_turn": 0.43888763374973794,
-            "ndcg_P_vague": 0.5321191184400146,
-            "ndcg_P_original": 0.050940675572862505,
+            "ndcg_final": 0.11295740869894391,
+            "ndcg_first_turn": 0.11295740869894391,
+            "ndcg_P_vague": 0.13695258675805957,
+            "ndcg_P_original": 0.765917333420837,
             "final_query": "livres de science-fiction"
           },
           {
@@ -1971,7 +1971,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.7614229318985066,
             "final_query": "русская классика"
           },
           {
@@ -1983,10 +1983,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8259896754927478,
-            "ndcg_first_turn": 0.8259896754927478,
-            "ndcg_P_vague": 0.8259896754927478,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.1699395326770145,
+            "ndcg_first_turn": 0.1699395326770145,
+            "ndcg_P_vague": 0.1699395326770145,
+            "ndcg_P_original": 0.7771419895596159,
             "final_query": "книги по философии"
           },
           {
@@ -1998,10 +1998,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.14569983489249144,
-            "ndcg_first_turn": 0.14569983489249144,
-            "ndcg_P_vague": 0.14569983489249144,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.07582903303182119,
+            "ndcg_first_turn": 0.07582903303182119,
+            "ndcg_P_vague": 0.07582903303182119,
+            "ndcg_P_original": 0.5313285723623473,
             "final_query": "aangrijpende literatuur"
           },
           {
@@ -2013,10 +2013,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.62109430929131,
+            "ndcg_final": 0.44633532181121105,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.3108759616731343,
-            "ndcg_P_original": 0.13449426451150215,
+            "ndcg_P_vague": 0.22961363843137572,
+            "ndcg_P_original": 0.613832528805698,
             "final_query": "narrative anthology science fiction or fantasy"
           },
           {
@@ -2028,10 +2028,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.274655107373902,
+            "ndcg_final": 0.20574050465659433,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.274655107373902,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.20574050465659433,
+            "ndcg_P_original": 1.0,
             "final_query": "историческая проза"
           },
           {
@@ -2043,10 +2043,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7369515214218475,
-            "ndcg_first_turn": 0.7369515214218475,
-            "ndcg_P_vague": 0.7369515214218475,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.19396670112704034,
+            "ndcg_first_turn": 0.19396670112704034,
+            "ndcg_P_vague": 0.19396670112704034,
+            "ndcg_P_original": 0.6553901310331164,
             "final_query": "ancient history"
           },
           {
@@ -2058,10 +2058,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.9705437052559006,
-            "ndcg_first_turn": 0.9705437052559006,
-            "ndcg_P_vague": 0.9705437052559006,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.13120574037055388,
+            "ndcg_first_turn": 0.13120574037055388,
+            "ndcg_P_vague": 0.13120574037055388,
+            "ndcg_P_original": 0.7710420084788906,
             "final_query": "saggi di filosofia"
           },
           {
@@ -2075,8 +2075,8 @@
             "final_route": "out_of_scope",
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.31546487678572877,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.1331896237946325,
+            "ndcg_P_original": 0.8743705652481897,
             "final_query": null
           },
           {
@@ -2091,7 +2091,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.6732602106409487,
             "final_query": "obras de não-ficção"
           },
           {
@@ -2103,10 +2103,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.2890648263178879,
-            "ndcg_first_turn": 0.2890648263178879,
-            "ndcg_P_vague": 0.2890648263178879,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.011369531812851524,
+            "ndcg_first_turn": 0.011369531812851524,
+            "ndcg_P_vague": 0.011369531812851524,
+            "ndcg_P_original": 0.9489627846872123,
             "final_query": "deutsche Belletristik"
           },
           {
@@ -2118,10 +2118,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.20994540983068768,
+            "ndcg_final": 0.9224654597764764,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.300001406566644,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.13237658255723428,
+            "ndcg_P_original": 0.7950120304734339,
             "final_query": "Récits de voyage réels sur les expéditions polaires"
           },
           {
@@ -2133,10 +2133,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7083023852525661,
-            "ndcg_first_turn": 0.7083023852525661,
-            "ndcg_P_vague": 0.7083023852525661,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.21518387087498778,
+            "ndcg_first_turn": 0.21518387087498778,
+            "ndcg_P_vague": 0.21518387087498778,
+            "ndcg_P_original": 1.0,
             "final_query": "llibres de filosofia"
           },
           {
@@ -2148,10 +2148,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.44356020867532087,
-            "ndcg_first_turn": 0.44356020867532087,
-            "ndcg_P_vague": 0.44356020867532087,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.23790729418352047,
+            "ndcg_first_turn": 0.23790729418352047,
+            "ndcg_P_vague": 0.23790729418352047,
+            "ndcg_P_original": 0.6651775044686263,
             "final_query": "gothic fiction"
           },
           {
@@ -2163,10 +2163,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.499759945980138,
-            "ndcg_first_turn": 0.499759945980138,
-            "ndcg_P_vague": 0.499759945980138,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.21645723438977782,
+            "ndcg_first_turn": 0.21645723438977782,
+            "ndcg_P_vague": 0.21645723438977782,
+            "ndcg_P_original": 0.8455555531748898,
             "final_query": "livros de poesia"
           },
           {
@@ -2178,10 +2178,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.0,
-            "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.24992610805291635,
+            "ndcg_first_turn": 0.24992610805291635,
+            "ndcg_P_vague": 0.24992610805291635,
+            "ndcg_P_original": 0.7874706312109987,
             "final_query": "historische fictie"
           },
           {
@@ -2193,10 +2193,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.0,
+            "ndcg_final": 0.6393519708009866,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.6153925060653322,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.16400195128228545,
+            "ndcg_P_original": 0.6391646064446939,
             "final_query": "Antología de versos de poesía catalana del siglo XX"
           },
           {
@@ -2208,10 +2208,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8395700624665824,
-            "ndcg_first_turn": 0.8395700624665824,
-            "ndcg_P_vague": 0.8395700624665824,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.07882414571941099,
+            "ndcg_first_turn": 0.07882414571941099,
+            "ndcg_P_vague": 0.07882414571941099,
+            "ndcg_P_original": 0.8641588458364763,
             "final_query": "storia antica"
           },
           {
@@ -2223,10 +2223,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7402295360291506,
-            "ndcg_first_turn": 0.7402295360291506,
-            "ndcg_P_vague": 0.7402295360291506,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.253901722418178,
+            "ndcg_first_turn": 0.253901722418178,
+            "ndcg_P_vague": 0.253901722418178,
+            "ndcg_P_original": 0.9027381630355066,
             "final_query": "Philosophie Sachbuch"
           },
           {
@@ -2238,10 +2238,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.2827994045668868,
+            "ndcg_final": 0.8949966841991244,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.09364787839833931,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.016201831646342688,
+            "ndcg_P_original": 0.7756981364302913,
             "final_query": "documentaire historique sur la Révolution française de 1789 et ses causes économiques et sociales"
           },
           {
@@ -2253,10 +2253,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.19342640361727081,
+            "ndcg_final": 0.01994144618245616,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.23719771276929622,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.02445408349291292,
+            "ndcg_P_original": 0.8493504101051987,
             "final_query": "イギリス文学の小説"
           },
           {
@@ -2271,7 +2271,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.7653973015678364,
             "final_query": "книги по этнографии"
           },
           {
@@ -2283,10 +2283,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.4619898298359074,
-            "ndcg_first_turn": 0.4619898298359074,
-            "ndcg_P_vague": 0.4619898298359074,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.29758118567307096,
+            "ndcg_first_turn": 0.29758118567307096,
+            "ndcg_P_vague": 0.29758118567307096,
+            "ndcg_P_original": 0.7689152658022073,
             "final_query": "novel·la en català"
           },
           {
@@ -2298,10 +2298,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8190856045597634,
-            "ndcg_first_turn": 0.8190856045597634,
-            "ndcg_P_vague": 0.8190856045597634,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.2415081074596124,
+            "ndcg_first_turn": 0.2415081074596124,
+            "ndcg_P_vague": 0.2415081074596124,
+            "ndcg_P_original": 1.0,
             "final_query": "philosophy books"
           },
           {
@@ -2313,10 +2313,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.38685280723454163,
-            "ndcg_first_turn": 0.38685280723454163,
-            "ndcg_P_vague": 0.38685280723454163,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.03107129581818804,
+            "ndcg_first_turn": 0.03107129581818804,
+            "ndcg_P_vague": 0.03107129581818804,
+            "ndcg_P_original": 0.7968487712645551,
             "final_query": "oorlogsgeschiedenis"
           },
           {
@@ -2328,10 +2328,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.442898529366393,
+            "ndcg_final": 0.23073047988620465,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.29240653921648546,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.09806102437063964,
+            "ndcg_P_original": 0.7555671367523328,
             "final_query": "كتب تاريخ عربي"
           },
           {
@@ -2343,10 +2343,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7367283992687399,
-            "ndcg_first_turn": 0.7367283992687399,
-            "ndcg_P_vague": 0.7367283992687399,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.11455989004971527,
+            "ndcg_first_turn": 0.11455989004971527,
+            "ndcg_P_vague": 0.11455989004971527,
+            "ndcg_P_original": 0.6289348288887795,
             "final_query": "science fiction"
           }
         ]
@@ -2719,23 +2719,23 @@
         "errors": 0,
         "precision_agent": {
           "n": 38,
-          "mean": 0.09473684210526316,
+          "mean": 0.8052631578947369,
           "ci": [
-            0.047368421052631574,
-            0.15789473684210525
+            0.7052631578947368,
+            0.8947368421052632
           ]
         },
         "precision_P_same_k": {
           "n": 38,
-          "mean": 0.010526315789473684,
+          "mean": 0.7122807017543861,
           "ci": [
-            0.0,
-            0.02631578947368421
+            0.6087719298245614,
+            0.8105263157894738
           ]
         },
         "paired_with_assistant": 34,
-        "precision_agent_paired": 0.09999999999999999,
-        "precision_assistant_paired": 0.00980392156862745,
+        "precision_agent_paired": 0.8705882352941176,
+        "precision_assistant_paired": 0.872549019607843,
         "assistant_routes": {
           "search": 40
         },
@@ -2750,378 +2750,378 @@
             "request_id": "b-ar-6",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
+            "precision_assistant": 1.0,
             "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.43067655807339306,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.8238786523491687,
+            "ndcg_P": 0.44509037793241735,
             "error": false
           },
           {
             "request_id": "b-ca-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 1,
             "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.2734625109269944,
-            "ndcg_P": 0.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7079101308595102,
+            "ndcg_P": 0.7689152658022073,
             "error": false
           },
           {
             "request_id": "b-de-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5942236218028711,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.8381528477158477,
             "error": false
           },
           {
             "request_id": "b-de-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.8512084259495571,
             "error": false
           },
           {
             "request_id": "b-en-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.3785830741179571,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.4191171492455216,
+            "ndcg_P": 0.6651775044686263,
             "error": false
           },
           {
             "request_id": "b-es-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7323368942534072,
+            "ndcg_P": 0.877440361940913,
             "error": false
           },
           {
             "request_id": "b-es-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.6309297535714575,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
             "error": false
           },
           {
             "request_id": "b-fr-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.7950120304734339,
             "error": false
           },
           {
             "request_id": "b-fr-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.24317575459503454,
-            "ndcg_P": 0.050940675572862505,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.550021289339121,
+            "ndcg_P": 0.765917333420837,
             "error": false
           },
           {
             "request_id": "b-it-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.4,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.6148285679957242,
+            "ndcg_P": 0.5597197279978838,
             "error": false
           },
           {
             "request_id": "b-it-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.2,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.3333333333333333,
-            "ndcg_agent_list": 0.14623379845101242,
-            "ndcg_P": 0.13449426451150215,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.18468251508966652,
+            "ndcg_P": 0.613832528805698,
             "error": false
           },
           {
             "request_id": "b-it-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7311738960010932,
+            "ndcg_P": 0.8641588458364763,
             "error": false
           },
           {
             "request_id": "b-it-5",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.3103414471745058,
+            "ndcg_P": 0.8874859667712016,
             "error": false
           },
           {
             "request_id": "b-ja-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.2,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.3333333333333333,
-            "precision_P_assistant_k": 0.3333333333333333,
-            "ndcg_agent_list": 0.52129602861432,
-            "ndcg_P": 0.41311732856427996,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5308871393104649,
+            "ndcg_P": 0.6905407656095652,
             "error": false
           },
           {
             "request_id": "b-ja-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.708636624928772,
+            "ndcg_P": 0.8493504101051987,
             "error": false
           },
           {
             "request_id": "b-nl-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.5641000499701609,
+            "ndcg_P": 0.6973915787600091,
             "error": false
           },
           {
             "request_id": "b-nl-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.8176035833928883,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6814581046882918,
+            "ndcg_P": 0.5313285723623473,
             "error": false
           },
           {
             "request_id": "b-nl-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.9333889380711156,
             "error": false
           },
           {
             "request_id": "b-pt-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5695816074041011,
+            "ndcg_P": 0.7523162163598108,
             "error": false
           },
           {
             "request_id": "b-ru-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.673413339588005,
+            "ndcg_P": 0.8449677140138431,
             "error": false
           },
           {
             "request_id": "b-ru-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5006996739514721,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 1.0,
             "error": false
           },
           {
             "request_id": "b-ru-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.7771419895596159,
             "error": false
           },
           {
             "request_id": "b-ru-5",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.4,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5012658353418872,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.6637622952800909,
+            "ndcg_P": 0.7653973015678364,
             "error": false
           },
           {
             "request_id": "b-ru-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
+            "precision_agent": 1.0,
             "precision_P_same_k": 0.0,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
+            "precision_assistant": 1.0,
             "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.7614229318985066,
             "error": false
           },
           {
             "request_id": "b-zh-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.9035456546298357,
             "error": false
           },
           {
             "request_id": "b-zh-5",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.637348631092328,
+            "ndcg_P": 0.7776698701798622,
             "error": false
           },
           {
             "request_id": "b-zh-6",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.9079527076222704,
+            "ndcg_P": 0.9458794174274586,
             "error": false
           },
           {
@@ -3135,7 +3135,7 @@
             "precision_assistant": null,
             "precision_P_assistant_k": null,
             "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_P": 0.8811285759359209,
             "error": false
           },
           {
@@ -3148,22 +3148,22 @@
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 1.0,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.3565964385966262,
             "error": false
           },
           {
             "request_id": "q07",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.7956419442906023,
+            "ndcg_P": 0.8741841191122277,
             "error": false
           },
           {
@@ -3176,92 +3176,92 @@
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.6934264036172708,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.5541432109622958,
+            "ndcg_P": 0.576323354912681,
             "error": false
           },
           {
             "request_id": "q16",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.7942537960637901,
             "error": false
           },
           {
             "request_id": "q19",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.4,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.7687046066281403,
+            "ndcg_P": 0.650642537196957,
             "error": false
           },
           {
             "request_id": "q24",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.907608339569819,
             "error": false
           },
           {
             "request_id": "q25",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.5747389928404192,
+            "ndcg_P": 0.8075330681679117,
             "error": false
           },
           {
             "request_id": "q26",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.844703501444527,
+            "ndcg_P": 0.8966936536196015,
             "error": false
           },
           {
             "request_id": "q28",
             "set": "A",
             "picks": 3,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6666666666666666,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6963074291256556,
+            "ndcg_P": 0.6820579432714684,
             "error": false
           },
           {
@@ -3275,35 +3275,35 @@
             "precision_assistant": null,
             "precision_P_assistant_k": null,
             "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_P": 0.9448792107357844,
             "error": false
           },
           {
             "request_id": "q32",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5706417189553201,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.7911845009323757,
+            "ndcg_P": 0.7472604770250192,
             "error": false
           },
           {
             "request_id": "q37",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.4388807734663434,
+            "ndcg_P": 0.8287939419777705,
             "error": false
           }
         ]
@@ -3313,27 +3313,27 @@
       "contrasts": {
         "H7": {
           "requests": 116,
-          "system_mean": 0.0441630074698652,
-          "reference_mean": 0.02572739098957666,
-          "difference": 0.018435616480288543,
+          "system_mean": 0.7680765037986939,
+          "reference_mean": 0.8019602727957151,
+          "difference": -0.03388376899702134,
           "ci": [
-            0.004451488613016722,
-            0.03561978680416409
+            -0.0683294529807035,
+            -0.006328152277820909
           ],
-          "p": 0.031796820317968204,
-          "p_holm": 0.0953904609539046
+          "p": 0.04839516048395161,
+          "p_holm": 0.14518548145185484
         },
         "H8": {
           "requests": 30,
-          "system_mean": 0.4670975660310024,
-          "reference_mean": 0.5033834706460671,
-          "difference": -0.03628590461506476,
+          "system_mean": 0.23530420982298456,
+          "reference_mean": 0.15367699152394634,
+          "difference": 0.08162721829903824,
           "ci": [
-            -0.12064399624975082,
-            0.03311053499145982
+            0.00499348286374344,
+            0.17689866786822103
           ],
-          "p": 0.43185681431856815,
-          "p_holm": 0.5641435856414359
+          "p": 0.09669033096690331,
+          "p_holm": 0.19338066193380662
         },
         "H9": {
           "requests": 20,
@@ -3345,82 +3345,82 @@
             0.22999999999999998
           ],
           "p": 0.2820717928207179,
-          "p_holm": 0.5641435856414359
+          "p_holm": 0.2820717928207179
         }
       },
       "h7": {
         "assistant": {
           "n": 116,
-          "mean": 0.0441630074698652,
+          "mean": 0.7680765037986939,
           "ci": [
-            0.02071922723538787,
-            0.07310600450402999
+            0.7263584000156125,
+            0.8053890318226049
           ]
         },
         "P": {
           "n": 116,
-          "mean": 0.02572739098957666,
+          "mean": 0.8019602727957151,
           "ci": [
-            0.007138983133796774,
-            0.051318466269552804
+            0.7743939889715521,
+            0.8278864868332089
           ]
         },
         "by_group": {
           "A ambiguous": {
             "requests": 10,
-            "assistant": 0.0,
-            "P": 0.0
+            "assistant": 0.4079277160354273,
+            "P": 0.7589343079027515
           },
           "A other": {
             "requests": 34,
-            "assistant": 0.05741527648675874,
-            "P": 0.008501906656408466
+            "assistant": 0.7762081536789879,
+            "P": 0.7916417709194236
           },
           "B": {
             "requests": 72,
-            "assistant": 0.044038742582702316,
-            "P": 0.03743489622879173
+            "assistant": 0.8142572229890086,
+            "P": 0.8128087271390978
           },
           "route clarify": {
             "requests": 4,
             "assistant": 0.0,
-            "P": 0.0
+            "P": 0.8775164796683107
           },
           "route out_of_scope": {
             "requests": 1,
             "assistant": 0.0,
-            "P": 0.0
+            "P": 0.5560491656685745
           },
           "route search": {
             "requests": 111,
-            "assistant": 0.04615233213066994,
-            "P": 0.02688628247559362
+            "assistant": 0.8026745445103468,
+            "P": 0.801452941981632
           }
         },
         "search_route_only": {
           "requests": 111,
-          "assistant": 0.04615233213066994,
-          "P": 0.02688628247559362,
+          "assistant": 0.8026745445103468,
+          "P": 0.801452941981632,
           "test": {
             "requests": 111,
-            "system_mean": 0.04615233213066994,
-            "reference_mean": 0.02688628247559362,
-            "difference": 0.019266049655076316,
+            "system_mean": 0.8026745445103468,
+            "reference_mean": 0.801452941981632,
+            "difference": 0.001221602528714791,
             "ci": [
-              0.004346594549002785,
-              0.03737466984948032
+              -0.0016986506166401772,
+              0.004606787523944008
             ],
-            "p": 0.0316968303169683
+            "p": 0.5125487451254874
           },
           "query_rewritten": 14,
-          "rewritten_mean_difference": 0.1527522508366765,
-          "rewritten_changed_ndcg": 7,
+          "rewritten_mean_difference": 0.0096855629062387,
+          "rewritten_changed_ndcg": 13,
           "query_unchanged": 97
         },
         "recommendations": {
           "replies": 92,
-          "precision_assistant": 0.012681159420289854,
-          "precision_P_same_k": 0.014492753623188404
+          "precision_assistant": 0.8931159420289854,
+          "precision_P_same_k": 0.8278985507246377
         }
       },
       "e": {
@@ -3444,77 +3444,77 @@
         },
         "ndcg_final": {
           "n": 30,
-          "mean": 0.4670975660310024,
+          "mean": 0.23530420982298456,
           "ci": [
-            0.34437561534846967,
-            0.5874724998378124
+            0.14885198023370927,
+            0.33321577393404056
           ]
         },
         "ndcg_P_vague": {
           "n": 30,
-          "mean": 0.5033834706460671,
+          "mean": 0.15367699152394634,
           "ci": [
-            0.3839712840544264,
-            0.6186108606091625
+            0.11197212014211377,
+            0.19804277070312337
           ]
         },
         "ndcg_P_original": {
           "n": 30,
-          "mean": 0.005284105649358333,
+          "mean": 0.7928476980010298,
           "ci": [
-            0.0,
-            0.01479848770931191
+            0.746531379833096,
+            0.8383843039504058
           ]
         },
         "asked_rows": {
           "ndcg_final": {
             "n": 8,
-            "mean": 0.2789890962185976,
+            "mean": 0.4623010361227599,
             "ci": [
-              0.1256036995567713,
-              0.44698569279659417
+              0.22057400659570237,
+              0.7233031807755956
             ]
           },
           "ndcg_P_vague": {
             "n": 8,
-            "mean": 0.38821408635362564,
+            "mean": 0.13331998354336722,
             "ci": [
-              0.2353240984780391,
-              0.5730098692177716
+              0.0806617012937127,
+              0.18372576944239824
             ]
           },
           "ndcg_P_original": {
             "n": 8,
-            "mean": 0.015863536539732163,
+            "mean": 0.8234454696736018,
             "ci": [
-              0.0,
-              0.04759060961919649
+              0.7135088578837205,
+              0.9155819200864765
             ]
           }
         },
         "not_asked_rows": {
           "ndcg_final": {
             "n": 22,
-            "mean": 0.5355006459627858,
+            "mean": 0.15275990935033898,
             "ci": [
-              0.3869749711424474,
-              0.6797426351242968
+              0.10053053402307278,
+              0.21134331038566673
             ]
           },
           "ndcg_P_vague": {
             "n": 22,
-            "mean": 0.5452632467524094,
+            "mean": 0.1610795398805205,
             "ci": [
-              0.401794461497136,
-              0.6833883025149001
+              0.11048472466994452,
+              0.2181150521857054
             ]
           },
           "ndcg_P_original": {
             "n": 22,
-            "mean": 0.0014370398710405769,
+            "mean": 0.78172123557464,
             "ci": [
-              0.0,
-              0.004311119613121731
+              0.7302139047478226,
+              0.831321731080117
             ]
           }
         },
@@ -3528,10 +3528,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8411243632638685,
-            "ndcg_first_turn": 0.8411243632638685,
-            "ndcg_P_vague": 0.8411243632638685,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.13293839686617467,
+            "ndcg_first_turn": 0.13293839686617467,
+            "ndcg_P_vague": 0.13293839686617467,
+            "ndcg_P_original": 0.8753170698415144,
             "final_query": "hedendaagse filosofie"
           },
           {
@@ -3546,7 +3546,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.7387509830935444,
             "final_query": "Nederlandse literatuur"
           },
           {
@@ -3558,10 +3558,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.16716045496620227,
+            "ndcg_final": 0.033784339394878966,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.23463936301137822,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.04742231574433904,
+            "ndcg_P_original": 0.5212790492040571,
             "final_query": "سير ذاتية لكتّاب"
           },
           {
@@ -3573,10 +3573,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.2737521611785856,
-            "ndcg_first_turn": 0.2737521611785856,
-            "ndcg_P_vague": 0.1730645017645749,
-            "ndcg_P_original": 0.03161487716289269,
+            "ndcg_final": 0.09075082018126508,
+            "ndcg_first_turn": 0.09075082018126508,
+            "ndcg_P_vague": 0.05737213328939287,
+            "ndcg_P_original": 0.7905601981306242,
             "final_query": "livres de science-fiction"
           },
           {
@@ -3588,10 +3588,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 1.0,
-            "ndcg_first_turn": 1.0,
-            "ndcg_P_vague": 1.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.15468493146140544,
+            "ndcg_first_turn": 0.15468493146140544,
+            "ndcg_P_vague": 0.15468493146140544,
+            "ndcg_P_original": 0.5912650026815736,
             "final_query": "русская классика"
           },
           {
@@ -3603,10 +3603,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.7998021654361973,
-            "ndcg_first_turn": 0.7998021654361973,
-            "ndcg_P_vague": 0.7998021654361973,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.2625479891109807,
+            "ndcg_first_turn": 0.2625479891109807,
+            "ndcg_P_vague": 0.2625479891109807,
+            "ndcg_P_original": 0.8771324975457362,
             "final_query": "книги по философии"
           },
           {
@@ -3618,10 +3618,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.22270884153717457,
-            "ndcg_first_turn": 0.22270884153717457,
-            "ndcg_P_vague": 0.22270884153717457,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.05423154435880861,
+            "ndcg_first_turn": 0.05423154435880861,
+            "ndcg_P_vague": 0.05423154435880861,
+            "ndcg_P_original": 0.8689249987252154,
             "final_query": "aangrijpende literatuur"
           },
           {
@@ -3633,10 +3633,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.7552733576437869,
+            "ndcg_final": 0.48492381720552263,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.3467215567748282,
-            "ndcg_P_original": 0.1269082923178573,
+            "ndcg_P_vague": 0.2068340061243189,
+            "ndcg_P_original": 0.7039385805549366,
             "final_query": "narrative anthology science fiction or fantasy"
           },
           {
@@ -3648,10 +3648,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.30082121033559506,
+            "ndcg_final": 0.24541548862046703,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.30082121033559506,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.24541548862046703,
+            "ndcg_P_original": 1.0,
             "final_query": "историческая проза"
           },
           {
@@ -3663,10 +3663,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 1.0,
-            "ndcg_first_turn": 1.0,
-            "ndcg_P_vague": 1.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.23218374314008308,
+            "ndcg_first_turn": 0.23218374314008308,
+            "ndcg_P_vague": 0.23218374314008308,
+            "ndcg_P_original": 0.8324252055938005,
             "final_query": "ancient history"
           },
           {
@@ -3678,10 +3678,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.9705437052559006,
-            "ndcg_first_turn": 0.9705437052559006,
-            "ndcg_P_vague": 0.9705437052559006,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.11076237485387265,
+            "ndcg_first_turn": 0.11076237485387265,
+            "ndcg_P_vague": 0.11076237485387265,
+            "ndcg_P_original": 0.809604718908629,
             "final_query": "saggi di filosofia"
           },
           {
@@ -3695,8 +3695,8 @@
             "final_route": "out_of_scope",
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.31546487678572877,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.21641055855586633,
+            "ndcg_P_original": 0.7164034193152138,
             "final_query": null
           },
           {
@@ -3711,7 +3711,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.791419267836202,
             "final_query": "obras de não-ficção"
           },
           {
@@ -3723,10 +3723,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.32174251607830057,
-            "ndcg_first_turn": 0.32174251607830057,
-            "ndcg_P_vague": 0.32174251607830057,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.03967542472041495,
+            "ndcg_first_turn": 0.03967542472041495,
+            "ndcg_P_vague": 0.03967542472041495,
+            "ndcg_P_original": 0.8344761464379765,
             "final_query": "deutsche Belletristik"
           },
           {
@@ -3738,10 +3738,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.21746656115148935,
+            "ndcg_final": 1.0,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.2796821010434916,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.18728948753314845,
+            "ndcg_P_original": 0.9552009891550426,
             "final_query": "Récits de voyage réels sur les expéditions polaires"
           },
           {
@@ -3753,10 +3753,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8454923931298779,
-            "ndcg_first_turn": 0.8454923931298779,
-            "ndcg_P_vague": 0.8454923931298779,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.1928308740036837,
+            "ndcg_first_turn": 0.1928308740036837,
+            "ndcg_P_vague": 0.1928308740036837,
+            "ndcg_P_original": 1.0,
             "final_query": "llibres de filosofia"
           },
           {
@@ -3768,10 +3768,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.5607804304161003,
-            "ndcg_first_turn": 0.5607804304161003,
-            "ndcg_P_vague": 0.5607804304161003,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.5623555404687086,
+            "ndcg_first_turn": 0.5623555404687086,
+            "ndcg_P_vague": 0.5623555404687086,
+            "ndcg_P_original": 0.6974606382644352,
             "final_query": "gothic fiction"
           },
           {
@@ -3783,10 +3783,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.34408081749946223,
-            "ndcg_first_turn": 0.34408081749946223,
-            "ndcg_P_vague": 0.34408081749946223,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.14194482284780502,
+            "ndcg_first_turn": 0.14194482284780502,
+            "ndcg_P_vague": 0.14194482284780502,
+            "ndcg_P_original": 0.7887414436374847,
             "final_query": "livros de poesia"
           },
           {
@@ -3798,10 +3798,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.8315546295836225,
-            "ndcg_first_turn": 0.8315546295836225,
-            "ndcg_P_vague": 0.8315546295836225,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.24415929173834897,
+            "ndcg_first_turn": 0.24415929173834897,
+            "ndcg_P_vague": 0.24415929173834897,
+            "ndcg_P_original": 0.6698173198566924,
             "final_query": "historische fictie"
           },
           {
@@ -3813,10 +3813,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.0,
+            "ndcg_final": 0.7212685795294043,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.5109559939712153,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.13326287119936134,
+            "ndcg_P_original": 0.7603946380673431,
             "final_query": "Antología de versos de poesía catalana del siglo XX"
           },
           {
@@ -3828,10 +3828,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.6922598480172828,
-            "ndcg_first_turn": 0.6922598480172828,
-            "ndcg_P_vague": 0.6922598480172828,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.16012139254378902,
+            "ndcg_first_turn": 0.16012139254378902,
+            "ndcg_P_vague": 0.16012139254378902,
+            "ndcg_P_original": 0.7999323478093696,
             "final_query": "storia antica"
           },
           {
@@ -3843,10 +3843,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.773393074628458,
-            "ndcg_first_turn": 0.773393074628458,
-            "ndcg_P_vague": 0.773393074628458,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.27845055361732035,
+            "ndcg_first_turn": 0.27845055361732035,
+            "ndcg_P_vague": 0.27845055361732035,
+            "ndcg_P_original": 0.831595707552727,
             "final_query": "Philosophie Sachbuch"
           },
           {
@@ -3858,10 +3858,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.28588167040407425,
+            "ndcg_final": 0.9275798549030239,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.047577930071849295,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.013726616996523706,
+            "ndcg_P_original": 0.9313268447108682,
             "final_query": "documentaire historique sur la Révolution française de 1789 et ses causes économiques et sociales"
           },
           {
@@ -3875,8 +3875,8 @@
             "final_route": "search",
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.9469024295259745,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.07515202673315627,
+            "ndcg_P_original": 0.8344486075881847,
             "final_query": "イギリス文学の小説"
           },
           {
@@ -3891,7 +3891,7 @@
             "ndcg_final": 0.0,
             "ndcg_first_turn": 0.0,
             "ndcg_P_vague": 0.0,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_original": 0.9069212362975007,
             "final_query": "книги по этнографии"
           },
           {
@@ -3903,10 +3903,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.3013169220781639,
-            "ndcg_first_turn": 0.3013169220781639,
-            "ndcg_P_vague": 0.3013169220781639,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.2301812235757286,
+            "ndcg_first_turn": 0.2301812235757286,
+            "ndcg_P_vague": 0.2301812235757286,
+            "ndcg_P_original": 0.5490720974118596,
             "final_query": "novel·la en català"
           },
           {
@@ -3918,10 +3918,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.6959633654956123,
-            "ndcg_first_turn": 0.6959633654956123,
-            "ndcg_P_vague": 0.6959633654956123,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.3159902567638569,
+            "ndcg_first_turn": 0.3159902567638569,
+            "ndcg_P_vague": 0.3159902567638569,
+            "ndcg_P_original": 1.0,
             "final_query": "philosophy books"
           },
           {
@@ -3933,10 +3933,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.38685280723454163,
-            "ndcg_first_turn": 0.38685280723454163,
-            "ndcg_P_vague": 0.38685280723454163,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.018077810786188846,
+            "ndcg_first_turn": 0.018077810786188846,
+            "ndcg_P_vague": 0.018077810786188846,
+            "ndcg_P_original": 0.5705978204782111,
             "final_query": "oorlogsgeschiedenis"
           },
           {
@@ -3948,10 +3948,10 @@
             "stop": "answered",
             "first_route": "clarify",
             "final_route": "search",
-            "ndcg_final": 0.5053095152476327,
+            "ndcg_final": 0.2854362093287824,
             "ndcg_first_turn": 0.0,
-            "ndcg_P_vague": 0.43841210609467307,
-            "ndcg_P_original": 0.0,
+            "ndcg_P_vague": 0.1574570553956231,
+            "ndcg_P_original": 0.8809750481083818,
             "final_query": "كتب تاريخ عربي"
           },
           {
@@ -3963,10 +3963,10 @@
             "stop": "answered",
             "first_route": "search",
             "final_route": "search",
-            "ndcg_final": 0.9196461703481416,
-            "ndcg_first_turn": 0.9196461703481416,
-            "ndcg_P_vague": 0.9196461703481416,
-            "ndcg_P_original": 0.0,
+            "ndcg_final": 0.13883101466902203,
+            "ndcg_first_turn": 0.13883101466902203,
+            "ndcg_P_vague": 0.13883101466902203,
+            "ndcg_P_original": 0.6574490632237684,
             "final_query": "science fiction"
           }
         ]
@@ -4339,23 +4339,23 @@
         "errors": 0,
         "precision_agent": {
           "n": 38,
-          "mean": 0.1,
+          "mean": 0.8333333333333334,
           "ci": [
-            0.04736842105263158,
-            0.1631578947368421
+            0.7315789473684211,
+            0.9210526315789473
           ]
         },
         "precision_P_same_k": {
           "n": 38,
-          "mean": 0.010526315789473684,
+          "mean": 0.7754385964912281,
           "ci": [
-            0.0,
-            0.02631578947368421
+            0.6631578947368421,
+            0.875438596491228
           ]
         },
         "paired_with_assistant": 34,
-        "precision_agent_paired": 0.10588235294117646,
-        "precision_assistant_paired": 0.00980392156862745,
+        "precision_agent_paired": 0.9019607843137255,
+        "precision_assistant_paired": 0.9117647058823528,
         "assistant_routes": {
           "search": 40
         },
@@ -4370,378 +4370,378 @@
             "request_id": "b-ar-6",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
+            "precision_assistant": 1.0,
             "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.23463936301137822,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.771175036137813,
+            "ndcg_P": 0.5212790492040571,
             "error": false
           },
           {
             "request_id": "b-ca-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.4,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.4,
             "assistant_route": "search",
             "assistant_picks": 1,
             "precision_assistant": 0.0,
             "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.4051698717735353,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.5946109041870483,
+            "ndcg_P": 0.5490720974118596,
             "error": false
           },
           {
             "request_id": "b-de-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5942236218028711,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.932801483732564,
             "error": false
           },
           {
             "request_id": "b-de-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.9048378590653269,
             "error": false
           },
           {
             "request_id": "b-en-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.24027177837829816,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.4038802558839801,
+            "ndcg_P": 0.6974606382644352,
             "error": false
           },
           {
             "request_id": "b-es-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6774304262673124,
+            "ndcg_P": 0.9151552579615303,
             "error": false
           },
           {
             "request_id": "b-es-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.6309297535714575,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
             "error": false
           },
           {
             "request_id": "b-fr-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.9552009891550426,
             "error": false
           },
           {
             "request_id": "b-fr-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.29768374303892825,
-            "ndcg_P": 0.03161487716289269,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5676844058722316,
+            "ndcg_P": 0.7905601981306242,
             "error": false
           },
           {
             "request_id": "b-it-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.4,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.5676844058722316,
+            "ndcg_P": 0.5397074640506596,
             "error": false
           },
           {
             "request_id": "b-it-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.2,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.3333333333333333,
-            "ndcg_agent_list": 0.137985673277425,
-            "ndcg_P": 0.1269082923178573,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.24803714872601115,
+            "ndcg_P": 0.7039385805549366,
             "error": false
           },
           {
             "request_id": "b-it-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6469095432547696,
+            "ndcg_P": 0.7999323478093696,
             "error": false
           },
           {
             "request_id": "b-it-5",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.18963866645605237,
+            "ndcg_P": 0.7928327934358071,
             "error": false
           },
           {
             "request_id": "b-ja-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.2,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.3333333333333333,
-            "precision_P_assistant_k": 0.3333333333333333,
-            "ndcg_agent_list": 0.5787641110093001,
-            "ndcg_P": 0.45865970635647857,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7009522505974335,
+            "ndcg_P": 0.7565420321382531,
             "error": false
           },
           {
             "request_id": "b-ja-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7045426561100492,
+            "ndcg_P": 0.8344486075881847,
             "error": false
           },
           {
             "request_id": "b-nl-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.4745116416520173,
+            "ndcg_P": 0.8753170698415144,
             "error": false
           },
           {
             "request_id": "b-nl-4",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.2,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.7262287617954056,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6916942737584821,
+            "ndcg_P": 0.8689249987252154,
             "error": false
           },
           {
             "request_id": "b-nl-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.7387509830935444,
             "error": false
           },
           {
             "request_id": "b-pt-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
             "error": false
           },
           {
             "request_id": "b-ru-1",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.8316740937301459,
             "error": false
           },
           {
             "request_id": "b-ru-2",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.6,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5070069614665226,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
             "error": false
           },
           {
             "request_id": "b-ru-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.8771324975457362,
             "error": false
           },
           {
             "request_id": "b-ru-5",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.4,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5012658353418872,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.9069212362975007,
             "error": false
           },
           {
             "request_id": "b-ru-6",
             "set": "B",
             "picks": 1,
-            "precision_agent": 0.0,
+            "precision_agent": 1.0,
             "precision_P_same_k": 0.0,
             "assistant_route": "search",
             "assistant_picks": 1,
-            "precision_assistant": 0.0,
+            "precision_assistant": 1.0,
             "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.5912650026815736,
             "error": false
           },
           {
             "request_id": "b-zh-3",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.9552009891550426,
             "error": false
           },
           {
             "request_id": "b-zh-5",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.6027862102175006,
+            "ndcg_P": 0.680635200838327,
             "error": false
           },
           {
             "request_id": "b-zh-6",
             "set": "B",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.9123113157669601,
+            "ndcg_P": 0.9447510571005682,
             "error": false
           },
           {
@@ -4755,7 +4755,7 @@
             "precision_assistant": null,
             "precision_P_assistant_k": null,
             "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_P": 0.5603317244107737,
             "error": false
           },
           {
@@ -4768,22 +4768,22 @@
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 1.0,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.4954588824701808,
             "error": false
           },
           {
             "request_id": "q07",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.38685280723454163,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.8648840638252079,
+            "ndcg_P": 0.8112572614507466,
             "error": false
           },
           {
@@ -4796,92 +4796,92 @@
             "assistant_picks": 0,
             "precision_assistant": null,
             "precision_P_assistant_k": null,
-            "ndcg_agent_list": 0.6934264036172708,
-            "ndcg_P": 0.0,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.725452110735279,
             "error": false
           },
           {
             "request_id": "q16",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5860482135323951,
+            "ndcg_P": 0.7419044441282687,
             "error": false
           },
           {
             "request_id": "q19",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.662860092262725,
             "error": false
           },
           {
             "request_id": "q24",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.9621404437403491,
             "error": false
           },
           {
             "request_id": "q25",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7158239597366096,
+            "ndcg_P": 0.8898136962080377,
             "error": false
           },
           {
             "request_id": "q26",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7921778933646361,
+            "ndcg_P": 0.9278543273468738,
             "error": false
           },
           {
             "request_id": "q28",
             "set": "A",
             "picks": 3,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.6666666666666666,
+            "precision_P_same_k": 0.6666666666666666,
             "assistant_route": "search",
             "assistant_picks": 2,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6705825840476667,
+            "ndcg_P": 0.7700061257113394,
             "error": false
           },
           {
@@ -4895,35 +4895,35 @@
             "precision_assistant": null,
             "precision_P_assistant_k": null,
             "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "ndcg_P": 0.855977607523827,
             "error": false
           },
           {
             "request_id": "q32",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.5706417189553201,
-            "ndcg_P": 0.0,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.6339773966009096,
+            "ndcg_P": 0.6414863808120139,
             "error": false
           },
           {
             "request_id": "q37",
             "set": "A",
             "picks": 5,
-            "precision_agent": 0.0,
-            "precision_P_same_k": 0.0,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
             "assistant_route": "search",
             "assistant_picks": 3,
-            "precision_assistant": 0.0,
-            "precision_P_assistant_k": 0.0,
-            "ndcg_agent_list": 0.0,
-            "ndcg_P": 0.0,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5052358959224323,
+            "ndcg_P": 0.7605408732675782,
             "error": false
           }
         ]

@@ -155,16 +155,20 @@ def cmd_report(args: argparse.Namespace) -> int:
 
     if not args.offline:
         log("The report never calls an API or the database; --offline only states it.")
+    # Every output follows --data-dir unless given explicitly (see design.report_md).
+    output = D.report_md(args.data_dir) if args.output is None else args.output
     results = _write_results(args.data_dir)
-    Path(args.output).write_text(build_markdown(results), encoding="utf-8")
-    log(f"Wrote {args.output}")
+    output.write_text(build_markdown(results), encoding="utf-8")
+    log(f"Wrote {output}")
     # The re-measurement (V25), side by side with the first measurement.
-    second_dir = D.V25_DIR if args.second_data_dir is None else args.second_data_dir
+    second_dir = D.second_data_dir(args.data_dir) if args.second_data_dir is None else args.second_data_dir
+    second_output = D.second_report_md(second_dir) if args.second_output is None else args.second_output
     if not args.skip_second and (second_dir / "runs" / "turns.jsonl").exists():
         second = _write_results(second_dir)
         instructions = json.loads((second_dir / "instructions.json").read_text(encoding="utf-8"))
-        Path(args.second_output).write_text(build_comparison(results, second, instructions, args.data_dir, second_dir), encoding="utf-8")
-        log(f"Wrote {args.second_output}")
+        second_output.write_text(build_comparison(results, second, instructions, args.data_dir, second_dir),
+                                 encoding="utf-8")
+        log(f"Wrote {second_output}")
     return 0
 
 
@@ -200,10 +204,13 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("judge", help="stage 4: judge every new pair with both judges").set_defaults(func=cmd_judge)
     rp = sub.add_parser("report", help="stage 5: results.json and the markdown report from saved files")
     rp.add_argument("--offline", action="store_true", help="no API call and no database connection (always true)")
-    rp.add_argument("--output", default=str(D.REPORT_MD))
+    rp.add_argument("--output", type=Path, default=None,
+                    help=f"default: {D.REPORT_MD.name} next to --data-dir ({D.REPORT_MD})")
     rp.add_argument("--second-data-dir", type=Path, default=None,
-                    help=f"the re-measurement's data (default {D.V25_DIR}); its report is written when it has runs")
-    rp.add_argument("--second-output", default=str(D.V25_REPORT_MD))
+                    help=f"the re-measurement's data (default: {D.V25_DIR.name} next to --data-dir, {D.V25_DIR}); "
+                         "its report is written when it has runs")
+    rp.add_argument("--second-output", type=Path, default=None,
+                    help=f"default: {D.V25_REPORT_MD.name} next to the second data dir ({D.V25_REPORT_MD})")
     rp.add_argument("--skip-second", action="store_true", help="only the first measurement's report")
     rp.set_defaults(func=cmd_report)
     sub.add_parser("seed-v25", help=f"V25: copy the reusable files into {D.V25_DIR} and record both instructions"

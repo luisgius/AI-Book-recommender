@@ -23,6 +23,17 @@ DATA_DIR = Path("data/evaluation/catalog50k")
 E2_DIR = Path("data/catalog_deploy/bge_m3")  # git-ignored: about 200 MB of vectors
 REPORT_MD = Path("data/evaluation/CATALOG_EVALUATION.md")
 
+
+def report_md(data_dir: Path) -> Path:
+    """
+    The markdown report of the measurement in data_dir: REPORT_MD's name, next
+    to the directory (REPORT_MD itself for DATA_DIR). The report command
+    derives it when it runs, so a report built from another directory (a
+    test's temporary one) never writes over the published report.
+    """
+    return Path(data_dir).parent / REPORT_MD.name
+
+
 # --- Models (all through OpenRouter) ---------------------------------------
 QWEN_EMBEDDING = "qwen/qwen3-embedding-8b"
 QWEN_DIMENSIONS = 1024

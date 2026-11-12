@@ -60,8 +60,14 @@ def instruction_at(commit: str) -> Dict[str, Any]:
             "route_lines": [line for line in prompt.splitlines() if line.startswith('- "')]}
 
 
-def seed(first_dir: Path = D.DATA_DIR, second_dir: Path = D.V25_DIR, log=print) -> Dict[str, Any]:
-    """Copy the reusable files (only those not yet there) and write instructions.json."""
+def seed(first_dir: Path, second_dir: Path, log=print) -> Dict[str, Any]:
+    """
+    Copy the reusable files (only those not yet there) and write instructions.json.
+
+    Both directories are passed explicitly (cli passes design.DATA_DIR and
+    design.V25_DIR): a default bound when the module is imported would not
+    follow a redirected design constant.
+    """
     copied = []
     for name in COPIED:
         target = second_dir / name
@@ -79,7 +85,7 @@ def seed(first_dir: Path = D.DATA_DIR, second_dir: Path = D.V25_DIR, log=print) 
     return {"copied": copied, "instructions": instructions}
 
 
-def current_instruction_matches(second_dir: Path = D.V25_DIR) -> bool:
+def current_instruction_matches(second_dir: Path) -> bool:
     """True if the code's routing instruction is the one recorded for the second measurement."""
     from app.infrastructure.llm.prompts_assistant import ROUTER_SYSTEM_PROMPT
 
