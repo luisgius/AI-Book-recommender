@@ -31,14 +31,14 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V19** Interfaz web para el tribunal y chat del asistente: por qué aparece cada resultado, recorrido por el grafo en cada respuesta, estados de espera y diagramas (incluye V21; nota `V19-interfaz-web-y-chat.md`)
 - [x] **V20** Asistente LangGraph como entrada conversacional (enruta, pregunta para aclarar, busca o delega en el agente) y explicaciones en paralelo
 - [x] **V23** Comprobación del resultado de bge-m3 (se mantiene) y de los fallos del modelo de embeddings desplegado (causa y mitigación medida)
+- [x] **V24** Candidatos vectoriales más reranker por defecto (BM25 como respaldo) y embeddings de la consulta con segundo proveedor, caché y sin retención de datos; pendiente de desplegar
 
 ## En curso
 
 
 ## Pendientes
 
-- [~] **V24** Aplicar al sistema la regla del protocolo: vectorial más reranker, con BM25 solo como respaldo
-- [ ] **V22** Evaluación del agente y del asistente con protocolo declarado antes de ejecutar
+- [~] **V22** Evaluación del agente y del asistente con protocolo declarado antes de ejecutar
 
 ## Aplazadas (con motivo)
 
