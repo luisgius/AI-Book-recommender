@@ -1,0 +1,5965 @@
+{
+  "protocol": {
+    "path": "docs/notes/2026-11-12-protocolo-evaluacion-asistente.md",
+    "commit": "0ccd5f2"
+  },
+  "system": {
+    "commit": "36802ee",
+    "profile": {
+      "name": "cloud",
+      "candidates": "vector",
+      "schema": "catalog_deploy",
+      "lexical_ranking": "bm25",
+      "vector_search": "approximate"
+    },
+    "embedding": {
+      "model": "qwen/qwen3-embedding-8b",
+      "dimensions": 1024,
+      "provider": "deepinfra",
+      "zdr": true,
+      "hedge_provider": "nebius",
+      "hedge_after_s": 1.0,
+      "hedge_primary_again_s": 2.5,
+      "query_cache_size": 256,
+      "query_deadlines": {
+        "timeout_s": 3.0,
+        "max_retries": 1,
+        "deadline_s": 5.0
+      },
+      "evaluation_attempts": 3
+    },
+    "reranker": {
+      "model": "qwen/qwen3-reranker-8b",
+      "provider": "primeintellect",
+      "depth": 30,
+      "evaluation_deadlines": {
+        "timeout_s": 30.0,
+        "max_retries": 3
+      }
+    },
+    "llm": {
+      "provider": "openrouter",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "temperature": 0.0,
+      "reasoning": false,
+      "max_tokens": 1024,
+      "timeout_s": 180.0,
+      "max_retries": 1,
+      "client_max_retries": null
+    },
+    "assistant": {
+      "router_max_tokens": 400,
+      "answer_context_books": 6,
+      "max_clarifying_turns": 2,
+      "max_results": 10
+    },
+    "agent": {
+      "max_tool_rounds": 4,
+      "max_reflections": 1,
+      "max_recommendations": 5,
+      "tool_results": 8
+    },
+    "usage_budget": null
+  },
+  "commits": {
+    "36802ee": 514
+  },
+  "dates": [
+    "2026-11-12T15:45:26",
+    "2026-11-12T15:55:05"
+  ],
+  "sets": {
+    "counts": {
+      "counts": {
+        "A": 44,
+        "B": 72,
+        "D": 12,
+        "E": 30,
+        "F": 20
+      },
+      "languages": {
+        "A": {
+          "en": 24,
+          "es": 20
+        },
+        "B": {
+          "en": 6,
+          "es": 6,
+          "fr": 6,
+          "de": 6,
+          "it": 6,
+          "pt": 6,
+          "ca": 6,
+          "nl": 6,
+          "ru": 6,
+          "zh": 6,
+          "ja": 6,
+          "ar": 6
+        },
+        "D": {
+          "en": 1,
+          "es": 1,
+          "fr": 1,
+          "de": 1,
+          "it": 1,
+          "pt": 1,
+          "ca": 1,
+          "nl": 1,
+          "ru": 1,
+          "zh": 1,
+          "ja": 1,
+          "ar": 1
+        },
+        "E": {
+          "nl": 5,
+          "ar": 2,
+          "fr": 3,
+          "ru": 4,
+          "it": 3,
+          "en": 4,
+          "pt": 3,
+          "de": 2,
+          "ca": 3,
+          "ja": 1
+        },
+        "F": {
+          "en": 13,
+          "fr": 2,
+          "ja": 1,
+          "es": 2,
+          "de": 1,
+          "ar": 1
+        }
+      },
+      "categories": {
+        "A": {
+          "ai": 12,
+          "fiction": 11,
+          "cooking": 11,
+          "ambiguous": 10
+        },
+        "B": {
+          "thematic": 36,
+          "descriptive": 24,
+          "known_item": 12
+        },
+        "D": {
+          "unanswerable": 12
+        },
+        "E": {
+          "thematic": 13,
+          "known_item": 3,
+          "descriptive": 14
+        },
+        "F": {
+          "compare": 7,
+          "like_but": 7,
+          "facts": 6
+        }
+      }
+    },
+    "generator": {
+      "model": "google/gemini-3.8-flash",
+      "temperature": 0.7,
+      "reasoning": {
+        "effort": "low"
+      },
+      "prompt_versions": {
+        "E": "v1",
+        "F": "v1"
+      }
+    },
+    "e_sample": {
+      "seed": 0,
+      "b_query_ids": [
+        "b-nl-2",
+        "b-nl-6",
+        "b-ar-6",
+        "b-fr-4",
+        "b-ru-6",
+        "b-ru-3",
+        "b-nl-4",
+        "b-it-3",
+        "b-ru-2",
+        "b-en-5",
+        "b-it-2",
+        "b-pt-4",
+        "b-pt-5",
+        "b-de-2",
+        "b-fr-3",
+        "b-ca-3",
+        "b-en-1",
+        "b-pt-3",
+        "b-nl-1",
+        "b-ca-1",
+        "b-it-4",
+        "b-de-5",
+        "b-fr-5",
+        "b-ja-4",
+        "b-ru-5",
+        "b-ca-4",
+        "b-en-2",
+        "b-nl-5",
+        "b-ar-5",
+        "b-en-4"
+      ]
+    },
+    "f_tasks": [
+      {
+        "id": "f01",
+        "kind": "compare",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "a97d2a0c-a51b-5821-921a-7500736d268c",
+            "title": "Poems by Emily Dickinson, Three Series, Complete",
+            "authors": [
+              "Emily Dickinson"
+            ]
+          },
+          {
+            "work_id": "1910a6e1-6c75-57e2-95ee-89a75939158a",
+            "title": "Poems by Emily Dickinson, Series Two",
+            "authors": [
+              "Emily Dickinson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f02",
+        "kind": "compare",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "ba45fb7c-57e3-5a36-ae1d-9f9166a0341a",
+            "title": "Justine",
+            "authors": [
+              "Lawrence Durrell"
+            ]
+          },
+          {
+            "work_id": "f4011ff6-faf9-5731-ace9-ad6111ff57ec",
+            "title": "Clea",
+            "authors": [
+              "Lawrence Durrell"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f03",
+        "kind": "compare",
+        "language": "fr",
+        "works": [
+          {
+            "work_id": "0e8900ee-6b17-5f66-b901-cf3a02498f76",
+            "title": "Réflexions sur la question juive",
+            "authors": [
+              "Jean-Paul Sartre"
+            ]
+          },
+          {
+            "work_id": "1cee6791-a0c7-59b0-b293-8ee6dfc0cc5b",
+            "title": "The Reprieve",
+            "authors": [
+              "Jean-Paul Sartre"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f04",
+        "kind": "compare",
+        "language": "ja",
+        "works": [
+          {
+            "work_id": "6df62360-e0f4-52ab-9d42-645e04d3b3a1",
+            "title": "The Twelve Kingdoms",
+            "authors": [
+              "Fuyumi Ono"
+            ]
+          },
+          {
+            "work_id": "588b975d-1893-5e97-b8f7-3d4a9899c3fd",
+            "title": "悪霊シリーズ",
+            "authors": [
+              "Fuyumi Ono"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f05",
+        "kind": "compare",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "e4943636-a037-5de6-a613-697deb1e6204",
+            "title": "Amos Fortune, Free Man",
+            "authors": [
+              "Elizabeth Yates"
+            ]
+          },
+          {
+            "work_id": "ad118a4f-7a9e-54d1-a960-3564fb81ee41",
+            "title": "Before Green Gables",
+            "authors": [
+              "Budge Wilson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f06",
+        "kind": "compare",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "d914d5b1-5518-500e-a410-7ec87b541a66",
+            "title": "The Gernsback Continuum",
+            "authors": [
+              "William Gibson"
+            ]
+          },
+          {
+            "work_id": "bdb575be-676d-5300-a44d-05a915ee4fc4",
+            "title": "Skinner's Room",
+            "authors": [
+              "William Gibson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f07",
+        "kind": "compare",
+        "language": "es",
+        "works": [
+          {
+            "work_id": "b2f3ecf2-8b39-5eb0-a457-345b78b5d814",
+            "title": "El inquilino",
+            "authors": [
+              "Javier Cercas"
+            ]
+          },
+          {
+            "work_id": "12a79eec-dfd6-5ec6-b29a-175a1ec63271",
+            "title": "El móvil",
+            "authors": [
+              "Javier Cercas"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f08",
+        "kind": "like_but",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "833ef2ab-97ad-5aad-bd0a-04ebfc597403",
+            "title": "Ringworld",
+            "authors": [
+              "Larry Niven"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f09",
+        "kind": "like_but",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "d4d20caa-7db6-5b5c-b8d4-7a16f5471b64",
+            "title": "Bloodlands",
+            "authors": [
+              "Timothy Snyder"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f10",
+        "kind": "like_but",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "9c6e997c-3073-5520-b475-45ec0c805615",
+            "title": "Hurlothrumbo",
+            "authors": [
+              "Samuel Johnson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f11",
+        "kind": "like_but",
+        "language": "es",
+        "works": [
+          {
+            "work_id": "5a4d7fb3-d572-5cf5-bbf3-6e3a1232ad67",
+            "title": "Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia",
+            "authors": [
+              "María Teresa Rodríguez",
+              "Odile Hoffmann"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f12",
+        "kind": "like_but",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "e1ae88eb-2abe-5e79-9f19-b476ea62588f",
+            "title": "Seventh Son",
+            "authors": [
+              "Orson Scott Card"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f13",
+        "kind": "like_but",
+        "language": "de",
+        "works": [
+          {
+            "work_id": "36270a1f-4edc-5070-a365-0070c6750041",
+            "title": "West-östlicher Divan",
+            "authors": [
+              "Johann Wolfgang von Goethe"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f14",
+        "kind": "like_but",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "789c2deb-5b64-5e45-bae4-f0921ac49f14",
+            "title": "The Japanese in Latin America",
+            "authors": [
+              "Unknown"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f15",
+        "kind": "facts",
+        "language": "fr",
+        "works": [
+          {
+            "work_id": "3655a15d-2002-583d-9ad6-e66c578637ea",
+            "title": "Les Ombres errantes",
+            "authors": [
+              "Pascal Quignard"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f16",
+        "kind": "facts",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "2273bab6-261c-561c-8c67-5d1b49ae7b7a",
+            "title": "Enoch Arden",
+            "authors": [
+              "Alfred Tennyson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f17",
+        "kind": "facts",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "69de7765-fb80-5270-9118-25b78fa2c0e5",
+            "title": "Beat the Reaper",
+            "authors": [
+              "Josh Bazell"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f18",
+        "kind": "facts",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "eeb79501-5f80-5e6a-a6f7-0d372ffaf603",
+            "title": "Bond Girls Are Forever",
+            "authors": [
+              "Maryam d'Abo",
+              "John Cork"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f19",
+        "kind": "facts",
+        "language": "en",
+        "works": [
+          {
+            "work_id": "399ccb5c-ab10-5a9a-a09e-5fd82b2064d4",
+            "title": "The Great Shark Hunt",
+            "authors": [
+              "Hunter S. Thompson"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f20",
+        "kind": "facts",
+        "language": "ar",
+        "works": [
+          {
+            "work_id": "8654ce79-9e41-514f-ad72-257801313fd3",
+            "title": "كتاب الفلاحة",
+            "authors": [
+              "Ibn al-'Awwam"
+            ]
+          }
+        ]
+      }
+    ],
+    "agent_sample": {
+      "seed": 0,
+      "request_ids": [
+        "b-ar-6",
+        "b-ca-4",
+        "b-de-1",
+        "b-de-6",
+        "b-en-1",
+        "b-es-3",
+        "b-es-4",
+        "b-fr-3",
+        "b-fr-4",
+        "b-it-1",
+        "b-it-3",
+        "b-it-4",
+        "b-it-5",
+        "b-ja-1",
+        "b-ja-4",
+        "b-nl-2",
+        "b-nl-4",
+        "b-nl-6",
+        "b-pt-2",
+        "b-ru-1",
+        "b-ru-2",
+        "b-ru-3",
+        "b-ru-5",
+        "b-ru-6",
+        "b-zh-3",
+        "b-zh-5",
+        "b-zh-6",
+        "q03",
+        "q06",
+        "q07",
+        "q08",
+        "q16",
+        "q19",
+        "q24",
+        "q25",
+        "q26",
+        "q28",
+        "q29",
+        "q32",
+        "q37"
+      ]
+    },
+    "E": {
+      "fixes": [
+        {
+          "round": 1,
+          "request_id": "b-ca-1",
+          "reasons": [
+            "gives need away: shares ['catalana', 'poesia'] with the precise query"
+          ],
+          "before": {
+            "id": "b-ca-1",
+            "text": "poesia catalana"
+          },
+          "after": {
+            "id": "b-ca-1",
+            "text": "antologia de versos"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-de-2",
+          "reasons": [
+            "gives need away: shares ['historischer', 'roman'] with the precise query"
+          ],
+          "before": {
+            "id": "b-de-2",
+            "text": "historischer Roman"
+          },
+          "after": {
+            "id": "b-de-2",
+            "text": "deutsche Belletristik"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-fr-3",
+          "reasons": [
+            "language: not fr: ca 1.00"
+          ],
+          "before": {
+            "id": "b-fr-3",
+            "text": "récits d'aventure"
+          },
+          "after": {
+            "id": "b-fr-3",
+            "text": "carnets d'expédition"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-fr-4",
+          "reasons": [
+            "language: not fr: ca 1.00",
+            "gives need away: shares ['anticipation', 'roman'] with the precise query"
+          ],
+          "before": {
+            "id": "b-fr-4",
+            "text": "roman d'anticipation"
+          },
+          "after": {
+            "id": "b-fr-4",
+            "text": "de la science-fiction"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-fr-5",
+          "reasons": [
+            "language: not fr: ca 1.00"
+          ],
+          "before": {
+            "id": "b-fr-5",
+            "text": "livre d'histoire"
+          },
+          "after": {
+            "id": "b-fr-5",
+            "text": "documentaire historique"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-it-3",
+          "reasons": [
+            "gives need away: shares ['fantastici', 'racconti'] with the precise query"
+          ],
+          "before": {
+            "id": "b-it-3",
+            "text": "racconti fantastici"
+          },
+          "after": {
+            "id": "b-it-3",
+            "text": "antologie narrative"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-nl-4",
+          "reasons": [
+            "gives need away: shares ['psychologische', 'roman'] with the precise query"
+          ],
+          "before": {
+            "id": "b-nl-4",
+            "text": "een psychologische roman"
+          },
+          "after": {
+            "id": "b-nl-4",
+            "text": "aangrijpende literatuur"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-pt-5",
+          "reasons": [
+            "gives need away: shares ['brasil', 'historia'] with the precise query"
+          ],
+          "before": {
+            "id": "b-pt-5",
+            "text": "história do Brasil"
+          },
+          "after": {
+            "id": "b-pt-5",
+            "text": "ensaios sobre sociedade"
+          }
+        },
+        {
+          "round": 1,
+          "request_id": "b-ru-5",
+          "reasons": [
+            "gives need away: shares ['мифология', 'славянская'] with the precise query"
+          ],
+          "before": {
+            "id": "b-ru-5",
+            "text": "славянская мифология"
+          },
+          "after": {
+            "id": "b-ru-5",
+            "text": "книги по этнографии"
+          }
+        },
+        {
+          "round": 2,
+          "request_id": "b-fr-3",
+          "reasons": [
+            "language: not fr: ca 1.00"
+          ],
+          "before": {
+            "id": "b-fr-3",
+            "text": "carnets d'expédition"
+          },
+          "after": {
+            "id": "b-fr-3",
+            "text": "livre de voyage"
+          }
+        },
+        {
+          "round": 2,
+          "request_id": "b-pt-5",
+          "reasons": [
+            "language: not pt: es 1.00"
+          ],
+          "before": {
+            "id": "b-pt-5",
+            "text": "ensaios sobre sociedade"
+          },
+          "after": {
+            "id": "b-pt-5",
+            "text": "livro sobre história"
+          }
+        },
+        {
+          "round": 3,
+          "request_id": "b-pt-5",
+          "reasons": [
+            "language: not pt: es 1.00",
+            "gives need away: shares ['historia', 'livro'] with the precise query"
+          ],
+          "before": {
+            "id": "b-pt-5",
+            "text": "livro sobre história"
+          },
+          "after": {
+            "id": "b-pt-5",
+            "text": "obras de não-ficção"
+          }
+        }
+      ],
+      "first_pass_problems": [
+        {
+          "request_id": "b-fr-4",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-fr-4",
+          "check": "gives need away",
+          "detail": "shares ['anticipation', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-nl-4",
+          "check": "gives need away",
+          "detail": "shares ['psychologische', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-it-3",
+          "check": "gives need away",
+          "detail": "shares ['fantastici', 'racconti'] with the precise query"
+        },
+        {
+          "request_id": "b-pt-5",
+          "check": "gives need away",
+          "detail": "shares ['brasil', 'historia'] with the precise query"
+        },
+        {
+          "request_id": "b-de-2",
+          "check": "gives need away",
+          "detail": "shares ['historischer', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-fr-3",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-ca-1",
+          "check": "gives need away",
+          "detail": "shares ['catalana', 'poesia'] with the precise query"
+        },
+        {
+          "request_id": "b-fr-5",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-ru-5",
+          "check": "gives need away",
+          "detail": "shares ['мифология', 'славянская'] with the precise query"
+        }
+      ],
+      "final_problems": [],
+      "language_summary": {
+        "undecided": 14,
+        "ok": 16
+      }
+    },
+    "F": {
+      "fixes": [],
+      "first_pass_problems": [],
+      "final_problems": [],
+      "language_summary": {
+        "ok": 20
+      },
+      "works_found": {
+        "f01": {
+          "Poems by Emily Dickinson, Three Series, Complete": [
+            "a97d2a0c-a51b-5821-921a-7500736d268c"
+          ],
+          "Poems by Emily Dickinson, Series Two": [
+            "1910a6e1-6c75-57e2-95ee-89a75939158a"
+          ]
+        },
+        "f02": {
+          "Justine": [
+            "ba45fb7c-57e3-5a36-ae1d-9f9166a0341a"
+          ],
+          "Clea": [
+            "f4011ff6-faf9-5731-ace9-ad6111ff57ec"
+          ]
+        },
+        "f03": {
+          "Réflexions sur la question juive": [
+            "0e8900ee-6b17-5f66-b901-cf3a02498f76"
+          ],
+          "The Reprieve": [
+            "1cee6791-a0c7-59b0-b293-8ee6dfc0cc5b"
+          ]
+        },
+        "f04": {
+          "The Twelve Kingdoms": [
+            "6df62360-e0f4-52ab-9d42-645e04d3b3a1"
+          ],
+          "悪霊シリーズ": [
+            "588b975d-1893-5e97-b8f7-3d4a9899c3fd"
+          ]
+        },
+        "f05": {
+          "Amos Fortune, Free Man": [
+            "e4943636-a037-5de6-a613-697deb1e6204"
+          ],
+          "Before Green Gables": [
+            "ad118a4f-7a9e-54d1-a960-3564fb81ee41"
+          ]
+        },
+        "f06": {
+          "The Gernsback Continuum": [
+            "d914d5b1-5518-500e-a410-7ec87b541a66"
+          ],
+          "Skinner's Room": [
+            "bdb575be-676d-5300-a44d-05a915ee4fc4"
+          ]
+        },
+        "f07": {
+          "El inquilino": [
+            "b2f3ecf2-8b39-5eb0-a457-345b78b5d814"
+          ],
+          "El móvil": [
+            "d2ca9be9-0a4a-5885-bec0-c4c8b07d9faf",
+            "12a79eec-dfd6-5ec6-b29a-175a1ec63271"
+          ]
+        },
+        "f08": {
+          "Ringworld": [
+            "833ef2ab-97ad-5aad-bd0a-04ebfc597403"
+          ]
+        },
+        "f09": {
+          "Bloodlands": [
+            "d4d20caa-7db6-5b5c-b8d4-7a16f5471b64"
+          ]
+        },
+        "f10": {
+          "Hurlothrumbo": [
+            "9c6e997c-3073-5520-b475-45ec0c805615"
+          ]
+        },
+        "f11": {
+          "Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia": [
+            "5a4d7fb3-d572-5cf5-bbf3-6e3a1232ad67"
+          ]
+        },
+        "f12": {
+          "Seventh Son": [
+            "e1ae88eb-2abe-5e79-9f19-b476ea62588f"
+          ]
+        },
+        "f13": {
+          "West-östlicher Divan": [
+            "36270a1f-4edc-5070-a365-0070c6750041"
+          ]
+        },
+        "f14": {
+          "The Japanese in Latin America": [
+            "789c2deb-5b64-5e45-bae4-f0921ac49f14"
+          ]
+        },
+        "f15": {
+          "Les Ombres errantes": [
+            "3655a15d-2002-583d-9ad6-e66c578637ea"
+          ]
+        },
+        "f16": {
+          "Enoch Arden": [
+            "2273bab6-261c-561c-8c67-5d1b49ae7b7a"
+          ]
+        },
+        "f17": {
+          "Beat the Reaper": [
+            "69de7765-fb80-5270-9118-25b78fa2c0e5"
+          ]
+        },
+        "f18": {
+          "Bond Girls Are Forever": [
+            "eeb79501-5f80-5e6a-a6f7-0d372ffaf603"
+          ]
+        },
+        "f19": {
+          "The Great Shark Hunt": [
+            "399ccb5c-ab10-5a9a-a09e-5fd82b2064d4"
+          ]
+        },
+        "f20": {
+          "كتاب الفلاحة": [
+            "8654ce79-9e41-514f-ad72-257801313fd3"
+          ]
+        }
+      }
+    },
+    "requests": {
+      "e-b-nl-2": {
+        "set": "E",
+        "text": "hedendaagse filosofie",
+        "language": "nl",
+        "source_query": "filosofie ethiek moderne technologie",
+        "category": "thematic"
+      },
+      "e-b-nl-6": {
+        "set": "E",
+        "text": "Nederlandse literatuur",
+        "language": "nl",
+        "source_query": "roman van willem frederik hermans over geoloog alfred issendorf op expeditie naar meteorieten in noorwegen",
+        "category": "known_item"
+      },
+      "e-b-ar-6": {
+        "set": "E",
+        "text": "سير ذاتية",
+        "language": "ar",
+        "source_query": "سيرة ذاتية لعميد الأدب العربي يروي فيها معاناته مع فقدان البصر في طفولته ودراسته في الأزهر وفرنسا",
+        "category": "known_item"
+      },
+      "e-b-fr-4": {
+        "set": "E",
+        "text": "de la science-fiction",
+        "language": "fr",
+        "source_query": "un roman d'anticipation dystopique sur le contrôle des esprits et la surveillance de masse",
+        "category": "descriptive"
+      },
+      "e-b-ru-6": {
+        "set": "E",
+        "text": "русская классика",
+        "language": "ru",
+        "source_query": "роман Булгакова где сатана со свитой появляется в советской Москве",
+        "category": "known_item"
+      },
+      "e-b-ru-3": {
+        "set": "E",
+        "text": "книги по философии",
+        "language": "ru",
+        "source_query": "философские эссе экзистенциализм двадцатый век",
+        "category": "thematic"
+      },
+      "e-b-nl-4": {
+        "set": "E",
+        "text": "aangrijpende literatuur",
+        "language": "nl",
+        "source_query": "een psychologische roman over het verlies van een kind en rouwverwerking binnen een huwelijk",
+        "category": "descriptive"
+      },
+      "e-b-it-3": {
+        "set": "E",
+        "text": "antologie narrative",
+        "language": "it",
+        "source_query": "racconti di fantascienza distopica",
+        "category": "thematic"
+      },
+      "e-b-ru-2": {
+        "set": "E",
+        "text": "историческая проза",
+        "language": "ru",
+        "source_query": "исторические романы эпоха наполеоновских войн",
+        "category": "thematic"
+      },
+      "e-b-en-5": {
+        "set": "E",
+        "text": "ancient history",
+        "language": "en",
+        "source_query": "a book that explains the fall of the Western Roman Empire for general readers",
+        "category": "descriptive"
+      },
+      "e-b-it-2": {
+        "set": "E",
+        "text": "saggi di filosofia",
+        "language": "it",
+        "source_query": "filosofia morale illuminismo",
+        "category": "thematic"
+      },
+      "e-b-pt-4": {
+        "set": "E",
+        "text": "romance de época",
+        "language": "pt",
+        "source_query": "um romance histórico sobre as viagens marítimas e descobrimentos portugueses",
+        "category": "descriptive"
+      },
+      "e-b-pt-5": {
+        "set": "E",
+        "text": "obras de não-ficção",
+        "language": "pt",
+        "source_query": "livro que explica a história do Brasil colonial e a escravidão",
+        "category": "descriptive"
+      },
+      "e-b-de-2": {
+        "set": "E",
+        "text": "deutsche Belletristik",
+        "language": "de",
+        "source_query": "Historische Romane Weimarer Republik Berlin",
+        "category": "thematic"
+      },
+      "e-b-fr-3": {
+        "set": "E",
+        "text": "livre de voyage",
+        "language": "fr",
+        "source_query": "récits de voyage exploration arctique",
+        "category": "thematic"
+      },
+      "e-b-ca-3": {
+        "set": "E",
+        "text": "llibres de filosofia",
+        "language": "ca",
+        "source_query": "filosofia medieval i teologia",
+        "category": "thematic"
+      },
+      "e-b-en-1": {
+        "set": "E",
+        "text": "gothic fiction",
+        "language": "en",
+        "source_query": "early Victorian gothic horror novels",
+        "category": "thematic"
+      },
+      "e-b-pt-3": {
+        "set": "E",
+        "text": "livros de poesia",
+        "language": "pt",
+        "source_query": "poesia lírica barroca século XVII",
+        "category": "thematic"
+      },
+      "e-b-nl-1": {
+        "set": "E",
+        "text": "historische fictie",
+        "language": "nl",
+        "source_query": "historische romans gouden eeuw amsterdam",
+        "category": "thematic"
+      },
+      "e-b-ca-1": {
+        "set": "E",
+        "text": "antologia de versos",
+        "language": "ca",
+        "source_query": "poesia catalana contemporània segle XX",
+        "category": "thematic"
+      },
+      "e-b-it-4": {
+        "set": "E",
+        "text": "storia antica",
+        "language": "it",
+        "source_query": "un saggio che spiega le cause della caduta dell'impero romano d'occidente",
+        "category": "descriptive"
+      },
+      "e-b-de-5": {
+        "set": "E",
+        "text": "Philosophie Sachbuch",
+        "language": "de",
+        "source_query": "Ein philosophischer Essay über die moralische Verantwortung der Wissenschaft für künftige Generationen",
+        "category": "descriptive"
+      },
+      "e-b-fr-5": {
+        "set": "E",
+        "text": "documentaire historique",
+        "language": "fr",
+        "source_query": "un essai historique qui analyse les causes économiques et sociales de la Révolution française",
+        "category": "descriptive"
+      },
+      "e-b-ja-4": {
+        "set": "E",
+        "text": "海外文学の小説",
+        "language": "ja",
+        "source_query": "孤島に取り残された少年たちのサバイバルと心理的な葛藤を描いた長編小説",
+        "category": "descriptive"
+      },
+      "e-b-ru-5": {
+        "set": "E",
+        "text": "книги по этнографии",
+        "language": "ru",
+        "source_query": "книга которая объясняет мифологию и верования древних славян доступным языком",
+        "category": "descriptive"
+      },
+      "e-b-ca-4": {
+        "set": "E",
+        "text": "novel·la en català",
+        "language": "ca",
+        "source_query": "una novel·la sobre la vida quotidiana d'una dona a la Barcelona de postguerra",
+        "category": "descriptive"
+      },
+      "e-b-en-2": {
+        "set": "E",
+        "text": "philosophy books",
+        "language": "en",
+        "source_query": "philosophy of mind consciousness essays",
+        "category": "thematic"
+      },
+      "e-b-nl-5": {
+        "set": "E",
+        "text": "oorlogsgeschiedenis",
+        "language": "nl",
+        "source_query": "een historisch boek dat uitlegt hoe het dagelijks leven eruitzag tijdens de bezetting in nederland",
+        "category": "descriptive"
+      },
+      "e-b-ar-5": {
+        "set": "E",
+        "text": "كتب تاريخ",
+        "language": "ar",
+        "source_query": "كتاب تاريخي يتناول رحلات الاستكشاف الجغرافي وحياة الرحالة العرب في العصور الوسطى",
+        "category": "descriptive"
+      },
+      "e-b-en-4": {
+        "set": "E",
+        "text": "science fiction",
+        "language": "en",
+        "source_query": "a novel about an astronomer discovering signs of alien life",
+        "category": "descriptive"
+      },
+      "f01": {
+        "set": "F",
+        "text": "How do Poems by Emily Dickinson, Three Series, Complete and Poems by Emily Dickinson, Series Two differ in scope, and which collection would you recommend for a beginner?",
+        "language": "en",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f02": {
+        "set": "F",
+        "text": "Could you compare Justine and Clea in terms of their narrative perspective and place within the sequence?",
+        "language": "en",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f03": {
+        "set": "F",
+        "text": "Pourriez-vous comparer Réflexions sur la question juive et The Reprieve afin de m'expliquer comment la pensée de l'auteur s'exprime différemment à travers l'essai et la fiction ?",
+        "language": "fr",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f04": {
+        "set": "F",
+        "text": "小野不由美の「The Twelve Kingdoms」と「悪霊シリーズ」では、作風や世界観にどのような違いがありますか？",
+        "language": "ja",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f05": {
+        "set": "F",
+        "text": "Which would be better suited for a middle-school reader interested in historical fiction, Amos Fortune, Free Man or Before Green Gables?",
+        "language": "en",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f06": {
+        "set": "F",
+        "text": "How do William Gibson's short stories The Gernsback Continuum and Skinner's Room compare in their themes and visions of the future?",
+        "language": "en",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f07": {
+        "set": "F",
+        "text": "¿Qué diferencias existen entre El inquilino y El móvil en cuanto a su formato narrativo y desarrollo inicial como obras del autor?",
+        "language": "es",
+        "source_query": null,
+        "category": "compare"
+      },
+      "f08": {
+        "set": "F",
+        "text": "Can you recommend sci-fi books featuring megastructures like Ringworld, but written more recently?",
+        "language": "en",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f09": {
+        "set": "F",
+        "text": "Are there any historical studies similar to Bloodlands that focus on Western Europe or the Pacific theater instead?",
+        "language": "en",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f10": {
+        "set": "F",
+        "text": "I enjoyed the theatrical absurdity of Hurlothrumbo; could you suggest modern comedic plays with a similar nonsense style?",
+        "language": "en",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f11": {
+        "set": "F",
+        "text": "¿Podrías recomendarme estudios antropológicos similares a Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia, pero que se centren en países del Cono Sur?",
+        "language": "es",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f12": {
+        "set": "F",
+        "text": "Could you suggest books similar to Seventh Son that explore magical alternate histories, but set in Europe instead of frontier America?",
+        "language": "en",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f13": {
+        "set": "F",
+        "text": "Können Sie mir Gedichtbände empfehlen, die wie West-östlicher Divan einen interkulturellen Dialog suchen, aber aus dem 20. oder 21. Jahrhundert stammen?",
+        "language": "de",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f14": {
+        "set": "F",
+        "text": "Can you recommend books like The Japanese in Latin America that focus specifically on Asian migrations to North America instead?",
+        "language": "en",
+        "source_query": null,
+        "category": "like_but"
+      },
+      "f15": {
+        "set": "F",
+        "text": "De quoi traite exactement l'ouvrage Les Ombres errantes et à quel genre littéraire appartient-il ?",
+        "language": "fr",
+        "source_query": null,
+        "category": "facts"
+      },
+      "f16": {
+        "set": "F",
+        "text": "What is the central story of Alfred Tennyson's poem Enoch Arden, and when was it originally published?",
+        "language": "en",
+        "source_query": null,
+        "category": "facts"
+      },
+      "f17": {
+        "set": "F",
+        "text": "Who is the author of Beat the Reaper, and what kind of plot does this novel follow?",
+        "language": "en",
+        "source_query": null,
+        "category": "facts"
+      },
+      "f18": {
+        "set": "F",
+        "text": "What is the background and subject matter of Bond Girls Are Forever?",
+        "language": "en",
+        "source_query": null,
+        "category": "facts"
+      },
+      "f19": {
+        "set": "F",
+        "text": "What topics and period of journalism are covered in The Great Shark Hunt?",
+        "language": "en",
+        "source_query": null,
+        "category": "facts"
+      },
+      "f20": {
+        "set": "F",
+        "text": "ما هي الموضوعات الرئيسية التي يناقشها كتاب الفلاحة ومن هو مؤلفه؟",
+        "language": "ar",
+        "source_query": null,
+        "category": "facts"
+      }
+    }
+  },
+  "runs": {
+    "P_texts": 166,
+    "turns": 308,
+    "turns_by_run_set": {
+      "run1/A": 44,
+      "run1/D": 12,
+      "run1/F": 20,
+      "run1/E": 44,
+      "run1/B": 72,
+      "run2/A": 44,
+      "run2/B": 72
+    },
+    "conversations": 30,
+    "agent_direct": 40,
+    "query_vectors": 327,
+    "query_vector_retries": 0,
+    "depth_check": {
+      "texts": 166,
+      "same_head_set": 166,
+      "same_head_order": 166,
+      "min_overlap": 30
+    }
+  },
+  "routes": {
+    "matrices": {
+      "run1": {
+        "A other": {
+          "search": 25,
+          "out_of_scope": 9,
+          "total": 34
+        },
+        "A ambiguous": {
+          "clarify": 8,
+          "search": 1,
+          "out_of_scope": 1,
+          "total": 10
+        },
+        "B": {
+          "clarify": 1,
+          "search": 70,
+          "out_of_scope": 1,
+          "total": 72
+        },
+        "D": {
+          "out_of_scope": 12,
+          "total": 12
+        },
+        "E first turn": {
+          "clarify": 14,
+          "search": 16,
+          "total": 30
+        },
+        "F": {
+          "search": 1,
+          "agent": 19,
+          "total": 20
+        }
+      },
+      "run2": {
+        "A other": {
+          "clarify": 1,
+          "search": 25,
+          "out_of_scope": 8,
+          "total": 34
+        },
+        "A ambiguous": {
+          "clarify": 6,
+          "search": 3,
+          "out_of_scope": 1,
+          "total": 10
+        },
+        "B": {
+          "search": 72,
+          "total": 72
+        }
+      }
+    },
+    "rates": {
+      "run1": {
+        "clarify_ab": {
+          "count": 9,
+          "requests": 116,
+          "rate": 0.07758620689655173
+        },
+        "clarify_b": {
+          "count": 1,
+          "requests": 72,
+          "rate": 0.013888888888888888
+        },
+        "clarify_a": {
+          "count": 8,
+          "requests": 44,
+          "rate": 0.18181818181818182
+        },
+        "out_of_scope_ab": {
+          "count": 11,
+          "requests": 116,
+          "rate": 0.09482758620689655
+        },
+        "out_of_scope_b": {
+          "count": 1,
+          "requests": 72,
+          "rate": 0.013888888888888888
+        },
+        "agent_ab": {
+          "count": 0,
+          "requests": 116,
+          "rate": 0.0
+        },
+        "d_detection": {
+          "count": 12,
+          "requests": 12,
+          "rate": 1.0
+        }
+      },
+      "run2": {
+        "clarify_ab": {
+          "count": 7,
+          "requests": 116,
+          "rate": 0.0603448275862069
+        },
+        "clarify_b": {
+          "count": 0,
+          "requests": 72,
+          "rate": 0.0
+        },
+        "clarify_a": {
+          "count": 7,
+          "requests": 44,
+          "rate": 0.1590909090909091
+        },
+        "out_of_scope_ab": {
+          "count": 9,
+          "requests": 116,
+          "rate": 0.07758620689655173
+        },
+        "out_of_scope_b": {
+          "count": 0,
+          "requests": 72,
+          "rate": 0.0
+        },
+        "agent_ab": {
+          "count": 0,
+          "requests": 116,
+          "rate": 0.0
+        },
+        "d_detection": {
+          "count": 0,
+          "requests": 0,
+          "rate": null
+        }
+      }
+    },
+    "forced": {
+      "run1": {
+        "E: invalid_clarification -> search": 3
+      },
+      "run2": {
+        "A: invalid_clarification -> search": 2
+      }
+    },
+    "e_later_turns": {
+      "turn 2: search": 14
+    },
+    "thresholds": {
+      "run1": {
+        "rows": {
+          "out_of_scope_ab": {
+            "value": 0.09482758620689655,
+            "count": 11,
+            "requests": 116,
+            "maximum": 0.02,
+            "met": false
+          },
+          "clarify_b": {
+            "value": 0.013888888888888888,
+            "count": 1,
+            "requests": 72,
+            "maximum": 0.1,
+            "met": true
+          }
+        },
+        "both_met": false
+      },
+      "run2": {
+        "rows": {
+          "out_of_scope_ab": {
+            "value": 0.07758620689655173,
+            "count": 9,
+            "requests": 116,
+            "maximum": 0.02,
+            "met": false
+          },
+          "clarify_b": {
+            "value": 0.0,
+            "count": 0,
+            "requests": 72,
+            "maximum": 0.1,
+            "met": true
+          }
+        },
+        "both_met": false
+      }
+    },
+    "stability": {
+      "requests": 116,
+      "same_route": 106,
+      "agreement": 0.9137931034482759,
+      "by_set": {
+        "A": {
+          "requests": 44,
+          "same_route": 36,
+          "agreement": 0.8181818181818182
+        },
+        "B": {
+          "requests": 72,
+          "same_route": 70,
+          "agreement": 0.9722222222222222
+        }
+      },
+      "changes": {
+        "search -> clarify": 1,
+        "out_of_scope -> search": 4,
+        "search -> out_of_scope": 2,
+        "clarify -> search": 3
+      },
+      "changed_requests": [
+        "b-de-5",
+        "b-fr-6",
+        "q02",
+        "q11",
+        "q12",
+        "q13",
+        "q25",
+        "q32",
+        "q40",
+        "q41"
+      ]
+    },
+    "clarify_or_out_of_scope_ab_run1": [
+      {
+        "request_id": "q03",
+        "set": "A",
+        "text": "recetas cocina rumana",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q11",
+        "set": "A",
+        "text": "computer vision opencv beginner guide",
+        "question": "I can only help with books from this catalog: searching by topic, author or period, comparing books, or finding books similar to one you liked. What would you like to read?"
+      },
+      {
+        "request_id": "q14",
+        "set": "A",
+        "text": "GPT large language models explained",
+        "question": "I can only help with books from this catalog: searching by topic, author or period, comparing books, or finding books similar to one you liked. What would you like to read?"
+      },
+      {
+        "request_id": "q25",
+        "set": "A",
+        "text": "recetas tradicionales cocina mediterranea",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q27",
+        "set": "A",
+        "text": "postres caseros faciles sin horno",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q28",
+        "set": "A",
+        "text": "Italian pasta recipes homemade sauce",
+        "question": "I can only help with books from this catalog: searching by topic, author or period, comparing books, or finding books similar to one you liked. What would you like to read?"
+      },
+      {
+        "request_id": "q31",
+        "set": "A",
+        "text": "recetas de mariscos y pescados frescos",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q32",
+        "set": "A",
+        "text": "Asian cuisine wok stir fry techniques",
+        "question": "I can only help with books from this catalog: searching by topic, author or period, comparing books, or finding books similar to one you liked. What would you like to read?"
+      },
+      {
+        "request_id": "q33",
+        "set": "A",
+        "text": "comida mexicana autentica tacos enchiladas",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q35",
+        "set": "A",
+        "text": "python",
+        "question": "What kind of Python book are you looking for?"
+      },
+      {
+        "request_id": "q36",
+        "set": "A",
+        "text": "historia",
+        "question": "¿Qué tipo de historia buscas?"
+      },
+      {
+        "request_id": "q37",
+        "set": "A",
+        "text": "recetas faciles",
+        "question": "Solo puedo ayudarte con libros de este catálogo: buscar por tema, autor o época, comparar libros o encontrar libros parecidos a uno que te haya gustado. ¿Qué te apetece leer?"
+      },
+      {
+        "request_id": "q38",
+        "set": "A",
+        "text": "java",
+        "question": "What kind of book are you looking for related to Java?"
+      },
+      {
+        "request_id": "q39",
+        "set": "A",
+        "text": "apple",
+        "question": "What kind of book are you looking for?"
+      },
+      {
+        "request_id": "q40",
+        "set": "A",
+        "text": "networks",
+        "question": "What kind of networks are you interested in?"
+      },
+      {
+        "request_id": "q41",
+        "set": "A",
+        "text": "learning",
+        "question": "What kind of learning books are you looking for?"
+      },
+      {
+        "request_id": "q43",
+        "set": "A",
+        "text": "classic",
+        "question": "What kind of classic books are you looking for?"
+      },
+      {
+        "request_id": "q44",
+        "set": "A",
+        "text": "guerra",
+        "question": "¿Qué tipo de libro sobre la guerra buscas?"
+      },
+      {
+        "request_id": "b-fr-6",
+        "set": "B",
+        "text": "Meursault tue un Arabe sur une plage sous le soleil d'Alger",
+        "question": "I can only help with books from this catalog: searching by topic, author or period, comparing books, or finding books similar to one you liked. What would you like to read?"
+      },
+      {
+        "request_id": "b-de-5",
+        "set": "B",
+        "text": "Ein philosophischer Essay über die moralische Verantwortung der Wissenschaft für künftige Generationen",
+        "question": "Suchst du einen philosophischen Essay (Sachbuch) zu diesem Thema oder eher einen Roman mit dieser Thematik?"
+      }
+    ],
+    "d": [
+      {
+        "request_id": "d-en",
+        "text": "train schedule from London to Edinburgh tomorrow morning",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-es",
+        "text": "pronóstico del tiempo para Madrid este fin de semana",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-fr",
+        "text": "vols pas chers Paris New York départ vendredi",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-de",
+        "text": "Öffnungszeiten Bürgeramt Berlin Neukölln heute",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-it",
+        "text": "numero di telefono farmacia di turno più vicina",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-pt",
+        "text": "cotação do dólar hoje em reais",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-ca",
+        "text": "com arribar a l'hospital Clínic amb metro",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-nl",
+        "text": "uitslagen voetbal eredivisie gisteravond",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-ru",
+        "text": "доставка пиццы круглосуточно рядом со мной",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-zh",
+        "text": "北京今天空气质量指数实时查询",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-ja",
+        "text": "渋谷駅周辺の現在空いているコインパーキング",
+        "route": "out_of_scope"
+      },
+      {
+        "request_id": "d-ar",
+        "text": "مواقيت صلاة الفجر والظهر اليوم في القاهرة",
+        "route": "out_of_scope"
+      }
+    ]
+  },
+  "judgments": {
+    "pairs_file_needs": 136,
+    "counts": {
+      "z-ai/glm-5.3-flash": {
+        "measured_pairs": 1826,
+        "from_v14": 1220,
+        "judged_here": 606,
+        "unjudged": 0,
+        "cache_size_here": 606
+      },
+      "minimax/minimax-m3.1-flash": {
+        "measured_pairs": 1826,
+        "from_v14": 1220,
+        "judged_here": 606,
+        "unjudged": 0,
+        "cache_size_here": 606
+      }
+    },
+    "runs": [
+      {
+        "model": "minimax/minimax-m3.1-flash",
+        "pairs": 606,
+        "judged_in_run": 606,
+        "failed_calls_in_run": 0,
+        "errors": {},
+        "passes": 2,
+        "unjudged": 0,
+        "reused_from_v14": 1220,
+        "measured_pairs": 1826,
+        "date": "2026-11-12T15:56:45"
+      },
+      {
+        "model": "z-ai/glm-5.3-flash",
+        "pairs": 606,
+        "judged_in_run": 606,
+        "failed_calls_in_run": 4,
+        "errors": {
+          "LengthFinishReasonError": 4
+        },
+        "passes": 3,
+        "unjudged": 0,
+        "reused_from_v14": 1220,
+        "measured_pairs": 1826,
+        "date": "2026-11-12T15:57:21"
+      }
+    ]
+  },
+  "metrics": {
+    "primary": {
+      "contrasts": {
+        "H7": {
+          "requests": 116,
+          "system_mean": 0.6526858991686436,
+          "reference_mean": 0.7898421991015919,
+          "difference": -0.13715629993294828,
+          "ci": [
+            -0.1944694282886204,
+            -0.08370444000983186
+          ],
+          "p": 9.999000099990002e-05,
+          "p_holm": 0.00029997000299970003
+        },
+        "H8": {
+          "requests": 30,
+          "system_mean": 0.33793303428733684,
+          "reference_mean": 0.12858921631438977,
+          "difference": 0.20934381797294702,
+          "ci": [
+            0.1037134153418782,
+            0.32571625683557437
+          ],
+          "p": 0.0008999100089991,
+          "p_holm": 0.0017998200179982
+        },
+        "H9": {
+          "requests": 20,
+          "system_mean": 0.925,
+          "reference_mean": 0.7949999999999999,
+          "difference": 0.13,
+          "ci": [
+            0.025,
+            0.26
+          ],
+          "p": 0.058694130586941305,
+          "p_holm": 0.058694130586941305
+        }
+      },
+      "h7": {
+        "assistant": {
+          "n": 116,
+          "mean": 0.6526858991686436,
+          "ci": [
+            0.59254771792179,
+            0.7106177771411228
+          ]
+        },
+        "P": {
+          "n": 116,
+          "mean": 0.7898421991015919,
+          "ci": [
+            0.7634429156123781,
+            0.8152507241280083
+          ]
+        },
+        "by_group": {
+          "A ambiguous": {
+            "requests": 10,
+            "assistant": 0.09135325056037084,
+            "P": 0.7689245888972789
+          },
+          "A other": {
+            "requests": 34,
+            "assistant": 0.561616693839679,
+            "P": 0.7753253790188056
+          },
+          "B": {
+            "requests": 72,
+            "assistant": 0.7736536695473593,
+            "P": 0.7996025877801735
+          },
+          "route clarify": {
+            "requests": 9,
+            "assistant": 0.0,
+            "P": 0.7610730671585352
+          },
+          "route out_of_scope": {
+            "requests": 11,
+            "assistant": 0.0,
+            "P": 0.8249160873254824
+          },
+          "route search": {
+            "requests": 96,
+            "assistant": 0.788662128162111,
+            "P": 0.7885204221955995
+          }
+        },
+        "search_route_only": {
+          "requests": 96,
+          "assistant": 0.788662128162111,
+          "P": 0.7885204221955995,
+          "test": {
+            "requests": 96,
+            "system_mean": 0.788662128162111,
+            "reference_mean": 0.7885204221955995,
+            "difference": 0.00014170596651170002,
+            "ci": [
+              -0.002840253787181639,
+              0.00299332618543784
+            ],
+            "p": 0.9145085491450855
+          },
+          "query_rewritten": 14,
+          "rewritten_mean_difference": 0.0009716980560802288,
+          "rewritten_changed_ndcg": 12,
+          "query_unchanged": 82
+        },
+        "recommendations": {
+          "replies": 83,
+          "precision_assistant": 0.897590361445783,
+          "precision_P_same_k": 0.7931726907630522
+        }
+      },
+      "e": {
+        "conversations": 30,
+        "asked": 14,
+        "clarification_rate": 0.4666666666666667,
+        "questions": {
+          "0": 16,
+          "1": 14
+        },
+        "assistant_turns": {
+          "1": 16,
+          "2": 14
+        },
+        "stop": {
+          "answered": 30
+        },
+        "final_route": {
+          "search": 30
+        },
+        "ndcg_final": {
+          "n": 30,
+          "mean": 0.33793303428733684,
+          "ci": [
+            0.22896738434885525,
+            0.4526056334827129
+          ]
+        },
+        "ndcg_P_vague": {
+          "n": 30,
+          "mean": 0.12858921631438977,
+          "ci": [
+            0.0937184850334404,
+            0.16224712960537022
+          ]
+        },
+        "ndcg_P_original": {
+          "n": 30,
+          "mean": 0.7749278700298655,
+          "ci": [
+            0.724318296378249,
+            0.8236836685705269
+          ]
+        },
+        "asked_rows": {
+          "ndcg_final": {
+            "n": 14,
+            "mean": 0.5404898161055225,
+            "ci": [
+              0.3558724669658542,
+              0.7158169159986137
+            ]
+          },
+          "ndcg_P_vague": {
+            "n": 14,
+            "mean": 0.09133709838100679,
+            "ci": [
+              0.04268275802739872,
+              0.14567856405104307
+            ]
+          },
+          "ndcg_P_original": {
+            "n": 14,
+            "mean": 0.7871535145711183,
+            "ci": [
+              0.7106185375996618,
+              0.8510061868339626
+            ]
+          }
+        },
+        "not_asked_rows": {
+          "ndcg_final": {
+            "n": 16,
+            "mean": 0.1606958501964244,
+            "ci": [
+              0.12221041668058982,
+              0.19539812123753258
+            ]
+          },
+          "ndcg_P_vague": {
+            "n": 16,
+            "mean": 0.16118481950609992,
+            "ci": [
+              0.12285397098667472,
+              0.19581804057715713
+            ]
+          },
+          "ndcg_P_original": {
+            "n": 16,
+            "mean": 0.764230431056269,
+            "ci": [
+              0.6958914884160214,
+              0.8348178352869796
+            ]
+          }
+        },
+        "rows": [
+          {
+            "request_id": "e-b-nl-2",
+            "language": "nl",
+            "text": "hedendaagse filosofie",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.18295522042940773,
+            "ndcg_first_turn": 0.18295522042940773,
+            "ndcg_P_vague": 0.18295522042940773,
+            "ndcg_P_original": 0.6973915787600091,
+            "final_query": "hedendaagse filosofie"
+          },
+          {
+            "request_id": "e-b-nl-6",
+            "language": "nl",
+            "text": "Nederlandse literatuur",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.1998575530405206,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.9333889380711156,
+            "final_query": "Nederlandse literatuur roman"
+          },
+          {
+            "request_id": "e-b-ar-6",
+            "language": "ar",
+            "text": "سير ذاتية",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.0,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.4328876702255411,
+            "final_query": "سير ذاتية لكتّاب"
+          },
+          {
+            "request_id": "e-b-fr-4",
+            "language": "fr",
+            "text": "de la science-fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.13695258675805957,
+            "ndcg_first_turn": 0.13695258675805957,
+            "ndcg_P_vague": 0.13695258675805957,
+            "ndcg_P_original": 0.765917333420837,
+            "final_query": "de la science-fiction"
+          },
+          {
+            "request_id": "e-b-ru-6",
+            "language": "ru",
+            "text": "русская классика",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.0,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.7614229318985066,
+            "final_query": "русская классика"
+          },
+          {
+            "request_id": "e-b-ru-3",
+            "language": "ru",
+            "text": "книги по философии",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.1699395326770145,
+            "ndcg_first_turn": 0.1699395326770145,
+            "ndcg_P_vague": 0.1699395326770145,
+            "ndcg_P_original": 0.7771419895596159,
+            "final_query": "книги по философии"
+          },
+          {
+            "request_id": "e-b-nl-4",
+            "language": "nl",
+            "text": "aangrijpende literatuur",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.07582903303182119,
+            "ndcg_first_turn": 0.07582903303182119,
+            "ndcg_P_vague": 0.07582903303182119,
+            "ndcg_P_original": 0.5313285723623473,
+            "final_query": "aangrijpende literatuur"
+          },
+          {
+            "request_id": "e-b-it-3",
+            "language": "it",
+            "text": "antologie narrative",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.22961363843137572,
+            "ndcg_first_turn": 0.22961363843137572,
+            "ndcg_P_vague": 0.22961363843137572,
+            "ndcg_P_original": 0.613832528805698,
+            "final_query": "antologie narrative"
+          },
+          {
+            "request_id": "e-b-ru-2",
+            "language": "ru",
+            "text": "историческая проза",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.932801483732564,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.20574050465659433,
+            "ndcg_P_original": 1.0,
+            "final_query": "историческая проза о периоде наполеоновских войн в Европе и России"
+          },
+          {
+            "request_id": "e-b-en-5",
+            "language": "en",
+            "text": "ancient history",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.19396670112704034,
+            "ndcg_first_turn": 0.19396670112704034,
+            "ndcg_P_vague": 0.19396670112704034,
+            "ndcg_P_original": 0.6553901310331164,
+            "final_query": "ancient history"
+          },
+          {
+            "request_id": "e-b-it-2",
+            "language": "it",
+            "text": "saggi di filosofia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.13120574037055388,
+            "ndcg_first_turn": 0.13120574037055388,
+            "ndcg_P_vague": 0.13120574037055388,
+            "ndcg_P_original": 0.7710420084788906,
+            "final_query": "saggi di filosofia"
+          },
+          {
+            "request_id": "e-b-pt-4",
+            "language": "pt",
+            "text": "romance de época",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.8988252059479765,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.1331896237946325,
+            "ndcg_P_original": 0.8743705652481897,
+            "final_query": "romance de época ambientado na Idade dos Descobrimentos e expedições marítimas portuguesas"
+          },
+          {
+            "request_id": "e-b-pt-5",
+            "language": "pt",
+            "text": "obras de não-ficção",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.6592553744202915,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.6124812862790441,
+            "final_query": "obras de não-ficção sobre História, com foco na escravidão e comércio transatlântico no Brasil colonial"
+          },
+          {
+            "request_id": "e-b-de-2",
+            "language": "de",
+            "text": "deutsche Belletristik",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.011369531812851524,
+            "ndcg_first_turn": 0.011369531812851524,
+            "ndcg_P_vague": 0.011369531812851524,
+            "ndcg_P_original": 0.9489627846872123,
+            "final_query": "deutsche Belletristik"
+          },
+          {
+            "request_id": "e-b-fr-3",
+            "language": "fr",
+            "text": "livre de voyage",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.8649336882972027,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.13237658255723428,
+            "ndcg_P_original": 0.7950120304734339,
+            "final_query": "récit de voyage sur les expéditions polaires et l'exploration arctique"
+          },
+          {
+            "request_id": "e-b-ca-3",
+            "language": "ca",
+            "text": "llibres de filosofia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.21518387087498778,
+            "ndcg_first_turn": 0.21518387087498778,
+            "ndcg_P_vague": 0.21518387087498778,
+            "ndcg_P_original": 1.0,
+            "final_query": "llibres de filosofia"
+          },
+          {
+            "request_id": "e-b-en-1",
+            "language": "en",
+            "text": "gothic fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.22925823728395736,
+            "ndcg_first_turn": 0.22925823728395736,
+            "ndcg_P_vague": 0.22925823728395736,
+            "ndcg_P_original": 0.6409951518249088,
+            "final_query": "gothic fiction"
+          },
+          {
+            "request_id": "e-b-pt-3",
+            "language": "pt",
+            "text": "livros de poesia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.228711348090738,
+            "ndcg_first_turn": 0.228711348090738,
+            "ndcg_P_vague": 0.228711348090738,
+            "ndcg_P_original": 0.8934242877001828,
+            "final_query": "livros de poesia"
+          },
+          {
+            "request_id": "e-b-nl-1",
+            "language": "nl",
+            "text": "historische fictie",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.8867725307540634,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.24992610805291635,
+            "ndcg_P_original": 0.7874706312109987,
+            "final_query": "historische fictie over de Nederlandse geschiedenis, specifiek de Gouden Eeuw in Amsterdam"
+          },
+          {
+            "request_id": "e-b-ca-1",
+            "language": "ca",
+            "text": "antologia de versos",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.15617844232747718,
+            "ndcg_first_turn": 0.15617844232747718,
+            "ndcg_P_vague": 0.16400195128228545,
+            "ndcg_P_original": 0.6391646064446939,
+            "final_query": "antología de versos"
+          },
+          {
+            "request_id": "e-b-it-4",
+            "language": "it",
+            "text": "storia antica",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.652309785160385,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.07882414571941099,
+            "ndcg_P_original": 0.8641588458364763,
+            "final_query": "storia antica, Roma antica, in particolare il declino e la caduta dell'Impero Romano d'Occidente"
+          },
+          {
+            "request_id": "e-b-de-5",
+            "language": "de",
+            "text": "Philosophie Sachbuch",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.253901722418178,
+            "ndcg_first_turn": 0.253901722418178,
+            "ndcg_P_vague": 0.253901722418178,
+            "ndcg_P_original": 0.9027381630355066,
+            "final_query": "Philosophie Sachbuch"
+          },
+          {
+            "request_id": "e-b-fr-5",
+            "language": "fr",
+            "text": "documentaire historique",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.0,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.016603856192971788,
+            "ndcg_P_original": 0.7949459411493225,
+            "final_query": "documentaire historique sur la Seconde Guerre mondiale"
+          },
+          {
+            "request_id": "e-b-ja-4",
+            "language": "ja",
+            "text": "海外文学の小説",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.0,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.02445408349291292,
+            "ndcg_P_original": 0.8493504101051987,
+            "final_query": "20世紀の海外文学の小説"
+          },
+          {
+            "request_id": "e-b-ru-5",
+            "language": "ru",
+            "text": "книги по этнографии",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.7641788306647124,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.7266107161344196,
+            "final_query": "книги по этнографии о культуре древних славян"
+          },
+          {
+            "request_id": "e-b-ca-4",
+            "language": "ca",
+            "text": "novel·la en català",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.4560731096580608,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.3084721526785941,
+            "ndcg_P_original": 0.7970562612450274,
+            "final_query": "novel·la històrica en català sobre la postguerra a Barcelona"
+          },
+          {
+            "request_id": "e-b-en-2",
+            "language": "en",
+            "text": "philosophy books",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.2415081074596124,
+            "ndcg_first_turn": 0.2415081074596124,
+            "ndcg_P_vague": 0.2415081074596124,
+            "ndcg_P_original": 1.0,
+            "final_query": "philosophy books"
+          },
+          {
+            "request_id": "e-b-nl-5",
+            "language": "nl",
+            "text": "oorlogsgeschiedenis",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.40289463414615073,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.03107129581818804,
+            "ndcg_P_original": 0.7968487712645551,
+            "final_query": "boeken over oorlogsgeschiedenis, Tweede Wereldoorlog"
+          },
+          {
+            "request_id": "e-b-ar-5",
+            "language": "ar",
+            "text": "كتب تاريخ",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.8489552296553862,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.09806102437063964,
+            "ndcg_P_original": 0.7555671367523328,
+            "final_query": "كتب تاريخ إسلامي عن الرحلات الجغرافية والاستكشاف في العصور الوسطى"
+          },
+          {
+            "request_id": "e-b-en-4",
+            "language": "en",
+            "text": "science fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.11455989004971527,
+            "ndcg_first_turn": 0.11455989004971527,
+            "ndcg_P_vague": 0.11455989004971527,
+            "ndcg_P_original": 0.6289348288887795,
+            "final_query": "science fiction"
+          }
+        ]
+      },
+      "f": {
+        "requests": 20,
+        "with_recommendations": 20,
+        "without_recommendations": [],
+        "route": {
+          "agent": 19,
+          "search": 1
+        },
+        "by_route": {
+          "agent": {
+            "requests": 19,
+            "precision_picks": 0.9210526315789473,
+            "precision_P": 0.8368421052631578
+          },
+          "search": {
+            "requests": 1,
+            "precision_picks": 1.0,
+            "precision_P": 0.0
+          }
+        },
+        "by_kind": {
+          "compare": {
+            "requests": 7,
+            "precision_picks": 0.9142857142857144,
+            "precision_P": 0.7714285714285715,
+            "routes": {
+              "agent": 7
+            }
+          },
+          "like_but": {
+            "requests": 7,
+            "precision_picks": 0.8714285714285713,
+            "precision_P": 0.6428571428571429,
+            "routes": {
+              "agent": 6,
+              "search": 1
+            }
+          },
+          "facts": {
+            "requests": 6,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "routes": {
+              "agent": 6
+            }
+          }
+        },
+        "named_works_recommended": 20,
+        "named_works": 27,
+        "named_works_in_P_top_k": 24,
+        "ndcg_list": {
+          "n": 20,
+          "mean": 0.675493869433927,
+          "ci": [
+            0.5938121257575243,
+            0.7528691329781434
+          ]
+        },
+        "ndcg_P": {
+          "n": 20,
+          "mean": 0.8562773724161297,
+          "ci": [
+            0.7924747923529809,
+            0.9129693133382524
+          ]
+        },
+        "rows": [
+          {
+            "request_id": "f01",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.4520538377107719,
+            "ndcg_P": 0.815216305619192,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f02",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7895959410076381,
+            "ndcg_P": 0.9879538239787089,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f03",
+            "kind": "compare",
+            "language": "fr",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.4,
+            "precision_P": 0.4,
+            "ndcg_list": 0.7956419442906023,
+            "ndcg_P": 0.8504347775489652,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f04",
+            "kind": "compare",
+            "language": "ja",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 1.0,
+            "ndcg_P": 1.0,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f05",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 0.5,
+            "ndcg_list": 0.7688384052728495,
+            "ndcg_P": 0.926901020130246,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 1,
+            "named_works": 2
+          },
+          {
+            "request_id": "f06",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 0.5,
+            "ndcg_list": 0.5556566185791553,
+            "ndcg_P": 0.9324060727902131,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 1,
+            "named_works": 2
+          },
+          {
+            "request_id": "f07",
+            "kind": "compare",
+            "language": "es",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.5204565510381675,
+            "ndcg_P": 0.9302224655096826,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f08",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 0.8,
+            "ndcg_list": 0.5641000499701609,
+            "ndcg_P": 0.6933577504100552,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f09",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.8,
+            "precision_P": 0.8,
+            "ndcg_list": 0.7241789836619268,
+            "ndcg_P": 0.8015321423740155,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f10",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 0.8,
+            "ndcg_list": 0.6712104704405341,
+            "ndcg_P": 0.6385015200000083,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f11",
+            "kind": "like_but",
+            "language": "es",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 0.6,
+            "ndcg_list": 0.5615194976399887,
+            "ndcg_P": 0.5590647778979583,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f12",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.8,
+            "precision_P": 1.0,
+            "ndcg_list": 0.6492845030103217,
+            "ndcg_P": 0.8985967006893345,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 0,
+            "named_works": 1
+          },
+          {
+            "request_id": "f13",
+            "kind": "like_but",
+            "language": "de",
+            "route": "search",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 0.0,
+            "ndcg_list": 0.733242567631301,
+            "ndcg_P": 0.733242567631301,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f14",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 4,
+            "precision_picks": 0.5,
+            "precision_P": 0.5,
+            "ndcg_list": 0.36055998012891716,
+            "ndcg_P": 0.5890553540719812,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f15",
+            "kind": "facts",
+            "language": "fr",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.9173194127129571,
+            "ndcg_P": 0.9680147827042069,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f16",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7032727136036656,
+            "ndcg_P": 0.9857726190185988,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f17",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.8176035833928883,
+            "ndcg_P": 0.9449272166343753,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f18",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7262917889560466,
+            "ndcg_P": 0.9808533793193547,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f19",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.9173194127129571,
+            "ndcg_P": 0.9567680782603095,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f20",
+            "kind": "facts",
+            "language": "ar",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.28173112691769076,
+            "ndcg_P": 0.9327260937340855,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          }
+        ]
+      },
+      "agent_direct": {
+        "requests": 40,
+        "with_recommendations": 39,
+        "errors": 0,
+        "precision_agent": {
+          "n": 39,
+          "mean": 0.7948717948717949,
+          "ci": [
+            0.6871794871794872,
+            0.8871794871794872
+          ]
+        },
+        "precision_P_same_k": {
+          "n": 39,
+          "mean": 0.6978632478632478,
+          "ci": [
+            0.5871794871794872,
+            0.7987179487179487
+          ]
+        },
+        "paired_with_assistant": 29,
+        "precision_agent_paired": 0.8896551724137931,
+        "precision_assistant_paired": 0.9080459770114943,
+        "assistant_routes": {
+          "search": 35,
+          "out_of_scope": 5
+        },
+        "picks": {
+          "5": 34,
+          "4": 1,
+          "3": 2,
+          "1": 2,
+          "0": 1
+        },
+        "rows": [
+          {
+            "request_id": "b-ar-6",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.8078659480803337,
+            "ndcg_P": 0.4328876702255411,
+            "error": false
+          },
+          {
+            "request_id": "b-ca-4",
+            "set": "B",
+            "picks": 4,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.75,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.7103022519398031,
+            "ndcg_P": 0.7970562612450274,
+            "error": false
+          },
+          {
+            "request_id": "b-de-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5947667956921032,
+            "ndcg_P": 0.8381528477158477,
+            "error": false
+          },
+          {
+            "request_id": "b-de-6",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.848713307521617,
+            "ndcg_P": 0.8512084259495571,
+            "error": false
+          },
+          {
+            "request_id": "b-en-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.5695816074041011,
+            "ndcg_P": 0.6409951518249088,
+            "error": false
+          },
+          {
+            "request_id": "b-es-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7323368942534072,
+            "ndcg_P": 0.877440361940913,
+            "error": false
+          },
+          {
+            "request_id": "b-es-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.40898531264226523,
+            "ndcg_P": 1.0,
+            "error": false
+          },
+          {
+            "request_id": "b-fr-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.7950120304734339,
+            "error": false
+          },
+          {
+            "request_id": "b-fr-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.550021289339121,
+            "ndcg_P": 0.765917333420837,
+            "error": false
+          },
+          {
+            "request_id": "b-it-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.4,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.697268777823186,
+            "ndcg_P": 0.5720370338150174,
+            "error": false
+          },
+          {
+            "request_id": "b-it-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.27450677187128664,
+            "ndcg_P": 0.613832528805698,
+            "error": false
+          },
+          {
+            "request_id": "b-it-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.8070743581243801,
+            "ndcg_P": 0.8641588458364763,
+            "error": false
+          },
+          {
+            "request_id": "b-it-5",
+            "set": "B",
+            "picks": 3,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6666666666666666,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6613158235505792,
+            "ndcg_P": 0.8874859667712016,
+            "error": false
+          },
+          {
+            "request_id": "b-ja-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5308871393104649,
+            "ndcg_P": 0.6905407656095652,
+            "error": false
+          },
+          {
+            "request_id": "b-ja-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7630852436933858,
+            "ndcg_P": 0.8493504101051987,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.5641000499701609,
+            "ndcg_P": 0.6973915787600091,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.6814581046882918,
+            "ndcg_P": 0.5313285723623473,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-6",
+            "set": "B",
+            "picks": 1,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.9333889380711156,
+            "error": false
+          },
+          {
+            "request_id": "b-pt-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.7523162163598108,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.673413339588005,
+            "ndcg_P": 0.8449677140138431,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.7771419895596159,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-5",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 2,
+            "precision_assistant": 0.5,
+            "precision_P_assistant_k": 0.5,
+            "ndcg_agent_list": 0.7104442085771869,
+            "ndcg_P": 0.7266107161344196,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-6",
+            "set": "B",
+            "picks": 1,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.7614229318985066,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.9035456546298357,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-5",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7625679075961455,
+            "ndcg_P": 0.7776698701798622,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-6",
+            "set": "B",
+            "picks": 3,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.8607761330035307,
+            "ndcg_P": 0.9458794174274586,
+            "error": false
+          },
+          {
+            "request_id": "q03",
+            "set": "A",
+            "picks": 0,
+            "precision_agent": null,
+            "precision_P_same_k": null,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.0,
+            "ndcg_P": 0.8811285759359209,
+            "error": false
+          },
+          {
+            "request_id": "q06",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.3340514446642156,
+            "ndcg_P": 0.3565964385966262,
+            "error": false
+          },
+          {
+            "request_id": "q07",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 2,
+            "precision_assistant": 0.5,
+            "precision_P_assistant_k": 0.5,
+            "ndcg_agent_list": 0.7956419442906023,
+            "ndcg_P": 0.8741841191122277,
+            "error": false
+          },
+          {
+            "request_id": "q08",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.576323354912681,
+            "error": false
+          },
+          {
+            "request_id": "q16",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.7942537960637901,
+            "error": false
+          },
+          {
+            "request_id": "q19",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.4,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.7687046066281403,
+            "ndcg_P": 0.650642537196957,
+            "error": false
+          },
+          {
+            "request_id": "q24",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.907608339569819,
+            "error": false
+          },
+          {
+            "request_id": "q25",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.637348631092328,
+            "ndcg_P": 0.8075330681679117,
+            "error": false
+          },
+          {
+            "request_id": "q26",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.844703501444527,
+            "ndcg_P": 0.8966936536196015,
+            "error": false
+          },
+          {
+            "request_id": "q28",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.4,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.7265175153329182,
+            "ndcg_P": 0.6820579432714684,
+            "error": false
+          },
+          {
+            "request_id": "q29",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6183981486632516,
+            "ndcg_P": 0.9448792107357844,
+            "error": false
+          },
+          {
+            "request_id": "q32",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.7662103804102471,
+            "ndcg_P": 0.7850448322605519,
+            "error": false
+          },
+          {
+            "request_id": "q37",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.4388807734663434,
+            "ndcg_P": 0.8287939419777705,
+            "error": false
+          }
+        ]
+      }
+    },
+    "second": {
+      "contrasts": {
+        "H7": {
+          "requests": 116,
+          "system_mean": 0.673739094835226,
+          "reference_mean": 0.8011002499181451,
+          "difference": -0.12736115508291912,
+          "ci": [
+            -0.18234366020309753,
+            -0.07620323598411193
+          ],
+          "p": 9.999000099990002e-05,
+          "p_holm": 0.00029997000299970003
+        },
+        "H8": {
+          "requests": 30,
+          "system_mean": 0.3506305554428869,
+          "reference_mean": 0.15302362215893653,
+          "difference": 0.19760693328395043,
+          "ci": [
+            0.09457926576798598,
+            0.3107141291634547
+          ],
+          "p": 0.0007999200079992001,
+          "p_holm": 0.0015998400159984002
+        },
+        "H9": {
+          "requests": 20,
+          "system_mean": 0.9475,
+          "reference_mean": 0.8525,
+          "difference": 0.095,
+          "ci": [
+            -0.02,
+            0.22999999999999998
+          ],
+          "p": 0.1857814218578142,
+          "p_holm": 0.1857814218578142
+        }
+      },
+      "h7": {
+        "assistant": {
+          "n": 116,
+          "mean": 0.673739094835226,
+          "ci": [
+            0.6130457470669423,
+            0.7320452489574342
+          ]
+        },
+        "P": {
+          "n": 116,
+          "mean": 0.8011002499181451,
+          "ci": [
+            0.7730676130192169,
+            0.8273069497351243
+          ]
+        },
+        "by_group": {
+          "A ambiguous": {
+            "requests": 10,
+            "assistant": 0.09047235852621718,
+            "P": 0.7589343079027515
+          },
+          "A other": {
+            "requests": 34,
+            "assistant": 0.6028167835344466,
+            "P": 0.7916417709194236
+          },
+          "B": {
+            "requests": 72,
+            "assistant": 0.788239455214623,
+            "P": 0.811423134725235
+          },
+          "route clarify": {
+            "requests": 9,
+            "assistant": 0.0,
+            "P": 0.7506304808944991
+          },
+          "route out_of_scope": {
+            "requests": 11,
+            "assistant": 0.0,
+            "P": 0.7341207455563551
+          },
+          "route search": {
+            "requests": 96,
+            "assistant": 0.8141014062592312,
+            "P": 0.8135065256389004
+          }
+        },
+        "search_route_only": {
+          "requests": 96,
+          "assistant": 0.8141014062592312,
+          "P": 0.8135065256389004,
+          "test": {
+            "requests": 96,
+            "system_mean": 0.8141014062592312,
+            "reference_mean": 0.8135065256389004,
+            "difference": 0.0005948806203310425,
+            "ci": [
+              -0.003019581191243447,
+              0.004552482635282541
+            ],
+            "p": 0.778022197780222
+          },
+          "query_rewritten": 14,
+          "rewritten_mean_difference": 0.00407918139655572,
+          "rewritten_changed_ndcg": 12,
+          "query_unchanged": 82
+        },
+        "recommendations": {
+          "replies": 83,
+          "precision_assistant": 0.9417670682730922,
+          "precision_P_same_k": 0.8654618473895583
+        }
+      },
+      "e": {
+        "conversations": 30,
+        "asked": 14,
+        "clarification_rate": 0.4666666666666667,
+        "questions": {
+          "0": 16,
+          "1": 14
+        },
+        "assistant_turns": {
+          "1": 16,
+          "2": 14
+        },
+        "stop": {
+          "answered": 30
+        },
+        "final_route": {
+          "search": 30
+        },
+        "ndcg_final": {
+          "n": 30,
+          "mean": 0.3506305554428869,
+          "ci": [
+            0.24123459370092729,
+            0.46593692018999006
+          ]
+        },
+        "ndcg_P_vague": {
+          "n": 30,
+          "mean": 0.15302362215893653,
+          "ci": [
+            0.11124337313016106,
+            0.1973570670253297
+          ]
+        },
+        "ndcg_P_original": {
+          "n": 30,
+          "mean": 0.7895222762077588,
+          "ci": [
+            0.7412413008248073,
+            0.8368708331473887
+          ]
+        },
+        "asked_rows": {
+          "ndcg_final": {
+            "n": 14,
+            "mean": 0.536974718097781,
+            "ci": [
+              0.35145749897169487,
+              0.7139204418669489
+            ]
+          },
+          "ndcg_P_vague": {
+            "n": 14,
+            "mean": 0.1120321415389016,
+            "ci": [
+              0.06268772357691527,
+              0.16119477146046726
+            ]
+          },
+          "ndcg_P_original": {
+            "n": 14,
+            "mean": 0.7677391341197574,
+            "ci": [
+              0.684459910049486,
+              0.8487971482183717
+            ]
+          }
+        },
+        "not_asked_rows": {
+          "ndcg_final": {
+            "n": 16,
+            "mean": 0.1875794131198546,
+            "ci": [
+              0.1329908509685324,
+              0.25536014362157483
+            ]
+          },
+          "ndcg_P_vague": {
+            "n": 16,
+            "mean": 0.18889116770146705,
+            "ci": [
+              0.13466984112411706,
+              0.25614919553670557
+            ]
+          },
+          "ndcg_P_original": {
+            "n": 16,
+            "mean": 0.8085825255347602,
+            "ci": [
+              0.7569058923128835,
+              0.8608436067418557
+            ]
+          }
+        },
+        "rows": [
+          {
+            "request_id": "e-b-nl-2",
+            "language": "nl",
+            "text": "hedendaagse filosofie",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.13293839686617467,
+            "ndcg_first_turn": 0.13293839686617467,
+            "ndcg_P_vague": 0.13293839686617467,
+            "ndcg_P_original": 0.8753170698415144,
+            "final_query": "hedendaagse filosofie"
+          },
+          {
+            "request_id": "e-b-nl-6",
+            "language": "nl",
+            "text": "Nederlandse literatuur",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.1998575530405206,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.7387509830935444,
+            "final_query": "Nederlandse literatuur roman"
+          },
+          {
+            "request_id": "e-b-ar-6",
+            "language": "ar",
+            "text": "سير ذاتية",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.033784339394878966,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.04742231574433904,
+            "ndcg_P_original": 0.5212790492040571,
+            "final_query": "سير ذاتية لكتّاب"
+          },
+          {
+            "request_id": "e-b-fr-4",
+            "language": "fr",
+            "text": "de la science-fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.05737213328939287,
+            "ndcg_first_turn": 0.05737213328939287,
+            "ndcg_P_vague": 0.05737213328939287,
+            "ndcg_P_original": 0.7905601981306242,
+            "final_query": "de la science-fiction"
+          },
+          {
+            "request_id": "e-b-ru-6",
+            "language": "ru",
+            "text": "русская классика",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.15468493146140544,
+            "ndcg_first_turn": 0.15468493146140544,
+            "ndcg_P_vague": 0.15468493146140544,
+            "ndcg_P_original": 0.5912650026815736,
+            "final_query": "русская классика"
+          },
+          {
+            "request_id": "e-b-ru-3",
+            "language": "ru",
+            "text": "книги по философии",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.2625479891109807,
+            "ndcg_first_turn": 0.2625479891109807,
+            "ndcg_P_vague": 0.2625479891109807,
+            "ndcg_P_original": 0.8771324975457362,
+            "final_query": "книги по философии"
+          },
+          {
+            "request_id": "e-b-nl-4",
+            "language": "nl",
+            "text": "aangrijpende literatuur",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.05204586907212206,
+            "ndcg_first_turn": 0.05204586907212206,
+            "ndcg_P_vague": 0.05204586907212206,
+            "ndcg_P_original": 0.8339050132508506,
+            "final_query": "aangrijpende literatuur"
+          },
+          {
+            "request_id": "e-b-it-3",
+            "language": "it",
+            "text": "antologie narrative",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.2068340061243189,
+            "ndcg_first_turn": 0.2068340061243189,
+            "ndcg_P_vague": 0.2068340061243189,
+            "ndcg_P_original": 0.7039385805549366,
+            "final_query": "antologie narrative"
+          },
+          {
+            "request_id": "e-b-ru-2",
+            "language": "ru",
+            "text": "историческая проза",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.932801483732564,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.24541548862046703,
+            "ndcg_P_original": 1.0,
+            "final_query": "историческая проза о периоде наполеоновских войн в Европе и России"
+          },
+          {
+            "request_id": "e-b-en-5",
+            "language": "en",
+            "text": "ancient history",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.23218374314008308,
+            "ndcg_first_turn": 0.23218374314008308,
+            "ndcg_P_vague": 0.23218374314008308,
+            "ndcg_P_original": 0.8324252055938005,
+            "final_query": "ancient history"
+          },
+          {
+            "request_id": "e-b-it-2",
+            "language": "it",
+            "text": "saggi di filosofia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.11076237485387265,
+            "ndcg_first_turn": 0.11076237485387265,
+            "ndcg_P_vague": 0.11076237485387265,
+            "ndcg_P_original": 0.809604718908629,
+            "final_query": "saggi di filosofia"
+          },
+          {
+            "request_id": "e-b-pt-4",
+            "language": "pt",
+            "text": "romance de época",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.7701403526300435,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.1893117849857137,
+            "ndcg_P_original": 0.6266959014637017,
+            "final_query": "romance de época ambientado na Idade dos Descobrimentos e expedições marítimas portuguesas"
+          },
+          {
+            "request_id": "e-b-pt-5",
+            "language": "pt",
+            "text": "obras de não-ficção",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.6954530927268698,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.7343192549006117,
+            "final_query": "obras de não-ficção sobre História, com foco na escravidão e comércio transatlântico no Brasil colonial"
+          },
+          {
+            "request_id": "e-b-de-2",
+            "language": "de",
+            "text": "deutsche Belletristik",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.03967542472041495,
+            "ndcg_first_turn": 0.03967542472041495,
+            "ndcg_P_vague": 0.03967542472041495,
+            "ndcg_P_original": 0.8344761464379765,
+            "final_query": "deutsche Belletristik"
+          },
+          {
+            "request_id": "e-b-fr-3",
+            "language": "fr",
+            "text": "livre de voyage",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.9621404437403491,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.18728948753314845,
+            "ndcg_P_original": 0.9552009891550426,
+            "final_query": "récit de voyage sur les expéditions polaires et l'exploration arctique"
+          },
+          {
+            "request_id": "e-b-ca-3",
+            "language": "ca",
+            "text": "llibres de filosofia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.1928308740036837,
+            "ndcg_first_turn": 0.1928308740036837,
+            "ndcg_P_vague": 0.1928308740036837,
+            "ndcg_P_original": 1.0,
+            "final_query": "llibres de filosofia"
+          },
+          {
+            "request_id": "e-b-en-1",
+            "language": "en",
+            "text": "gothic fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.5623555404687086,
+            "ndcg_first_turn": 0.5623555404687086,
+            "ndcg_P_vague": 0.5623555404687086,
+            "ndcg_P_original": 0.6974606382644352,
+            "final_query": "gothic fiction"
+          },
+          {
+            "request_id": "e-b-pt-3",
+            "language": "pt",
+            "text": "livros de poesia",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.1514927038627545,
+            "ndcg_first_turn": 0.1514927038627545,
+            "ndcg_P_vague": 0.1514927038627545,
+            "ndcg_P_original": 0.8417959285022468,
+            "final_query": "livros de poesia"
+          },
+          {
+            "request_id": "e-b-nl-1",
+            "language": "nl",
+            "text": "historische fictie",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.7993890283376698,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.24415929173834897,
+            "ndcg_P_original": 0.6698173198566924,
+            "final_query": "historische fictie over de Nederlandse geschiedenis, specifiek de Gouden Eeuw in Amsterdam"
+          },
+          {
+            "request_id": "e-b-ca-1",
+            "language": "ca",
+            "text": "antologia de versos",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.11227479789356218,
+            "ndcg_first_turn": 0.11227479789356218,
+            "ndcg_P_vague": 0.13326287119936134,
+            "ndcg_P_original": 0.7603946380673431,
+            "final_query": "antología de versos"
+          },
+          {
+            "request_id": "e-b-it-4",
+            "language": "it",
+            "text": "storia antica",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.6669536514645704,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.16012139254378902,
+            "ndcg_P_original": 0.7999323478093696,
+            "final_query": "storia antica, Roma antica, in particolare il declino e la caduta dell'Impero Romano d'Occidente"
+          },
+          {
+            "request_id": "e-b-de-5",
+            "language": "de",
+            "text": "Philosophie Sachbuch",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.27845055361732035,
+            "ndcg_first_turn": 0.27845055361732035,
+            "ndcg_P_vague": 0.27845055361732035,
+            "ndcg_P_original": 0.831595707552727,
+            "final_query": "Philosophie Sachbuch"
+          },
+          {
+            "request_id": "e-b-fr-5",
+            "language": "fr",
+            "text": "documentaire historique",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.016040487629522746,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.014408278213819906,
+            "ndcg_P_original": 0.9775763605840813,
+            "final_query": "documentaire historique sur la Seconde Guerre mondiale"
+          },
+          {
+            "request_id": "e-b-ja-4",
+            "language": "ja",
+            "text": "海外文学の小説",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.022961264526286516,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.07515202673315627,
+            "ndcg_P_original": 0.8344486075881847,
+            "final_query": "20世紀の海外文学の小説"
+          },
+          {
+            "request_id": "e-b-ru-5",
+            "language": "ru",
+            "text": "книги по этнографии",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.7768604938853789,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.0,
+            "ndcg_P_original": 0.9069212362975007,
+            "final_query": "книги по этнографии о культуре древних славян"
+          },
+          {
+            "request_id": "e-b-ca-4",
+            "language": "ca",
+            "text": "novel·la en català",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.4213243478815271,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.2301812235757286,
+            "ndcg_P_original": 0.5490720974118596,
+            "final_query": "novel·la històrica en català sobre la postguerra a Barcelona"
+          },
+          {
+            "request_id": "e-b-en-2",
+            "language": "en",
+            "text": "philosophy books",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.3159902567638569,
+            "ndcg_first_turn": 0.3159902567638569,
+            "ndcg_P_vague": 0.3159902567638569,
+            "ndcg_P_original": 1.0,
+            "final_query": "philosophy books"
+          },
+          {
+            "request_id": "e-b-nl-5",
+            "language": "nl",
+            "text": "oorlogsgeschiedenis",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.2596144983426252,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.01753163646048843,
+            "ndcg_P_original": 0.5533586822035751,
+            "final_query": "boeken over oorlogsgeschiedenis, Tweede Wereldoorlog"
+          },
+          {
+            "request_id": "e-b-ar-5",
+            "language": "ar",
+            "text": "كتب تاريخ",
+            "questions": 1,
+            "assistant_turns": 2,
+            "stop": "answered",
+            "first_route": "clarify",
+            "final_route": "search",
+            "ndcg_final": 0.9603250160361273,
+            "ndcg_first_turn": 0.0,
+            "ndcg_P_vague": 0.1574570553956231,
+            "ndcg_P_original": 0.8809750481083818,
+            "final_query": "كتب تاريخ إسلامي عن الرحلات الجغرافية والاستكشاف في العصور الوسطى"
+          },
+          {
+            "request_id": "e-b-en-4",
+            "language": "en",
+            "text": "science fiction",
+            "questions": 0,
+            "assistant_turns": 1,
+            "stop": "answered",
+            "first_route": "search",
+            "final_route": "search",
+            "ndcg_final": 0.13883101466902203,
+            "ndcg_first_turn": 0.13883101466902203,
+            "ndcg_P_vague": 0.13883101466902203,
+            "ndcg_P_original": 0.6574490632237684,
+            "final_query": "science fiction"
+          }
+        ]
+      },
+      "f": {
+        "requests": 20,
+        "with_recommendations": 20,
+        "without_recommendations": [],
+        "route": {
+          "agent": 19,
+          "search": 1
+        },
+        "by_route": {
+          "agent": {
+            "requests": 19,
+            "precision_picks": 0.9447368421052631,
+            "precision_P": 0.8973684210526316
+          },
+          "search": {
+            "requests": 1,
+            "precision_picks": 1.0,
+            "precision_P": 0.0
+          }
+        },
+        "by_kind": {
+          "compare": {
+            "requests": 7,
+            "precision_picks": 0.9428571428571428,
+            "precision_P": 0.9285714285714286,
+            "routes": {
+              "agent": 7
+            }
+          },
+          "like_but": {
+            "requests": 7,
+            "precision_picks": 0.9071428571428571,
+            "precision_P": 0.6500000000000001,
+            "routes": {
+              "agent": 6,
+              "search": 1
+            }
+          },
+          "facts": {
+            "requests": 6,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "routes": {
+              "agent": 6
+            }
+          }
+        },
+        "named_works_recommended": 20,
+        "named_works": 27,
+        "named_works_in_P_top_k": 24,
+        "ndcg_list": {
+          "n": 20,
+          "mean": 0.6328845721072137,
+          "ci": [
+            0.5679612412220626,
+            0.6943116198581791
+          ]
+        },
+        "ndcg_P": {
+          "n": 20,
+          "mean": 0.8475463098665565,
+          "ci": [
+            0.7634210825515606,
+            0.9217823031642506
+          ]
+        },
+        "rows": [
+          {
+            "request_id": "f01",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7438828944313827,
+            "ndcg_P": 1.0,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f02",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.566283138778383,
+            "ndcg_P": 0.9660662980904438,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f03",
+            "kind": "compare",
+            "language": "fr",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.6,
+            "precision_P": 1.0,
+            "ndcg_list": 0.5876617191751049,
+            "ndcg_P": 0.8685030556430159,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f04",
+            "kind": "compare",
+            "language": "ja",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.9072836011519267,
+            "ndcg_P": 0.9790187994940358,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f05",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.5519182786795085,
+            "ndcg_P": 0.9973280429392428,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 1,
+            "named_works": 2
+          },
+          {
+            "request_id": "f06",
+            "kind": "compare",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 0.5,
+            "ndcg_list": 0.6820287306389082,
+            "ndcg_P": 0.8933285183970908,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 1,
+            "named_works": 2
+          },
+          {
+            "request_id": "f07",
+            "kind": "compare",
+            "language": "es",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 2,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.569282294258184,
+            "ndcg_P": 0.9870703912766859,
+            "named_works_recommended": 2,
+            "named_works_in_P_top_k": 2,
+            "named_works": 2
+          },
+          {
+            "request_id": "f08",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.8,
+            "precision_P": 0.8,
+            "ndcg_list": 0.6131067773268076,
+            "ndcg_P": 0.40854838356326406,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f09",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 0.8,
+            "precision_P": 0.8,
+            "ndcg_list": 0.6834202964439241,
+            "ndcg_P": 0.6995757391086053,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f10",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 0.8,
+            "ndcg_list": 0.7009522505974335,
+            "ndcg_P": 0.6370570000826409,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f11",
+            "kind": "like_but",
+            "language": "es",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 0.4,
+            "ndcg_list": 0.6604869130577008,
+            "ndcg_P": 0.5153809459712686,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f12",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 5,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.5219676862916053,
+            "ndcg_P": 0.9795527431738457,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 0,
+            "named_works": 1
+          },
+          {
+            "request_id": "f13",
+            "kind": "like_but",
+            "language": "de",
+            "route": "search",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 0.0,
+            "ndcg_list": 0.7499648413928617,
+            "ndcg_P": 0.7400776434004331,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f14",
+            "kind": "like_but",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 4,
+            "precision_picks": 0.75,
+            "precision_P": 0.75,
+            "ndcg_list": 0.6380847057156557,
+            "ndcg_P": 0.5773512015017996,
+            "named_works_recommended": 0,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f15",
+            "kind": "facts",
+            "language": "fr",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.39771832059220996,
+            "ndcg_P": 0.7952489005597969,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f16",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7262917889560466,
+            "ndcg_P": 0.9865022490709313,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f17",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.7523106976437837,
+            "ndcg_P": 0.994248103893122,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f18",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.5497078144203298,
+            "ndcg_P": 0.9831019234103989,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f19",
+            "kind": "facts",
+            "language": "en",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.8176035833928883,
+            "ndcg_P": 0.9449272166343753,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          },
+          {
+            "request_id": "f20",
+            "kind": "facts",
+            "language": "ar",
+            "route": "agent",
+            "forced_route": null,
+            "picks": 1,
+            "precision_picks": 1.0,
+            "precision_P": 1.0,
+            "ndcg_list": 0.23773510919962873,
+            "ndcg_P": 0.9980390411201359,
+            "named_works_recommended": 1,
+            "named_works_in_P_top_k": 1,
+            "named_works": 1
+          }
+        ]
+      },
+      "agent_direct": {
+        "requests": 40,
+        "with_recommendations": 39,
+        "errors": 0,
+        "precision_agent": {
+          "n": 39,
+          "mean": 0.7807692307692308,
+          "ci": [
+            0.6704807692307695,
+            0.8794871794871794
+          ]
+        },
+        "precision_P_same_k": {
+          "n": 39,
+          "mean": 0.7529914529914529,
+          "ci": [
+            0.6376068376068377,
+            0.8564102564102564
+          ]
+        },
+        "paired_with_assistant": 29,
+        "precision_agent_paired": 0.903448275862069,
+        "precision_assistant_paired": 0.9482758620689655,
+        "assistant_routes": {
+          "search": 35,
+          "out_of_scope": 5
+        },
+        "picks": {
+          "5": 34,
+          "4": 1,
+          "3": 2,
+          "1": 2,
+          "0": 1
+        },
+        "rows": [
+          {
+            "request_id": "b-ar-6",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.7521820956063688,
+            "ndcg_P": 0.5212790492040571,
+            "error": false
+          },
+          {
+            "request_id": "b-ca-4",
+            "set": "B",
+            "picks": 4,
+            "precision_agent": 0.25,
+            "precision_P_same_k": 0.5,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.4248009156273153,
+            "ndcg_P": 0.5490720974118596,
+            "error": false
+          },
+          {
+            "request_id": "b-de-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5947667956921032,
+            "ndcg_P": 0.932801483732564,
+            "error": false
+          },
+          {
+            "request_id": "b-de-6",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 0.3333333333333333,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.8012909917772779,
+            "ndcg_P": 0.9048378590653269,
+            "error": false
+          },
+          {
+            "request_id": "b-en-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.5695816074041011,
+            "ndcg_P": 0.6974606382644352,
+            "error": false
+          },
+          {
+            "request_id": "b-es-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6613713138578564,
+            "ndcg_P": 0.9151552579615303,
+            "error": false
+          },
+          {
+            "request_id": "b-es-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.40898531264226523,
+            "ndcg_P": 1.0,
+            "error": false
+          },
+          {
+            "request_id": "b-fr-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.9552009891550426,
+            "error": false
+          },
+          {
+            "request_id": "b-fr-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5676844058722316,
+            "ndcg_P": 0.7905601981306242,
+            "error": false
+          },
+          {
+            "request_id": "b-it-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 0.4,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.575951760210457,
+            "ndcg_P": 0.5397074640506596,
+            "error": false
+          },
+          {
+            "request_id": "b-it-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 0.6666666666666666,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.21760566832232384,
+            "ndcg_P": 0.7039385805549366,
+            "error": false
+          },
+          {
+            "request_id": "b-it-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7110714937728606,
+            "ndcg_P": 0.7999323478093696,
+            "error": false
+          },
+          {
+            "request_id": "b-it-5",
+            "set": "B",
+            "picks": 3,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6666666666666666,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.4041066767788155,
+            "ndcg_P": 0.7928327934358071,
+            "error": false
+          },
+          {
+            "request_id": "b-ja-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7009522505974335,
+            "ndcg_P": 0.7565420321382531,
+            "error": false
+          },
+          {
+            "request_id": "b-ja-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7110714937728606,
+            "ndcg_P": 0.8344486075881847,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.8,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.39602025697181087,
+            "ndcg_P": 0.8753170698415144,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-4",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 0.6,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.6638171572579089,
+            "ndcg_P": 0.8339050132508506,
+            "error": false
+          },
+          {
+            "request_id": "b-nl-6",
+            "set": "B",
+            "picks": 1,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.7387509830935444,
+            "error": false
+          },
+          {
+            "request_id": "b-pt-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-1",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.8316740937301459,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-2",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 1.0,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.8771324975457362,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-5",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 2,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.9069212362975007,
+            "error": false
+          },
+          {
+            "request_id": "b-ru-6",
+            "set": "B",
+            "picks": 1,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.0,
+            "ndcg_agent_list": 0.6639124204207466,
+            "ndcg_P": 0.5912650026815736,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-3",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6002783652509203,
+            "ndcg_P": 0.9552009891550426,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-5",
+            "set": "B",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.8,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.6666666666666666,
+            "ndcg_agent_list": 0.6436750808096334,
+            "ndcg_P": 0.680635200838327,
+            "error": false
+          },
+          {
+            "request_id": "b-zh-6",
+            "set": "B",
+            "picks": 3,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 1,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.8200168041069498,
+            "ndcg_P": 0.9447510571005682,
+            "error": false
+          },
+          {
+            "request_id": "q03",
+            "set": "A",
+            "picks": 0,
+            "precision_agent": null,
+            "precision_P_same_k": null,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.0,
+            "ndcg_P": 0.5603317244107737,
+            "error": false
+          },
+          {
+            "request_id": "q06",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.5541432109622958,
+            "ndcg_P": 0.4954588824701808,
+            "error": false
+          },
+          {
+            "request_id": "q07",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "search",
+            "assistant_picks": 2,
+            "precision_assistant": 0.5,
+            "precision_P_assistant_k": 0.5,
+            "ndcg_agent_list": 0.8648840638252079,
+            "ndcg_P": 0.8112572614507466,
+            "error": false
+          },
+          {
+            "request_id": "q08",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.0,
+            "precision_P_same_k": 0.0,
+            "assistant_route": "search",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.6489315753318465,
+            "ndcg_P": 0.725452110735279,
+            "error": false
+          },
+          {
+            "request_id": "q16",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5860482135323951,
+            "ndcg_P": 0.7419044441282687,
+            "error": false
+          },
+          {
+            "request_id": "q19",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 0.6,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 0.3333333333333333,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.662860092262725,
+            "error": false
+          },
+          {
+            "request_id": "q24",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.6489315753318466,
+            "ndcg_P": 0.9621404437403491,
+            "error": false
+          },
+          {
+            "request_id": "q25",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.6436750808096334,
+            "ndcg_P": 0.8898136962080377,
+            "error": false
+          },
+          {
+            "request_id": "q26",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.7921778933646361,
+            "ndcg_P": 0.9278543273468738,
+            "error": false
+          },
+          {
+            "request_id": "q28",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.4,
+            "precision_P_same_k": 0.4,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.7398329322162259,
+            "ndcg_P": 0.7700061257113394,
+            "error": false
+          },
+          {
+            "request_id": "q29",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "search",
+            "assistant_picks": 3,
+            "precision_assistant": 1.0,
+            "precision_P_assistant_k": 1.0,
+            "ndcg_agent_list": 0.5593827974467318,
+            "ndcg_P": 0.855977607523827,
+            "error": false
+          },
+          {
+            "request_id": "q32",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 0.2,
+            "precision_P_same_k": 0.2,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.5844153148080933,
+            "ndcg_P": 0.6414863808120139,
+            "error": false
+          },
+          {
+            "request_id": "q37",
+            "set": "A",
+            "picks": 5,
+            "precision_agent": 1.0,
+            "precision_P_same_k": 1.0,
+            "assistant_route": "out_of_scope",
+            "assistant_picks": 0,
+            "precision_assistant": null,
+            "precision_P_assistant_k": null,
+            "ndcg_agent_list": 0.5052358959224323,
+            "ndcg_P": 0.7605408732675782,
+            "error": false
+          }
+        ]
+      }
+    }
+  },
+  "conclusions": {
+    "H7": "sustained",
+    "H8": "sustained",
+    "H9": "not significant"
+  },
+  "grounding": {
+    "search_route_by_set": {
+      "A": {
+        "replies": 26,
+        "replies_without_answer_output": 0,
+        "replies_with_every_pick_dropped": 0,
+        "picks_proposed": 54,
+        "picks_kept": 54,
+        "picks_dropped": 0,
+        "citations_proposed": 110,
+        "citations_kept": 107,
+        "dropped_reasons": {}
+      },
+      "B": {
+        "replies": 70,
+        "replies_without_answer_output": 1,
+        "replies_with_every_pick_dropped": 3,
+        "picks_proposed": 174,
+        "picks_kept": 167,
+        "picks_dropped": 7,
+        "citations_proposed": 345,
+        "citations_kept": 330,
+        "dropped_reasons": {
+          "no_valid_citation": 7
+        }
+      },
+      "D": {
+        "replies": 0,
+        "replies_without_answer_output": 0,
+        "replies_with_every_pick_dropped": 0,
+        "dropped_reasons": {}
+      },
+      "E": {
+        "replies": 30,
+        "replies_without_answer_output": 0,
+        "replies_with_every_pick_dropped": 1,
+        "picks_proposed": 83,
+        "picks_kept": 81,
+        "picks_dropped": 2,
+        "citations_proposed": 161,
+        "citations_kept": 158,
+        "dropped_reasons": {
+          "no_valid_citation": 2
+        }
+      },
+      "F": {
+        "replies": 1,
+        "replies_without_answer_output": 0,
+        "replies_with_every_pick_dropped": 0,
+        "picks_proposed": 1,
+        "picks_kept": 1,
+        "picks_dropped": 0,
+        "citations_proposed": 1,
+        "citations_kept": 1,
+        "dropped_reasons": {}
+      },
+      "all": {
+        "replies": 127,
+        "replies_without_answer_output": 1,
+        "replies_with_every_pick_dropped": 4,
+        "picks_proposed": 312,
+        "picks_kept": 303,
+        "picks_dropped": 9,
+        "citations_proposed": 617,
+        "citations_kept": 596,
+        "dropped_reasons": {
+          "no_valid_citation": 9
+        }
+      }
+    },
+    "agent_in_assistant": {
+      "runs": 19,
+      "recommended": 52,
+      "dropped_not_from_tools": 0,
+      "runs_with_reflection": 0,
+      "tool_calls": {
+        "search_books": 38,
+        "get_book_details": 41,
+        "find_similar_books": 2
+      },
+      "tool_calls_per_run": {
+        "n": 19,
+        "median": 4.0,
+        "p95": 7.199999999999996,
+        "mean": 4.2631578947368425,
+        "min": 2.0,
+        "max": 9.0
+      }
+    },
+    "agent_direct": {
+      "runs": 40,
+      "recommended": 182,
+      "dropped_not_from_tools": 0,
+      "runs_with_reflection": 4,
+      "tool_calls": {
+        "search_books": 97,
+        "get_book_details": 60
+      },
+      "tool_calls_per_run": {
+        "n": 40,
+        "median": 4.0,
+        "p95": 6.0,
+        "mean": 3.925,
+        "min": 2.0,
+        "max": 8.0
+      }
+    }
+  },
+  "language": {
+    "by_language": {
+      "ar": {
+        "ok": 10,
+        "mismatch": 2
+      },
+      "ca": {
+        "ok": 5,
+        "mismatch": 3,
+        "undecided": 3
+      },
+      "de": {
+        "ok": 7,
+        "undecided": 1,
+        "mismatch": 2
+      },
+      "en": {
+        "ok": 43,
+        "undecided": 5
+      },
+      "es": {
+        "undecided": 10,
+        "ok": 19
+      },
+      "fr": {
+        "ok": 8,
+        "mismatch": 2,
+        "undecided": 4
+      },
+      "it": {
+        "ok": 8,
+        "mismatch": 2,
+        "undecided": 1
+      },
+      "ja": {
+        "ok": 9,
+        "mismatch": 1
+      },
+      "nl": {
+        "ok": 10,
+        "mismatch": 4,
+        "undecided": 1
+      },
+      "pt": {
+        "undecided": 3,
+        "mismatch": 3,
+        "ok": 6
+      },
+      "ru": {
+        "ok": 12,
+        "mismatch": 1
+      },
+      "zh": {
+        "ok": 6,
+        "mismatch": 1
+      }
+    },
+    "by_route": {
+      "agent": {
+        "ok": 18,
+        "undecided": 1
+      },
+      "clarify": {
+        "ok": 8,
+        "undecided": 12,
+        "mismatch": 3
+      },
+      "out_of_scope": {
+        "undecided": 7,
+        "ok": 5,
+        "mismatch": 11
+      },
+      "search": {
+        "ok": 112,
+        "undecided": 8,
+        "mismatch": 7
+      }
+    },
+    "by_set": {
+      "A": {
+        "ok": 30,
+        "undecided": 14
+      },
+      "B": {
+        "ok": 63,
+        "mismatch": 4,
+        "undecided": 5
+      },
+      "D": {
+        "undecided": 1,
+        "ok": 1,
+        "mismatch": 10
+      },
+      "E": {
+        "ok": 30,
+        "mismatch": 7,
+        "undecided": 7
+      },
+      "F": {
+        "ok": 19,
+        "undecided": 1
+      }
+    },
+    "by_text": {
+      "fixed reply": {
+        "undecided": 9,
+        "ok": 15,
+        "mismatch": 14
+      },
+      "written by the LLM": {
+        "ok": 128,
+        "undecided": 19,
+        "mismatch": 7
+      }
+    },
+    "llm_text_by_language": {
+      "ar": {
+        "ok": 9,
+        "mismatch": 1
+      },
+      "ca": {
+        "ok": 5,
+        "mismatch": 2,
+        "undecided": 2
+      },
+      "de": {
+        "ok": 7
+      },
+      "en": {
+        "ok": 33,
+        "undecided": 5
+      },
+      "es": {
+        "undecided": 3,
+        "ok": 16
+      },
+      "fr": {
+        "ok": 8,
+        "undecided": 4
+      },
+      "it": {
+        "ok": 8,
+        "mismatch": 1,
+        "undecided": 1
+      },
+      "ja": {
+        "ok": 9
+      },
+      "nl": {
+        "ok": 9,
+        "mismatch": 2,
+        "undecided": 1
+      },
+      "pt": {
+        "undecided": 3,
+        "ok": 6,
+        "mismatch": 1
+      },
+      "ru": {
+        "ok": 12
+      },
+      "zh": {
+        "ok": 6
+      }
+    },
+    "overall": {
+      "ok": 143,
+      "undecided": 28,
+      "mismatch": 21
+    },
+    "mismatches_detected_as": {
+      "nl->en": 4,
+      "fr->en": 2,
+      "pt->en": 2,
+      "ca->es": 2,
+      "ar->en": 2,
+      "de->en": 2,
+      "ca->en": 1,
+      "it->en": 2,
+      "ru->en": 1,
+      "zh->en": 1,
+      "ja->en": 1,
+      "pt->nl": 1
+    }
+  },
+  "cost_time": {
+    "by_route": {
+      "agent": {
+        "turns": 19,
+        "wall_s": {
+          "n": 19,
+          "median": 10.370899999999999,
+          "p95": 16.305839999999993,
+          "mean": 11.151915789473685,
+          "min": 6.821,
+          "max": 19.1097
+        },
+        "cost_usd": {
+          "n": 19,
+          "median": 0.0051643692,
+          "p95": 0.008589380899999999,
+          "mean": 0.005075228084210526,
+          "min": 0.002047163,
+          "max": 0.009060368
+        },
+        "llm_calls": {
+          "n": 19,
+          "median": 5.0,
+          "p95": 5.099999999999998,
+          "mean": 5.052631578947368,
+          "min": 5.0,
+          "max": 6.0
+        }
+      },
+      "clarify": {
+        "turns": 30,
+        "wall_s": {
+          "n": 30,
+          "median": 1.3364,
+          "p95": 2.2628299999999997,
+          "mean": 1.4685633333333332,
+          "min": 0.6956,
+          "max": 2.762
+        },
+        "cost_usd": {
+          "n": 30,
+          "median": 0.0001544935,
+          "p95": 0.00024112629999999998,
+          "mean": 0.00016764386666666666,
+          "min": 7.578e-05,
+          "max": 0.00033579
+        },
+        "llm_calls": {
+          "n": 30,
+          "median": 1.0,
+          "p95": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      },
+      "out_of_scope": {
+        "turns": 32,
+        "wall_s": {
+          "n": 32,
+          "median": 0.9438500000000001,
+          "p95": 1.4759449999999998,
+          "mean": 0.95414375,
+          "min": 0.4063,
+          "max": 1.6202999999999999
+        },
+        "cost_usd": {
+          "n": 32,
+          "median": 8.44425e-05,
+          "p95": 0.000469599,
+          "mean": 0.00013402889375,
+          "min": 5.5935e-05,
+          "max": 0.0004881
+        },
+        "llm_calls": {
+          "n": 32,
+          "median": 1.0,
+          "p95": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      },
+      "search": {
+        "turns": 227,
+        "wall_s": {
+          "n": 227,
+          "median": 5.401,
+          "p95": 9.469909999999999,
+          "mean": 5.728429955947137,
+          "min": 2.2063,
+          "max": 11.3684
+        },
+        "cost_usd": {
+          "n": 227,
+          "median": 0.0026381956,
+          "p95": 0.0034830599999999996,
+          "mean": 0.0026685635207048457,
+          "min": 0.0014533319999999999,
+          "max": 0.004248372
+        },
+        "llm_calls": {
+          "n": 227,
+          "median": 2.0,
+          "p95": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      }
+    },
+    "by_set": {
+      "A": {
+        "turns": 88,
+        "wall_s": {
+          "n": 88,
+          "median": 3.577,
+          "p95": 7.8575099999999996,
+          "mean": 3.677619318181818,
+          "min": 0.4928,
+          "max": 10.409799999999999
+        },
+        "cost_usd": {
+          "n": 88,
+          "median": 0.001979966,
+          "p95": 0.0032157196499999993,
+          "mean": 0.0015500016613636365,
+          "min": 5.5935e-05,
+          "max": 0.003454472
+        },
+        "llm_calls": {
+          "n": 88,
+          "median": 2.0,
+          "p95": 2.0,
+          "mean": 1.6136363636363635,
+          "min": 1.0,
+          "max": 2.0
+        }
+      },
+      "B": {
+        "turns": 144,
+        "wall_s": {
+          "n": 144,
+          "median": 5.444699999999999,
+          "p95": 9.391659999999998,
+          "mean": 5.6677,
+          "min": 0.957,
+          "max": 11.3684
+        },
+        "cost_usd": {
+          "n": 144,
+          "median": 0.0027042365000000002,
+          "p95": 0.00356949655,
+          "mean": 0.0027329709263888887,
+          "min": 8.7114e-05,
+          "max": 0.004248372
+        },
+        "llm_calls": {
+          "n": 144,
+          "median": 2.0,
+          "p95": 2.0,
+          "mean": 1.9861111111111112,
+          "min": 1.0,
+          "max": 2.0
+        }
+      },
+      "D": {
+        "turns": 12,
+        "wall_s": {
+          "n": 12,
+          "median": 0.84605,
+          "p95": 1.3886999999999998,
+          "mean": 0.8797499999999999,
+          "min": 0.4063,
+          "max": 1.4425999999999999
+        },
+        "cost_usd": {
+          "n": 12,
+          "median": 8.110499999999999e-05,
+          "p95": 0.00036671999999999985,
+          "mean": 0.00014006191666666662,
+          "min": 6.015e-05,
+          "max": 0.0004677
+        },
+        "llm_calls": {
+          "n": 12,
+          "median": 1.0,
+          "p95": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      },
+      "E": {
+        "turns": 44,
+        "wall_s": {
+          "n": 44,
+          "median": 5.06715,
+          "p95": 8.886535,
+          "mean": 5.013395454545454,
+          "min": 0.6956,
+          "max": 10.5091
+        },
+        "cost_usd": {
+          "n": 44,
+          "median": 0.0022127245,
+          "p95": 0.0033028106,
+          "mean": 0.0018336282090909088,
+          "min": 7.578e-05,
+          "max": 0.0037509040000000002
+        },
+        "llm_calls": {
+          "n": 44,
+          "median": 2.0,
+          "p95": 2.0,
+          "mean": 1.6818181818181819,
+          "min": 1.0,
+          "max": 2.0
+        }
+      },
+      "F": {
+        "turns": 20,
+        "wall_s": {
+          "n": 20,
+          "median": 10.33395,
+          "p95": 16.150070000000003,
+          "mean": 10.79519,
+          "min": 4.0174,
+          "max": 19.1097
+        },
+        "cost_usd": {
+          "n": 20,
+          "median": 0.0050684363,
+          "p95": 0.00856321495,
+          "mean": 0.00496015748,
+          "min": 0.002047163,
+          "max": 0.009060368
+        },
+        "llm_calls": {
+          "n": 20,
+          "median": 5.0,
+          "p95": 5.050000000000001,
+          "mean": 4.9,
+          "min": 2.0,
+          "max": 6.0
+        }
+      }
+    },
+    "all_turns": {
+      "turns": 308,
+      "wall_s": {
+        "n": 308,
+        "median": 5.0732,
+        "p95": 10.258529999999999,
+        "mean": 5.152043831168831,
+        "min": 0.4063,
+        "max": 19.1097
+      },
+      "cost_usd": {
+        "n": 308,
+        "median": 0.0024771805,
+        "p95": 0.00399130865,
+        "mean": 0.002310102251298701,
+        "min": 5.5935e-05,
+        "max": 0.009060368
+      },
+      "llm_calls": {
+        "n": 308,
+        "median": 2.0,
+        "p95": 5.0,
+        "mean": 1.9870129870129871,
+        "min": 1.0,
+        "max": 6.0
+      }
+    },
+    "node_seconds_by_route": {
+      "search": {
+        "route": {
+          "n": 227,
+          "median": 1.0635,
+          "p95": 2.1051699999999993,
+          "mean": 1.1685594713656389,
+          "min": 0.4794,
+          "max": 2.9985
+        },
+        "retrieve": {
+          "n": 227,
+          "median": 1.1304,
+          "p95": 2.146169999999999,
+          "mean": 1.2727004405286344,
+          "min": 0.7293999999999999,
+          "max": 4.7036999999999995
+        },
+        "answer": {
+          "n": 227,
+          "median": 2.9916,
+          "p95": 6.94818,
+          "mean": 3.283954185022026,
+          "min": 0.4803,
+          "max": 8.9365
+        },
+        "verify": {
+          "n": 227,
+          "median": 0.0001,
+          "p95": 0.0002,
+          "mean": 0.00011321585903083704,
+          "min": 0.0,
+          "max": 0.0004
+        }
+      },
+      "out_of_scope": {
+        "route": {
+          "n": 32,
+          "median": 0.9423999999999999,
+          "p95": 1.4743549999999999,
+          "mean": 0.9524437499999999,
+          "min": 0.4046,
+          "max": 1.6185
+        },
+        "out_of_scope": {
+          "n": 32,
+          "median": 0.0,
+          "p95": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "agent": {
+        "route": {
+          "n": 19,
+          "median": 1.0805,
+          "p95": 2.2446499999999996,
+          "mean": 1.244805263157895,
+          "min": 0.466,
+          "max": 2.5853
+        },
+        "agent": {
+          "n": 19,
+          "median": 9.22,
+          "p95": 15.284969999999992,
+          "mean": 9.905021052631579,
+          "min": 5.0326,
+          "max": 18.6417
+        }
+      },
+      "clarify": {
+        "route": {
+          "n": 30,
+          "median": 1.3349,
+          "p95": 2.26131,
+          "mean": 1.4668933333333336,
+          "min": 0.6934,
+          "max": 2.7594000000000003
+        },
+        "clarify": {
+          "n": 30,
+          "median": 0.0,
+          "p95": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    "agent_direct": {
+      "turns": 40,
+      "wall_s": {
+        "n": 40,
+        "median": 11.49485,
+        "p95": 18.592214999999985,
+        "mean": 12.1699825,
+        "min": 7.4176,
+        "max": 26.536
+      },
+      "cost_usd": {
+        "n": 40,
+        "median": 0.005587494,
+        "p95": 0.01137763855,
+        "mean": 0.006326852199999999,
+        "min": 0.004398350400000001,
+        "max": 0.014231394
+      },
+      "llm_calls": {
+        "n": 40,
+        "median": 4.0,
+        "p95": 6.049999999999997,
+        "mean": 3.9,
+        "min": 3.0,
+        "max": 7.0
+      }
+    },
+    "llm_calls": 768,
+    "llm_failed": 5,
+    "api_failed": 0,
+    "api_cancelled": 26,
+    "ledger_errors": {
+      "2-reference qwen/qwen3-embedding-8b: cancelled": 25,
+      "3-assistant qwen/qwen3-embedding-8b: cancelled": 26,
+      "3-assistant deepseek/deepseek-v4.1-flash: LengthFinishReasonError": 5,
+      "4-judge z-ai/glm-5.3-flash: LengthFinishReasonError": 4
+    }
+  },
+  "failures": {
+    "turns_without_reply": [],
+    "turns_retried": [],
+    "notices": {
+      "assistant_answer_failed": 5
+    },
+    "degraded_searches": [],
+    "searches_not_reranked": [],
+    "router_errors": 0,
+    "answer_errors": 5,
+    "agent_direct_errors": [],
+    "P_not_reranked_or_degraded": [],
+    "P_retried": 0
+  },
+  "spend": {
+    "by_stage": {
+      "1-queries": {
+        "calls": 14,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.042837749999999994
+      },
+      "2-reference": {
+        "calls": 357,
+        "failed_calls": 25,
+        "calls_without_cost": 25,
+        "cost_usd": 0.28244660000000016
+      },
+      "3-assistant": {
+        "calls": 1331,
+        "failed_calls": 31,
+        "calls_without_cost": 31,
+        "cost_usd": 0.9654631113999992
+      },
+      "4-judge": {
+        "calls": 1216,
+        "failed_calls": 4,
+        "calls_without_cost": 4,
+        "cost_usd": 0.107245301
+      }
+    },
+    "by_model": {
+      "google/gemini-3.8-flash": {
+        "calls": 14,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.042837749999999994
+      },
+      "qwen/qwen3-embedding-8b": {
+        "calls": 378,
+        "failed_calls": 51,
+        "calls_without_cost": 51,
+        "cost_usd": 0.00010318000000000003
+      },
+      "qwen/qwen3-reranker-8b": {
+        "calls": 528,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.8980865999999998
+      },
+      "deepseek/deepseek-v4.1-flash": {
+        "calls": 768,
+        "failed_calls": 5,
+        "calls_without_cost": 5,
+        "cost_usd": 0.34884240140000017
+      },
+      "mistralai/mistral-small-2603": {
+        "calls": 14,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.00087753
+      },
+      "minimax/minimax-m3.1-flash": {
+        "calls": 606,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.057862860000000065
+      },
+      "z-ai/glm-5.3-flash": {
+        "calls": 610,
+        "failed_calls": 4,
+        "calls_without_cost": 4,
+        "cost_usd": 0.04938244100000001
+      }
+    },
+    "total_usd": 1.3979927623999993,
+    "calls": 2918,
+    "key_usage_snapshots": [
+      {
+        "date": "2026-11-12T14:36:58+00:00",
+        "stage": "1-sets",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.43481056,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:37:36+00:00",
+        "stage": "1-sets",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.44612881,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:38:00+00:00",
+        "stage": "1-sets",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.46034281,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:38:18+00:00",
+        "stage": "1-sets",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.47049856,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:41:59+00:00",
+        "stage": "2-reference",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.481496576,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:42:05+00:00",
+        "stage": "2-reference",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.481496576,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:42:09+00:00",
+        "stage": "2-reference",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.481496576,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:44:09+00:00",
+        "stage": "2-reference",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.699424186,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:45:17+00:00",
+        "stage": "3-assistant",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.763949816,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:46:16+00:00",
+        "stage": "3-assistant",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.797528301,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:46:28+00:00",
+        "stage": "3-assistant",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.797528301,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:55:05+00:00",
+        "stage": "3-assistant",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 4.71353935,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T14:55:17+00:00",
+        "stage": "4-judge",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 4.71353935,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T14:57:21+00:00",
+        "stage": "4-judge",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 4.838139506,
+        "when": "end"
+      }
+    ]
+  },
+  "stage_seconds": {
+    "1-sets": 55.599999999999994,
+    "2-reference": 125.6,
+    "3-assistant": 576.8000000000001,
+    "4-judge": 123.8
+  }
+}

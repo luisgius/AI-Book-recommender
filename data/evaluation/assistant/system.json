@@ -1,0 +1,58 @@
+{
+  "commit": "36802ee",
+  "profile": {
+    "name": "cloud",
+    "candidates": "vector",
+    "schema": "catalog_deploy",
+    "lexical_ranking": "bm25",
+    "vector_search": "approximate"
+  },
+  "embedding": {
+    "model": "qwen/qwen3-embedding-8b",
+    "dimensions": 1024,
+    "provider": "deepinfra",
+    "zdr": true,
+    "hedge_provider": "nebius",
+    "hedge_after_s": 1.0,
+    "hedge_primary_again_s": 2.5,
+    "query_cache_size": 256,
+    "query_deadlines": {
+      "timeout_s": 3.0,
+      "max_retries": 1,
+      "deadline_s": 5.0
+    },
+    "evaluation_attempts": 3
+  },
+  "reranker": {
+    "model": "qwen/qwen3-reranker-8b",
+    "provider": "primeintellect",
+    "depth": 30,
+    "evaluation_deadlines": {
+      "timeout_s": 30.0,
+      "max_retries": 3
+    }
+  },
+  "llm": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4.1-flash",
+    "temperature": 0.0,
+    "reasoning": false,
+    "max_tokens": 1024,
+    "timeout_s": 180.0,
+    "max_retries": 1,
+    "client_max_retries": null
+  },
+  "assistant": {
+    "router_max_tokens": 400,
+    "answer_context_books": 6,
+    "max_clarifying_turns": 2,
+    "max_results": 10
+  },
+  "agent": {
+    "max_tool_rounds": 4,
+    "max_reflections": 1,
+    "max_recommendations": 5,
+    "tool_results": 8
+  },
+  "usage_budget": null
+}

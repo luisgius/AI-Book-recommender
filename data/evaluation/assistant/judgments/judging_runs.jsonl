@@ -1,0 +1,2 @@
+{"model": "minimax/minimax-m3.1-flash", "pairs": 606, "judged_in_run": 606, "failed_calls_in_run": 0, "errors": {}, "passes": 2, "unjudged": 0, "reused_from_v14": 1220, "measured_pairs": 1826, "date": "2026-11-12T15:56:45"}
+{"model": "z-ai/glm-5.3-flash", "pairs": 606, "judged_in_run": 606, "failed_calls_in_run": 4, "errors": {"LengthFinishReasonError": 4}, "passes": 3, "unjudged": 0, "reused_from_v14": 1220, "measured_pairs": 1826, "date": "2026-11-12T15:57:21"}

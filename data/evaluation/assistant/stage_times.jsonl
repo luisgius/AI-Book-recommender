@@ -1,0 +1,7 @@
+{"stage": "1-sets", "seconds": 37.8, "ended": "2026-11-12T15:37:36", "status": 0}
+{"stage": "1-sets", "seconds": 17.8, "ended": "2026-11-12T15:38:18", "status": 0}
+{"stage": "2-reference", "seconds": 5.6, "ended": "2026-11-12T15:42:05", "status": 0}
+{"stage": "2-reference", "seconds": 120.0, "ended": "2026-11-12T15:44:09", "status": 0}
+{"stage": "3-assistant", "seconds": 59.6, "ended": "2026-11-12T15:46:16", "status": 0}
+{"stage": "3-assistant", "seconds": 517.2, "ended": "2026-11-12T15:55:05", "status": 0}
+{"stage": "4-judge", "seconds": 123.8, "ended": "2026-11-12T15:57:21", "status": 0}
