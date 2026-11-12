@@ -62,3 +62,22 @@ def test_report_has_every_section(tmp_path):
     assert "run in `fra1`" in text and "`POST /api/v1/evaluate`: 404" in text and "first at request 21" in text
     assert "| 2026-11-11T21:20:00+00:00 | 12 | 4000.0 | 3000.0 | hybrid |" in text
     assert "The function started in 2.2 s." in text
+
+
+def test_report_sets_warm_latency_before_and_after_side_by_side(tmp_path):
+    """V18: the latency of the run before the catalog was enlarged is kept next to the new one."""
+    before = {"label": "30,000 works", "run_at": "2026-11-11T22:38:37+00:00", "latency": dc.latency(RESULTS)}
+    after = {**RESULTS, "catalog_label": "50,000 works", "previous_latency": [before], "catalog_works": 50000,
+             "cold_runs": [{**RESULTS["cold_runs"][0], "catalog_works": 30000}],
+             "cold_note": "No new cold start was measured.", "deployment": {}}
+    out, report = tmp_path / "results.json", tmp_path / "REPORT.md"
+    out.write_text(json.dumps(after))
+
+    assert dc.main(["report", "--out", str(out), "--report", str(report)]) == 0
+    text = report.read_text()
+
+    assert "## Warm latency before and after the enlargement" in text
+    assert "| Part | 30,000 works: median ms | p95 ms | 50,000 works: median ms | p95 ms |" in text
+    assert "| Client wall clock | 1200.0 | 1500.0 | 1200.0 | 1500.0 |" in text
+    assert "| Degraded of searches | 1 of 2 | - | 1 of 2 | - |" in text
+    assert "| 4.0 | 30000 |" in text and "No new cold start was measured." in text

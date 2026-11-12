@@ -13,7 +13,7 @@ orders by created_at descending and iter_all() by id.
 """
 
 import logging
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple
 from uuid import UUID
 
 from app.domain.entities import Book
@@ -25,8 +25,10 @@ from app.infrastructure.db.postgres_rows import (
     WORK_INSERT_COLUMNS,
     book_to_work_params,
     lexical_header_sql,
+    normalize,
     row_to_book,
     text_rows,
+    vector_literal,
 )
 from app.infrastructure.db.postgres_schema import text_config_names, validate_schema_name
 
@@ -141,13 +143,23 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
         """Save books in transactions of SAVE_CHUNK_SIZE (see upsert_many)."""
         self.upsert_many(books)
 
-    def upsert_many(self, books: List[Book]) -> int:
+    def upsert_many(self, books: List[Book], embeddings: Optional[Mapping[UUID, Sequence[float]]] = None) -> int:
         """
         Insert new books and update changed ones; unchanged books are skipped.
 
         Each chunk is one transaction: the works rows, their work_texts rows
-        and tsvectors, and the catalog facts the lexical search reads
-        (configurations in use, most texts per work).
+        with their tsvectors, and the catalog facts the lexical search reads
+        (configurations in use, most texts per work). Every row is written
+        once, in its final form (no insert-then-update), so a load leaves no
+        dead rows behind.
+
+        Args:
+            books: Books to save
+            embeddings: Optional document vectors by book id (loader helper,
+                V18): a new work is inserted with its vector, and a work whose
+                text changed gets the new one, instead of a NULL embedding
+                filled by a second write. A work whose text is unchanged keeps
+                its stored vector.
 
         Returns:
             Number of books inserted or changed
@@ -158,10 +170,10 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
         """
         changed = 0
         for start in range(0, len(books), self.SAVE_CHUNK_SIZE):
-            changed += self._upsert_chunk(books[start:start + self.SAVE_CHUNK_SIZE])
+            changed += self._upsert_chunk(books[start:start + self.SAVE_CHUNK_SIZE], embeddings or {})
         return changed
 
-    def _upsert_chunk(self, books: List[Book]) -> int:
+    def _upsert_chunk(self, books: List[Book], embeddings: Mapping[UUID, Sequence[float]]) -> int:
         books = list({book.id: book for book in books}.values())  # last one wins, like an upsert
         if not books:
             return 0
@@ -176,7 +188,7 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
         todo = [(book, p) for book, p in zip(books, params) if stored.get(p["id"]) != p["content_hash"]]
         if not todo:
             return 0
-        sql, values = self._write_script([book for book, _ in todo], [p for _, p in todo])
+        sql, values = self._write_script([book for book, _ in todo], [p for _, p in todo], embeddings)
         self._categories = None
         self._db.execute(sql, values)
         return len(todo)
@@ -191,9 +203,15 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
                 )
         return self._configs
 
-    def _write_script(self, books: List[Book], params: List[Dict[str, Any]]) -> Tuple[str, Dict[str, Any]]:
+    def _write_script(
+        self,
+        books: List[Book],
+        params: List[Dict[str, Any]],
+        embeddings: Optional[Mapping[UUID, Sequence[float]]] = None,
+    ) -> Tuple[str, Dict[str, Any]]:
         """The statements of one write transaction and their parameters."""
         s = self._schema
+        embeddings = embeddings or {}
         values: Dict[str, Any] = {}
         work_rows: List[str] = []
         for i, p in enumerate(params):
@@ -201,6 +219,9 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
             for column in WORK_INSERT_COLUMNS:
                 values[f"{column}_{i}"] = p[column]
                 placeholders.append(f"%({column}_{i})s")
+            vector = embeddings.get(p["id"])
+            values[f"embedding_{i}"] = vector_literal(normalize(vector)) if vector is not None else None
+            placeholders.append(f"%(embedding_{i})s::halfvec")
             work_rows.append("(" + ", ".join(placeholders) + ")")
 
         texts: List[str] = []
@@ -214,29 +235,35 @@ class PostgresBookCatalogRepository(BookCatalogRepository):
                 values[f"tl_{i}_{j}"] = row.language
                 values[f"tc_{i}_{j}"] = row.ts_config
                 values[f"tb_{i}_{j}"] = row.body
-                texts.append(f"(%(tw_{i}_{j})s, %(tl_{i}_{j})s, %(tc_{i}_{j})s, %(tb_{i}_{j})s)")
+                texts.append(f"(%(tw_{i}_{j})s::uuid, %(tl_{i}_{j})s::text, "
+                             f"%(tc_{i}_{j})s::text, %(tb_{i}_{j})s::text)")
                 configs_used.add(row.ts_config)
         values["ids"] = [p["id"] for p in params]
         values["configs_used"] = sorted(configs_used | {f"{s}.{SIMPLE_CONFIG}"})
         values["max_texts"] = max_texts
 
-        # created_at keeps its first value, as in the SQLite catalog. The
-        # embedding survives an update only if its input text is unchanged.
-        # Without stored bodies the text is dropped once its tsvector exists.
+        # created_at keeps its first value, as in the SQLite catalog. A work
+        # whose input text is unchanged keeps its stored embedding (or takes
+        # the given one if it had none); a changed text takes the given vector,
+        # or NULL for the loader to fill. Each text row is inserted with its
+        # tsvector already computed (title, authors and categories of the
+        # works row written just above, plus its description); without stored
+        # bodies the text is not written at all.
         updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in WORK_INSERT_COLUMNS if c not in ("id", "created_at"))
-        drop_body = "" if self._store_text_bodies else ",\n    body = NULL"
+        body = "v.body" if self._store_text_bodies else "NULL"
         sql = f"""
-INSERT INTO {s}.works AS cur ({", ".join(WORK_INSERT_COLUMNS)})
+INSERT INTO {s}.works AS cur ({", ".join(WORK_INSERT_COLUMNS)}, embedding)
 VALUES {", ".join(work_rows)}
 ON CONFLICT (id) DO UPDATE SET {updates},
-  embedding = CASE WHEN cur.text_hash = EXCLUDED.text_hash THEN cur.embedding END;
+  embedding = CASE WHEN cur.text_hash = EXCLUDED.text_hash THEN coalesce(cur.embedding, EXCLUDED.embedding)
+                   ELSE EXCLUDED.embedding END;
 DELETE FROM {s}.work_texts WHERE work_id = ANY(%(ids)s::uuid[]);
-INSERT INTO {s}.work_texts (work_id, language, ts_config, body) VALUES {", ".join(texts)};
-UPDATE {s}.work_texts t
-SET tsv = to_tsvector('{s}.{SIMPLE_CONFIG}'::regconfig, {lexical_header_sql("w")})
-          || to_tsvector(t.ts_config::regconfig, coalesce(t.body, '')){drop_body}
-FROM {s}.works w
-WHERE w.id = t.work_id AND t.work_id = ANY(%(ids)s::uuid[]);
+INSERT INTO {s}.work_texts (work_id, language, ts_config, body, tsv)
+SELECT v.work_id, v.language, v.ts_config, {body},
+       to_tsvector('{s}.{SIMPLE_CONFIG}'::regconfig, {lexical_header_sql("w")})
+       || to_tsvector(v.ts_config::regconfig, coalesce(v.body, ''))
+FROM (VALUES {", ".join(texts)}) AS v(work_id, language, ts_config, body)
+JOIN {s}.works w ON w.id = v.work_id;
 INSERT INTO {s}.catalog_info AS info (key, value)
 VALUES ('text_configs', to_jsonb(%(configs_used)s::text[])), ('max_texts_per_work', to_jsonb(%(max_texts)s::int))
 ON CONFLICT (key) DO UPDATE SET value = CASE

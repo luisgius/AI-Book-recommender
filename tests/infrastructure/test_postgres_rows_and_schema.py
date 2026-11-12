@@ -235,6 +235,52 @@ def test_render_fills_every_placeholder():
     assert "halfvec(1024)" in sql and "k1 = 1.5, b = 0.75" in sql and "eval177.works" in sql
 
 
+class IndexDatabase:
+    """Fake database for the index builders: which indexes exist, every statement run."""
+
+    def __init__(self, indexes):
+        self.indexes = set(indexes)
+        self.statements = []
+
+    def query(self, sql, params=None, *, settings=None):
+        if "FROM pg_extension" in sql:
+            return [{"extname": "lakebase_text", "extversion": "0.1.3"}]
+        if "IS NOT NULL AS found" in sql:
+            return [{"found": params["name"].split(".")[1] in self.indexes}]
+        raise AssertionError(sql)
+
+    def execute(self, sql, params=None, *, settings=None):
+        self.statements.append(" ".join(sql.split()))
+        return 0
+
+
+def test_bm25_rebuild_runs_beside_the_index_in_use_and_swaps_in_one_transaction():
+    """V18: a live catalog never loses its BM25 index (the searches name it)."""
+    from app.infrastructure.db.postgres_schema import build_lexical_indexes
+
+    db = IndexDatabase({"work_texts_bm25"})
+    build_lexical_indexes(db, "cat", gin=False)
+    drop_gin, drop_leftover, build, swap = db.statements
+    assert drop_gin == "DROP INDEX IF EXISTS cat.work_texts_tsv_gin"
+    assert drop_leftover == "DROP INDEX IF EXISTS cat.work_texts_bm25_next"
+    assert "CREATE INDEX IF NOT EXISTS work_texts_bm25_next ON cat.work_texts USING lakebase_bm25" in build
+    assert swap == "DROP INDEX cat.work_texts_bm25; ALTER INDEX cat.work_texts_bm25_next RENAME TO work_texts_bm25"
+
+
+def test_first_bm25_build_uses_the_final_name():
+    from app.infrastructure.db.postgres_schema import build_lexical_indexes
+
+    db = IndexDatabase(set())
+    build_lexical_indexes(db, "cat", gin=False)
+    assert "CREATE INDEX IF NOT EXISTS work_texts_bm25 ON cat.work_texts" in db.statements[-1]
+    assert not any("RENAME" in s for s in db.statements)
+
+
+def test_render_accepts_only_the_known_bm25_index_names():
+    with pytest.raises(ValueError):
+        render(load_sections()["lexical_index_bm25"], "cat", bm25_index="x; DROP TABLE y")
+
+
 @pytest.mark.parametrize("name", ["", "Eval", "a-b", "x; DROP", "1abc", "pg_temp", "public", "a" * 64])
 def test_invalid_schema_names_are_rejected(name):
     with pytest.raises(ValueError):

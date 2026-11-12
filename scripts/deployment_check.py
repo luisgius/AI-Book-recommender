@@ -212,12 +212,46 @@ def latency(results: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def latency_comparison(results: Dict[str, Any]) -> List[str]:
+    """
+    Warm latency of earlier runs next to this one's (V18: before and after
+    enlarging the catalog). Earlier runs are kept in the JSON's
+    "previous_latency" entry as {"label", "run_at", "latency"} (latency() of
+    that run's results); this run is labelled by "catalog_label".
+    """
+    previous = results.get("previous_latency") or []
+    if not previous:
+        return []
+    columns = [*previous, {"label": results.get("catalog_label", "this run"), "run_at": results.get("started_at"),
+                           "latency": latency(results)}]
+    head = " | ".join(f"{c['label']}: median ms | p95 ms" for c in columns)
+    lines = ["## Warm latency before and after the enlargement", "",
+             "Same queries, rounds and client; runs: " + "; ".join(f"{c['label']} at {c['run_at']}" for c in columns)
+             + ".", "", f"| Part | {head} |", "|---|" + "---|---|" * len(columns)]
+
+    def cells(part: str, stage: Optional[str] = None) -> str:
+        out = []
+        for column in columns:
+            lat = column["latency"]
+            s = (lat["stages"].get(stage) if stage else lat.get(part)) or {}
+            out += [str(s.get("median")), str(s.get("p95"))]
+        return " | ".join(out)
+
+    lines.append(f"| Client wall clock | {cells('client_wall')} |")
+    lines.append(f"| Server (latency_ms) | {cells('server')} |")
+    stages = sorted({stage for column in columns for stage in column["latency"]["stages"]})
+    lines += [f"| Stage `{stage}` | {cells('', stage)} |" for stage in stages]
+    lines.append("| Degraded of searches | " + " | ".join(
+        f"{c['latency']['degraded']} of {c['latency']['searches']} | -" for c in columns) + " |")
+    return lines + [""]
+
+
 def render(results: Dict[str, Any], deployment: Dict[str, Any]) -> str:
     """The Markdown report (deployment facts come from the JSON's "deployment" entry)."""
     lat = latency(results)
     health = results["health"]["body"]
     lines = [
-        "# Deployment check of the cloud profile (V17)", "",
+        f"# {results.get('title', 'Deployment check of the cloud profile (V17)')}", "",
         f"Run of {results['started_at']} against {results['base_url']} from the measuring machine "
         f"(Spain; requests enter Vercel's network at `{(results['health'].get('vercel_id') or '?').split('::')[0]}` "
         f"and run in `{(results['health'].get('vercel_id') or '?::?').split('::')[1]}`).", "",
@@ -248,19 +282,27 @@ def render(results: Dict[str, Any], deployment: Dict[str, Any]) -> str:
     if degraded:
         lines += ["", "Degraded searches:", ""]
         lines += [f"- round {r['round']}, \"{r['query']}\": {r.get('degradation_reason')}" for r in degraded]
-    if results.get("cold_runs"):
-        lines += ["", "## Cold start", "",
-                  "The first search after the function and the database had been idle (Neon suspends its compute "
-                  "after 5 minutes), then /health:", "",
-                  "| At (UTC) | Idle min | Client wall ms | Server ms | Mode | Stages (ms) | Instance uptime at /health (s) |",
-                  "|---|---|---|---|---|---|---|"]
-        for c in results["cold_runs"]:
+    comparison = latency_comparison(results)
+    if comparison:
+        lines += ["", *comparison[:-1]]
+    if results.get("cold_runs") or results.get("cold_note"):
+        lines += ["", "## Cold start", ""]
+        if results.get("cold_runs"):
+            lines += ["The first search after the function and the database had been idle (Neon suspends its compute "
+                      "after 5 minutes), then /health:", "",
+                      "| At (UTC) | Idle min | Client wall ms | Server ms | Mode | Stages (ms) | "
+                      "Instance uptime at /health (s) | Catalog works |",
+                      "|---|---|---|---|---|---|---|---|"]
+        for c in results.get("cold_runs", []):
             mode = f"{c.get('search_mode')}{' (degraded)' if c.get('degraded') else ''}"
             lines.append(f"| {c['at']} | {c.get('idle_minutes', '?')} | {c['wall_ms']} | {c.get('server_ms')} | {mode} | "
-                         f"{json.dumps(c.get('timings_ms'))} | {c.get('instance_uptime_s_after')} |")
-        for c in results["cold_runs"]:
+                         f"{json.dumps(c.get('timings_ms'))} | {c.get('instance_uptime_s_after')} | "
+                         f"{c.get('catalog_works', '?')} |")
+        for c in results.get("cold_runs", []):
             if c.get("notes"):
                 lines += ["", f"{c['at']}: " + " ".join(c["notes"])]
+        if results.get("cold_note"):
+            lines += ["", results["cold_note"]]
     lines += ["", "## Book, similar books, explanations", ""]
     if results.get("book"):
         lines.append(f"- `GET /api/v1/books/{results['book']['id']}`: {results['book']['status']} "
@@ -293,6 +335,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="results JSON")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT, help="Markdown report")
     parser.add_argument("--idle-minutes", type=float, default=None, help="cold: minutes without traffic before it")
+    parser.add_argument("--catalog-works", type=int, default=None,
+                        help="run, cold: works in the deployed catalog at the time (recorded with the results)")
     args = parser.parse_args(argv)
 
     if args.step == "report":
@@ -306,9 +350,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     existing = json.loads(args.out.read_text(encoding="utf-8")) if args.out.exists() else {}
     if args.step == "run":
         existing.update(run(base_url))
+        if args.catalog_works is not None:
+            existing["catalog_works"] = args.catalog_works
     else:
         record = cold(base_url)
         record["idle_minutes"] = args.idle_minutes
+        if args.catalog_works is not None:
+            record["catalog_works"] = args.catalog_works
         existing.setdefault("cold_runs", []).append(record)
     args.out.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Results written to {args.out}")

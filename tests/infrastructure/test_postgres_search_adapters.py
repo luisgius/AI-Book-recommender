@@ -320,11 +320,29 @@ def test_upsert_writes_works_texts_tsvectors_and_catalog_facts_in_one_transactio
     [write] = [c for c in db.calls if c["kind"] == "execute"]
     sql = write["sql"]
     assert sql.index("INSERT INTO cat.works") < sql.index("DELETE FROM cat.work_texts") < sql.index(
-        "INSERT INTO cat.work_texts") < sql.index("UPDATE cat.work_texts") < sql.index("INSERT INTO cat.catalog_info")
+        "INSERT INTO cat.work_texts") < sql.index("INSERT INTO cat.catalog_info")
     assert "ON CONFLICT (id) DO UPDATE" in sql and "WHEN cur.text_hash = EXCLUDED.text_hash" in sql
     assert write["params"]["tc_0_0"] == "cat.english_unaccent"
     assert write["params"]["ids"] == [b.id for b in books]
     assert "cat.simple_unaccent" in write["params"]["configs_used"]
+
+
+def test_upsert_writes_each_row_once_in_its_final_form():
+    """V18: no insert-then-update (no dead rows): tsvectors and vectors go in with the rows."""
+    books = [make_book("Python"), make_book("Java")]
+    db = FakeDatabase()
+    repo = PostgresBookCatalogRepository(db, "cat", store_text_bodies=False)
+
+    assert repo.upsert_many(books, embeddings={books[0].id: [3.0, 4.0]}) == 2
+
+    [write] = [c for c in db.calls if c["kind"] == "execute"]
+    sql, params = write["sql"], write["params"]
+    assert "UPDATE cat.work_texts" not in sql and "UPDATE cat.works" not in sql
+    assert "INSERT INTO cat.work_texts (work_id, language, ts_config, body, tsv)" in sql and "to_tsvector(" in sql
+    assert "SELECT v.work_id, v.language, v.ts_config, NULL," in sql  # no stored description bodies
+    assert "embedding)" in sql.split("VALUES")[0]
+    assert params["embedding_0"] == "[0.6,0.8]" and params["embedding_1"] is None  # unit length; none given
+    assert "coalesce(cur.embedding, EXCLUDED.embedding)" in sql
 
 
 def test_repository_requires_an_applied_schema():

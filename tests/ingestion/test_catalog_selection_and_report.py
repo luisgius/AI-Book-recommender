@@ -56,6 +56,21 @@ class TestSelection:
         assert mix["fr"] >= 7  # quota, plus any leftover places won by score
         assert mix["en"] >= 80  # 40% quota plus part of the leftovers
 
+    def test_a_larger_selection_contains_every_smaller_one(self):
+        """
+        V18: enlarging the deployed catalog keeps the works already loaded.
+        Quotas only grow with the size and each language's ranking is fixed,
+        so the quota places are nested; the places left unused grow at least
+        as much, so the leftover works chosen before are chosen again.
+        """
+        pool = make_pool()
+        # es, fr and de run short of their quotas at the larger sizes, so the
+        # leftovers (the Latin works among them) matter here.
+        sizes = [60, 120, 200, 300, 400, 600, 675]
+        selections = [{c.book_id for c in select_books(pool, size, LANGUAGES)} for size in sizes]
+        for size, smaller, larger in zip(sizes, selections, selections[1:]):
+            assert len(smaller) == size and smaller <= larger
+
     def test_highest_scores_first_within_a_language(self):
         pool = [candidate(1, "es", 1.0), candidate(2, "es", 9.0), candidate(3, "es", 5.0, langs=4),
                 candidate(4, "es", 5.0, langs=1)]

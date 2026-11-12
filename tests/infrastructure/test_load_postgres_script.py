@@ -108,6 +108,28 @@ def test_load_needs_exactly_one_encoder_source(tmp_path):
              vector_index="hnsw", reuse_index=None)
 
 
+def test_a_stage_from_an_empty_schema_takes_the_first_works_by_id():
+    from scripts.load_postgres import stage_ids
+
+    source = sorted(uuid4() for _ in range(6))
+    assert stage_ids(source, set(), 4) == source[:4]
+    assert stage_ids(source, set(), None) == source
+    assert stage_ids(source, set(), 10) == source
+
+
+def test_a_stage_keeps_every_work_already_stored_and_fills_up_with_new_ones():
+    """V18: enlarging a live catalog in stages never drops (or re-embeds) a loaded work."""
+    from scripts.load_postgres import stage_ids
+
+    source = sorted(uuid4() for _ in range(8))
+    stored = {source[1], source[5], source[7]}  # scattered over the id range, as in a selection
+    stage = stage_ids(source, stored | {uuid4()}, 5)  # a stored work that left the source is not staged
+    assert stored <= set(stage) and len(stage) == 5
+    assert set(stage) - stored == {source[0], source[2]}  # then the first new works by id
+    assert stage == sorted(stage)
+    assert stage_ids(source, stored, 2) == sorted(stored)  # never fewer than the works already stored
+
+
 def test_encode_texts_keeps_the_input_order_with_several_workers():
     """Concurrent embedding requests (V17) return the vectors in input order."""
     import threading

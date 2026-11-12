@@ -366,6 +366,52 @@ def test_staged_load_without_gin_or_text_bodies_still_searches(setup):
         drop_schema(direct, schema)
 
 
+def test_enlarging_a_loaded_catalog_keeps_its_works_and_writes_each_row_once(setup):
+    """
+    V18: the deployed catalog was enlarged with works whose ids fall between
+    the loaded ones. A stage keeps every loaded work (none deleted, none
+    re-embedded), new works arrive with their vector and their tsvectors in
+    one write (nothing left to fill), and the rebuilt indexes serve searches.
+    """
+    from app.infrastructure.db.postgres_schema import (
+        BM25_INDEX, BM25_NEXT_INDEX, VECTOR_INDEX, drop_schema, index_exists)
+    from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatalogRepository
+    from app.infrastructure.search.pgvector_search_repository import PgVectorSearchRepository
+    from scripts.load_postgres import load
+
+    direct = setup["direct"]
+    schema = f"it_v18_{uuid4().hex[:8]}"
+    by_id = sorted(BOOKS, key=lambda b: b.id)
+    first = setup["source"].parent / "first_two.db"
+    SqliteBookCatalogRepository(first).save_many([by_id[-1], by_id[1]])  # not a prefix by id
+    options = dict(embedding_model=MODEL, device=None, vector_index=setup["vector_index"],
+                   reuse_index=setup["index_dir"], log=lambda message: None, gin_index=False, store_text_bodies=False)
+    try:
+        load(direct, first, schema, **options)
+        stage = load(direct, setup["source"], schema, limit=3, **options)
+        stored = {row["id"] for row in direct.query(f"SELECT id FROM {schema}.works")}
+        full = load(direct, setup["source"], schema, **options)
+
+        assert stage["facts"]["works"] == 3 and stage["facts"]["stage_works"] == 3
+        assert stage["facts"]["last_load"]["works_deleted"] == 0 and stage["facts"]["last_load"]["works_changed"] == 1
+        assert stored == {by_id[-1].id, by_id[1].id, by_id[0].id}  # both loaded works, then the first new by id
+        last = full["facts"]["last_load"]
+        assert full["facts"]["works"] == 5 and last["works_changed"] == 2 and last["vectors_reused"] == 2
+        assert last["vectors_filled_after_insert"] == 0
+        counts = direct.query(f"SELECT count(*) FILTER (WHERE embedding IS NULL) AS no_vector, "
+                              f"(SELECT count(*) FROM {schema}.work_texts WHERE tsv IS NULL) AS no_tsv "
+                              f"FROM {schema}.works")[0]
+        assert counts == {"no_vector": 0, "no_tsv": 0}
+        assert index_exists(direct, schema, VECTOR_INDEX) and not index_exists(direct, schema, BM25_NEXT_INDEX)
+        if setup["has_bm25"]:
+            assert index_exists(direct, schema, BM25_INDEX)
+        vector = PgVectorSearchRepository(setup["db"], schema, "exact", expected_identity=MODEL)
+        query = VECTORS[BOOKS[0].id]
+        assert [r.book.id for r in vector.search(query, 2)] == _brute_force(query, 2)
+    finally:
+        drop_schema(direct, schema)
+
+
 def test_load_stops_when_the_database_passes_the_size_limit(setup):
     from app.infrastructure.db.postgres_schema import drop_schema
     from scripts.load_postgres import load

@@ -157,7 +157,9 @@ CREATE INDEX IF NOT EXISTS work_texts_tsv_gin ON __SCHEMA__.work_texts USING gin
 
 -- @section lexical_index_bm25
 -- BM25 index (lakebase_text). k1 and b are fixed when the index is built.
-CREATE INDEX IF NOT EXISTS work_texts_bm25 ON __SCHEMA__.work_texts
+-- __BM25_INDEX__ is work_texts_bm25, or a temporary name while a rebuild
+-- runs beside the index in use (see postgres_schema.build_lexical_indexes).
+CREATE INDEX IF NOT EXISTS __BM25_INDEX__ ON __SCHEMA__.work_texts
   USING lakebase_bm25 (tsv) WITH (k1 = __BM25_K1__, b = __BM25_B__);
 
 -- @section vector_index_lakebase_ann

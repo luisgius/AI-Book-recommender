@@ -10,34 +10,45 @@ Load a SQLite catalog of this project into a Postgres schema (cloud profile, V12
     python -m scripts.load_postgres --schema eval177 --report         # sizes only
     python -m scripts.load_postgres --schema eval177 --drop           # delete the schema
     SEARCH_PROFILE=cloud python -m scripts.load_postgres --from data/catalog_deploy/catalog.db \\
-        --schema catalog_deploy --no-gin --no-text-bodies --limit 10000 --max-database-mib 800
-        # the deployed catalog (V17): smaller footprint, loaded in stages under a size guard
+        --schema catalog_deploy --no-gin --no-text-bodies --limit 35000 --max-database-mib 780
+        # the deployed catalog (V17, enlarged in V18): smaller footprint, loaded in
+        # stages under a size guard; works already loaded stay in every stage
 
 Uses the direct connection string (DATABASE_URL_UNPOOLED, falling back to
 DATABASE_URL), as Neon recommends for migrations, bulk loads and index
 builds. Steps, each resumable (a second run with an unchanged source writes
-nothing, re-embeds nothing and rebuilds nothing):
+nothing, re-embeds nothing and rebuilds nothing; an interrupted run is
+finished by running the same command again):
 
 1. Apply the schema (app/infrastructure/db/postgres_schema.sql) with the
    embedding dimension of the model.
-2. Upsert works and their texts in batches through
-   PostgresBookCatalogRepository (unchanged works are skipped).
+2. Upsert works, their vectors and their texts in batches through
+   PostgresBookCatalogRepository (unchanged works are skipped). Each row is
+   written once in its final form (V18): the vector of a new work, or of a
+   work whose text changed, is obtained first and inserted with the row, and
+   each text row is inserted with its tsvector, so a load leaves no dead
+   rows and needs no VACUUM FULL. Vectors of a local FAISS index built with
+   the same encoder identity are reused (an index under
+   data/indexes_ablation/<slug>/ or data/indexes/ is used automatically when
+   it holds exactly the catalog's books; --reuse-index names one
+   explicitly); the rest are encoded with the configured encoder
+   (EmbeddingSettings, as the API: EMBEDDING_PROVIDER "local" loads the
+   sentence-transformers model EMBEDDING_MODEL, or --embedding-model;
+   "openrouter" uses OpenRouter's embeddings API with EMBEDDING_MODEL,
+   EMBEDDING_DIMENSIONS and EMBEDDING_OPENROUTER_PROVIDER, whose defaults
+   under SEARCH_PROFILE=cloud are the cloud choice). The halfvec dimension
+   is the encoder's. A stored vector is kept while its text is unchanged
+   (works.text_hash) and the encoder identity is the one recorded in
+   catalog_info; a schema loaded with another identity (model, provider or
+   dimension) is refused: use another schema or --drop it.
 3. Delete works that are no longer in the source catalog.
-4. Fill missing embeddings. Vectors of a local FAISS index built with the
-   same encoder identity are reused (an index under data/indexes_ablation/<slug>/
-   or data/indexes/ is used automatically when it holds exactly the catalog's
-   books; --reuse-index names one explicitly); the rest are encoded with
-   the configured encoder (EmbeddingSettings, as the API: EMBEDDING_PROVIDER
-   "local" loads the sentence-transformers model EMBEDDING_MODEL, or
-   --embedding-model; "openrouter" uses OpenRouter's embeddings API with
-   EMBEDDING_MODEL, EMBEDDING_DIMENSIONS and EMBEDDING_OPENROUTER_PROVIDER,
-   whose defaults under SEARCH_PROFILE=cloud are the cloud choice). The
-   halfvec dimension is the encoder's. A stored vector is kept while its
-   text is unchanged (works.text_hash) and the encoder identity is the one
-   recorded in catalog_info; a schema loaded with another identity (model,
-   provider or dimension) is refused: use another schema or --drop it.
+4. Fill embeddings still missing (rows written without a vector by an
+   earlier version of this loader).
 5. Build the indexes (GIN, BM25 if lakebase_text is installed, ANN) when
-   anything changed or an index is missing, then VACUUM ANALYZE.
+   anything changed or an index is missing, then VACUUM ANALYZE. On a live
+   catalog the BM25 index is rebuilt beside the one in use and swapped in
+   (lexical search never loses it); the ANN index is dropped first and
+   rebuilt last, and vector search scans every row (exact) meanwhile.
 6. Record the facts the search adapters need in catalog_info (among them
    the encoder identity: "embedding_model" is the identity string the API
    compares with its query encoder, "embedding_identity" holds model,
@@ -54,7 +65,7 @@ import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set
 from uuid import UUID
 
 from dotenv import load_dotenv
@@ -68,6 +79,7 @@ from app.infrastructure.search.text_encoding import model_slug
 from app.infrastructure.usage_recording import UsageRecorder
 from app.infrastructure.db.postgres_book_catalog_repository import PostgresBookCatalogRepository
 from app.infrastructure.db.postgres_connection import PostgresDatabase, redact
+from app.infrastructure.db.postgres_rows import content_hash, text_hash
 from app.infrastructure.db.postgres_schema import (
     BM25_B,
     BM25_INDEX,
@@ -94,6 +106,8 @@ from app.infrastructure.db.sqlite_book_catalog_repository import SqliteBookCatal
 
 UPSERT_BATCH = 500
 EMBED_BATCH = 64
+BM25_REBUILD_MARGIN = 1.5
+"""Size of a rebuilt BM25 index assumed by the size check, relative to the index in use"""
 
 
 class ReadOnlySqliteCatalog(SqliteBookCatalogRepository):
@@ -183,6 +197,29 @@ def find_reusable_index(
         if ids == wanted:
             return candidate
     return None
+
+
+# =============================================================================
+# Staged loads
+# =============================================================================
+
+
+def stage_ids(source_ids: Sequence[UUID], stored_ids: Set[UUID], limit: Optional[int]) -> List[UUID]:
+    """
+    The works one (staged) load writes, by id.
+
+    Without a limit, every work of the source. With one, the source works
+    already stored in the schema come first, then the other source works by
+    id, up to `limit` in all (more if more are already stored). So a stage
+    never leaves out a work that is already loaded: enlarging a live catalog
+    (V18) keeps every loaded work searchable and its vector stored, and a
+    load from an empty schema takes the first `limit` works by id as before.
+    """
+    if limit is None or limit >= len(source_ids):
+        return list(source_ids)
+    kept = [book_id for book_id in source_ids if book_id in stored_ids]
+    new = [book_id for book_id in source_ids if book_id not in stored_ids]
+    return sorted(kept + new[:max(0, limit - len(kept))])
 
 
 # =============================================================================
@@ -324,12 +361,16 @@ def load(
             comparison ranking); False drops it
         store_text_bodies: keep the description texts in work_texts.body
             (False keeps only their tsvectors; see PostgresBookCatalogRepository)
-        limit: load only the first `limit` works of the source by id, so a
-            catalog can be loaded in stages (each stage contains the previous
-            one, and stored vectors are kept)
+        limit: load the works of the source already stored in the schema
+            plus the first new ones by id, up to `limit` works in all (see
+            stage_ids), so a catalog can be loaded or enlarged in stages
+            (each stage contains the previous one, and stored vectors are
+            kept); works no longer in the source are still deleted
         max_database_bytes: stop with an error as soon as pg_database_size
             exceeds this, checked after every write batch and after the
-            indexes, so a load stops before the plan's storage limit
+            indexes, so a load stops before the plan's storage limit; the
+            index rebuild is refused beforehand if its estimated peak
+            (BM25_REBUILD_MARGIN) would pass it
         catalog_contents: what the catalog holds (counts, licences), recorded
             in catalog_info under "catalog_contents"
         embed_workers: embedding requests sent at the same time (API encoder)
@@ -346,12 +387,7 @@ def load(
     started = time.perf_counter()
     catalog = ReadOnlySqliteCatalog(source)
     source_ids = catalog.all_ids()
-    if limit is not None and limit < len(source_ids):
-        log(f"Source {source}: {len(source_ids)} books; this stage loads the first {limit} by id")
-        source_ids = source_ids[:limit]
-    else:
-        log(f"Source {source}: {len(source_ids)} books")
-    in_stage = set(source_ids)
+    log(f"Source {source}: {len(source_ids)} books")
     size_log: List[Dict[str, Any]] = []
 
     def check_size(step: str) -> int:
@@ -404,40 +440,89 @@ def load(
     write_catalog_info(db, schema, {"embedding_model": identity,
                                     "embedding_identity": identity_record(identity, dim, encoder)})
 
-    # 2. Works and texts.
+    # 2. Works, texts and vectors. Each row is written once, in its final
+    #    form: the vector of a new work (or of a work whose text changed) is
+    #    reused or encoded first and inserted with the row, and each text row
+    #    is inserted with its tsvector, so a load leaves no dead rows (V18).
     check_size("the schema")
     repo = PostgresBookCatalogRepository(db, schema, store_text_bodies=store_text_bodies)
+    stage = stage_ids(source_ids, set(repo.all_ids()), limit)
+    in_stage = set(stage)
+    if len(stage) < len(source_ids):
+        log(f"This stage loads {len(stage)} of the {len(source_ids)} works (the works already stored, then "
+            f"the first new ones by id)")
     t0 = time.perf_counter()
     changed = 0
+    vectors_reused = 0
+    vectors_encoded = 0
+    encode_seconds = 0.0
+    marked_stale = False
+
+    def mark_stale() -> None:
+        """Flag the indexes as stale before the first write, so an interrupted load still rebuilds them."""
+        nonlocal marked_stale
+        if not marked_stale:
+            write_catalog_info(db, schema, {"indexes_stale": True})
+            marked_stale = True
+
+    def write(books: List[Any]) -> None:
+        nonlocal changed, vectors_reused, vectors_encoded, encode_seconds
+        if not books:
+            return
+        stored = {row["id"]: row for row in db.query(
+            f"SELECT id, content_hash, text_hash, embedding IS NOT NULL AS has_vector FROM {schema}.works "
+            f"WHERE id = ANY(%(ids)s::uuid[])", {"ids": [book.id for book in books]})}
+        todo = [book for book in books
+                if book.id not in stored or stored[book.id]["content_hash"] != content_hash(book)]
+        if not todo:
+            return
+        needs_vector = [book for book in todo if book.id not in stored or not stored[book.id]["has_vector"]
+                        or stored[book.id]["text_hash"] != text_hash(book)]
+        vectors = {book.id: reused_vectors[book.id] for book in needs_vector if book.id in reused_vectors}
+        to_encode = [book for book in needs_vector if book.id not in reused_vectors]
+        if to_encode:
+            e0 = time.perf_counter()
+            encoded = encode_texts(get_encoder(), [book.get_searchable_text() for book in to_encode],
+                                   embed_batch, embed_workers)
+            encode_seconds += time.perf_counter() - e0
+            vectors.update(zip([book.id for book in to_encode], encoded))
+        mark_stale()
+        changed += repo.upsert_many(todo, embeddings=vectors)
+        vectors_reused += len(needs_vector) - len(to_encode)
+        vectors_encoded += len(to_encode)
+
     batch = []
     for book in catalog.iter_all(batch_size=upsert_batch):
         if book.id not in in_stage:
-            break  # iter_all is ordered by id, so the stage's works come first
+            continue
         batch.append(book)
         if len(batch) >= upsert_batch:
-            changed += repo.upsert_many(batch)
+            write(batch)
             batch = []
             check_size(f"works up to {book.id}")
-            log(f"  upserted up to {book.id} ({changed} new or changed so far)")
-    changed += repo.upsert_many(batch)
+            log(f"  upserted up to {book.id} ({changed} new or changed so far, {vectors_encoded} encoded)")
+    write(batch)
     upsert_seconds = time.perf_counter() - t0
     check_size("the works")
-    log(f"Works: {changed} new or changed ({upsert_seconds:.1f} s)")
+    log(f"Works: {changed} new or changed, with {vectors_reused} reused and {vectors_encoded} encoded vectors "
+        f"({upsert_seconds:.1f} s)")
 
-    # 3. Prune works that left the source.
+    # 3. Prune works that left the source (not those a stage leaves for later).
     extra = sorted(set(repo.all_ids()) - set(source_ids))
+    if extra:
+        mark_stale()
     for start in range(0, len(extra), 1000):
         repo.delete_many(extra[start:start + 1000])
     if extra:
         log(f"Deleted {len(extra)} works that are no longer in the source")
-    if changed or extra:
-        write_catalog_info(db, schema, {"indexes_stale": True})
 
-    # 4. Embeddings.
+    # 4. Embeddings still missing: rows written without a vector by an
+    #    earlier loader version or by upsert_many without embeddings. These
+    #    are updates (one dead row each); step 2 leaves none to fill.
     from app.infrastructure.search.postgres_embeddings_store import PostgresEmbeddingsStore
 
     missing = [row["id"] for row in db.query(f"SELECT id FROM {schema}.works WHERE embedding IS NULL ORDER BY id")]
-    t0 = time.perf_counter()
+    t1 = time.perf_counter()
     reused_now = [book_id for book_id in missing if book_id in reused_vectors]
     to_encode = [book_id for book_id in missing if book_id not in reused_vectors]
 
@@ -445,11 +530,12 @@ def load(
         def get_dimension(self) -> int:
             return dim
 
+    if missing:
+        mark_stale()
     store = PostgresEmbeddingsStore(_DimOnly() if not to_encode else get_encoder(), db, schema)  # type: ignore[arg-type]
     if reused_now:
         store.store_embeddings_batch(reused_now, [reused_vectors[i] for i in reused_now])
         log(f"Stored {len(reused_now)} reused vectors")
-    encode_seconds = 0.0
     for start in range(0, len(to_encode), embed_batch * 8):
         ids = to_encode[start:start + embed_batch * 8]
         books = catalog.get_many(ids)
@@ -460,10 +546,11 @@ def load(
         store.store_embeddings_batch(ids, vectors)
         check_size(f"{min(start + len(ids), len(to_encode))} vectors")
         log(f"  encoded {min(start + len(ids), len(to_encode))}/{len(to_encode)}")
-    embed_seconds = time.perf_counter() - t0
+    vectors_reused += len(reused_now)
+    vectors_encoded += len(to_encode)
+    embed_seconds = time.perf_counter() - t1
     if missing:
-        write_catalog_info(db, schema, {"indexes_stale": True})
-    log(f"Embeddings: {len(reused_now)} reused, {len(to_encode)} encoded ({embed_seconds:.1f} s)")
+        log(f"Missing embeddings filled: {len(reused_now)} reused, {len(to_encode)} encoded ({embed_seconds:.1f} s)")
 
     # 5. Indexes and statistics.
     info = read_catalog_info(db, schema)
@@ -481,15 +568,34 @@ def load(
     if not gin_index:
         build_seconds.pop(GIN_INDEX, None)
     vacuum_seconds = None
+    vector_index_absent_seconds = None
     if needs_build:
         log("Building indexes")
+        # The BM25 index is rebuilt beside the one in use (searches keep it);
+        # the vector index is dropped first, so the database never holds two
+        # BM25 indexes and the vector index at once, and rebuilt last. Until
+        # then vector searches scan every row (exact, slower).
+        sizes = {item["relation"]: item.get("bytes") or 0 for item in relation_sizes(db, schema)
+                 if item["kind"] == "index"}
+        peak = database_size(db) - sizes.get(VECTOR_INDEX, 0) + int(BM25_REBUILD_MARGIN * sizes.get(BM25_INDEX, 0))
+        if max_database_bytes is not None and peak > max_database_bytes:
+            raise RuntimeError(
+                f"Rebuilding the indexes could take the database to about {peak / 2**20:.1f} MiB, over the limit "
+                f"of {max_database_bytes / 2**20:.0f} MiB: nothing was dropped"
+            )
         db.execute(f"DROP INDEX IF EXISTS {schema}.{GIN_INDEX}")
+        vector_dropped_at = time.perf_counter() if index_exists(db, schema, VECTOR_INDEX) else None
+        db.execute(f"DROP INDEX IF EXISTS {schema}.{VECTOR_INDEX}")
         build_seconds.update(build_lexical_indexes(db, schema, k1=BM25_K1, b=BM25_B, gin=gin_index))
         check_size("the lexical indexes")
         build_seconds[f"{VECTOR_INDEX} ({vector_index})"] = build_vector_index(db, schema, vector_index)
+        if vector_dropped_at is not None:
+            vector_index_absent_seconds = time.perf_counter() - vector_dropped_at
         vacuum_seconds = vacuum_analyze(db, schema)
         for name, seconds in build_seconds.items():
             log(f"  {name}: {seconds:.2f} s")
+        if vector_index_absent_seconds is not None:
+            log(f"  vector index absent (exact vector scans) for {vector_index_absent_seconds:.2f} s")
         log(f"  VACUUM ANALYZE: {vacuum_seconds:.2f} s")
     else:
         log("Indexes are up to date")
@@ -519,19 +625,22 @@ def load(
         "gin_index": gin_index,
         "text_bodies_stored": store_text_bodies,
         "stage_limit": limit,
+        "stage_works": len(stage),
         "database_size_log": size_log,
     }
     if catalog_contents is not None:
         facts["catalog_contents"] = dict(catalog_contents)
     if needs_build:
         facts["vacuum_seconds"] = vacuum_seconds
-    if changed or missing:
+        facts["vector_index_absent_seconds"] = vector_index_absent_seconds
+    if changed or missing or extra:
         facts["last_load"] = {
             "upsert_seconds": upsert_seconds,
             "works_changed": changed,
             "works_deleted": len(extra),
-            "vectors_reused": len(reused_now),
-            "vectors_encoded": len(to_encode),
+            "vectors_reused": vectors_reused,
+            "vectors_encoded": vectors_encoded,
+            "vectors_filled_after_insert": len(missing),
             "vectors_reused_from": str(reusable) if reusable else None,
             "encode_seconds": encode_seconds,
             "embedding_seconds": embed_seconds,
@@ -558,7 +667,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-text-bodies", action="store_true",
                         help="keep only the tsvector of each description in work_texts (the texts stay in works)")
     parser.add_argument("--limit", type=int, default=None,
-                        help="load only the first N works of the source by id (staged loads)")
+                        help="staged loads: the works already stored plus the first new ones by id, N in all")
     parser.add_argument("--embed-workers", type=int, default=1,
                         help="embedding requests sent at the same time (API encoder; default 1)")
     parser.add_argument("--max-database-mib", type=float, default=None,

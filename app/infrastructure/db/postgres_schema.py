@@ -34,6 +34,8 @@ BM25_B = 0.75
 
 VECTOR_INDEX_TYPES = ("lakebase_ann", "hnsw")
 BM25_INDEX = "work_texts_bm25"
+BM25_NEXT_INDEX = "work_texts_bm25_next"
+"""Temporary name of a BM25 index rebuilt beside the one in use (renamed to BM25_INDEX when done)"""
 GIN_INDEX = "work_texts_tsv_gin"
 VECTOR_INDEX = "works_embedding_ann"
 
@@ -65,14 +67,19 @@ def load_sections(path: Path = SCHEMA_FILE) -> Dict[str, str]:
     return sections
 
 
-def render(sql: str, schema: str, *, dim: int = 0, k1: float = BM25_K1, b: float = BM25_B) -> str:
+def render(
+    sql: str, schema: str, *, dim: int = 0, k1: float = BM25_K1, b: float = BM25_B, bm25_index: str = BM25_INDEX
+) -> str:
     """Fill the placeholders of a section."""
     validate_schema_name(schema)
+    if bm25_index not in (BM25_INDEX, BM25_NEXT_INDEX):
+        raise ValueError(f"Unknown BM25 index name {bm25_index!r}")
     return (
         sql.replace("__SCHEMA__", schema)
         .replace("__DIM__", str(int(dim)))
         .replace("__BM25_K1__", repr(float(k1)))
         .replace("__BM25_B__", repr(float(b)))
+        .replace("__BM25_INDEX__", bm25_index)
     )
 
 
@@ -171,10 +178,14 @@ def build_lexical_indexes(
     (Re)build the GIN index and, when lakebase_text is installed, the BM25 index.
 
     The BM25 index is always rebuilt (its corpus statistics are frozen at
-    build time). The GIN index serves only the ts_rank_cd comparison ranking
-    (matching with @@), not BM25, so a deployed catalog can leave it out
-    (gin=False drops an existing one); ts_rank_cd still works without it,
-    by scanning every text row. Returns seconds per index.
+    build time). When one exists, the new index is built beside it under
+    BM25_NEXT_INDEX and the two are swapped in one transaction (drop the old,
+    rename the new), so the searches, which name the index in their query,
+    never find it missing (V18: reloading a live catalog); the database holds
+    both indexes until the swap. The GIN index serves only the ts_rank_cd
+    comparison ranking (matching with @@), not BM25, so a deployed catalog
+    can leave it out (gin=False drops an existing one); ts_rank_cd still
+    works without it, by scanning every text row. Returns seconds per index.
     """
     seconds: Dict[str, float] = {}
     schema = validate_schema_name(schema)
@@ -185,9 +196,14 @@ def build_lexical_indexes(
         db.execute(_section("lexical_index_gin", schema))
         seconds[GIN_INDEX] = time.perf_counter() - started
     if "lakebase_text" in installed_extensions(db):
-        db.execute(f"DROP INDEX IF EXISTS {schema}.{BM25_INDEX}")
+        db.execute(f"DROP INDEX IF EXISTS {schema}.{BM25_NEXT_INDEX}")  # left by an interrupted rebuild
         started = time.perf_counter()
-        db.execute(_section("lexical_index_bm25", schema, k1=k1, b=b))
+        if index_exists(db, schema, BM25_INDEX):
+            db.execute(_section("lexical_index_bm25", schema, k1=k1, b=b, bm25_index=BM25_NEXT_INDEX))
+            db.execute(f"DROP INDEX {schema}.{BM25_INDEX}; "
+                       f"ALTER INDEX {schema}.{BM25_NEXT_INDEX} RENAME TO {BM25_INDEX}")
+        else:
+            db.execute(_section("lexical_index_bm25", schema, k1=k1, b=b))
         seconds[BM25_INDEX] = time.perf_counter() - started
     return seconds
 
