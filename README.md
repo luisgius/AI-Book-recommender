@@ -4,9 +4,13 @@ Trabajo Fin de Grado de Luis Giménez (ETSINF, Universitat Politècnica de Valè
 Repositorio: https://github.com/luisgius/AI-Book-recommender
 
 Es un buscador de libros que acepta peticiones en lenguaje natural y en varios
-idiomas. Combina una búsqueda léxica (BM25) con una búsqueda semántica
-(embeddings multilingües e índice vectorial), fusiona las dos listas con
-Reciprocal Rank Fusion y reordena los primeros resultados con un cross-encoder.
+idiomas. Una búsqueda semántica (embeddings multilingües e índice vectorial)
+encuentra los candidatos y un cross-encoder reordena los primeros; la búsqueda
+léxica (BM25) responde cuando la semántica no está disponible. La fusión de las
+dos listas con Reciprocal Rank Fusion sigue disponible como configuración
+(`SEARCH_CANDIDATES=hybrid`): fue la configuración por defecto hasta que la
+evaluación sobre el catálogo desplegado la encontró peor que la búsqueda
+semántica sola ([sección 5](#5-resultados-principales)).
 Un LLM, opcional y siempre condicionado por los libros recuperados (RAG),
 interpreta la consulta y explica con citas verificadas por qué cada libro
 responde a ella. El código sigue una arquitectura hexagonal con dos perfiles de
@@ -61,11 +65,15 @@ construye los índices de la colección de evaluación de 177 libros
 fichero `.env`, y arranca siempre con el LLM apagado, aunque el `.env` de la
 máquina tenga una clave.
 
-Configuración que arranca: la del pipeline evaluado (BM25 con normalización
-léxica, embeddings `intfloat/multilingual-e5-large-instruct`, fusión RRF y
-reordenación con `BAAI/bge-reranker-v2-m3`); es el sistema
-`hybrid_norm_e5_bge_nopad` de
-[`BM25_PADDING.md`](data/evaluation/BM25_PADDING.md).
+Configuración que arranca: los modelos locales evaluados, embeddings
+`intfloat/multilingual-e5-large-instruct` y reordenación con
+`BAAI/bge-reranker-v2-m3`, con los candidatos de la búsqueda vectorial y BM25
+(con normalización léxica) solo como respaldo, como en el despliegue. En esta
+colección la combinación vectorial más reordenador no se midió; la búsqueda
+vectorial sola (`vec_e5`, 0.661) y el sistema fusionado y reordenado
+(`hybrid_norm_e5_bge_nopad`, 0.660) quedaron empatados
+([`BM25_PADDING.md`](data/evaluation/BM25_PADDING.md)). `make demo
+CANDIDATES=hybrid` arranca ese sistema fusionado.
 
 **Coste de la primera ejecución** (medido el 2026-11-12 en un portátil con Apple
 M5 Pro, macOS y Python 3.13):
@@ -151,7 +159,7 @@ flowchart LR
     API["API FastAPI (/api/v1)"] --> S
     MCP --> S
     subgraph Dominio
-      S["SearchService: BM25 + vectores, RRF, reranker, filtros, MMR, explicaciones"]
+      S["SearchService: candidatos vectoriales (o BM25 + vectores con RRF), reranker,<br/>respaldo BM25, filtros, MMR, explicaciones"]
       P["Puertos principales: BookCatalogRepository, LexicalSearchRepository,<br/>VectorSearchRepository, EmbeddingsStore, Reranker,<br/>LLMClient, SearchAgent, UsageBudget"]
     end
     S --- P
@@ -167,15 +175,48 @@ flowchart LR
 | Aplicación | `app/api/`, `app/ui/`, `app/main.py` | API REST, servidor MCP, interfaz web y composición de adaptadores (`app/api/v1/dependencies.py`) |
 
 Los dos perfiles comparten el mismo `SearchService`; `SEARCH_PROFILE` elige los
-adaptadores:
+adaptadores y `SEARCH_CANDIDATES` de dónde salen los candidatos, en los dos:
+
+- `vector` (por defecto): la búsqueda vectorial da los candidatos, el reranker
+  los ordena y BM25 no se consulta. Si falla el embedding de la consulta o la
+  búsqueda vectorial, o se agota el presupuesto diario de búsquedas con
+  modelos, responde BM25 y la respuesta lo indica (`degraded`,
+  `search_mode: "lexical_only"`).
+- `hybrid`: BM25 y la búsqueda vectorial se fusionan con RRF (k = 60) antes del
+  reranker, como en los experimentos de las secciones 5 y 3. Los módulos de
+  evaluación construyen su propio `SearchService` en este modo y no leen la
+  variable, así que `make eval` reproduce los informes publicados.
+
+La respuesta de `/api/v1/search` dice en qué modo se buscó (`search_mode`:
+`vector_only`, `hybrid` o `lexical_only`) y da el puesto de cada libro en cada
+etapa que se ejecutó; en modo `vector` ningún resultado tiene puesto en BM25.
+La página toma el modo de `/api/v1/health` (`profile.candidates`) para explicar
+el pipeline que ejecuta el servidor.
+
+En el perfil nube el embedding de la consulta se pide a DeepInfra y, si no ha
+respondido en 1 s (o falla), también a Nebius; a los 2.5 s se repite la
+petición a DeepInfra; gana la primera respuesta dentro de 5 s y las demás se
+cancelan. La investigación de los fallos de V14
+([`FINDINGS.md`](data/evaluation/catalog50k/investigation/FINDINGS.md),
+pregunta 2) midió 0 fallos en 540 llamadas con esta estrategia frente a 3 con
+DeepInfra sola, con la misma latencia mediana, y comprobó que los vectores de
+consulta de Nebius sirven contra los documentos calculados con DeepInfra
+(nDCG@10 0.689 frente a 0.682). Todas las peticiones de embeddings van
+restringidas a endpoints sin retención de datos (`provider.zdr`), y los
+vectores de las últimas 256 consultas se guardan en memoria por texto exacto:
+la misma búsqueda repetida en la misma instancia devuelve la misma lista. Esa
+caché no cubre una instancia nueva ni otra instancia en paralelo, donde el
+orden de los diez primeros puede variar un poco (DeepInfra devuelve dos
+variantes del vector para el mismo texto; la calidad medida es la misma).
+`.env.example` documenta cada parámetro y cómo volver a la política anterior.
 
 | | Perfil local (`SEARCH_PROFILE=local`) | Perfil nube (`SEARCH_PROFILE=cloud`) |
 |---|---|---|
 | Catálogo | SQLite, 177 libros (`data/catalog.db`) | Postgres en Neon, el catálogo desplegado |
-| Léxica | rank-bm25 con normalización léxica | BM25 de Postgres (`lakebase_text`) |
+| Léxica (respaldo; candidatos en modo `hybrid`) | rank-bm25 con normalización léxica | BM25 de Postgres (`lakebase_text`) |
 | Vectorial | FAISS, `multilingual-e5-large-instruct` | pgvector, `qwen/qwen3-embedding-8b` por API |
 | Reordenación | `BAAI/bge-reranker-v2-m3` en el proceso | `qwen/qwen3-reranker-8b` por API |
-| Papel | Evaluado (44 consultas, juicios de relevancia) | Desplegado (URL pública) |
+| Papel | Evaluado (44 consultas, juicios de relevancia) | Desplegado (URL pública); evaluado sobre su catálogo con jueces LLM (116 consultas) |
 
 ### El asistente conversacional
 
@@ -225,6 +266,39 @@ graph TD;
 
 ## 5. Resultados principales
 
+### Sobre el catálogo desplegado (50 000 obras)
+
+[`CATALOG_EVALUATION.md`](data/evaluation/CATALOG_EVALUATION.md), con el
+protocolo declarado antes de ejecutarlo
+([`2026-11-12-protocolo-evaluacion-catalogo.md`](docs/notes/2026-11-12-protocolo-evaluacion-catalogo.md)):
+116 consultas en doce idiomas (estratos A y B) sobre el catálogo desplegado,
+juicios de dos jueces LLM de familias distintas (aún sin acuerdo medido con
+personas en este catálogo). nDCG@10 con el juez principal:
+
+| Sistema | nDCG@10 [IC 95 %] |
+|---|---|
+| Solo BM25 | 0.336 [0.287, 0.384] |
+| Solo vectorial (`qwen3-embedding-8b`) | 0.683 [0.647, 0.717] |
+| Fusión híbrida RRF | 0.592 [0.554, 0.628] |
+| Vectorial + reranker `qwen3-reranker-8b` (**configuración actual**) | 0.798 [0.772, 0.823] |
+| Híbrida + reranker (configuración desplegada hasta este cambio) | 0.769 [0.740, 0.797] |
+
+**La fusión híbrida fue peor.** Sin reranker, fusionar BM25 con la búsqueda
+vectorial bajó el nDCG@10 en -0.092 [-0.128, -0.055] (p de Holm < 0.001; con el
+segundo juez, -0.099). Con el reranker, los candidatos de BM25 siguieron
+restando: -0.029 [-0.045, -0.014] (p de Holm < 0.001; con el segundo juez,
+-0.035 [-0.054, -0.014]). El protocolo había fijado de antemano que la
+configuración desplegada mantendría BM25 en la fusión salvo que vectorial +
+reranker superase a híbrida + reranker de forma significativa; se cumplió con
+los dos jueces, así que la configuración por defecto pasó a ser vectorial +
+reranker en los dos perfiles, con BM25 solo como respaldo cuando falla la
+búsqueda vectorial (`SEARCH_CANDIDATES`, [sección 4](#4-arquitectura)). La
+fusión sigue disponible con `SEARCH_CANDIDATES=hybrid`. El reordenador por LLM
+sobre la fusión puntuó 0.811, pero añade unos 2.7 s y una llamada al LLM por
+búsqueda, y no se desplegó.
+
+### Sobre la colección de evaluación (177 libros)
+
 nDCG@10 sobre la colección de 177 libros y 44 consultas (24 en inglés, 20 en
 español). Diferencia con intervalo bootstrap del 95 % y p corregido por Holm
 dentro de la familia de contrastes declarada en cada informe.
@@ -244,11 +318,12 @@ cambian el nDCG ideal de algunas consultas).
 
 ## 6. Límites conocidos
 
-- **El perfil desplegado no es el evaluado.** La evaluación con juicios de
-  relevancia se hizo sobre el perfil local y 177 libros. Del perfil nube se
-  midió la paridad del almacenamiento con los mismos vectores
-  (`PROFILE_PARITY.md`) y los modelos por API sobre la misma colección
-  (`API_MODELS.md`); el catálogo desplegado no tiene juicios de relevancia.
+- **Dos evaluaciones con alcances distintos.** La colección de 177 libros tiene
+  juicios originales más juicios de un juez LLM; el catálogo desplegado de
+  50 000 obras (`CATALOG_EVALUATION.md`) solo tiene juicios de jueces LLM, y la
+  hoja de anotación humana de 200 pares está sin rellenar. La configuración
+  actual (vectorial + reranker) se eligió con la segunda; en la primera no se
+  midió esa combinación.
 - **Colección pequeña.** 44 consultas y 177 libros: diferencias de nDCG@10
   menores de unos 0.08 son difíciles de detectar, y los resultados pueden no
   trasladarse a un catálogo mayor (`RETRIEVAL_ABLATION.md`).
@@ -260,14 +335,16 @@ cambian el nDCG ideal de algunas consultas).
   límites por cliente se cuentan en la memoria de cada instancia y no son un
   techo garantizado; un proveedor lento puede costar hasta unos 5 s por llamada
   antes de degradar la búsqueda (vectorial perdida: solo léxica; reranker
-  perdido: orden fusionado); las explicaciones tardan (tres explicaciones, 23.5 s
+  perdido: orden de los candidatos); la estrategia con un segundo proveedor de
+  embeddings reduce esos fallos pero no cubre un episodio que afecte a los dos
+  proveedores a la vez ni una caída de OpenRouter; las explicaciones tardan (tres explicaciones, 23.5 s
   en la medida); la primera petición tras un periodo sin uso tardó 12.6 s y
   22.3 s; las consultas sin respuesta buena en el catálogo devuelven igualmente
   diez resultados, sin relación con la consulta.
 - **La configuración local por defecto del código no es la evaluada.** Sin
   variables, el código usa el índice de `data/indexes` (`all-MiniLM-L6-v2`, sin
-  reranker); `make demo` fija la configuración evaluada y el `Dockerfile` usa la
-  ligera.
+  reranker); `make demo` fija los modelos evaluados y el `Dockerfile` usa la
+  configuración ligera.
 
 ## 7. Servidor MCP
 
