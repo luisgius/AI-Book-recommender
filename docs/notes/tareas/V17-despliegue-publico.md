@@ -1,7 +1,7 @@
 # V17 · Despliegue público: catálogo de 30 000 obras en Neon y backend en Vercel, con límites de gasto
 
 - **Fecha:** 2026-11-12 (código en el commit `df2d890`; las medidas del despliegue se tomaron el 2026-11-11, en UTC)
-- **Estado:** hecha y validada; la ampliación del catálogo pedida el 2026-11-12 está en curso (ver "Trabajo pendiente")
+- **Estado:** hecha y validada; el catálogo se amplió a 50 000 obras el mismo día, en la tarea V18 (`V18-ampliacion-catalogo-desplegado.md`)
 - **Capa:** infraestructura (`app/infrastructure/`), dominio (`app/domain/`), aplicación (`app/api/`), interfaz (`app/ui/static/`), scripts, configuración de despliegue
 
 ## Qué se ha hecho
@@ -201,7 +201,7 @@ Embeddings de la carga: 0.0560 USD. Peor caso diario con los límites de producc
 | Alternativa | Por qué no |
 |---|---|
 | Supabase en lugar de Neon | Su plan gratuito es de 500 MB y se pausa tras siete días de poca actividad; el mismo SQL cuesta de 25 a 30 USD al mes (V12 y propuesta). Neon no tiene cuota mínima y se suspende en reposo. El adaptador es SQL estándar, de modo que cambiar después sería cambiar la cadena de conexión |
-| El plan de pago de Neon para un catálogo mayor | Los 30 000 obras caben en el plan gratuito; un catálogo mayor exige el plan de pago por uso, que V12 deja como decisión del autor. 200 000 obras de este tipo necesitarían unos 6.2 GiB según la medida de V12, que usó el esquema antiguo con GIN y textos; aquí se midieron 14 158 bytes por obra. La ampliación en curso se hace dentro del plan gratuito |
+| El plan de pago de Neon para un catálogo mayor | Los 30 000 obras caben en el plan gratuito; un catálogo mayor exige el plan de pago por uso, que V12 deja como decisión del autor. 200 000 obras de este tipo necesitarían unos 6.2 GiB según la medida de V12, que usó el esquema antiguo con GIN y textos; aquí se midieron 14 158 bytes por obra. La ampliación a 50 000 obras (V18) se hizo dentro del plan gratuito |
 | Un contenedor único que se apaga cuando no se usa (Cloud Run), con SQLite y FAISS dentro | La propuesta lo dio como alternativa más barata y conservadora, pero no escala bien a un millón de obras (imagen de varios GB, arranque en frío largo) y exige una cuenta de Google Cloud con tarjeta. El autor eligió Vercel |
 | Ejecutar los modelos dentro de la función de Vercel | Las bibliotecas de modelos (torch, FAISS, sentence-transformers) ocupan varios GB instalados y una función serverless no puede alojarlas; por eso los embeddings y el reranker van por API y el paquete desplegado pesa 49.8 MB |
 | Un solo fichero de dependencias para los dos perfiles (`requirements.txt` en Vercel) | Vercel prioriza `pyproject.toml`; con solo `requirements.txt` instalaría el fichero completo. `pyproject.toml` replica el reducido y un test los contrasta |
@@ -243,7 +243,7 @@ Embeddings de la carga: 0.0560 USD. Peor caso diario con los límites de producc
 
 - **V14**, la evaluación sobre el catálogo desplegado: consultas ampliadas y multilingües, juicios de relevancia y, con ello, la medida de calidad que hoy falta para el sistema de 30 000 obras (incluida la comparación de la búsqueda híbrida y la vectorial en el catálogo grande, que V13 dejó abierta).
 - **V09**, la ejecución en un comando (README, Makefile, demostración, integración continua).
-- **Ampliación del catálogo.** El 2026-11-12 el autor pidió cargar más obras dentro del plan gratuito de Neon, con 423.9 MiB usados de 1 GB. Se está haciendo como tarea de seguimiento y se añadirá a esta nota como una sección de actualización, con sus medidas.
+- **Ampliación del catálogo.** El 2026-11-12 el autor pidió cargar más obras dentro del plan gratuito de Neon, con 423.9 MiB usados de 1 GB. La ampliación se hizo el mismo día como tarea V18, con sus medidas, en `V18-ampliacion-catalogo-desplegado.md`.
 - Fijar un límite de crédito en la clave de OpenRouter (recomendación del informe, que no consta como hecha).
 
 ## Cómo reproducirlo
