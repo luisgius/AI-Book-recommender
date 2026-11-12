@@ -1,7 +1,7 @@
 # V14 · Evaluación del sistema desplegado sobre su catálogo real
 
 - **Fecha:** 2026-11-12
-- **Estado:** hecha; los juicios son solo de LLM hasta que el autor rellene la hoja de anotación humana, y el resultado sobre el modelo de embeddings es provisional (ver la sección de reservas)
+- **Estado:** hecha; los juicios son solo de LLM hasta que el autor rellene la hoja de anotación humana; el resultado sobre el modelo de embeddings se comprobó después en la tarea V23 y se mantiene
 - **Capa:** evaluación (`app/evaluation/catalog_evaluation/`), datos (`data/evaluation/catalog50k/`), documentación (`docs/notes/`)
 - **Commits:** protocolo en `9abf48e` (antes de cualquier resultado); implementación y resultados en `ac35110`
 
@@ -171,7 +171,7 @@ Mediciones operativas (168 consultas codificadas 3 veces por modelo con los tiem
 
 Las dos caras, sin suavizar. En calidad, el modelo desplegado es mejor en esta medición, y por mucho. En lo operativo, es claramente peor: 51 llamadas fallidas o agotadas de 504 frente a 6, percentil 95 de latencia de 1977 ms frente a 728 ms, y la lista de diez primeros cambia entre llamadas repetidas en 116 consultas frente a 10. Para un visitante, un embedding fallido significa que la búsqueda recurre a resultados solo por palabras clave (BM25), que en este catálogo son mucho peores (S1 0.336 frente a S2 0.683 con el juez principal).
 
-**Reserva sobre H6 (provisional).** La diferencia entre los dos modelos de embeddings es mucho mayor que en la colección de 177 libros (allí 0.614 frente a 0.654, V16; aquí 0.426 frente a 0.683 con el juez principal). El informe da la causa como no verificada: se comprobaron los vectores guardados (9 obras recodificadas, coseno 1.000, identificadores alineados) y que el texto por obra es el del cargador, pero no se investigó por qué la diferencia es mayor en este catálogo. El 2026-11-12 se inició una investigación para comprobar si los vectores y las consultas del segundo modelo se construyeron correctamente y por qué fallan las llamadas del modelo desplegado. Hasta que informe, la cifra de H6 debe leerse como provisional. No se especula aquí sobre la causa.
+**Reserva sobre H6 (resuelta por V23).** La diferencia entre los dos modelos de embeddings es mucho mayor que en la colección de 177 libros (allí 0.614 frente a 0.654, V16; aquí 0.426 frente a 0.683 con el juez principal). El informe da la causa como no verificada: se comprobaron los vectores guardados (9 obras recodificadas, coseno 1.000, identificadores alineados) y que el texto por obra es el del cargador, pero no se investigó por qué la diferencia es mayor en este catálogo. La investigación posterior (tarea V23, `V23-comprobacion-embeddings.md`) no encontró ningún defecto en cómo se construyó o consultó el segundo modelo, de modo que la cifra de H6 se mantiene y la decisión de la regla no cambia.
 
 ### Resultados descriptivos que conviene mirar (juez principal, nDCG@10)
 
@@ -262,7 +262,7 @@ El informe lista diez. Todas están anotadas con su motivo.
 - El pool lo forman los sistemas evaluados y por tanto los favorece; un sistema futuro no puede compararse con estos juicios sin juzgar sus resultados nuevos. Recall@100 es relativo a este pool.
 - Una sola colección y una sola ejecución de cada sistema determinista; S6 se repitió por ser el único con salida variable. Los modelos por API pueden cambiar bajo el mismo identificador; se registran las fechas y los proveedores fijados.
 - Las latencias describen un portátil por internet contra un Neon compartido con la web viva, no la función desplegada.
-- La diferencia entre E2 y E1 es mucho mayor que en 177 libros y su causa no está verificada (ver la reserva en la sección de resultados).
+- La diferencia entre E2 y E1 es mucho mayor que en 177 libros. La tarea V23 no encontró ningún defecto en la medida; la explicación que ofrece (consultas que piden conocimiento de la obra que no está en el texto del catálogo) está argumentada con ejemplos, no aislada con un experimento.
 - Las 116 consultas de A y B son la unidad estadística; el estrato C (40 consultas, 10 necesidades) y las tablas por idioma y por tipo son descriptivas, con pocas consultas por celda.
 - El umbral del análisis de consultas sin respuesta se eligió y se midió con los mismos datos.
 - El juez recibe un prompt cuyo texto habla de consultas en español o inglés (desviación 4).
@@ -271,10 +271,10 @@ El informe lista diez. Todas están anotadas con su motivo.
 
 - **Hoja de anotación humana:** la tiene que rellenar el autor; después se calcula el acuerdo.
 - **Aplicar el resultado de la regla híbrida al despliegue:** la condición para pasar de híbrido más reranker a vectorial más reranker se cumple (S4 supera a S5 con los dos jueces). No se cambió el despliegue; es una tarea aparte, y BM25 se conserva como recurso cuando falla el proveedor de embeddings.
-- **Investigar el resultado de los embeddings y los fallos:** comprobar si los vectores y las consultas de `baai/bge-m3` se construyeron correctamente, por qué la diferencia con qwen es mucho mayor que en 177 libros y por qué fallan las llamadas del modelo desplegado (investigación iniciada el 2026-11-12). La decisión de mantener el modelo desplegado y la cifra de H6 son provisionales hasta que informe.
+- **Investigar el resultado de los embeddings y los fallos:** hecha en la tarea V23 (`V23-comprobacion-embeddings.md`, 2026-11-12). No se encontró ningún defecto; la cifra de H6 y la decisión de mantener el modelo desplegado se mantienen. Aplicar su recomendación sobre las llamadas fallidas es la tarea V24.
 - **Evaluación del agente y del asistente:** tarea posterior con su propio protocolo; esta evaluación no los mide.
 - **Revisión por el autor de las consultas generadas por el LLM.**
-- **Qué puede afirmar el texto del TFG:** que, sobre este catálogo, con consultas en parte generadas por un LLM y con juicios de dos jueces LLM, la fusión híbrida no superó a la vectorial sola, que los candidatos de BM25 empeoraron el resultado con reranker, que el reranker mejora mucho al híbrido, que el LLM como reordenador superó al cross-encoder con réplica pero con listas individuales muy distintas entre ejecuciones, y que el modelo desplegado fue mejor en calidad pero claramente peor en lo operativo. **Qué no puede afirmar:** que los juicios coincidan con los de personas, que la diferencia entre los dos modelos de embeddings sea una propiedad de los modelos mientras la investigación no concluya, que el umbral de consultas sin respuesta funcione fuera de estos datos, que los resultados valgan para consultas de usuarios reales, ni que un sistema nuevo pueda compararse con estos juicios sin volver a juzgar.
+- **Qué puede afirmar el texto del TFG:** que, sobre este catálogo, con consultas en parte generadas por un LLM y con juicios de dos jueces LLM, la fusión híbrida no superó a la vectorial sola, que los candidatos de BM25 empeoraron el resultado con reranker, que el reranker mejora mucho al híbrido, que el LLM como reordenador superó al cross-encoder con réplica pero con listas individuales muy distintas entre ejecuciones, y que el modelo desplegado fue mejor en calidad pero claramente peor en lo operativo. **Qué no puede afirmar:** que los juicios coincidan con los de personas, que la causa de la diferencia entre los dos modelos de embeddings esté demostrada (la tarea V23 descartó un defecto de la medida, pero su explicación no se aisló con un experimento), que el umbral de consultas sin respuesta funcione fuera de estos datos, que los resultados valgan para consultas de usuarios reales, ni que un sistema nuevo pueda compararse con estos juicios sin volver a juzgar.
 
 ## Cómo reproducirlo
 
