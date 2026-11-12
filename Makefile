@@ -4,7 +4,8 @@
 #   make help    list the targets
 #   make demo    install everything and start the web UI over the 177-book
 #                local profile, with the LLM off (no API key needed);
-#                make demo LLM=on uses OPENROUTER_API_KEY
+#                make demo LLM=on uses OPENROUTER_API_KEY;
+#                make demo CANDIDATES=hybrid fuses BM25 and vector search
 #   make test    run the test suite
 #   make eval    regenerate the evaluation reports from the cached judgments
 #                (no API call)
@@ -35,14 +36,26 @@ VENV_PY := $(VENV)/bin/python
 HOST := 127.0.0.1
 PORT := 8000
 
-# Configuration of the demo: the evaluated local pipeline (V06 and V13):
-# BM25 with the normalizing tokenizer, multilingual-e5-large-instruct
-# embeddings, RRF fusion and the bge-reranker-v2-m3 cross-encoder (system
-# hybrid_norm_e5_bge_nopad of data/evaluation/BM25_PADDING.md).
+# Configuration of the demo: the local models of the evaluation (V06 and V13):
+# multilingual-e5-large-instruct embeddings and the bge-reranker-v2-m3
+# cross-encoder, with BM25 (normalizing tokenizer) as the fallback.
 # make demo RERANKER=none switches the re-ranking stage off (no 2.3 GB download,
 # faster searches, but without the stage the ablation supports).
 EMBEDDING_MODEL := intfloat/multilingual-e5-large-instruct
 RERANKER := BAAI/bge-reranker-v2-m3
+
+# Candidates of the search (SEARCH_CANDIDATES), as in the application's default:
+# vector (default): the vector search supplies the candidates the reranker
+#   orders; BM25 runs only if the vector search fails. The evaluation on the
+#   deployed 50,000-work catalog (data/evaluation/CATALOG_EVALUATION.md) found
+#   it better than fusing BM25 in (nDCG@10 0.798 against 0.769 with the
+#   reranker, 0.683 against 0.592 without it). On this 177-book catalog the
+#   vector search alone (vec_e5, 0.661) and the fused, re-ranked system
+#   (hybrid_norm_e5_bge_nopad, 0.660) were level; vector + reranker was not
+#   measured here.
+# hybrid: BM25 and vector search fused with RRF before the reranker, the
+#   system hybrid_norm_e5_bge_nopad of data/evaluation/BM25_PADDING.md.
+CANDIDATES := vector
 
 # LLM of the demo. off (default): no LLM on any machine, even one whose .env
 # holds an OpenRouter key; this is what an examiner without a key gets.
@@ -74,7 +87,11 @@ DEMO_LLM := LLM_PROVIDER=none
 else
 $(error LLM must be on or off, got '$(LLM)')
 endif
+ifeq ($(filter $(CANDIDATES),vector hybrid),)
+$(error CANDIDATES must be vector or hybrid, got '$(CANDIDATES)')
+endif
 DEMO_ENV := SEARCH_PROFILE=local DB_PATH=data/catalog.db INDEXES_DIR=$(DEMO_INDEXES) \
+	SEARCH_CANDIDATES=$(CANDIDATES) \
 	EMBEDDING_PROVIDER=local EMBEDDING_MODEL=$(EMBEDDING_MODEL) \
 	RERANKER_PROVIDER=local RERANKER_MODEL=$(RERANKER) $(DEMO_LLM)
 
@@ -96,7 +113,7 @@ help:
 	@echo "  make test    run the test suite (pytest)"
 	@echo "  make eval    regenerate the evaluation reports in data/evaluation/ from cached judgments, no API call"
 	@echo "  make clean   remove what make created (.venv if make made it, the demo and evaluation indexes)"
-	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none  LLM=on"
+	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none  LLM=on  CANDIDATES=hybrid"
 	@echo "Python found for .venv: $(if $(PYTHON),$(PYTHON),none (need Python 3.11 to 3.13))"
 
 # ---------------------------------------------------------------------------
@@ -150,6 +167,7 @@ demo-notice:
 	@echo "   Python packages (requirements.txt)          about 190 MB"
 	@echo "   intfloat/multilingual-e5-large-instruct     1.14 GB (embeddings)"
 	@echo "   BAAI/bge-reranker-v2-m3                     2.29 GB (re-ranking; skip with RERANKER=none)"
+	@echo " Candidates: $(CANDIDATES)$(if $(filter vector,$(CANDIDATES)), (BM25 only as the fallback; CANDIDATES=hybrid fuses it in),)"
 	@echo " Re-ranking: $(RERANKER)"
 	@echo " LLM: $(LLM)$(if $(filter off,$(LLM)), (make demo LLM=on uses OPENROUTER_API_KEY from the environment or .env),)"
 	@echo "=================================================================="
