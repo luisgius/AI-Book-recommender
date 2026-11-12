@@ -103,17 +103,18 @@ Se comprobó también que 8000 estaba ocupado en la máquina de prueba (el servi
 - Las medidas de tiempo y de tamaño son una sola ejecución en un portátil con Apple silicon. No se han probado Linux ni Windows. La primera ejecución exige una descarga de unos 3.6 GB (1.3 GB con `RERANKER=none`).
 - Sin ninguna variable definida (arrancando la aplicación directamente, sin `make demo`), el código ejecuta la configuración ligera anterior (embeddings MiniLM, BM25 con separación por espacios, sin reranker), no la evaluada. Es lo que selecciona `make demo`. No se ha cambiado.
 - El `data/catalog.db` versionado, de 177 libros, procede de Google Books, cuyas condiciones, según la nota V11, no permiten una base de datos permanente. El README lo declara; juzgarlo corresponde al autor.
-- **Problemas hallados al construir `make eval`.** Se escriben tal como se hallaron; una tarea posterior del mismo día los aborda.
+- **Problemas hallados al construir `make eval`.** Se escriben tal como se hallaron. Los cinco se corrigieron el mismo día, 2026-11-12, en el commit `99a941c`; el resultado está en la sección «Actualización: corrección de los problemas de reproducibilidad», más abajo. El punto 3 contenía una afirmación que resultó ser errónea y se corrige en su propio texto.
   1. `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md` no se pudo regenerar. Después de producirse, la tarea V07 añadió 146 juicios al fichero del segundo juez, y el comando del informe se detiene. Repetir la ablación del segundo juez sobre el fichero de hoy da las mismas clasificaciones con valores distintos: el contraste C5 sale +0.096 con p de Holm 0.024, frente a los +0.100 y 0.019 publicados, y `hybrid_norm_e5_bge` sale 0.688 frente a 0.701. Las siete conclusiones se mantienen. `make eval` omite estos dos pasos.
   2. `bm25_padding run --no-judge` siempre se detenía («22 top-10 pairs have no judgment») porque contaba los pares sin juicio contra el fichero base de juicios y no contra el fichero que contiene esas 22 calificaciones. `make eval` recalcula ese informe desde los resultados guardados.
-  3. `COMPARISON_BASELINE.md` registraba un hash del fichero de consultas (`76c4dcce85e2`) que ninguna versión versionada tiene; el fichero actual es `60f78e921b0b`. Solo cambió esa línea; las métricas fueron idénticas.
+  3. `COMPARISON_BASELINE.md` registraba un hash del fichero de consultas (`76c4dcce85e2`) que, según se creyó entonces, ninguna versión versionada tiene; el fichero actual es `60f78e921b0b`. Solo cambió esa línea; las métricas fueron idénticas. **Corrección:** la creencia era errónea. La investigación posterior mostró que `76c4dcce85e2` es el hash del fichero de consultas tal como se versionó en `f6485d5` (tarea V03), el mismo commit que el informe. La tarea V06 (commit `b8d6ee3`) añadió después un campo `text_accented` a 14 consultas en español y no cambió nada más (detalle en la sección de actualización).
   4. Dos modos sin conexión leen la identidad del modelo del entorno, por lo que `make eval` se la pasa de forma explícita.
   5. `app/domain/ports.py` importa un tipo de infraestructura, aunque solo para la comprobación de tipos.
-- `make eval` no regenera `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md` (punto 1), `DEPLOYMENT_CHECK.md` (necesita el despliegue), `JUDGE_AGREEMENT.md` ni `COMPARISON_EXTENDED_QRELS.md` (necesitan el juez LLM), ni `EVALUATION_SUMMARY.md` y `QRELS_DATASHEET.md`, que están escritos a mano.
+- `make eval` regenera ahora `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md` (punto 1, corregido en `99a941c`). No regenera `DEPLOYMENT_CHECK.md` (necesita el despliegue), `JUDGE_AGREEMENT.md` ni `COMPARISON_EXTENDED_QRELS.md` (necesitan el juez LLM), ni `EVALUATION_SUMMARY.md` y `QRELS_DATASHEET.md`, que están escritos a mano.
 
 ## Trabajo pendiente
 
-- Una tarea de seguimiento, del mismo día, para los cinco problemas de la sección anterior.
+- Hecho: la tarea de seguimiento para los cinco problemas de la sección anterior, completada el mismo día en el commit `99a941c` (ver la sección de actualización).
+- Comprobar `make eval` sin ninguna conexión de red, que no está verificado (ver los límites de la sección de actualización).
 - Publicar la rama para que el flujo de CI se ejecute en GitHub, y comprobar entonces el paso de Linux.
 - Construir y ejecutar la imagen de Docker, que nunca se ha ejecutado.
 - Decidir si la configuración por defecto sin variables debe ser la evaluada o seguir siendo la ligera.
@@ -136,6 +137,42 @@ make clean                    # borra lo que creó make
 - Los tests nuevos de esta tarea: `pytest tests/api/test_without_api_key.py tests/api/test_search_api.py tests/api/test_ui.py tests/api/test_agent_api.py`.
 - Para activar el LLM, copiar `.env.example` a `.env` y poner `OPENROUTER_API_KEY`. La clave no se versiona.
 
+## Actualización: corrección de los problemas de reproducibilidad
+
+Los cinco problemas de la sección de límites se corrigieron el 2026-11-12 en el commit `99a941c`. Esta sección recoge qué se halló y qué resultó de cada uno.
+
+**Informe de sensibilidad al segundo juez (`RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md`).**
+- Causa: la tarea V07 (commit `a3468f5`) añadió 146 calificaciones a `app/evaluation/relevance_judgments_extended_z-ai-glm-5.3-flash.json`, todas del juez `z-ai/glm-5.3-flash`, para pares fuera del conjunto de la ablación de V06 y repartidas en 36 consultas. Ninguna de las 919 calificaciones anteriores cambió ni se eliminó. Los valores cambiaron porque el DCG ideal usa todos los juicios relevantes, no solo los del top 10.
+- Evidencia: el fichero de hoy, restringido a los 919 pares que calificó el primer juez, es idéntico byte a byte a la versión de la tarea V10 (commit `2d57a6d`), cuyo SHA-256 es el que quedó registrado en la ejecución publicada.
+- Corrección: una opción nueva, `--llm-pairs-from`, en `retrieval_ablation --no-judge` conserva los juicios originales y solo las calificaciones del LLM de los pares del fichero indicado. Se detiene si alguno de esos pares no tiene calificación, y registra en los resultados que se fijó el conjunto y el hash del conjunto fijado. `judge_sensitivity` compara los dos jueces sobre los pares del primer juez y se detiene si la ablación no se ejecutó con ese conjunto fijado. El fichero de juicios no se modifica, de modo que los informes que usan las calificaciones más recientes no se ven afectados.
+- Resultado: los resultados regenerados coinciden con los publicados en todas las métricas; el contraste C5 vuelve a ser +0.100 con p de Holm 0.019 y `hybrid_norm_e5_bge` vuelve a 0.701. En el informe solo difieren la fecha, el commit, una línea nueva que explica la fijación y los comandos de reproducción. Ambos pasos forman ahora parte de `make eval`.
+
+**Relleno de BM25 (`BM25_PADDING.md`).**
+- Causa: la ejecución sin conexión contaba los pares sin juicio contra el fichero base de juicios. Además, habría sobrescrito `relevance_judgments_extended_v13.json` con los juicios base, perdiendo las 22 calificaciones y las 41 añadidas después.
+- Corrección: ahora comprueba contra el fichero V13 y nunca lo reescribe.
+- Resultado: las 44 consultas devuelven las mismas clasificaciones, con los mismos contrastes y tablas; solo difieren las latencias, las fechas, el commit y el origen de los índices. `make eval` ejecuta ahora este módulo en lugar de volver a presentar los resultados guardados.
+
+**Hash del fichero de consultas.**
+- La creencia de que ninguna versión versionada tenía el hash `76c4dcce85e2` era errónea: es el hash del fichero de consultas tal como se versionó en `f6485d5` (tarea V03), el mismo commit que el informe. La tarea V06 (commit `b8d6ee3`) añadió después un campo `text_accented` a 14 consultas en español y no cambió nada más. Solo las ejecuciones de la ablación con acentos leen ese campo; la comparación con la línea base no lo lee.
+- Tras regenerar, todas las métricas son idénticas y el informe registra el hash actual, `60f78e921b0b`.
+
+**Identidad del modelo tomada del entorno.**
+- Los dos módulos la toman ahora de sus resultados guardados cuando solo vuelven a presentar salidas en caché, y `make eval` ya no pasa esas variables.
+- Uno de los dos casos era un defecto real: sin `LLM_REASONING` definida, un clon nuevo habría cambiado en el informe del recomendador la etiqueta del razonamiento del LLM del sistema de «off» a «at the model default».
+
+**Capa de dominio.**
+- `app/domain/ports.py` declara ahora dos protocolos pequeños de solo lectura, `ExplanationJudgment` y `JudgmentScore`, en lugar de importar un tipo de infraestructura. El comportamiento no cambia.
+- Un test nuevo, `tests/domain/test_architecture.py`, analiza todos los módulos del dominio (incluidos los bloques de comprobación de tipos, las importaciones dentro de funciones y las relativas) y falla si alguno importa de las capas de infraestructura o de la API, de FastAPI, Starlette, LangChain, LangGraph, FAISS o de un controlador de base de datos.
+
+**Validación.**
+- Se ejecutó `make eval` en un clon nuevo y se comparó cada informe y cada fichero de resultados regenerado con la versión versionada, campo a campo: no difiere ninguna métrica, recuento, clasificación ni conclusión.
+- Batería completa de tests: 1645 superados y 22 omitidos.
+
+**Límites de esta validación.**
+- No está verificada una ejecución de `make eval` sin ninguna red. Al forzar las bibliotecas de Hugging Face a modo sin conexión, esta versión de sentence-transformers rechazó los modelos guardados en la caché. Durante la ejecución, Hugging Face recibió peticiones de metadatos de modelos que ya estaban en disco y varias agotaron el tiempo de espera.
+- Esa ejecución, que terminó con éxito, duró unos 30 minutos, frente a los 602 s medidos antes. Durante ella el portátil estuvo suspendido de forma intermitente con la tapa cerrada, de modo que la cifra no es una medida limpia.
+- El flujo de CI sigue sin haberse ejecutado en GitHub.
+
 ## Ficheros
 
 - **Herramientas y empaquetado:** `Makefile`, `Dockerfile`, `.github/workflows/tests.yml`, `.gitignore`, `.env.example`.
@@ -144,3 +181,9 @@ make clean                    # borra lo que creó make
 - **Infraestructura:** `app/infrastructure/config/settings.py` (`default_llm_provider`, valor por defecto de `LLM_PROVIDER`, mensaje del juez).
 - **Aplicación:** `app/api/v1/dependencies.py` (mensaje de registro con el LLM apagado), `app/api/v1/schemas.py` (documentación del aviso), `app/api/v1/agent_endpoints.py` (503 con `AGENT_NO_LLM_MESSAGE`), `app/ui/static/app.js` (texto del aviso y opciones desactivadas).
 - **Tests:** `tests/api/test_without_api_key.py` (nuevo), `tests/api/test_search_api.py`, `tests/api/test_ui.py`, `tests/api/test_agent_api.py`, `tests/domain/test_usage_budget_in_search.py`, `tests/infrastructure/llm/test_llm_wiring.py`, `test_openrouter_provider.py` y `test_relevance_judge_adapter.py`.
+- **Cambiados en `99a941c` (corrección de reproducibilidad):**
+  - **Herramientas y documentación:** `Makefile`, `README.md`.
+  - **Dominio:** `app/domain/ports.py` (protocolos `ExplanationJudgment` y `JudgmentScore`).
+  - **Evaluación:** `app/evaluation/retrieval_ablation.py` (`--llm-pairs-from`), `judge_sensitivity.py`, `bm25_padding.py`, `llm_path_evaluation.py` y `llm_recommender_evaluation.py`.
+  - **Informes y resultados regenerados:** `data/evaluation/COMPARISON_BASELINE.md`, `results_comparison_baseline.json`, `RETRIEVAL_ABLATION_JUDGE_SENSITIVITY.md`, `results_judge_sensitivity.json` y `results_retrieval_ablation_z-ai-glm-5.3-flash.json`.
+  - **Tests:** `tests/domain/test_architecture.py` (nuevo) y casos añadidos en `tests/evaluation/` para los cinco módulos (`test_bm25_padding.py`, `test_judge_sensitivity.py`, `test_llm_path_evaluation.py`, `test_llm_recommender_evaluation.py`, `test_retrieval_ablation.py`).
