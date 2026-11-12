@@ -247,6 +247,26 @@ class SearchResult:
     or when re-ranking failed and the fused order was kept.
     """
 
+    lexical_rank: Optional[int] = None
+    """
+    Position (1-based) of the book in the keyword (BM25) list. None when that
+    stage did not return the book or did not run. With several query
+    variations, the best position among them.
+    """
+
+    vector_rank: Optional[int] = None
+    """
+    Position (1-based) of the book in the semantic (vector) list. None when
+    that stage did not return the book or did not run. With several query
+    variations, the best position among them.
+    """
+
+    rerank_rank: Optional[int] = None
+    """
+    Position (1-based) of the book after the re-ranking stage. None without a
+    reranker, beyond the re-ranking depth, or when re-ranking failed.
+    """
+
     def __post_init__(self) -> None:
         """Validate search result data."""
         if self.rank < 1:

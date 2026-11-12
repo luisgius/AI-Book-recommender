@@ -170,6 +170,19 @@ class SearchResult(BaseModel):
         ),
     )
 
+    lexical_rank: int | None = Field(
+        default=None, ge=1,
+        description="Position (1-based) in the keyword (BM25) list; null if that list did not return the book",
+    )
+    vector_rank: int | None = Field(
+        default=None, ge=1,
+        description="Position (1-based) in the semantic (vector) list; null if that list did not return the book or did not run",
+    )
+    rerank_rank: int | None = Field(
+        default=None, ge=1,
+        description="Position (1-based) after the reranker; null without a reranker or beyond its depth",
+    )
+
 class SearchMetadata(BaseModel):
     """
     Debug/telemetry metadata for search operations.

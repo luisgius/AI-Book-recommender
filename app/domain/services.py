@@ -694,6 +694,10 @@ class SearchService:
             filters=query.filters,
         )
         timings["lexical"] = _elapsed_ms(started)
+        # The BM25 list is the only retrieval list here: its positions are
+        # the keyword positions
+        for result in results:
+            result.lexical_rank = result.rank
 
         if rerank:
             started = time.perf_counter()
@@ -948,7 +952,13 @@ class SearchService:
         books_map: Dict[UUID, Book] = {}
         lexical_scores: Dict[UUID, float] = {}
         vector_scores: Dict[UUID, float] = {}
+        lexical_ranks: Dict[UUID, int] = {}
+        vector_ranks: Dict[UUID, int] = {}
         k = 60
+
+        def best(ranks: Dict[UUID, int], book_id: UUID, rank: Optional[int]) -> None:
+            if rank is not None and rank < ranks.get(book_id, rank + 1):
+                ranks[book_id] = rank
 
         for variation_results in all_results:
             for result in variation_results:
@@ -965,6 +975,8 @@ class SearchService:
                     vector_scores[book_id] = max(
                         result.vector_score, vector_scores.get(book_id, float("-inf"))
                     )
+                best(lexical_ranks, book_id, result.lexical_rank)
+                best(vector_ranks, book_id, result.vector_rank)
 
         # sorted() is stable: ties keep first-seen order, which follows variation order
         sorted_ids = sorted(rrf_scores, key=lambda bid: rrf_scores[bid], reverse=True)
@@ -979,6 +991,8 @@ class SearchService:
                 source="hybrid",
                 lexical_score=lexical_scores.get(bid),
                 vector_score=vector_scores.get(bid),
+                lexical_rank=lexical_ranks.get(bid),
+                vector_rank=vector_ranks.get(bid),
             )
             for i, bid in enumerate(sorted_ids)
         ]
@@ -1113,12 +1127,17 @@ class SearchService:
         books_map: Dict[UUID, Book] = {}
         lexical_scores_map: Dict[UUID, float] = {}
         vector_scores_map: Dict[UUID, float] = {}
+        # Position of each book in each input list (the adapters number
+        # their lists 1..n, the same rank the RRF formula uses)
+        lexical_ranks: Dict[UUID, int] = {}
+        vector_ranks: Dict[UUID, int] = {}
 
         # Process lexical results
         for result in lexical_results:
             book_id = result.book.id
             rrf_scores[book_id] = rrf_scores.get(book_id, 0.0) + (1.0 / (k + result.rank))
             books_map[book_id] = result.book
+            lexical_ranks.setdefault(book_id, result.rank)
             # Preserve original lexical score
             if result.has_lexical_score():
                 lexical_scores_map[book_id] = result.lexical_score
@@ -1130,6 +1149,7 @@ class SearchService:
             book_id = result.book.id
             rrf_scores[book_id] = rrf_scores.get(book_id, 0.0) + (1.0 / (k + result.rank))
             books_map[book_id] = result.book
+            vector_ranks.setdefault(book_id, result.rank)
             # Preserve original vector score
             if result.has_vector_score():
                 vector_scores_map[book_id] = result.vector_score
@@ -1152,6 +1172,8 @@ class SearchService:
                 source="hybrid",
                 lexical_score=lexical_scores_map.get(book_id),
                 vector_score=vector_scores_map.get(book_id),
+                lexical_rank=lexical_ranks.get(book_id),
+                vector_rank=vector_ranks.get(book_id),
             )
             for i, book_id in enumerate(sorted_book_ids)
         ]
@@ -1216,8 +1238,8 @@ class SearchService:
             results: Fused and filtered results, best first
 
         Returns:
-            Results with the head re-ordered, rerank_score set on the head
-            and ranks renumbered 1..n over the whole list
+            Results with the head re-ordered, rerank_score and rerank_rank
+            set on the head and ranks renumbered 1..n over the whole list
         """
         if self._reranker is None or not results:
             return results
@@ -1237,6 +1259,8 @@ class SearchService:
             logger.warning(f"Re-ranking failed, keeping the fused order: {e}")
             return results
 
+        for i, result in enumerate(reranked_head, start=1):
+            result.rerank_rank = i
         reranked = list(reranked_head) + tail
         for i, result in enumerate(reranked, start=1):
             result.rank = i

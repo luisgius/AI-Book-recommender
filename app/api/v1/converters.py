@@ -92,6 +92,9 @@ def domain_search_result_to_api(result: domain.SearchResult) -> api.SearchResult
             else None
         ),
         rerank_score=result.rerank_score,
+        lexical_rank=result.lexical_rank,
+        vector_rank=result.vector_rank,
+        rerank_rank=result.rerank_rank,
     )
 
 
