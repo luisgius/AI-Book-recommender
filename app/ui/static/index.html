@@ -3,71 +3,216 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Buscador de libros: BM25 + embeddings + LLM</title>
+  <meta name="color-scheme" content="light dark">
+  <title>Buscador de libros: BM25, embeddings y LLM</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
   <header class="top">
-    <div>
+    <div class="top-text">
       <h1>Buscador híbrido de libros</h1>
-      <p class="subtitle">BM25 + embeddings fusionados con RRF y reordenados, con comprensión de la consulta y explicaciones mediante LLM</p>
+      <p class="subtitle">Busca en lenguaje natural, en cualquier idioma del catálogo. Cada resultado muestra qué etapas
+        del sistema lo encontraron y en qué puesto.</p>
     </div>
-    <div id="health" class="health" aria-live="polite">Comprobando estado…</div>
+    <p id="health" class="health" role="status">Comprobando el servidor…</p>
   </header>
 
-  <main>
-    <form id="search-form" class="panel" autocomplete="off">
-      <label class="query">
-        <span class="sr-only">Consulta</span>
-        <input id="query" name="query" type="search" required
-               placeholder="p. ej. novelas españolas sobre la guerra civil">
-      </label>
-      <button type="submit" id="search-button">Buscar</button>
+  <main id="main">
+    <div class="modes" role="tablist" aria-label="Modo">
+      <button type="button" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Buscar libros</button>
+      <button type="button" role="tab" id="tab-agent" aria-controls="panel-agent" aria-selected="false" tabindex="-1">Preguntar al agente</button>
+    </div>
 
-      <fieldset class="options">
-        <legend>Opciones</legend>
-        <label><input type="checkbox" id="use-understanding"> Interpretar la consulta (LLM)</label>
-        <label><input type="checkbox" id="use-explanations"> Explicar los primeros resultados (LLM)</label>
-        <label><input type="checkbox" id="use-diversification"> Diversificar (MMR)</label>
-        <label class="inline">Resultados
-          <input type="number" id="max-results" min="1" max="50" value="10">
-        </label>
-      </fieldset>
+    <!-- Search mode: hybrid search with optional LLM steps -->
+    <section id="panel-search" role="tabpanel" aria-labelledby="tab-search" class="mode-panel">
+      <form id="search-form" class="query-form" autocomplete="off">
+        <div class="query-row">
+          <label for="query" class="query-label">Qué buscas</label>
+          <input id="query" name="query" type="search" required maxlength="500"
+                 placeholder="p. ej. novelas sobre la guerra civil española">
+          <button type="submit" id="search-button" class="primary">Buscar</button>
+        </div>
 
-      <fieldset class="options">
-        <legend>Filtros explícitos</legend>
-        <label class="inline">Idioma
-          <select id="language">
-            <option value="">cualquiera</option>
-            <option value="es">español</option>
-            <option value="en">inglés</option>
-            <option value="fr">francés</option>
-            <option value="de">alemán</option>
-            <option value="it">italiano</option>
-            <option value="pt">portugués</option>
-            <option value="ca">catalán</option>
-            <option value="nl">neerlandés</option>
-            <option value="ru">ruso</option>
-            <option value="zh">chino</option>
-            <option value="ja">japonés</option>
-            <option value="ar">árabe</option>
-          </select>
-        </label>
-        <label class="inline">Categoría <input type="text" id="category" placeholder="p. ej. fiction"></label>
-        <label class="inline">Desde <input type="number" id="min-year" min="1000" max="2100" placeholder="año"></label>
-        <label class="inline">Hasta <input type="number" id="max-year" min="1000" max="2100" placeholder="año"></label>
-      </fieldset>
-    </form>
+        <div class="examples" role="group" aria-labelledby="examples-label">
+          <span id="examples-label" class="examples-label">Prueba con:</span>
+          <ul id="search-examples" class="example-list"></ul>
+        </div>
 
-    <p id="status" class="status" aria-live="polite"></p>
-    <p id="notice" class="notice" aria-live="polite" hidden></p>
-    <section id="intent" class="panel intent" hidden></section>
-    <section id="similar-banner" class="panel banner" hidden></section>
-    <ol id="results" class="results"></ol>
+        <details class="settings" id="search-settings">
+          <summary>Opciones y filtros</summary>
+          <div class="settings-grid">
+            <fieldset class="options">
+              <legend>Etapas opcionales</legend>
+              <label class="check"><input type="checkbox" id="use-understanding">
+                <span>Interpretar la consulta con el LLM <small>(intención, filtros, reformulación)</small></span></label>
+              <label class="check"><input type="checkbox" id="use-explanations">
+                <span>Explicar los primeros resultados con el LLM <small>(tarda más)</small></span></label>
+              <label class="check"><input type="checkbox" id="use-diversification">
+                <span>Diversificar los resultados <small>(MMR: menos libros casi iguales)</small></span></label>
+              <p id="llm-off-note" class="field-note" hidden></p>
+            </fieldset>
 
-    <details id="about" class="panel about">
+            <fieldset class="options filters">
+              <legend>Filtros</legend>
+              <label class="field" for="language">Idioma
+                <select id="language">
+                  <option value="">Cualquiera</option>
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                  <option value="fr">Francés</option>
+                  <option value="de">Alemán</option>
+                  <option value="it">Italiano</option>
+                  <option value="pt">Portugués</option>
+                  <option value="ca">Catalán</option>
+                  <option value="nl">Neerlandés</option>
+                  <option value="ru">Ruso</option>
+                  <option value="zh">Chino</option>
+                  <option value="ja">Japonés</option>
+                  <option value="ar">Árabe</option>
+                </select>
+              </label>
+              <label class="field" for="category">Categoría
+                <input type="text" id="category" placeholder="p. ej. fiction"></label>
+              <label class="field" for="min-year">Desde el año
+                <input type="number" id="min-year" min="1000" max="2100" inputmode="numeric"></label>
+              <label class="field" for="max-year">Hasta el año
+                <input type="number" id="max-year" min="1000" max="2100" inputmode="numeric"></label>
+              <label class="field" for="max-results">Número de resultados
+                <input type="number" id="max-results" min="1" max="50" value="10" inputmode="numeric"></label>
+            </fieldset>
+          </div>
+        </details>
+      </form>
+
+      <div id="search-output" class="output">
+      <div id="search-wait" class="wait" role="status" aria-live="polite" hidden>
+        <p class="wait-main"></p>
+        <p class="wait-hint"></p>
+        <button type="button" class="link-button" id="search-cancel">Cancelar</button>
+      </div>
+      <div id="search-message" class="message" role="alert" hidden></div>
+      <p id="status" class="status" aria-live="polite"></p>
+      <div id="notice" class="message notice" hidden></div>
+      <section id="intent" class="intent" aria-label="Cómo entendió el LLM la consulta" hidden></section>
+      <div id="similar-banner" class="banner" hidden>
+        <p class="banner-text"></p>
+        <button type="button" class="link-button" id="similar-back">Volver a la búsqueda</button>
+      </div>
+      <ol id="results" class="results" aria-label="Resultados"></ol>
+      <div id="empty-search" class="empty">
+        <p>Escribe una consulta o elige uno de los ejemplos. El catálogo tiene obras en español, inglés, francés,
+          alemán y otros idiomas; la búsqueda por significado encuentra libros aunque la consulta esté en otro idioma.</p>
+      </div>
+      </div>
+    </section>
+
+    <!-- Agent mode: LangGraph agent that calls the search tools -->
+    <section id="panel-agent" role="tabpanel" aria-labelledby="tab-agent" class="mode-panel" hidden>
+      <form id="agent-form" class="query-form" autocomplete="off">
+        <div class="query-row agent-row">
+          <label for="agent-question" class="query-label">Tu pregunta</label>
+          <textarea id="agent-question" name="question" rows="2" required minlength="3" maxlength="500"
+                    placeholder="p. ej. Busco una novela clásica sobre la culpa, mejor en español"></textarea>
+          <button type="submit" id="agent-button" class="primary">Preguntar</button>
+        </div>
+        <div class="examples" role="group" aria-labelledby="agent-examples-label">
+          <span id="agent-examples-label" class="examples-label">Prueba con:</span>
+          <ul id="agent-examples" class="example-list"></ul>
+        </div>
+        <p class="field-note">El agente decide qué herramientas de búsqueda usar, puede buscar varias veces y solo
+          recomienda libros que esas herramientas le han devuelto. Cada pregunta consume una petición al LLM.</p>
+        <p id="agent-off-note" class="message notice" hidden></p>
+      </form>
+
+      <div id="agent-output" class="output">
+      <div id="agent-wait" class="wait" role="status" aria-live="polite" hidden>
+        <p class="wait-main"></p>
+        <p class="wait-hint"></p>
+        <button type="button" class="link-button" id="agent-cancel">Cancelar</button>
+      </div>
+      <div id="agent-message" class="message" role="alert" hidden></div>
+
+      <article id="agent-result" class="agent-result" hidden>
+        <h2 class="section-title">Respuesta</h2>
+        <p id="agent-answer" class="agent-answer" tabindex="-1"></p>
+        <p id="agent-meta" class="agent-meta"></p>
+
+        <h2 class="section-title">Libros que recomienda</h2>
+        <p id="agent-dropped" class="field-note" hidden></p>
+        <ol id="agent-books" class="agent-books"></ol>
+
+        <h2 class="section-title">Pasos que ha seguido</h2>
+        <p class="field-note">Llamadas a herramientas, en el orden en que el agente las hizo (traza ReAct del grafo LangGraph).</p>
+        <ol id="agent-steps" class="steps"></ol>
+      </article>
+      <div id="empty-agent" class="empty">
+        <p>Haz una pregunta como se la harías a un bibliotecario. Verás la respuesta, los libros que cita y cada
+          búsqueda que hizo para llegar a ella.</p>
+      </div>
+      </div>
+    </section>
+
+    <!-- How the pipeline works -->
+    <details id="how" class="explainer">
+      <summary>Cómo funciona</summary>
+      <div class="how-grid">
+        <svg class="pipeline" viewBox="0 0 300 430" role="img" aria-labelledby="pipeline-title pipeline-desc">
+          <title id="pipeline-title">Etapas de la búsqueda</title>
+          <desc id="pipeline-desc">La consulta pasa, opcionalmente, por el LLM; después la buscan en paralelo la búsqueda por
+            palabras clave y la búsqueda por significado; sus listas se fusionan con RRF, el reordenador las ordena de nuevo
+            y, opcionalmente, el LLM explica los primeros resultados.</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" class="dg-arrowhead"/>
+            </marker>
+          </defs>
+          <g class="dg-node"><rect x="90" y="8" width="120" height="36" rx="18"/><text x="150" y="31">Consulta</text></g>
+          <g class="dg-node dg-optional"><rect x="60" y="66" width="180" height="40" rx="6"/><text x="150" y="85">LLM: interpretar</text><text x="150" y="99" class="dg-small">opcional</text></g>
+          <g class="dg-node"><rect x="10" y="134" width="130" height="50" rx="6"/><text x="75" y="155">Palabras clave</text><text x="75" y="172" class="dg-small">BM25</text></g>
+          <g class="dg-node"><rect x="160" y="134" width="130" height="50" rx="6"/><text x="225" y="155">Significado</text><text x="225" y="172" class="dg-small">embeddings</text></g>
+          <g class="dg-node"><rect x="60" y="212" width="180" height="40" rx="6"/><text x="150" y="237">Fusión RRF</text></g>
+          <g class="dg-node"><rect x="60" y="280" width="180" height="40" rx="6"/><text x="150" y="305">Reordenador</text></g>
+          <g class="dg-node dg-optional"><rect x="60" y="348" width="180" height="40" rx="6"/><text x="150" y="367">LLM: explicar</text><text x="150" y="381" class="dg-small">opcional</text></g>
+          <g class="dg-edges">
+            <path d="M150 44 V64"/>
+            <path d="M120 106 L80 132"/>
+            <path d="M180 106 L220 132"/>
+            <path d="M75 184 L120 210"/>
+            <path d="M225 184 L180 210"/>
+            <path d="M150 252 V278"/>
+            <path d="M150 320 V346"/>
+            <path d="M150 388 V424"/>
+          </g>
+          <text x="160" y="414" class="dg-small dg-left">resultados</text>
+        </svg>
+        <ol class="stages">
+          <li><strong>Consulta.</strong> Texto libre, en cualquier idioma del catálogo.</li>
+          <li><strong>LLM: interpretar</strong> <span class="tag">opcional</span>. Un modelo de lenguaje detecta la intención,
+            extrae filtros (idioma, años) y propone variantes de la consulta.</li>
+          <li><strong>Palabras clave (BM25).</strong> Encuentra los libros que comparten palabras con la consulta en el título,
+            los autores, la descripción o las categorías.</li>
+          <li><strong>Significado (embeddings).</strong> Convierte consulta y libros en vectores y encuentra los más cercanos,
+            aunque no compartan palabras ni idioma.</li>
+          <li><strong>Fusión RRF.</strong> Une las dos listas premiando a los libros que aparecen arriba en cualquiera de
+            ellas (Reciprocal Rank Fusion).</li>
+          <li><strong>Reordenador.</strong> Un modelo que lee la consulta y cada libro a la vez decide el orden final de los
+            primeros candidatos.</li>
+          <li><strong>LLM: explicar</strong> <span class="tag">opcional</span>. Genera una explicación breve por libro con
+            citas que se comprueban contra los datos del libro (RAG).</li>
+        </ol>
+      </div>
+      <p id="how-config" class="field-note"></p>
+      <p class="field-note">El modo <em>Preguntar al agente</em> usa estas mismas etapas como herramientas: un grafo
+        LangGraph deja que el LLM decida qué buscar, lee las respuestas, puede volver a buscar y, antes de responder,
+        descarta cualquier libro que ninguna herramienta haya devuelto.</p>
+    </details>
+
+    <details id="about" class="explainer about">
       <summary>Sobre los datos</summary>
-      <p>El catálogo de esta demostración reúne unas 50&nbsp;000 obras en doce idiomas, seleccionadas por popularidad
+      <p>El catálogo de la demostración pública reúne unas 50&nbsp;000 obras en doce idiomas, seleccionadas por popularidad
         con cuotas por idioma, de tres fuentes abiertas:</p>
       <ul>
         <li><strong>Wikidata</strong> (datos estructurados, <a href="https://creativecommons.org/publicdomain/zero/1.0/" rel="noopener">CC0 1.0</a>)
@@ -82,27 +227,52 @@
       <p>Las búsquedas usan modelos de embeddings y de reordenación por API, y las opciones con LLM llaman a un modelo de lenguaje.
         Al ser una demostración pública tiene un límite diario de uso: al alcanzarse, la búsqueda sigue funcionando solo con
         BM25 y las funciones con LLM se desactivan hasta las 00:00 UTC.</p>
+      <p>Esta página no carga nada de terceros (ni fuentes ni scripts): las consultas solo llegan al servidor de la aplicación.</p>
     </details>
   </main>
+
+  <!-- Book detail view, shared by search results and agent recommendations -->
+  <dialog id="book-dialog" class="book-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <h2 id="dialog-title" class="book-title"></h2>
+      <button type="button" class="link-button" id="dialog-close">Cerrar</button>
+    </div>
+    <p class="dialog-authors"></p>
+    <dl class="dialog-facts"></dl>
+    <p class="dialog-description"></p>
+    <p class="attribution dialog-attribution"></p>
+    <button type="button" class="secondary" id="dialog-similar">Ver libros similares</button>
+  </dialog>
 
   <template id="result-template">
     <li class="result">
       <div class="result-head">
-        <span class="rank"></span>
-        <div>
-          <h2 class="title"></h2>
-          <p class="meta"></p>
+        <span class="rank" aria-hidden="true"></span>
+        <div class="result-heading">
+          <h2 class="book-title"><button type="button" class="title-button"></button></h2>
+          <p class="authors"></p>
+          <p class="facts"></p>
         </div>
       </div>
       <p class="description"></p>
-      <p class="attribution"></p>
-      <p class="scores"></p>
       <div class="explanation" hidden>
+        <p class="explanation-label">Por qué encaja, según el LLM</p>
         <p class="explanation-text"></p>
         <ul class="citations"></ul>
         <p class="explanation-model"></p>
       </div>
-      <button type="button" class="similar">Libros similares</button>
+      <div class="why">
+        <p class="why-label">Por qué aparece</p>
+        <ol class="trail"></ol>
+        <details class="raw">
+          <summary>Valores exactos</summary>
+          <dl class="raw-values"></dl>
+        </details>
+      </div>
+      <div class="result-foot">
+        <p class="attribution"></p>
+        <button type="button" class="secondary similar">Libros similares</button>
+      </div>
     </li>
   </template>
 
