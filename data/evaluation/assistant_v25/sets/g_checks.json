@@ -1,0 +1,1725 @@
+{
+  "generator": {
+    "model": "google/gemini-3.8-flash",
+    "temperature": 0.7,
+    "reasoning": {
+      "effort": "low"
+    },
+    "prompt_version": "v1",
+    "date": "2026-11-12T15:17:20+00:00",
+    "provider": "Google"
+  },
+  "tasks": [
+    {
+      "id": "g01",
+      "group": "valid",
+      "field": "health",
+      "topic": "living with type 2 diabetes",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g02",
+      "group": "valid",
+      "field": "science",
+      "topic": "quantum physics for beginners",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g03",
+      "group": "valid",
+      "field": "economics",
+      "topic": "the history of money",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g04",
+      "group": "valid",
+      "field": "trades",
+      "topic": "woodworking and carpentry",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g05",
+      "group": "valid",
+      "field": "sport",
+      "topic": "football tactics",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g06",
+      "group": "valid",
+      "field": "sport",
+      "topic": "marathon training",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g07",
+      "group": "valid",
+      "field": "sport",
+      "topic": "swimming technique",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g08",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "barbecue and smoking meat",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g09",
+      "group": "valid",
+      "field": "computing",
+      "topic": "cybersecurity for small businesses",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g10",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "composting",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g11",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "keeping backyard chickens",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g12",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "planning a wedding",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g13",
+      "group": "valid",
+      "field": "travel",
+      "topic": "visiting Morocco",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g14",
+      "group": "valid",
+      "field": "economics",
+      "topic": "starting a small business",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g15",
+      "group": "valid",
+      "field": "economics",
+      "topic": "behavioural economics",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g16",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "understanding cat behaviour",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g17",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "sourdough bread baking",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g18",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "Thai curry cooking",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g19",
+      "group": "valid",
+      "field": "trades",
+      "topic": "sewing and tailoring",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g20",
+      "group": "valid",
+      "field": "trades",
+      "topic": "basic household electrical wiring",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g21",
+      "group": "valid",
+      "field": "health",
+      "topic": "exercises for back pain",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g22",
+      "group": "valid",
+      "field": "health",
+      "topic": "nutrition during pregnancy",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g23",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "caring for houseplants",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g24",
+      "group": "valid",
+      "field": "sport",
+      "topic": "rock climbing",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g25",
+      "group": "valid",
+      "field": "travel",
+      "topic": "a road trip around Iceland",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g26",
+      "group": "valid",
+      "field": "science",
+      "topic": "volcanoes and earthquakes",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g27",
+      "group": "valid",
+      "field": "computing",
+      "topic": "algorithms and data structures",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g28",
+      "group": "valid",
+      "field": "sport",
+      "topic": "yoga for beginners",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g29",
+      "group": "valid",
+      "field": "computing",
+      "topic": "electronics projects with a Raspberry Pi",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g30",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "cake decorating",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g31",
+      "group": "valid",
+      "field": "health",
+      "topic": "first aid",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g32",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "decluttering the home",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g33",
+      "group": "valid",
+      "field": "travel",
+      "topic": "travelling in Japan on a budget",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g34",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "fermenting vegetables such as kimchi and sauerkraut",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g35",
+      "group": "valid",
+      "field": "trades",
+      "topic": "car mechanics",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g36",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "bonsai",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g37",
+      "group": "valid",
+      "field": "computing",
+      "topic": "Linux system administration",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g38",
+      "group": "valid",
+      "field": "science",
+      "topic": "coral reef marine biology",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g39",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "pruning fruit trees",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g40",
+      "group": "valid",
+      "field": "trades",
+      "topic": "welding",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g41",
+      "group": "valid",
+      "field": "computing",
+      "topic": "relational databases and SQL",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g42",
+      "group": "valid",
+      "field": "sport",
+      "topic": "chess openings",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g43",
+      "group": "valid",
+      "field": "travel",
+      "topic": "backpacking in Southeast Asia",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g44",
+      "group": "valid",
+      "field": "computing",
+      "topic": "building websites with JavaScript",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g45",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "permaculture",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g46",
+      "group": "valid",
+      "field": "health",
+      "topic": "sleep problems and insomnia",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g47",
+      "group": "valid",
+      "field": "trades",
+      "topic": "home plumbing repairs",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g48",
+      "group": "valid",
+      "field": "travel",
+      "topic": "hiking in the Alps",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g49",
+      "group": "valid",
+      "field": "science",
+      "topic": "black holes",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g50",
+      "group": "valid",
+      "field": "travel",
+      "topic": "walking the Camino de Santiago",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g51",
+      "group": "valid",
+      "field": "economics",
+      "topic": "investing in the stock market for beginners",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g52",
+      "group": "valid",
+      "field": "science",
+      "topic": "the science of climate change",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g53",
+      "group": "valid",
+      "field": "science",
+      "topic": "human genetics and DNA",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g54",
+      "group": "valid",
+      "field": "health",
+      "topic": "coping with anxiety",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g55",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "vegetarian meal prep",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g56",
+      "group": "valid",
+      "field": "economics",
+      "topic": "inflation and central banks",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g57",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "toddler sleep",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g58",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "growing a vegetable garden",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g59",
+      "group": "valid",
+      "field": "economics",
+      "topic": "personal finance and saving money",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g60",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "training a puppy",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g-oos01",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a Python function that removes duplicates from a list",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos02",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "converting 72 degrees Fahrenheit to Celsius",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos03",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the traffic on the ring road at this moment",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos04",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "greeting the assistant and asking how it is",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos05",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing an SQL query that counts orders per customer",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos06",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the current price of bitcoin",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos07",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a regular expression that validates an email address",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos08",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "how many days there are between 3 March and 19 August",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos09",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a bash script that renames photos by date",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos10",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "asking the assistant its favourite colour",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos11",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "asking the assistant to tell a joke",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos12",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "saying they are bored and want to chat",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos13",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "the monthly payment of a 200000 mortgage at 3 percent over 25 years",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos14",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "what 15 percent of 240 is",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos15",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the live score of tonight's tennis final",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos16",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "whether the nearest post office is open right now",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos17",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing an HTML page with a contact form",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos18",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "thanking the assistant and saying goodbye",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos19",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "today's lottery results",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos20",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "solving the equation 3x + 7 = 22",
+      "language": "en",
+      "form": "any"
+    }
+  ],
+  "G": {
+    "first_pass": {
+      "problems": [
+        {
+          "request_id": "g13",
+          "check": "language",
+          "detail": "not es: pt 1.00"
+        },
+        {
+          "request_id": "g21",
+          "check": "asks for reading",
+          "detail": "the translation 'Do you have a work that offers effective exercises against back pain?' does not ask for something to read"
+        },
+        {
+          "request_id": "g34",
+          "check": "asks for reading",
+          "detail": "the translation 'Do you have good instructions on fermenting vegetables such as kimchi and sauerkraut?' does not ask for something to read"
+        },
+        {
+          "request_id": "g35",
+          "check": "asks for reading",
+          "detail": "the translation 'I am looking for a clear text on automotive mechanics and routine maintenance.' does not ask for something to read"
+        },
+        {
+          "request_id": "g45",
+          "check": "asks for reading",
+          "detail": "the translation 'I would like to borrow a good theoretical and practical introduction to the principles of permaculture.' does not ask for something to read"
+        },
+        {
+          "request_id": "g47",
+          "check": "language",
+          "detail": "not it: nl 1.00, it 0.75, pt 0.50"
+        },
+        {
+          "request_id": "g50",
+          "check": "language",
+          "detail": "not en: es 0.17, fr 0.17, pt 0.17"
+        },
+        {
+          "request_id": "g60",
+          "check": "asks for reading",
+          "detail": "the translation 'I would like a publication specialized in positive reinforcement training and essential puppy care.' does not ask for something to read"
+        }
+      ],
+      "language": {
+        "g01": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "diabetes tipo 2"
+        },
+        "g02": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "quantum physics beginners"
+        },
+        "g03": {
+          "verdict": "ok",
+          "evidence": "es 0.42, fr 0.42, ca 0.42",
+          "text": "histoire de la monnaie"
+        },
+        "g04": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Holzbearbeitung Schreinerei"
+        },
+        "g05": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "tattica calcistica"
+        },
+        "g06": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "treino de maratona"
+        },
+        "g07": {
+          "verdict": "ok",
+          "evidence": "es 0.92, pt 0.67, fr 0.42",
+          "text": "Quisiera encontrar un manual práctico para mejorar mi técnica de natación."
+        },
+        "g08": {
+          "verdict": "ok",
+          "evidence": "en 2.00, pt 1.00",
+          "text": "Can you recommend a comprehensive guide on meat smoking and outdoor barbecue?"
+        },
+        "g09": {
+          "verdict": "ok",
+          "evidence": "fr 2.50, es 0.50, it 0.50",
+          "text": "Je cherche un bon livre sur la cybersécurité adapté aux petites entreprises."
+        },
+        "g10": {
+          "verdict": "ok",
+          "evidence": "de 2.50, pt 0.50",
+          "text": "Ich suche einen praktischen Ratgeber über das richtige Kompostieren im eigenen Garten."
+        },
+        "g11": {
+          "verdict": "ok",
+          "evidence": "it 1.58, ca 0.58, la 0.58",
+          "text": "Vorrei un manuale introduttivo per allevare galline in giardino nel modo corretto."
+        },
+        "g12": {
+          "verdict": "ok",
+          "evidence": "pt 3.50, es 1.50",
+          "text": "Procuro um guia completo passo a passo sobre como planejar um casamento."
+        },
+        "g13": {
+          "verdict": "mismatch",
+          "evidence": "pt 1.00",
+          "text": "viajar a Marruecos"
+        },
+        "g14": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "starting small business"
+        },
+        "g15": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "économie comportementale"
+        },
+        "g16": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Katzenverhalten verstehen"
+        },
+        "g17": {
+          "verdict": "ok",
+          "evidence": "es 0.50, it 0.50",
+          "text": "pane con lievito madre"
+        },
+        "g18": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "culinária caril tailandês"
+        },
+        "g19": {
+          "verdict": "ok",
+          "evidence": "es 1.92, pt 1.67, fr 0.42",
+          "text": "Necesito un libro de costura y confección básica para empezar a diseñar ropa."
+        },
+        "g20": {
+          "verdict": "ok",
+          "evidence": "en 2.50, de 0.50, it 0.25",
+          "text": "I am looking for an introductory handbook on basic household electrical wiring."
+        },
+        "g21": {
+          "verdict": "ok",
+          "evidence": "fr 1.92, pt 1.17, it 0.75",
+          "text": "Avez-vous un ouvrage qui propose des exercices efficaces contre le mal de dos?"
+        },
+        "g22": {
+          "verdict": "ok",
+          "evidence": "de 3.33, es 0.33, ca 0.33",
+          "text": "Gibt es hier ein Fachbuch über gesunde Ernährung während der Schwangerschaft?"
+        },
+        "g23": {
+          "verdict": "ok",
+          "evidence": "it 3.33, pt 1.00, es 0.33",
+          "text": "Cerco una guida illustrata dedicata alla cura e coltivazione delle piante da appartamento."
+        },
+        "g24": {
+          "verdict": "ok",
+          "evidence": "pt 2.33, es 1.33, fr 0.33",
+          "text": "Gostaria de encontrar um livro introdutório sobre técnicas fundamentais de escalada em rocha."
+        },
+        "g25": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ruta Islandia coche"
+        },
+        "g26": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "volcanoes earthquakes"
+        },
+        "g27": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "algorithmes structures données"
+        },
+        "g28": {
+          "verdict": "ok",
+          "evidence": "de 1.00",
+          "text": "Yoga für Anfänger"
+        },
+        "g29": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "progetti Raspberry Pi elettronica"
+        },
+        "g30": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "decoração de bolos"
+        },
+        "g31": {
+          "verdict": "ok",
+          "evidence": "es 1.58, fr 0.58, ca 0.58",
+          "text": "Me gustaría consultar un manual actualizado de primeros auxilios y atención de urgencias."
+        },
+        "g32": {
+          "verdict": "ok",
+          "evidence": "en 2.50, de 0.50",
+          "text": "Could you suggest an inspiring book about decluttering and organizing the home?"
+        },
+        "g33": {
+          "verdict": "ok",
+          "evidence": "fr 3.50, es 0.50, it 0.50",
+          "text": "Je souhaite lire un guide pratique pour voyager au Japon avec un petit budget."
+        },
+        "g34": {
+          "verdict": "ok",
+          "evidence": "de 5.00",
+          "text": "Haben Sie eine gute Anleitung zum Fermentieren von Gemüse wie Kimchi und Sauerkraut?"
+        },
+        "g35": {
+          "verdict": "ok",
+          "evidence": "it 1.00, es 0.50, fr 0.50",
+          "text": "Sto cercando un testo chiaro sulla meccanica automobilistica e la manutenzione ordinaria."
+        },
+        "g36": {
+          "verdict": "ok",
+          "evidence": "pt 3.17, es 0.67, it 0.50",
+          "text": "Preciso de um manual prático para aprender a cultivar e podar árvores bonsai."
+        },
+        "g37": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "administración sistemas Linux"
+        },
+        "g38": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "coral reef marine biology"
+        },
+        "g39": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "taille arbres fruitiers"
+        },
+        "g40": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Schweißen Grundkurs"
+        },
+        "g41": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "database relazionali SQL"
+        },
+        "g42": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "aberturas de xadrez"
+        },
+        "g43": {
+          "verdict": "ok",
+          "evidence": "es 2.08, pt 1.25, ca 1.08",
+          "text": "Busco una guía detallada para mochileros que recorren el sudeste asiático por libre."
+        },
+        "g44": {
+          "verdict": "ok",
+          "evidence": "en 2.00, pt 1.00",
+          "text": "Please recommend a modern tutorial book for building dynamic websites with JavaScript."
+        },
+        "g45": {
+          "verdict": "ok",
+          "evidence": "fr 2.92, la 0.50, es 0.42",
+          "text": "J'aimerais emprunter une bonne introduction théorique et pratique aux principes de la permaculture."
+        },
+        "g46": {
+          "verdict": "ok",
+          "evidence": "de 6.00",
+          "text": "Können Sie mir ein Buch über Schlafstörungen und Wege zur Überwindung von Schlaflosigkeit empfehlen?"
+        },
+        "g47": {
+          "verdict": "mismatch",
+          "evidence": "nl 1.00, it 0.75, pt 0.50",
+          "text": "Vorrei trovare un pratico manuale fai-da-te dedicato alle riparazioni idrauliche domestiche."
+        },
+        "g48": {
+          "verdict": "ok",
+          "evidence": "pt 1.50, es 1.00, it 0.50",
+          "text": "Quero um guia confiável sobre trilhas e caminhadas deslumbrantes nos Alpes."
+        },
+        "g49": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "agujeros negros astrofísica"
+        },
+        "g50": {
+          "verdict": "mismatch",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "Camino de Santiago walking"
+        },
+        "g51": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "bourse débutants investissement"
+        },
+        "g52": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Klimawandel Wissenschaft"
+        },
+        "g53": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "genetica umana DNA"
+        },
+        "g54": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ansiedade estratégias lidar"
+        },
+        "g55": {
+          "verdict": "ok",
+          "evidence": "es 0.92, it 0.75, fr 0.42",
+          "text": "Busco un recetario práctico de meal prep con menús vegetarianos semanales equilibrados."
+        },
+        "g56": {
+          "verdict": "ok",
+          "evidence": "en 5.00, pl 0.75, de 0.50",
+          "text": "I want to read an explanatory text on inflation and the role of central banks."
+        },
+        "g57": {
+          "verdict": "ok",
+          "evidence": "fr 2.75, ca 1.25, it 0.75",
+          "text": "Je cherche un guide bienveillant sur l'accompagnement du sommeil chez le jeune enfant."
+        },
+        "g58": {
+          "verdict": "ok",
+          "evidence": "de 4.50, pt 0.50",
+          "text": "Ich benötige ein leicht verständliches Buch über das Anlegen und Pflegen eines Gemüsegartens."
+        },
+        "g59": {
+          "verdict": "ok",
+          "evidence": "it 2.33, es 0.83, ca 0.83",
+          "text": "Desidero trovare un valido manuale di finanza personale incentrato sul risparmio e la gestione del budget."
+        },
+        "g60": {
+          "verdict": "ok",
+          "evidence": "pt 3.33, ca 0.83, it 0.50",
+          "text": "Gostaria de uma publicação especializada em adestramento positivo e cuidados essenciais com filhotes de cachorro."
+        },
+        "g-oos01": {
+          "verdict": "ok",
+          "evidence": "es 2.03, ca 1.53, it 0.67",
+          "text": "Escribe una función en Python para eliminar duplicados de una lista manteniendo el orden"
+        },
+        "g-oos02": {
+          "verdict": "ok",
+          "evidence": "en 0.50, pl 0.50",
+          "text": "Convert 72 degrees Fahrenheit to Celsius"
+        },
+        "g-oos03": {
+          "verdict": "ok",
+          "evidence": "fr 3.45, it 0.75, la 0.50",
+          "text": "Comment est la circulation sur le périphérique en ce moment?"
+        },
+        "g-oos04": {
+          "verdict": "ok",
+          "evidence": "es 0.33, de 0.33, ca 0.33",
+          "text": "Hallo, wie geht es dir heute?"
+        },
+        "g-oos05": {
+          "verdict": "ok",
+          "evidence": "it 2.50, ca 1.00, la 0.67",
+          "text": "Scrivi una query SQL per contare il numero di ordini per ciascun cliente"
+        },
+        "g-oos06": {
+          "verdict": "ok",
+          "evidence": "pt 2.50, pl 0.50",
+          "text": "Qual é a cotação atual do bitcoin agora?"
+        },
+        "g-oos07": {
+          "verdict": "ok",
+          "evidence": "es 1.33, ca 0.83, it 0.67",
+          "text": "Genera una expresión regular para validar una dirección de correo electrónico"
+        },
+        "g-oos08": {
+          "verdict": "ok",
+          "evidence": "en 2.00",
+          "text": "How many days are there between March 3 and August 19?"
+        },
+        "g-oos09": {
+          "verdict": "ok",
+          "evidence": "fr 2.25, ca 0.75, la 0.50",
+          "text": "Écris un script bash qui renomme automatiquement toutes les photos selon leur date"
+        },
+        "g-oos10": {
+          "verdict": "ok",
+          "evidence": "en 1.00, de 1.00",
+          "text": "Was ist deine Lieblingsfarbe?"
+        },
+        "g-oos11": {
+          "verdict": "ok",
+          "evidence": "es 0.33, it 0.33, ca 0.33",
+          "text": "Raccontami una barzelletta divertente"
+        },
+        "g-oos12": {
+          "verdict": "ok",
+          "evidence": "pt 1.00",
+          "text": "Estou muito entediado, podemos bater um papo?"
+        },
+        "g-oos13": {
+          "verdict": "ok",
+          "evidence": "es 1.75, ca 1.25, it 0.92",
+          "text": "Calcula la cuota mensual de una hipoteca de 200000 euros al 3 por ciento durante 25 años"
+        },
+        "g-oos14": {
+          "verdict": "ok",
+          "evidence": "en 1.50, nl 0.50",
+          "text": "What is 15 percent of 240?"
+        },
+        "g-oos15": {
+          "verdict": "ok",
+          "evidence": "fr 2.78, es 0.78, ca 0.78",
+          "text": "Quel est le score en direct de la finale de tennis ce soir?"
+        },
+        "g-oos16": {
+          "verdict": "ok",
+          "evidence": "de 1.50, nl 0.50",
+          "text": "Hat die nächste Postfiliale jetzt im Moment geöffnet?"
+        },
+        "g-oos17": {
+          "verdict": "ok",
+          "evidence": "it 2.08, es 1.08, ca 0.58",
+          "text": "Crea una pagina HTML con un modulo di contatto completo"
+        },
+        "g-oos18": {
+          "verdict": "ok",
+          "evidence": "pt 1.50, it 0.50",
+          "text": "Muito obrigado pela ajuda e até logo!"
+        },
+        "g-oos19": {
+          "verdict": "ok",
+          "evidence": "es 2.08, fr 1.08, ca 0.58",
+          "text": "Cuáles son los resultados de la lotería de hoy"
+        },
+        "g-oos20": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Solve 3x + 7 = 22"
+        }
+      },
+      "language_summary": {
+        "mismatch": 3,
+        "ok": 54,
+        "undecided": 23
+      }
+    },
+    "fixes": [
+      {
+        "round": 1,
+        "request_id": "g13",
+        "reasons": [
+          "language: not es: pt 1.00"
+        ],
+        "before": {
+          "id": "g13",
+          "text": "viajar a Marruecos",
+          "english": "travel to Morocco"
+        },
+        "after": {
+          "id": "g13",
+          "text": "turismo en Marruecos",
+          "english": "tourism in Morocco"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g21",
+        "reasons": [
+          "asks for reading: the translation 'Do you have a work that offers effective exercises against back pain?' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g21",
+          "text": "Avez-vous un ouvrage qui propose des exercices efficaces contre le mal de dos?",
+          "english": "Do you have a work that offers effective exercises against back pain?"
+        },
+        "after": {
+          "id": "g21",
+          "text": "Je cherche un bon livre illustré d'exercices pratiques pour soulager efficacement le mal de dos.",
+          "english": "I am looking for a good illustrated book of practical exercises to relieve back pain effectively."
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g34",
+        "reasons": [
+          "asks for reading: the translation 'Do you have good instructions on fermenting vegetables such as kimchi and sauerkraut?' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g34",
+          "text": "Haben Sie eine gute Anleitung zum Fermentieren von Gemüse wie Kimchi und Sauerkraut?",
+          "english": "Do you have good instructions on fermenting vegetables such as kimchi and sauerkraut?"
+        },
+        "after": {
+          "id": "g34",
+          "text": "Ich möchte ein Buch über das Fermentieren von Gemüse wie Kimchi und Sauerkraut lesen.",
+          "english": "I want to read a book on fermenting vegetables such as kimchi and sauerkraut."
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g35",
+        "reasons": [
+          "asks for reading: the translation 'I am looking for a clear text on automotive mechanics and routine maintenance.' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g35",
+          "text": "Sto cercando un testo chiaro sulla meccanica automobilistica e la manutenzione ordinaria.",
+          "english": "I am looking for a clear text on automotive mechanics and routine maintenance."
+        },
+        "after": {
+          "id": "g35",
+          "text": "Sto cercando un libro chiaro sulla meccanica automobilistica per imparare la manutenzione di base.",
+          "english": "I am looking for a clear book on automotive mechanics to learn basic maintenance."
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g45",
+        "reasons": [
+          "asks for reading: the translation 'I would like to borrow a good theoretical and practical introduction to the principles of permaculture.' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g45",
+          "text": "J'aimerais emprunter une bonne introduction théorique et pratique aux principes de la permaculture.",
+          "english": "I would like to borrow a good theoretical and practical introduction to the principles of permaculture."
+        },
+        "after": {
+          "id": "g45",
+          "text": "Je cherche un bon manuel à lire pour découvrir les bases et principes de la permaculture.",
+          "english": "I am looking for a good manual to read to discover the basics and principles of permaculture."
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g47",
+        "reasons": [
+          "language: not it: nl 1.00, it 0.75, pt 0.50"
+        ],
+        "before": {
+          "id": "g47",
+          "text": "Vorrei trovare un pratico manuale fai-da-te dedicato alle riparazioni idrauliche domestiche.",
+          "english": "I would like to find a practical DIY manual dedicated to home plumbing repairs."
+        },
+        "after": {
+          "id": "g47",
+          "text": "Potreste indicarmi un testo introduttivo dedicato alla riparazione dei guasti idraulici negli appartamenti?",
+          "english": "Could you recommend an introductory text dedicated to repairing plumbing faults in apartments?"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g50",
+        "reasons": [
+          "language: not en: es 0.17, fr 0.17, pt 0.17"
+        ],
+        "before": {
+          "id": "g50",
+          "text": "Camino de Santiago walking",
+          "english": "Camino de Santiago walking"
+        },
+        "after": {
+          "id": "g50",
+          "text": "St James Way pilgrimage",
+          "english": "St James Way pilgrimage"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "g60",
+        "reasons": [
+          "asks for reading: the translation 'I would like a publication specialized in positive reinforcement training and essential puppy care.' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g60",
+          "text": "Gostaria de uma publicação especializada em adestramento positivo e cuidados essenciais com filhotes de cachorro.",
+          "english": "I would like a publication specialized in positive reinforcement training and essential puppy care."
+        },
+        "after": {
+          "id": "g60",
+          "text": "Quero ler um livro prático sobre técnicas eficazes para adestrar e educar um filhote de cachorro.",
+          "english": "I want to read a practical book on effective techniques to train and educate a puppy."
+        }
+      },
+      {
+        "round": 2,
+        "request_id": "g47",
+        "reasons": [
+          "asks for reading: the translation 'Could you recommend an introductory text dedicated to repairing plumbing faults in apartments?' does not ask for something to read"
+        ],
+        "before": {
+          "id": "g47",
+          "text": "Potreste indicarmi un testo introduttivo dedicato alla riparazione dei guasti idraulici negli appartamenti?",
+          "english": "Could you recommend an introductory text dedicated to repairing plumbing faults in apartments?"
+        },
+        "after": {
+          "id": "g47",
+          "text": "Vorrei trovare un pratico manuale fai-da-te da leggere sulle riparazioni idrauliche domestiche.",
+          "english": "I would like to find a practical DIY manual to read on home plumbing repairs."
+        }
+      },
+      {
+        "round": 2,
+        "request_id": "g50",
+        "reasons": [
+          "topic: the translation 'St James Way pilgrimage' does not name the topic 'walking the Camino de Santiago'"
+        ],
+        "before": {
+          "id": "g50",
+          "text": "St James Way pilgrimage",
+          "english": "St James Way pilgrimage"
+        },
+        "after": {
+          "id": "g50",
+          "text": "walking Camino de Santiago",
+          "english": "walking Camino de Santiago"
+        }
+      },
+      {
+        "round": 3,
+        "request_id": "g50",
+        "reasons": [
+          "language: not en: es 0.17, fr 0.17, pt 0.17"
+        ],
+        "before": {
+          "id": "g50",
+          "text": "walking Camino de Santiago",
+          "english": "walking Camino de Santiago"
+        },
+        "after": {
+          "id": "g50",
+          "text": "Santiago pilgrimage route walking",
+          "english": "Santiago pilgrimage route walking"
+        }
+      }
+    ],
+    "final": {
+      "problems": [],
+      "language": {
+        "g01": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "diabetes tipo 2"
+        },
+        "g02": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "quantum physics beginners"
+        },
+        "g03": {
+          "verdict": "ok",
+          "evidence": "es 0.42, fr 0.42, ca 0.42",
+          "text": "histoire de la monnaie"
+        },
+        "g04": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Holzbearbeitung Schreinerei"
+        },
+        "g05": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "tattica calcistica"
+        },
+        "g06": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "treino de maratona"
+        },
+        "g07": {
+          "verdict": "ok",
+          "evidence": "es 0.92, pt 0.67, fr 0.42",
+          "text": "Quisiera encontrar un manual práctico para mejorar mi técnica de natación."
+        },
+        "g08": {
+          "verdict": "ok",
+          "evidence": "en 2.00, pt 1.00",
+          "text": "Can you recommend a comprehensive guide on meat smoking and outdoor barbecue?"
+        },
+        "g09": {
+          "verdict": "ok",
+          "evidence": "fr 2.50, es 0.50, it 0.50",
+          "text": "Je cherche un bon livre sur la cybersécurité adapté aux petites entreprises."
+        },
+        "g10": {
+          "verdict": "ok",
+          "evidence": "de 2.50, pt 0.50",
+          "text": "Ich suche einen praktischen Ratgeber über das richtige Kompostieren im eigenen Garten."
+        },
+        "g11": {
+          "verdict": "ok",
+          "evidence": "it 1.58, ca 0.58, la 0.58",
+          "text": "Vorrei un manuale introduttivo per allevare galline in giardino nel modo corretto."
+        },
+        "g12": {
+          "verdict": "ok",
+          "evidence": "pt 3.50, es 1.50",
+          "text": "Procuro um guia completo passo a passo sobre como planejar um casamento."
+        },
+        "g13": {
+          "verdict": "ok",
+          "evidence": "es 0.20, fr 0.20, ca 0.20",
+          "text": "turismo en Marruecos"
+        },
+        "g14": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "starting small business"
+        },
+        "g15": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "économie comportementale"
+        },
+        "g16": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Katzenverhalten verstehen"
+        },
+        "g17": {
+          "verdict": "ok",
+          "evidence": "es 0.50, it 0.50",
+          "text": "pane con lievito madre"
+        },
+        "g18": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "culinária caril tailandês"
+        },
+        "g19": {
+          "verdict": "ok",
+          "evidence": "es 1.92, pt 1.67, fr 0.42",
+          "text": "Necesito un libro de costura y confección básica para empezar a diseñar ropa."
+        },
+        "g20": {
+          "verdict": "ok",
+          "evidence": "en 2.50, de 0.50, it 0.25",
+          "text": "I am looking for an introductory handbook on basic household electrical wiring."
+        },
+        "g21": {
+          "verdict": "ok",
+          "evidence": "fr 1.92, ca 1.42, pt 1.17",
+          "text": "Je cherche un bon livre illustré d'exercices pratiques pour soulager efficacement le mal de dos."
+        },
+        "g22": {
+          "verdict": "ok",
+          "evidence": "de 3.33, es 0.33, ca 0.33",
+          "text": "Gibt es hier ein Fachbuch über gesunde Ernährung während der Schwangerschaft?"
+        },
+        "g23": {
+          "verdict": "ok",
+          "evidence": "it 3.33, pt 1.00, es 0.33",
+          "text": "Cerco una guida illustrata dedicata alla cura e coltivazione delle piante da appartamento."
+        },
+        "g24": {
+          "verdict": "ok",
+          "evidence": "pt 2.33, es 1.33, fr 0.33",
+          "text": "Gostaria de encontrar um livro introdutório sobre técnicas fundamentais de escalada em rocha."
+        },
+        "g25": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ruta Islandia coche"
+        },
+        "g26": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "volcanoes earthquakes"
+        },
+        "g27": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "algorithmes structures données"
+        },
+        "g28": {
+          "verdict": "ok",
+          "evidence": "de 1.00",
+          "text": "Yoga für Anfänger"
+        },
+        "g29": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "progetti Raspberry Pi elettronica"
+        },
+        "g30": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "decoração de bolos"
+        },
+        "g31": {
+          "verdict": "ok",
+          "evidence": "es 1.58, fr 0.58, ca 0.58",
+          "text": "Me gustaría consultar un manual actualizado de primeros auxilios y atención de urgencias."
+        },
+        "g32": {
+          "verdict": "ok",
+          "evidence": "en 2.50, de 0.50",
+          "text": "Could you suggest an inspiring book about decluttering and organizing the home?"
+        },
+        "g33": {
+          "verdict": "ok",
+          "evidence": "fr 3.50, es 0.50, it 0.50",
+          "text": "Je souhaite lire un guide pratique pour voyager au Japon avec un petit budget."
+        },
+        "g34": {
+          "verdict": "ok",
+          "evidence": "de 4.50, pt 0.50",
+          "text": "Ich möchte ein Buch über das Fermentieren von Gemüse wie Kimchi und Sauerkraut lesen."
+        },
+        "g35": {
+          "verdict": "ok",
+          "evidence": "it 1.83, ca 0.83, es 0.50",
+          "text": "Sto cercando un libro chiaro sulla meccanica automobilistica per imparare la manutenzione di base."
+        },
+        "g36": {
+          "verdict": "ok",
+          "evidence": "pt 3.17, es 0.67, it 0.50",
+          "text": "Preciso de um manual prático para aprender a cultivar e podar árvores bonsai."
+        },
+        "g37": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "administración sistemas Linux"
+        },
+        "g38": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "coral reef marine biology"
+        },
+        "g39": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "taille arbres fruitiers"
+        },
+        "g40": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Schweißen Grundkurs"
+        },
+        "g41": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "database relazionali SQL"
+        },
+        "g42": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "aberturas de xadrez"
+        },
+        "g43": {
+          "verdict": "ok",
+          "evidence": "es 2.08, pt 1.25, ca 1.08",
+          "text": "Busco una guía detallada para mochileros que recorren el sudeste asiático por libre."
+        },
+        "g44": {
+          "verdict": "ok",
+          "evidence": "en 2.00, pt 1.00",
+          "text": "Please recommend a modern tutorial book for building dynamic websites with JavaScript."
+        },
+        "g45": {
+          "verdict": "ok",
+          "evidence": "fr 2.67, pt 1.17, ca 1.17",
+          "text": "Je cherche un bon manuel à lire pour découvrir les bases et principes de la permaculture."
+        },
+        "g46": {
+          "verdict": "ok",
+          "evidence": "de 6.00",
+          "text": "Können Sie mir ein Buch über Schlafstörungen und Wege zur Überwindung von Schlaflosigkeit empfehlen?"
+        },
+        "g47": {
+          "verdict": "ok",
+          "evidence": "it 1.25, pt 1.00, nl 1.00",
+          "text": "Vorrei trovare un pratico manuale fai-da-te da leggere sulle riparazioni idrauliche domestiche."
+        },
+        "g48": {
+          "verdict": "ok",
+          "evidence": "pt 1.50, es 1.00, it 0.50",
+          "text": "Quero um guia confiável sobre trilhas e caminhadas deslumbrantes nos Alpes."
+        },
+        "g49": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "agujeros negros astrofísica"
+        },
+        "g50": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Santiago pilgrimage route walking"
+        },
+        "g51": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "bourse débutants investissement"
+        },
+        "g52": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Klimawandel Wissenschaft"
+        },
+        "g53": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "genetica umana DNA"
+        },
+        "g54": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ansiedade estratégias lidar"
+        },
+        "g55": {
+          "verdict": "ok",
+          "evidence": "es 0.92, it 0.75, fr 0.42",
+          "text": "Busco un recetario práctico de meal prep con menús vegetarianos semanales equilibrados."
+        },
+        "g56": {
+          "verdict": "ok",
+          "evidence": "en 5.00, pl 0.75, de 0.50",
+          "text": "I want to read an explanatory text on inflation and the role of central banks."
+        },
+        "g57": {
+          "verdict": "ok",
+          "evidence": "fr 2.75, ca 1.25, it 0.75",
+          "text": "Je cherche un guide bienveillant sur l'accompagnement du sommeil chez le jeune enfant."
+        },
+        "g58": {
+          "verdict": "ok",
+          "evidence": "de 4.50, pt 0.50",
+          "text": "Ich benötige ein leicht verständliches Buch über das Anlegen und Pflegen eines Gemüsegartens."
+        },
+        "g59": {
+          "verdict": "ok",
+          "evidence": "it 2.33, es 0.83, ca 0.83",
+          "text": "Desidero trovare un valido manuale di finanza personale incentrato sul risparmio e la gestione del budget."
+        },
+        "g60": {
+          "verdict": "ok",
+          "evidence": "pt 3.17, es 1.67, it 0.50",
+          "text": "Quero ler um livro prático sobre técnicas eficazes para adestrar e educar um filhote de cachorro."
+        },
+        "g-oos01": {
+          "verdict": "ok",
+          "evidence": "es 2.03, ca 1.53, it 0.67",
+          "text": "Escribe una función en Python para eliminar duplicados de una lista manteniendo el orden"
+        },
+        "g-oos02": {
+          "verdict": "ok",
+          "evidence": "en 0.50, pl 0.50",
+          "text": "Convert 72 degrees Fahrenheit to Celsius"
+        },
+        "g-oos03": {
+          "verdict": "ok",
+          "evidence": "fr 3.45, it 0.75, la 0.50",
+          "text": "Comment est la circulation sur le périphérique en ce moment?"
+        },
+        "g-oos04": {
+          "verdict": "ok",
+          "evidence": "es 0.33, de 0.33, ca 0.33",
+          "text": "Hallo, wie geht es dir heute?"
+        },
+        "g-oos05": {
+          "verdict": "ok",
+          "evidence": "it 2.50, ca 1.00, la 0.67",
+          "text": "Scrivi una query SQL per contare il numero di ordini per ciascun cliente"
+        },
+        "g-oos06": {
+          "verdict": "ok",
+          "evidence": "pt 2.50, pl 0.50",
+          "text": "Qual é a cotação atual do bitcoin agora?"
+        },
+        "g-oos07": {
+          "verdict": "ok",
+          "evidence": "es 1.33, ca 0.83, it 0.67",
+          "text": "Genera una expresión regular para validar una dirección de correo electrónico"
+        },
+        "g-oos08": {
+          "verdict": "ok",
+          "evidence": "en 2.00",
+          "text": "How many days are there between March 3 and August 19?"
+        },
+        "g-oos09": {
+          "verdict": "ok",
+          "evidence": "fr 2.25, ca 0.75, la 0.50",
+          "text": "Écris un script bash qui renomme automatiquement toutes les photos selon leur date"
+        },
+        "g-oos10": {
+          "verdict": "ok",
+          "evidence": "en 1.00, de 1.00",
+          "text": "Was ist deine Lieblingsfarbe?"
+        },
+        "g-oos11": {
+          "verdict": "ok",
+          "evidence": "es 0.33, it 0.33, ca 0.33",
+          "text": "Raccontami una barzelletta divertente"
+        },
+        "g-oos12": {
+          "verdict": "ok",
+          "evidence": "pt 1.00",
+          "text": "Estou muito entediado, podemos bater um papo?"
+        },
+        "g-oos13": {
+          "verdict": "ok",
+          "evidence": "es 1.75, ca 1.25, it 0.92",
+          "text": "Calcula la cuota mensual de una hipoteca de 200000 euros al 3 por ciento durante 25 años"
+        },
+        "g-oos14": {
+          "verdict": "ok",
+          "evidence": "en 1.50, nl 0.50",
+          "text": "What is 15 percent of 240?"
+        },
+        "g-oos15": {
+          "verdict": "ok",
+          "evidence": "fr 2.78, es 0.78, ca 0.78",
+          "text": "Quel est le score en direct de la finale de tennis ce soir?"
+        },
+        "g-oos16": {
+          "verdict": "ok",
+          "evidence": "de 1.50, nl 0.50",
+          "text": "Hat die nächste Postfiliale jetzt im Moment geöffnet?"
+        },
+        "g-oos17": {
+          "verdict": "ok",
+          "evidence": "it 2.08, es 1.08, ca 0.58",
+          "text": "Crea una pagina HTML con un modulo di contatto completo"
+        },
+        "g-oos18": {
+          "verdict": "ok",
+          "evidence": "pt 1.50, it 0.50",
+          "text": "Muito obrigado pela ajuda e até logo!"
+        },
+        "g-oos19": {
+          "verdict": "ok",
+          "evidence": "es 2.08, fr 1.08, ca 0.58",
+          "text": "Cuáles son los resultados de la lotería de hoy"
+        },
+        "g-oos20": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Solve 3x + 7 = 22"
+        }
+      },
+      "language_summary": {
+        "ok": 56,
+        "undecided": 24
+      }
+    }
+  },
+  "counts": {
+    "valid/es/keywords": 5,
+    "valid/en/keywords": 5,
+    "valid/fr/keywords": 5,
+    "valid/de/keywords": 5,
+    "valid/it/keywords": 5,
+    "valid/pt/keywords": 5,
+    "valid/es/sentence": 5,
+    "valid/en/sentence": 5,
+    "valid/fr/sentence": 5,
+    "valid/de/sentence": 5,
+    "valid/it/sentence": 5,
+    "valid/pt/sentence": 5,
+    "out_of_scope/es/any": 4,
+    "out_of_scope/en/any": 4,
+    "out_of_scope/fr/any": 3,
+    "out_of_scope/de/any": 3,
+    "out_of_scope/it/any": 3,
+    "out_of_scope/pt/any": 3
+  }
+}

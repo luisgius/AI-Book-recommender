@@ -29,6 +29,18 @@ query vectors, capture of the raw model outputs), simulated_user (the E
 loop), runs (stages 2-3), judging (stage 4), analysis (pure measures,
 contrasts, thresholds), results and report (stage 5), cli.
 
+Re-measurement (V25 addendum, docs/notes/2026-11-12-protocolo-evaluacion-
+asistente-adenda.md): after the routing instruction was revised, the whole
+measurement is repeated in data/evaluation/assistant_v25/ (--data-dir), which
+reuses the first measurement's sets, P, depth check, query vectors and
+judgments without changing them, and adds the held-out set G:
+
+    seed-v25    copy the reusable files and record both routing instructions
+    set-g       generate and check G (set_g.py)
+    assistant   as above, with the part "g"
+    report      also writes data/evaluation/ASSISTANT_EVALUATION_V25.md, both
+                measurements side by side (report_v25.py)
+
 Reused from V14 (app/evaluation/catalog_evaluation/, unchanged): the spend
 ledger and its recorders, the generator call, the query checks, the judges
 with their cache, the statistics and the conclusion rule.

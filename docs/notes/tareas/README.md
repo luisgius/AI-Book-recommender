@@ -32,13 +32,14 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V20** Asistente LangGraph como entrada conversacional (enruta, pregunta para aclarar, busca o delega en el agente) y explicaciones en paralelo
 - [x] **V23** Comprobación del resultado de bge-m3 (se mantiene) y de los fallos del modelo de embeddings desplegado (causa y mitigación medida)
 - [x] **V24** Candidatos vectoriales más reranker por defecto (BM25 como respaldo) y embeddings de la consulta con segundo proveedor, caché y sin retención de datos; pendiente de desplegar
+- [x] **V22** Evaluación del asistente y del agente con protocolo declarado antes de ejecutar; no cumplió el umbral de rechazos indebidos (9,5 % frente a 2 %)
+- [x] **V25** Revisión de la instrucción de ruta con adenda declarada y nueva medida con un conjunto no visto: rechazos indebidos 2 de 60 (3,3 %), por encima del umbral; el asistente no se presenta como entrada principal
 
 ## En curso
 
 
 ## Pendientes
 
-- [~] **V22** Evaluación del agente y del asistente con protocolo declarado antes de ejecutar
 
 ## Aplazadas (con motivo)
 

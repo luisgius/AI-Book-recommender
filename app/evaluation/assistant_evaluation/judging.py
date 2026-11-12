@@ -47,6 +47,17 @@ def new_cache(data_dir: Path, model: str) -> JudgmentCache:
     return judge_cache(data_dir, model)
 
 
+def first_measurement_cache(data_dir: Path, model: str) -> JudgmentCache | None:
+    """
+    The first measurement's cache of `model` when data_dir is the re-measurement's (V25), else None.
+
+    Read only: the re-measurement reuses the pairs the first one judged
+    (same need id, prompt and judge) and judges only new pairs, into its own
+    cache.
+    """
+    return judge_cache(D.DATA_DIR, model) if D.is_v25(data_dir) else None
+
+
 def pairs_needed(requests: Sequence[Request], data: Mapping[str, Any]) -> Dict[str, List[str]]:
     """{need_id: work ids in first-seen order} that the measures read (see the module docstring)."""
     out: Dict[str, List[str]] = {}
@@ -114,19 +125,26 @@ def judge_all(data_dir: Path, requests: Sequence[Request], ledger: SpendLedger, 
 
     def judge(model: str) -> None:
         old = v14_cache(model)
+        first = first_measurement_cache(data_dir, model)
         cache = new_cache(data_dir, model)
         tasks = []
-        reused = 0
+        reused = reused_first = 0
         for (need_id, work_id), book in books.items():
             key = (need_id, book.source, book.source_id or "")
             if key in old:
                 reused += 1
                 continue
+            if first is not None and key in first:
+                reused_first += 1
+                continue
             tasks.append((need_id, texts[need_id], book))
-        log(f"{model}: {len(books)} pairs measured, {reused} judged in V14, {len(tasks)} to judge here")
+        log(f"{model}: {len(books)} pairs measured, {reused} judged in V14, {reused_first} judged in the first "
+            f"measurement, {len(tasks)} to judge here")
         stats = judge_pool(model, tasks, cache, ledger, stage="4-judge", log=log, judge_factory=judge_factory)
         stats.update({"reused_from_v14": reused, "measured_pairs": len(books),
                       "date": time.strftime("%Y-%m-%dT%H:%M:%S")})
+        if first is not None:
+            stats["reused_from_first_measurement"] = reused_first
         with (out_dir / JUDGING_RUNS).open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(stats) + "\n")
         stats_all[model] = stats
@@ -142,12 +160,13 @@ def load_grades(data_dir: Path, model: str, pairs: Mapping[str, Any],
     """{need_id: {work_id: grade}} of one judge over the works of pairs.json (V14's judgments, then this task's)."""
     v14 = v14 if v14 is not None else v14_cache(model)
     new = new if new is not None else new_cache(data_dir, model)
+    first = first_measurement_cache(data_dir, model)
     out: Dict[str, Dict[str, int]] = {}
     for need_id, entry in pairs.items():
         grades: Dict[str, int] = {}
         for work in entry["works"]:
             key = (need_id, work["source"], work["source_id"])
-            judgment = v14.get(key) or new.get(key)
+            judgment = v14.get(key) or (first.get(key) if first is not None else None) or new.get(key)
             if judgment is not None:
                 grades[work["work_id"]] = judgment.grade
         out[need_id] = grades
@@ -159,7 +178,10 @@ def judged_counts(data_dir: Path, pairs: Mapping[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for model in D.JUDGES:
         v14, new = v14_cache(model), new_cache(data_dir, model)
+        first = first_measurement_cache(data_dir, model)
         counts = {"measured_pairs": 0, "from_v14": 0, "judged_here": 0, "unjudged": 0}
+        if first is not None:
+            counts["from_first_measurement"] = 0
         source: Dict[Tuple[str, str], Tuple[str, str]] = {}
         for need_id, entry in pairs.items():
             for work in entry["works"]:
@@ -169,6 +191,8 @@ def judged_counts(data_dir: Path, pairs: Mapping[str, Any]) -> Dict[str, Any]:
                 key = (need_id, *source[(need_id, work_id)])
                 if key in v14:
                     counts["from_v14"] += 1
+                elif first is not None and key in first:
+                    counts["from_first_measurement"] += 1
                 elif key in new:
                     counts["judged_here"] += 1
                 else:

@@ -1,0 +1,1539 @@
+{
+  "generator": {
+    "model": "google/gemini-3.8-flash",
+    "temperature": 0.7,
+    "reasoning": {
+      "effort": "low"
+    },
+    "prompt_versions": {
+      "E": "v1",
+      "F": "v1"
+    }
+  },
+  "e_sample": {
+    "seed": 0,
+    "b_query_ids": [
+      "b-nl-2",
+      "b-nl-6",
+      "b-ar-6",
+      "b-fr-4",
+      "b-ru-6",
+      "b-ru-3",
+      "b-nl-4",
+      "b-it-3",
+      "b-ru-2",
+      "b-en-5",
+      "b-it-2",
+      "b-pt-4",
+      "b-pt-5",
+      "b-de-2",
+      "b-fr-3",
+      "b-ca-3",
+      "b-en-1",
+      "b-pt-3",
+      "b-nl-1",
+      "b-ca-1",
+      "b-it-4",
+      "b-de-5",
+      "b-fr-5",
+      "b-ja-4",
+      "b-ru-5",
+      "b-ca-4",
+      "b-en-2",
+      "b-nl-5",
+      "b-ar-5",
+      "b-en-4"
+    ]
+  },
+  "f_tasks": [
+    {
+      "id": "f01",
+      "kind": "compare",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "a97d2a0c-a51b-5821-921a-7500736d268c",
+          "title": "Poems by Emily Dickinson, Three Series, Complete",
+          "authors": [
+            "Emily Dickinson"
+          ]
+        },
+        {
+          "work_id": "1910a6e1-6c75-57e2-95ee-89a75939158a",
+          "title": "Poems by Emily Dickinson, Series Two",
+          "authors": [
+            "Emily Dickinson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f02",
+      "kind": "compare",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "ba45fb7c-57e3-5a36-ae1d-9f9166a0341a",
+          "title": "Justine",
+          "authors": [
+            "Lawrence Durrell"
+          ]
+        },
+        {
+          "work_id": "f4011ff6-faf9-5731-ace9-ad6111ff57ec",
+          "title": "Clea",
+          "authors": [
+            "Lawrence Durrell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f03",
+      "kind": "compare",
+      "language": "fr",
+      "works": [
+        {
+          "work_id": "0e8900ee-6b17-5f66-b901-cf3a02498f76",
+          "title": "Réflexions sur la question juive",
+          "authors": [
+            "Jean-Paul Sartre"
+          ]
+        },
+        {
+          "work_id": "1cee6791-a0c7-59b0-b293-8ee6dfc0cc5b",
+          "title": "The Reprieve",
+          "authors": [
+            "Jean-Paul Sartre"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f04",
+      "kind": "compare",
+      "language": "ja",
+      "works": [
+        {
+          "work_id": "6df62360-e0f4-52ab-9d42-645e04d3b3a1",
+          "title": "The Twelve Kingdoms",
+          "authors": [
+            "Fuyumi Ono"
+          ]
+        },
+        {
+          "work_id": "588b975d-1893-5e97-b8f7-3d4a9899c3fd",
+          "title": "悪霊シリーズ",
+          "authors": [
+            "Fuyumi Ono"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f05",
+      "kind": "compare",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "e4943636-a037-5de6-a613-697deb1e6204",
+          "title": "Amos Fortune, Free Man",
+          "authors": [
+            "Elizabeth Yates"
+          ]
+        },
+        {
+          "work_id": "ad118a4f-7a9e-54d1-a960-3564fb81ee41",
+          "title": "Before Green Gables",
+          "authors": [
+            "Budge Wilson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f06",
+      "kind": "compare",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "d914d5b1-5518-500e-a410-7ec87b541a66",
+          "title": "The Gernsback Continuum",
+          "authors": [
+            "William Gibson"
+          ]
+        },
+        {
+          "work_id": "bdb575be-676d-5300-a44d-05a915ee4fc4",
+          "title": "Skinner's Room",
+          "authors": [
+            "William Gibson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f07",
+      "kind": "compare",
+      "language": "es",
+      "works": [
+        {
+          "work_id": "b2f3ecf2-8b39-5eb0-a457-345b78b5d814",
+          "title": "El inquilino",
+          "authors": [
+            "Javier Cercas"
+          ]
+        },
+        {
+          "work_id": "12a79eec-dfd6-5ec6-b29a-175a1ec63271",
+          "title": "El móvil",
+          "authors": [
+            "Javier Cercas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f08",
+      "kind": "like_but",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "833ef2ab-97ad-5aad-bd0a-04ebfc597403",
+          "title": "Ringworld",
+          "authors": [
+            "Larry Niven"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f09",
+      "kind": "like_but",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "d4d20caa-7db6-5b5c-b8d4-7a16f5471b64",
+          "title": "Bloodlands",
+          "authors": [
+            "Timothy Snyder"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f10",
+      "kind": "like_but",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "9c6e997c-3073-5520-b475-45ec0c805615",
+          "title": "Hurlothrumbo",
+          "authors": [
+            "Samuel Johnson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f11",
+      "kind": "like_but",
+      "language": "es",
+      "works": [
+        {
+          "work_id": "5a4d7fb3-d572-5cf5-bbf3-6e3a1232ad67",
+          "title": "Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia",
+          "authors": [
+            "María Teresa Rodríguez",
+            "Odile Hoffmann"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f12",
+      "kind": "like_but",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "e1ae88eb-2abe-5e79-9f19-b476ea62588f",
+          "title": "Seventh Son",
+          "authors": [
+            "Orson Scott Card"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f13",
+      "kind": "like_but",
+      "language": "de",
+      "works": [
+        {
+          "work_id": "36270a1f-4edc-5070-a365-0070c6750041",
+          "title": "West-östlicher Divan",
+          "authors": [
+            "Johann Wolfgang von Goethe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f14",
+      "kind": "like_but",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "789c2deb-5b64-5e45-bae4-f0921ac49f14",
+          "title": "The Japanese in Latin America",
+          "authors": [
+            "Unknown"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f15",
+      "kind": "facts",
+      "language": "fr",
+      "works": [
+        {
+          "work_id": "3655a15d-2002-583d-9ad6-e66c578637ea",
+          "title": "Les Ombres errantes",
+          "authors": [
+            "Pascal Quignard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f16",
+      "kind": "facts",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "2273bab6-261c-561c-8c67-5d1b49ae7b7a",
+          "title": "Enoch Arden",
+          "authors": [
+            "Alfred Tennyson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f17",
+      "kind": "facts",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "69de7765-fb80-5270-9118-25b78fa2c0e5",
+          "title": "Beat the Reaper",
+          "authors": [
+            "Josh Bazell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f18",
+      "kind": "facts",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "eeb79501-5f80-5e6a-a6f7-0d372ffaf603",
+          "title": "Bond Girls Are Forever",
+          "authors": [
+            "Maryam d'Abo",
+            "John Cork"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f19",
+      "kind": "facts",
+      "language": "en",
+      "works": [
+        {
+          "work_id": "399ccb5c-ab10-5a9a-a09e-5fd82b2064d4",
+          "title": "The Great Shark Hunt",
+          "authors": [
+            "Hunter S. Thompson"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f20",
+      "kind": "facts",
+      "language": "ar",
+      "works": [
+        {
+          "work_id": "8654ce79-9e41-514f-ad72-257801313fd3",
+          "title": "كتاب الفلاحة",
+          "authors": [
+            "Ibn al-'Awwam"
+          ]
+        }
+      ]
+    }
+  ],
+  "f_eligible_works": 37298,
+  "agent_sample": {
+    "seed": 0,
+    "request_ids": [
+      "b-ar-6",
+      "b-ca-4",
+      "b-de-1",
+      "b-de-6",
+      "b-en-1",
+      "b-es-3",
+      "b-es-4",
+      "b-fr-3",
+      "b-fr-4",
+      "b-it-1",
+      "b-it-3",
+      "b-it-4",
+      "b-it-5",
+      "b-ja-1",
+      "b-ja-4",
+      "b-nl-2",
+      "b-nl-4",
+      "b-nl-6",
+      "b-pt-2",
+      "b-ru-1",
+      "b-ru-2",
+      "b-ru-3",
+      "b-ru-5",
+      "b-ru-6",
+      "b-zh-3",
+      "b-zh-5",
+      "b-zh-6",
+      "q03",
+      "q06",
+      "q07",
+      "q08",
+      "q16",
+      "q19",
+      "q24",
+      "q25",
+      "q26",
+      "q28",
+      "q29",
+      "q32",
+      "q37"
+    ]
+  },
+  "E": {
+    "first_pass": {
+      "problems": [
+        {
+          "request_id": "b-fr-4",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-fr-4",
+          "check": "gives need away",
+          "detail": "shares ['anticipation', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-nl-4",
+          "check": "gives need away",
+          "detail": "shares ['psychologische', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-it-3",
+          "check": "gives need away",
+          "detail": "shares ['fantastici', 'racconti'] with the precise query"
+        },
+        {
+          "request_id": "b-pt-5",
+          "check": "gives need away",
+          "detail": "shares ['brasil', 'historia'] with the precise query"
+        },
+        {
+          "request_id": "b-de-2",
+          "check": "gives need away",
+          "detail": "shares ['historischer', 'roman'] with the precise query"
+        },
+        {
+          "request_id": "b-fr-3",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-ca-1",
+          "check": "gives need away",
+          "detail": "shares ['catalana', 'poesia'] with the precise query"
+        },
+        {
+          "request_id": "b-fr-5",
+          "check": "language",
+          "detail": "not fr: ca 1.00"
+        },
+        {
+          "request_id": "b-ru-5",
+          "check": "gives need away",
+          "detail": "shares ['мифология', 'славянская'] with the precise query"
+        }
+      ],
+      "language": {
+        "e-b-nl-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "hedendaagse filosofie"
+        },
+        "e-b-nl-6": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Nederlandse literatuur"
+        },
+        "e-b-ar-6": {
+          "verdict": "ok",
+          "evidence": "8/8 arabic letters",
+          "text": "سير ذاتية"
+        },
+        "e-b-fr-4": {
+          "verdict": "mismatch",
+          "evidence": "ca 1.00",
+          "text": "roman d'anticipation"
+        },
+        "e-b-ru-6": {
+          "verdict": "ok",
+          "evidence": "15/15 cyrillic letters",
+          "text": "русская классика"
+        },
+        "e-b-ru-3": {
+          "verdict": "ok",
+          "evidence": "16/16 cyrillic letters",
+          "text": "книги по философии"
+        },
+        "e-b-nl-4": {
+          "verdict": "ok",
+          "evidence": "nl 1.00",
+          "text": "een psychologische roman"
+        },
+        "e-b-it-3": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "racconti fantastici"
+        },
+        "e-b-ru-2": {
+          "verdict": "ok",
+          "evidence": "17/17 cyrillic letters",
+          "text": "историческая проза"
+        },
+        "e-b-en-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ancient history"
+        },
+        "e-b-it-2": {
+          "verdict": "ok",
+          "evidence": "it 1.00",
+          "text": "saggi di filosofia"
+        },
+        "e-b-pt-4": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "romance de época"
+        },
+        "e-b-pt-5": {
+          "verdict": "ok",
+          "evidence": "pt 0.50, pl 0.50",
+          "text": "história do Brasil"
+        },
+        "e-b-de-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "historischer Roman"
+        },
+        "e-b-fr-3": {
+          "verdict": "mismatch",
+          "evidence": "ca 1.00",
+          "text": "récits d'aventure"
+        },
+        "e-b-ca-3": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "llibres de filosofia"
+        },
+        "e-b-en-1": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "gothic fiction"
+        },
+        "e-b-pt-3": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "livros de poesia"
+        },
+        "e-b-nl-1": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "historische fictie"
+        },
+        "e-b-ca-1": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "poesia catalana"
+        },
+        "e-b-it-4": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "storia antica"
+        },
+        "e-b-de-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Philosophie Sachbuch"
+        },
+        "e-b-fr-5": {
+          "verdict": "mismatch",
+          "evidence": "ca 1.00",
+          "text": "livre d'histoire"
+        },
+        "e-b-ja-4": {
+          "verdict": "ok",
+          "evidence": "1 kana, 6 Han",
+          "text": "海外文学の小説"
+        },
+        "e-b-ru-5": {
+          "verdict": "ok",
+          "evidence": "19/19 cyrillic letters",
+          "text": "славянская мифология"
+        },
+        "e-b-ca-4": {
+          "verdict": "ok",
+          "evidence": "es 0.45, fr 0.45, ca 0.45",
+          "text": "novel·la en català"
+        },
+        "e-b-en-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "philosophy books"
+        },
+        "e-b-nl-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "oorlogsgeschiedenis"
+        },
+        "e-b-ar-5": {
+          "verdict": "ok",
+          "evidence": "8/8 arabic letters",
+          "text": "كتب تاريخ"
+        },
+        "e-b-en-4": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "science fiction"
+        }
+      },
+      "language_summary": {
+        "undecided": 13,
+        "ok": 14,
+        "mismatch": 3
+      }
+    },
+    "fixes": [
+      {
+        "round": 1,
+        "request_id": "b-ca-1",
+        "reasons": [
+          "gives need away: shares ['catalana', 'poesia'] with the precise query"
+        ],
+        "before": {
+          "id": "b-ca-1",
+          "text": "poesia catalana"
+        },
+        "after": {
+          "id": "b-ca-1",
+          "text": "antologia de versos"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-de-2",
+        "reasons": [
+          "gives need away: shares ['historischer', 'roman'] with the precise query"
+        ],
+        "before": {
+          "id": "b-de-2",
+          "text": "historischer Roman"
+        },
+        "after": {
+          "id": "b-de-2",
+          "text": "deutsche Belletristik"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-fr-3",
+        "reasons": [
+          "language: not fr: ca 1.00"
+        ],
+        "before": {
+          "id": "b-fr-3",
+          "text": "récits d'aventure"
+        },
+        "after": {
+          "id": "b-fr-3",
+          "text": "carnets d'expédition"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-fr-4",
+        "reasons": [
+          "language: not fr: ca 1.00",
+          "gives need away: shares ['anticipation', 'roman'] with the precise query"
+        ],
+        "before": {
+          "id": "b-fr-4",
+          "text": "roman d'anticipation"
+        },
+        "after": {
+          "id": "b-fr-4",
+          "text": "de la science-fiction"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-fr-5",
+        "reasons": [
+          "language: not fr: ca 1.00"
+        ],
+        "before": {
+          "id": "b-fr-5",
+          "text": "livre d'histoire"
+        },
+        "after": {
+          "id": "b-fr-5",
+          "text": "documentaire historique"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-it-3",
+        "reasons": [
+          "gives need away: shares ['fantastici', 'racconti'] with the precise query"
+        ],
+        "before": {
+          "id": "b-it-3",
+          "text": "racconti fantastici"
+        },
+        "after": {
+          "id": "b-it-3",
+          "text": "antologie narrative"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-nl-4",
+        "reasons": [
+          "gives need away: shares ['psychologische', 'roman'] with the precise query"
+        ],
+        "before": {
+          "id": "b-nl-4",
+          "text": "een psychologische roman"
+        },
+        "after": {
+          "id": "b-nl-4",
+          "text": "aangrijpende literatuur"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-pt-5",
+        "reasons": [
+          "gives need away: shares ['brasil', 'historia'] with the precise query"
+        ],
+        "before": {
+          "id": "b-pt-5",
+          "text": "história do Brasil"
+        },
+        "after": {
+          "id": "b-pt-5",
+          "text": "ensaios sobre sociedade"
+        }
+      },
+      {
+        "round": 1,
+        "request_id": "b-ru-5",
+        "reasons": [
+          "gives need away: shares ['мифология', 'славянская'] with the precise query"
+        ],
+        "before": {
+          "id": "b-ru-5",
+          "text": "славянская мифология"
+        },
+        "after": {
+          "id": "b-ru-5",
+          "text": "книги по этнографии"
+        }
+      },
+      {
+        "round": 2,
+        "request_id": "b-fr-3",
+        "reasons": [
+          "language: not fr: ca 1.00"
+        ],
+        "before": {
+          "id": "b-fr-3",
+          "text": "carnets d'expédition"
+        },
+        "after": {
+          "id": "b-fr-3",
+          "text": "livre de voyage"
+        }
+      },
+      {
+        "round": 2,
+        "request_id": "b-pt-5",
+        "reasons": [
+          "language: not pt: es 1.00"
+        ],
+        "before": {
+          "id": "b-pt-5",
+          "text": "ensaios sobre sociedade"
+        },
+        "after": {
+          "id": "b-pt-5",
+          "text": "livro sobre história"
+        }
+      },
+      {
+        "round": 3,
+        "request_id": "b-pt-5",
+        "reasons": [
+          "language: not pt: es 1.00",
+          "gives need away: shares ['historia', 'livro'] with the precise query"
+        ],
+        "before": {
+          "id": "b-pt-5",
+          "text": "livro sobre história"
+        },
+        "after": {
+          "id": "b-pt-5",
+          "text": "obras de não-ficção"
+        }
+      }
+    ],
+    "final": {
+      "problems": [],
+      "language": {
+        "e-b-nl-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "hedendaagse filosofie"
+        },
+        "e-b-nl-6": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Nederlandse literatuur"
+        },
+        "e-b-ar-6": {
+          "verdict": "ok",
+          "evidence": "8/8 arabic letters",
+          "text": "سير ذاتية"
+        },
+        "e-b-fr-4": {
+          "verdict": "ok",
+          "evidence": "es 0.42, fr 0.42, ca 0.42",
+          "text": "de la science-fiction"
+        },
+        "e-b-ru-6": {
+          "verdict": "ok",
+          "evidence": "15/15 cyrillic letters",
+          "text": "русская классика"
+        },
+        "e-b-ru-3": {
+          "verdict": "ok",
+          "evidence": "16/16 cyrillic letters",
+          "text": "книги по философии"
+        },
+        "e-b-nl-4": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "aangrijpende literatuur"
+        },
+        "e-b-it-3": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "antologie narrative"
+        },
+        "e-b-ru-2": {
+          "verdict": "ok",
+          "evidence": "17/17 cyrillic letters",
+          "text": "историческая проза"
+        },
+        "e-b-en-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "ancient history"
+        },
+        "e-b-it-2": {
+          "verdict": "ok",
+          "evidence": "it 1.00",
+          "text": "saggi di filosofia"
+        },
+        "e-b-pt-4": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "romance de época"
+        },
+        "e-b-pt-5": {
+          "verdict": "ok",
+          "evidence": "pt 1.17, es 0.17, fr 0.17",
+          "text": "obras de não-ficção"
+        },
+        "e-b-de-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "deutsche Belletristik"
+        },
+        "e-b-fr-3": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "livre de voyage"
+        },
+        "e-b-ca-3": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "llibres de filosofia"
+        },
+        "e-b-en-1": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "gothic fiction"
+        },
+        "e-b-pt-3": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "livros de poesia"
+        },
+        "e-b-nl-1": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "historische fictie"
+        },
+        "e-b-ca-1": {
+          "verdict": "ok",
+          "evidence": "es 0.17, fr 0.17, pt 0.17",
+          "text": "antologia de versos"
+        },
+        "e-b-it-4": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "storia antica"
+        },
+        "e-b-de-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "Philosophie Sachbuch"
+        },
+        "e-b-fr-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "documentaire historique"
+        },
+        "e-b-ja-4": {
+          "verdict": "ok",
+          "evidence": "1 kana, 6 Han",
+          "text": "海外文学の小説"
+        },
+        "e-b-ru-5": {
+          "verdict": "ok",
+          "evidence": "17/17 cyrillic letters",
+          "text": "книги по этнографии"
+        },
+        "e-b-ca-4": {
+          "verdict": "ok",
+          "evidence": "es 0.45, fr 0.45, ca 0.45",
+          "text": "novel·la en català"
+        },
+        "e-b-en-2": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "philosophy books"
+        },
+        "e-b-nl-5": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "oorlogsgeschiedenis"
+        },
+        "e-b-ar-5": {
+          "verdict": "ok",
+          "evidence": "8/8 arabic letters",
+          "text": "كتب تاريخ"
+        },
+        "e-b-en-4": {
+          "verdict": "undecided",
+          "evidence": "no function word",
+          "text": "science fiction"
+        }
+      },
+      "language_summary": {
+        "undecided": 14,
+        "ok": 16
+      }
+    }
+  },
+  "F": {
+    "first_pass": {
+      "problems": [],
+      "language": {
+        "f01": {
+          "verdict": "ok",
+          "evidence": "en 6.25, pt 1.50, pl 0.50",
+          "text": "How do Poems by Emily Dickinson, Three Series, Complete and Poems by Emily Dickinson, Series Two differ in scope, and which collection would you recommend for a beginner?"
+        },
+        "f02": {
+          "verdict": "ok",
+          "evidence": "en 5.25, de 0.25, nl 0.25",
+          "text": "Could you compare Justine and Clea in terms of their narrative perspective and place within the sequence?"
+        },
+        "f03": {
+          "verdict": "ok",
+          "evidence": "fr 3.08, ca 3.08, pt 1.33",
+          "text": "Pourriez-vous comparer Réflexions sur la question juive et The Reprieve afin de m'expliquer comment la pensée de l'auteur s'exprime différemment à travers l'essai et la fiction ?"
+        },
+        "f04": {
+          "verdict": "ok",
+          "evidence": "22 kana, 13 Han",
+          "text": "小野不由美の「The Twelve Kingdoms」と「悪霊シリーズ」では、作風や世界観にどのような違いがありますか？"
+        },
+        "f05": {
+          "verdict": "ok",
+          "evidence": "en 4.25, pt 1.00, de 0.25",
+          "text": "Which would be better suited for a middle-school reader interested in historical fiction, Amos Fortune, Free Man or Before Green Gables?"
+        },
+        "f06": {
+          "verdict": "ok",
+          "evidence": "en 6.25, pt 0.50, pl 0.50",
+          "text": "How do William Gibson's short stories The Gernsback Continuum and Skinner's Room compare in their themes and visions of the future?"
+        },
+        "f07": {
+          "verdict": "ok",
+          "evidence": "es 5.37, ca 1.87, pt 1.83",
+          "text": "¿Qué diferencias existen entre El inquilino y El móvil en cuanto a su formato narrativo y desarrollo inicial como obras del autor?"
+        },
+        "f08": {
+          "verdict": "ok",
+          "evidence": "en 1.00",
+          "text": "Can you recommend sci-fi books featuring megastructures like Ringworld, but written more recently?"
+        },
+        "f09": {
+          "verdict": "ok",
+          "evidence": "en 5.50, pl 0.50",
+          "text": "Are there any historical studies similar to Bloodlands that focus on Western Europe or the Pacific theater instead?"
+        },
+        "f10": {
+          "verdict": "ok",
+          "evidence": "en 3.00, pt 1.00, it 0.25",
+          "text": "I enjoyed the theatrical absurdity of Hurlothrumbo; could you suggest modern comedic plays with a similar nonsense style?"
+        },
+        "f11": {
+          "verdict": "ok",
+          "evidence": "es 6.28, fr 2.62, pt 2.25",
+          "text": "¿Podrías recomendarme estudios antropológicos similares a Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia, pero que se centren en países del Cono Sur?"
+        },
+        "f12": {
+          "verdict": "ok",
+          "evidence": "en 3.75, pl 0.50, es 0.50",
+          "text": "Could you suggest books similar to Seventh Son that explore magical alternate histories, but set in Europe instead of frontier America?"
+        },
+        "f13": {
+          "verdict": "ok",
+          "evidence": "de 3.50, nl 0.50",
+          "text": "Können Sie mir Gedichtbände empfehlen, die wie West-östlicher Divan einen interkulturellen Dialog suchen, aber aus dem 20. oder 21. Jahrhundert stammen?"
+        },
+        "f14": {
+          "verdict": "ok",
+          "evidence": "en 3.75, pl 0.50, de 0.25",
+          "text": "Can you recommend books like The Japanese in Latin America that focus specifically on Asian migrations to North America instead?"
+        },
+        "f15": {
+          "verdict": "ok",
+          "evidence": "ca 1.67, fr 1.67, pt 1.17",
+          "text": "De quoi traite exactement l'ouvrage Les Ombres errantes et à quel genre littéraire appartient-il ?"
+        },
+        "f16": {
+          "verdict": "ok",
+          "evidence": "en 5.50, nl 0.50",
+          "text": "What is the central story of Alfred Tennyson's poem Enoch Arden, and when was it originally published?"
+        },
+        "f17": {
+          "verdict": "ok",
+          "evidence": "en 7.50, nl 0.50",
+          "text": "Who is the author of Beat the Reaper, and what kind of plot does this novel follow?"
+        },
+        "f18": {
+          "verdict": "ok",
+          "evidence": "en 4.50, nl 0.50",
+          "text": "What is the background and subject matter of Bond Girls Are Forever?"
+        },
+        "f19": {
+          "verdict": "ok",
+          "evidence": "en 4.25, de 0.25, nl 0.25",
+          "text": "What topics and period of journalism are covered in The Great Shark Hunt?"
+        },
+        "f20": {
+          "verdict": "ok",
+          "evidence": "53/53 arabic letters",
+          "text": "ما هي الموضوعات الرئيسية التي يناقشها كتاب الفلاحة ومن هو مؤلفه؟"
+        }
+      },
+      "works_found": {
+        "f01": {
+          "Poems by Emily Dickinson, Three Series, Complete": [
+            "a97d2a0c-a51b-5821-921a-7500736d268c"
+          ],
+          "Poems by Emily Dickinson, Series Two": [
+            "1910a6e1-6c75-57e2-95ee-89a75939158a"
+          ]
+        },
+        "f02": {
+          "Justine": [
+            "ba45fb7c-57e3-5a36-ae1d-9f9166a0341a"
+          ],
+          "Clea": [
+            "f4011ff6-faf9-5731-ace9-ad6111ff57ec"
+          ]
+        },
+        "f03": {
+          "Réflexions sur la question juive": [
+            "0e8900ee-6b17-5f66-b901-cf3a02498f76"
+          ],
+          "The Reprieve": [
+            "1cee6791-a0c7-59b0-b293-8ee6dfc0cc5b"
+          ]
+        },
+        "f04": {
+          "The Twelve Kingdoms": [
+            "6df62360-e0f4-52ab-9d42-645e04d3b3a1"
+          ],
+          "悪霊シリーズ": [
+            "588b975d-1893-5e97-b8f7-3d4a9899c3fd"
+          ]
+        },
+        "f05": {
+          "Amos Fortune, Free Man": [
+            "e4943636-a037-5de6-a613-697deb1e6204"
+          ],
+          "Before Green Gables": [
+            "ad118a4f-7a9e-54d1-a960-3564fb81ee41"
+          ]
+        },
+        "f06": {
+          "The Gernsback Continuum": [
+            "d914d5b1-5518-500e-a410-7ec87b541a66"
+          ],
+          "Skinner's Room": [
+            "bdb575be-676d-5300-a44d-05a915ee4fc4"
+          ]
+        },
+        "f07": {
+          "El inquilino": [
+            "b2f3ecf2-8b39-5eb0-a457-345b78b5d814"
+          ],
+          "El móvil": [
+            "d2ca9be9-0a4a-5885-bec0-c4c8b07d9faf",
+            "12a79eec-dfd6-5ec6-b29a-175a1ec63271"
+          ]
+        },
+        "f08": {
+          "Ringworld": [
+            "833ef2ab-97ad-5aad-bd0a-04ebfc597403"
+          ]
+        },
+        "f09": {
+          "Bloodlands": [
+            "d4d20caa-7db6-5b5c-b8d4-7a16f5471b64"
+          ]
+        },
+        "f10": {
+          "Hurlothrumbo": [
+            "9c6e997c-3073-5520-b475-45ec0c805615"
+          ]
+        },
+        "f11": {
+          "Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia": [
+            "5a4d7fb3-d572-5cf5-bbf3-6e3a1232ad67"
+          ]
+        },
+        "f12": {
+          "Seventh Son": [
+            "e1ae88eb-2abe-5e79-9f19-b476ea62588f"
+          ]
+        },
+        "f13": {
+          "West-östlicher Divan": [
+            "36270a1f-4edc-5070-a365-0070c6750041"
+          ]
+        },
+        "f14": {
+          "The Japanese in Latin America": [
+            "789c2deb-5b64-5e45-bae4-f0921ac49f14"
+          ]
+        },
+        "f15": {
+          "Les Ombres errantes": [
+            "3655a15d-2002-583d-9ad6-e66c578637ea"
+          ]
+        },
+        "f16": {
+          "Enoch Arden": [
+            "2273bab6-261c-561c-8c67-5d1b49ae7b7a"
+          ]
+        },
+        "f17": {
+          "Beat the Reaper": [
+            "69de7765-fb80-5270-9118-25b78fa2c0e5"
+          ]
+        },
+        "f18": {
+          "Bond Girls Are Forever": [
+            "eeb79501-5f80-5e6a-a6f7-0d372ffaf603"
+          ]
+        },
+        "f19": {
+          "The Great Shark Hunt": [
+            "399ccb5c-ab10-5a9a-a09e-5fd82b2064d4"
+          ]
+        },
+        "f20": {
+          "كتاب الفلاحة": [
+            "8654ce79-9e41-514f-ad72-257801313fd3"
+          ]
+        }
+      },
+      "language_summary": {
+        "ok": 20
+      }
+    },
+    "fixes": [],
+    "final": {
+      "problems": [],
+      "language": {
+        "f01": {
+          "verdict": "ok",
+          "evidence": "en 6.25, pt 1.50, pl 0.50",
+          "text": "How do Poems by Emily Dickinson, Three Series, Complete and Poems by Emily Dickinson, Series Two differ in scope, and which collection would you recommend for a beginner?"
+        },
+        "f02": {
+          "verdict": "ok",
+          "evidence": "en 5.25, de 0.25, nl 0.25",
+          "text": "Could you compare Justine and Clea in terms of their narrative perspective and place within the sequence?"
+        },
+        "f03": {
+          "verdict": "ok",
+          "evidence": "fr 3.08, ca 3.08, pt 1.33",
+          "text": "Pourriez-vous comparer Réflexions sur la question juive et The Reprieve afin de m'expliquer comment la pensée de l'auteur s'exprime différemment à travers l'essai et la fiction ?"
+        },
+        "f04": {
+          "verdict": "ok",
+          "evidence": "22 kana, 13 Han",
+          "text": "小野不由美の「The Twelve Kingdoms」と「悪霊シリーズ」では、作風や世界観にどのような違いがありますか？"
+        },
+        "f05": {
+          "verdict": "ok",
+          "evidence": "en 4.25, pt 1.00, de 0.25",
+          "text": "Which would be better suited for a middle-school reader interested in historical fiction, Amos Fortune, Free Man or Before Green Gables?"
+        },
+        "f06": {
+          "verdict": "ok",
+          "evidence": "en 6.25, pt 0.50, pl 0.50",
+          "text": "How do William Gibson's short stories The Gernsback Continuum and Skinner's Room compare in their themes and visions of the future?"
+        },
+        "f07": {
+          "verdict": "ok",
+          "evidence": "es 5.37, ca 1.87, pt 1.83",
+          "text": "¿Qué diferencias existen entre El inquilino y El móvil en cuanto a su formato narrativo y desarrollo inicial como obras del autor?"
+        },
+        "f08": {
+          "verdict": "ok",
+          "evidence": "en 1.00",
+          "text": "Can you recommend sci-fi books featuring megastructures like Ringworld, but written more recently?"
+        },
+        "f09": {
+          "verdict": "ok",
+          "evidence": "en 5.50, pl 0.50",
+          "text": "Are there any historical studies similar to Bloodlands that focus on Western Europe or the Pacific theater instead?"
+        },
+        "f10": {
+          "verdict": "ok",
+          "evidence": "en 3.00, pt 1.00, it 0.25",
+          "text": "I enjoyed the theatrical absurdity of Hurlothrumbo; could you suggest modern comedic plays with a similar nonsense style?"
+        },
+        "f11": {
+          "verdict": "ok",
+          "evidence": "es 6.28, fr 2.62, pt 2.25",
+          "text": "¿Podrías recomendarme estudios antropológicos similares a Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia, pero que se centren en países del Cono Sur?"
+        },
+        "f12": {
+          "verdict": "ok",
+          "evidence": "en 3.75, pl 0.50, es 0.50",
+          "text": "Could you suggest books similar to Seventh Son that explore magical alternate histories, but set in Europe instead of frontier America?"
+        },
+        "f13": {
+          "verdict": "ok",
+          "evidence": "de 3.50, nl 0.50",
+          "text": "Können Sie mir Gedichtbände empfehlen, die wie West-östlicher Divan einen interkulturellen Dialog suchen, aber aus dem 20. oder 21. Jahrhundert stammen?"
+        },
+        "f14": {
+          "verdict": "ok",
+          "evidence": "en 3.75, pl 0.50, de 0.25",
+          "text": "Can you recommend books like The Japanese in Latin America that focus specifically on Asian migrations to North America instead?"
+        },
+        "f15": {
+          "verdict": "ok",
+          "evidence": "ca 1.67, fr 1.67, pt 1.17",
+          "text": "De quoi traite exactement l'ouvrage Les Ombres errantes et à quel genre littéraire appartient-il ?"
+        },
+        "f16": {
+          "verdict": "ok",
+          "evidence": "en 5.50, nl 0.50",
+          "text": "What is the central story of Alfred Tennyson's poem Enoch Arden, and when was it originally published?"
+        },
+        "f17": {
+          "verdict": "ok",
+          "evidence": "en 7.50, nl 0.50",
+          "text": "Who is the author of Beat the Reaper, and what kind of plot does this novel follow?"
+        },
+        "f18": {
+          "verdict": "ok",
+          "evidence": "en 4.50, nl 0.50",
+          "text": "What is the background and subject matter of Bond Girls Are Forever?"
+        },
+        "f19": {
+          "verdict": "ok",
+          "evidence": "en 4.25, de 0.25, nl 0.25",
+          "text": "What topics and period of journalism are covered in The Great Shark Hunt?"
+        },
+        "f20": {
+          "verdict": "ok",
+          "evidence": "53/53 arabic letters",
+          "text": "ما هي الموضوعات الرئيسية التي يناقشها كتاب الفلاحة ومن هو مؤلفه؟"
+        }
+      },
+      "works_found": {
+        "f01": {
+          "Poems by Emily Dickinson, Three Series, Complete": [
+            "a97d2a0c-a51b-5821-921a-7500736d268c"
+          ],
+          "Poems by Emily Dickinson, Series Two": [
+            "1910a6e1-6c75-57e2-95ee-89a75939158a"
+          ]
+        },
+        "f02": {
+          "Justine": [
+            "ba45fb7c-57e3-5a36-ae1d-9f9166a0341a"
+          ],
+          "Clea": [
+            "f4011ff6-faf9-5731-ace9-ad6111ff57ec"
+          ]
+        },
+        "f03": {
+          "Réflexions sur la question juive": [
+            "0e8900ee-6b17-5f66-b901-cf3a02498f76"
+          ],
+          "The Reprieve": [
+            "1cee6791-a0c7-59b0-b293-8ee6dfc0cc5b"
+          ]
+        },
+        "f04": {
+          "The Twelve Kingdoms": [
+            "6df62360-e0f4-52ab-9d42-645e04d3b3a1"
+          ],
+          "悪霊シリーズ": [
+            "588b975d-1893-5e97-b8f7-3d4a9899c3fd"
+          ]
+        },
+        "f05": {
+          "Amos Fortune, Free Man": [
+            "e4943636-a037-5de6-a613-697deb1e6204"
+          ],
+          "Before Green Gables": [
+            "ad118a4f-7a9e-54d1-a960-3564fb81ee41"
+          ]
+        },
+        "f06": {
+          "The Gernsback Continuum": [
+            "d914d5b1-5518-500e-a410-7ec87b541a66"
+          ],
+          "Skinner's Room": [
+            "bdb575be-676d-5300-a44d-05a915ee4fc4"
+          ]
+        },
+        "f07": {
+          "El inquilino": [
+            "b2f3ecf2-8b39-5eb0-a457-345b78b5d814"
+          ],
+          "El móvil": [
+            "d2ca9be9-0a4a-5885-bec0-c4c8b07d9faf",
+            "12a79eec-dfd6-5ec6-b29a-175a1ec63271"
+          ]
+        },
+        "f08": {
+          "Ringworld": [
+            "833ef2ab-97ad-5aad-bd0a-04ebfc597403"
+          ]
+        },
+        "f09": {
+          "Bloodlands": [
+            "d4d20caa-7db6-5b5c-b8d4-7a16f5471b64"
+          ]
+        },
+        "f10": {
+          "Hurlothrumbo": [
+            "9c6e997c-3073-5520-b475-45ec0c805615"
+          ]
+        },
+        "f11": {
+          "Los retos de la diferencia : Los actores de la multiculturalidad entre México y Colombia": [
+            "5a4d7fb3-d572-5cf5-bbf3-6e3a1232ad67"
+          ]
+        },
+        "f12": {
+          "Seventh Son": [
+            "e1ae88eb-2abe-5e79-9f19-b476ea62588f"
+          ]
+        },
+        "f13": {
+          "West-östlicher Divan": [
+            "36270a1f-4edc-5070-a365-0070c6750041"
+          ]
+        },
+        "f14": {
+          "The Japanese in Latin America": [
+            "789c2deb-5b64-5e45-bae4-f0921ac49f14"
+          ]
+        },
+        "f15": {
+          "Les Ombres errantes": [
+            "3655a15d-2002-583d-9ad6-e66c578637ea"
+          ]
+        },
+        "f16": {
+          "Enoch Arden": [
+            "2273bab6-261c-561c-8c67-5d1b49ae7b7a"
+          ]
+        },
+        "f17": {
+          "Beat the Reaper": [
+            "69de7765-fb80-5270-9118-25b78fa2c0e5"
+          ]
+        },
+        "f18": {
+          "Bond Girls Are Forever": [
+            "eeb79501-5f80-5e6a-a6f7-0d372ffaf603"
+          ]
+        },
+        "f19": {
+          "The Great Shark Hunt": [
+            "399ccb5c-ab10-5a9a-a09e-5fd82b2064d4"
+          ]
+        },
+        "f20": {
+          "كتاب الفلاحة": [
+            "8654ce79-9e41-514f-ad72-257801313fd3"
+          ]
+        }
+      },
+      "language_summary": {
+        "ok": 20
+      }
+    }
+  },
+  "sets": {
+    "counts": {
+      "A": 44,
+      "B": 72,
+      "D": 12,
+      "E": 30,
+      "F": 20
+    },
+    "languages": {
+      "A": {
+        "en": 24,
+        "es": 20
+      },
+      "B": {
+        "en": 6,
+        "es": 6,
+        "fr": 6,
+        "de": 6,
+        "it": 6,
+        "pt": 6,
+        "ca": 6,
+        "nl": 6,
+        "ru": 6,
+        "zh": 6,
+        "ja": 6,
+        "ar": 6
+      },
+      "D": {
+        "en": 1,
+        "es": 1,
+        "fr": 1,
+        "de": 1,
+        "it": 1,
+        "pt": 1,
+        "ca": 1,
+        "nl": 1,
+        "ru": 1,
+        "zh": 1,
+        "ja": 1,
+        "ar": 1
+      },
+      "E": {
+        "nl": 5,
+        "ar": 2,
+        "fr": 3,
+        "ru": 4,
+        "it": 3,
+        "en": 4,
+        "pt": 3,
+        "de": 2,
+        "ca": 3,
+        "ja": 1
+      },
+      "F": {
+        "en": 13,
+        "fr": 2,
+        "ja": 1,
+        "es": 2,
+        "de": 1,
+        "ar": 1
+      }
+    },
+    "categories": {
+      "A": {
+        "ai": 12,
+        "fiction": 11,
+        "cooking": 11,
+        "ambiguous": 10
+      },
+      "B": {
+        "thematic": 36,
+        "descriptive": 24,
+        "known_item": 12
+      },
+      "D": {
+        "unanswerable": 12
+      },
+      "E": {
+        "thematic": 13,
+        "known_item": 3,
+        "descriptive": 14
+      },
+      "F": {
+        "compare": 7,
+        "like_but": 7,
+        "facts": 6
+      }
+    }
+  }
+}

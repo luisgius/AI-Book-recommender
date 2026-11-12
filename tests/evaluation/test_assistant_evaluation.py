@@ -303,6 +303,10 @@ def offline_dir(tmp_path, monkeypatch):
                 cache.add(LLMJudgment(query_id=need, source="s", source_id=w, grade=g, rationale="", model=model,
                                       prompt_version=RELEVANCE_JUDGE_PROMPT_VERSION, date="2026-11-12", query_text=need, title=w))
     monkeypatch.setattr(judging, "v14_cache", lambda model: JudgmentCache.for_judge(empty, model, RELEVANCE_JUDGE_PROMPT_VERSION))
+    # the system description saved when the measurement ran (the report reads nothing else about the system)
+    (d / "system.json").write_text(json.dumps({
+        "commit": "abc", "llm": {"model": "saved/model", "temperature": 0.0, "reasoning": False},
+        "assistant": {"answer_context_books": 6}}), encoding="utf-8")
     return d
 
 
@@ -331,3 +335,186 @@ def test_offline_report_needs_no_network(offline_dir, tmp_path, monkeypatch):
     assert primary["f"]["rows"][0]["precision_picks"] == 1.0 and primary["f"]["rows"][0]["precision_P"] == 1.0
     assert results["grounding"]["agent_in_assistant"]["dropped_not_from_tools"] == 1
     assert set(results["conclusions"]) == {"H7", "H8", "H9"}
+
+
+# =============================================================================
+# Re-measurement (V25 addendum): set G, thresholds, both reports offline
+# =============================================================================
+
+
+def test_g_tasks_balance_languages_forms_and_kinds():
+    from collections import Counter
+
+    from app.evaluation.assistant_evaluation import set_g
+
+    tasks = set_g.g_tasks()
+    valid = [t for t in tasks if t["group"] == "valid"]
+    oos = [t for t in tasks if t["group"] == "out_of_scope"]
+    assert len(valid) == 60 and len(oos) == 20 and len({t["id"] for t in tasks}) == 80
+    assert set(Counter((t["language"], t["form"]) for t in valid).values()) == {5}
+    assert Counter(t["field"] for t in oos) == {k: 5 for k in set_g.G_OUT_OF_SCOPE}
+    assert Counter(t["field"] for t in valid) == {k: 6 for k in set_g.G_TOPICS}
+    assert set_g.g_tasks() == tasks  # seeded
+
+
+def test_check_g_flags_each_rule():
+    from app.evaluation.assistant_evaluation import set_g
+
+    tasks = [{"id": "g1", "group": "valid", "field": "cooking", "topic": "sourdough bread baking", "language": "en",
+              "form": "keywords"},
+             {"id": "g2", "group": "valid", "field": "cooking", "topic": "Thai curry cooking", "language": "en",
+              "form": "sentence"},
+             {"id": "g3", "group": "out_of_scope", "field": "calculation", "topic": "15 percent of 240", "language": "en",
+              "form": "any"}]
+    good = {"g1": {"text": "sourdough bread", "english": "sourdough bread"},
+            "g2": {"text": "I am looking for a book about Thai curry for beginners",
+                   "english": "I am looking for a book about Thai curry for beginners"},
+            "g3": {"text": "What is 15 percent of 240?", "english": "What is 15 percent of 240?"}}
+    result = set_g.check_g(good, tasks, other_texts=[])
+    assert [p for p in result["problems"] if p["request_id"]] == []
+    bad = {"g1": {"text": "how to bake sourdough bread at home?", "english": "how to bake sourdough bread at home?"},
+           "g2": {"text": "Teach me to cook Thai curry tonight please", "english": "Teach me to cook Thai curry tonight please"},
+           "g3": {"text": "Which book explains percentages?", "english": "Which book explains percentages?"}}
+    checks = {(p["request_id"], p["check"]) for p in set_g.check_g(bad, tasks, other_texts=["sourdough bread"])["problems"]}
+    assert ("g1", "form") in checks and ("g2", "asks for reading") in checks
+    assert ("g3", "asks for books") in checks and ("g3", "kind") in checks
+    dup = set_g.check_g(good, tasks, other_texts=["Sourdough  bread"])["problems"]
+    assert any(p["request_id"] == "g1" and p["check"] == "duplicate" for p in dup)
+
+
+def test_g_routes_threshold_allows_one_refusal_in_sixty():
+    rows = [{"group": "valid", "language": "es", "field": "cooking", "form": "keywords", "route": "search"}] * 59
+    rows = rows + [{"group": "valid", "language": "es", "field": "cooking", "form": "keywords", "route": "out_of_scope"}]
+    rows = rows + [{"group": "out_of_scope", "language": "en", "field": "program", "form": "any", "route": "out_of_scope"}] * 20
+    g = A.g_routes(rows)
+    assert g["threshold"]["count"] == 1 and g["threshold"]["met"] is True
+    assert g["out_of_scope"]["detection"]["count"] == 20
+    two = A.g_routes(rows[:58] + [rows[-21]] * 2 + rows[60:])
+    assert two["threshold"]["count"] == 2 and two["threshold"]["met"] is False
+
+
+def test_spend_cap_and_v25_dir(tmp_path, monkeypatch):
+    monkeypatch.setattr(D, "V25_DIR", tmp_path / "v25")
+    assert D.spend_cap(tmp_path / "v25") == D.V25_SPEND_CAP_USD == 2.5
+    assert D.spend_cap(tmp_path / "other") == D.SPEND_CAP_USD
+
+
+@pytest.fixture
+def second_dir(offline_dir, tmp_path, monkeypatch):
+    """A re-measurement directory next to offline_dir: A-F as there, plus G, a log and the instructions record."""
+    import shutil
+
+    from app.evaluation.relevance_judge import JudgmentCache
+    from app.infrastructure.llm.prompts_judge import RELEVANCE_JUDGE_PROMPT_VERSION
+
+    d = tmp_path / "assistant_v25"
+    monkeypatch.setattr(D, "DATA_DIR", offline_dir)
+    monkeypatch.setattr(D, "V25_DIR", d)
+    for name in ("sets", "runs"):
+        shutil.copytree(offline_dir / name, d / name)
+    (d / "judgments").mkdir(parents=True)
+    # pairs.json of the second measurement; its judgments all come from the first measurement's caches
+    shutil.copy(offline_dir / "judgments" / "pairs.json", d / "judgments" / "pairs.json")
+    for model in D.JUDGES:
+        assert len(JudgmentCache.for_judge(d / "judgments", model, RELEVANCE_JUDGE_PROMPT_VERSION)) == 0
+    meta = json.loads((d / "sets" / "requests.json").read_text(encoding="utf-8"))
+    reqs = [S.Request.from_dict(r) for r in meta["requests"]]
+    g = [S.Request("g01", "G", "pan de masa madre", "es", "g01", "sourdough", category="valid",
+                   notes=["cooking", "keywords", "sourdough bread"]),
+         S.Request("g02", "G", "un libro de cocina tailandesa", "es", "g02", "thai", category="valid",
+                   notes=["cooking", "sentence", "a Thai cooking book"]),
+         S.Request("g-oos01", "G", "15 % de 240", "es", "g-oos01", "calc", category="out_of_scope",
+                   notes=["calculation", "any", "15 % of 240"])]
+    S.save_requests(d / "sets" / "requests.json", reqs + g, {k: v for k, v in meta.items() if k != "requests"})
+    turns = [json.loads(line) for line in (d / "runs" / "turns.jsonl").read_text(encoding="utf-8").splitlines()]
+    turns += [_turn("run1", "g01", "G", _search_reply(["w1"])),
+              _turn("run1", "g02", "G", {**_search_reply([]), "route": "out_of_scope", "search": None}),
+              _turn("run1", "g-oos01", "G", {**_search_reply([]), "route": "out_of_scope", "search": None})]
+    _jsonl(d / "runs" / "turns.jsonl", turns)
+    (d / "sets" / "g_checks.json").write_text(json.dumps({"generator": {"model": "gen"}, "G": {"fixes": []}}),
+                                              encoding="utf-8")
+    instruction = {"router_system_prompt": "x", "sha256": "s", "prompts_version": "v", "commit": "c",
+                   "route_lines": ['- "out_of_scope": old']}
+    (d / "instructions.json").write_text(json.dumps({"first": instruction, "second": {
+        **instruction, "router_system_prompt": "y", "route_lines": ['- "out_of_scope": new']}}), encoding="utf-8")
+    (d / "system.json").write_text(json.dumps({
+        "commit": "def", "llm": {"model": "saved/model", "temperature": 0.0, "reasoning": False},
+        "llm_openrouter_extra_body": {"reasoning": {"enabled": False}}, "assistant": {"answer_context_books": 6}}),
+        encoding="utf-8")
+    (d / "assistant.log").write_text(
+        "WARNING x: Assistant answer failed: Could not parse response content as the length limit was reached - "
+        "CompletionUsage(completion_tokens=1024, prompt_tokens=9, completion_tokens_details=CompletionTokensDetails("
+        "reasoning_tokens=0))\n", encoding="utf-8")
+    return d
+
+
+def test_offline_report_covers_both_measurements(offline_dir, second_dir, tmp_path, monkeypatch):
+    from app.evaluation.assistant_evaluation import judging
+    from app.evaluation.assistant_evaluation.cli import main
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("the offline report opened a network connection")
+
+    monkeypatch.setattr(socket.socket, "connect", refuse)
+    monkeypatch.setattr(socket, "create_connection", refuse)
+    first_md, second_md = tmp_path / "REPORT.md", tmp_path / "REPORT_V25.md"
+    assert main(["--data-dir", str(offline_dir), "report", "--offline", "--output", str(first_md), "--skip-second"]) == 0
+    first_files = {p: p.read_bytes() for p in (first_md, offline_dir / "results.json", offline_dir / "per_request.json")}
+    assert main(["--data-dir", str(offline_dir), "report", "--offline", "--output", str(first_md),
+                 "--second-data-dir", str(second_dir), "--second-output", str(second_md)]) == 0
+    # the first measurement's report and results do not change when the second one is reported
+    assert {p: p.read_bytes() for p in first_files} == first_files
+    text = second_md.read_text(encoding="utf-8")
+    assert "Re-measurement of the assistant" in text and "## The two instructions" in text
+    assert '- "out_of_scope": old' in text and '- "out_of_scope": new' in text
+    assert "**not met**" in text and "LLM judges only" in text and "## Deviations from the addendum" in text
+    second = json.loads((second_dir / "results.json").read_text(encoding="utf-8"))
+    v = second["v25"]
+    assert v["g"]["threshold"]["count"] == 1 and v["g"]["threshold"]["requests"] == 2
+    assert v["g"]["out_of_scope"]["detection"]["count"] == 1
+    assert v["thresholds"]["required_met"] is False and v["spend_cap_usd"] == D.V25_SPEND_CAP_USD
+    # G stays out of the measures both measurements share
+    assert "G valid" not in second["routes"]["matrices"]["run1"]
+    assert sum(second["routes"]["matrices"]["run1"]["B"].values()) == 2  # clarify 1 + total 1
+    # every judgment of the second measurement comes from the first one's caches
+    counts = second["judgments"]["counts"][D.PRIMARY_JUDGE]
+    assert counts["from_first_measurement"] == counts["measured_pairs"] and counts["judged_here"] == 0
+    assert judging.first_measurement_cache(offline_dir, D.PRIMARY_JUDGE) is None
+    assert "| second (V25) | 1 | 0 | [0] |" in text  # one answer call at the cap, no reasoning
+
+
+def test_offline_reports_ignore_environment_and_say_what_was_not_recorded(offline_dir, second_dir, tmp_path, monkeypatch):
+    """Both offline reports describe the system only from the saved system.json of each measurement."""
+    from app.evaluation.assistant_evaluation.cli import main
+
+    first_json = offline_dir / "system.json"
+    saved = json.loads(first_json.read_text(encoding="utf-8"))
+    envs = [
+        {},
+        {"LLM_REASONING": "high", "LLM_MODEL": "other/model", "LLM_PROVIDER": "ollama", "LLM_TEMPERATURE": "0.9",
+         "OPENROUTER_API_KEY": "sk-not-a-real-key", "SEARCH_PROFILE": "local", "JUDGE_REASONING": "high"},
+    ]
+    names = ("LLM_REASONING", "LLM_MODEL", "LLM_PROVIDER", "LLM_TEMPERATURE", "OPENROUTER_API_KEY", "SEARCH_PROFILE",
+             "JUDGE_REASONING")
+    outputs = []
+    for i, env in enumerate(envs):
+        for n in names:
+            monkeypatch.delenv(n, raising=False)
+        for n, v in env.items():
+            monkeypatch.setenv(n, v)
+        first_md, second_md = tmp_path / f"r{i}.md", tmp_path / f"r{i}_v25.md"
+        assert main(["--data-dir", str(offline_dir), "report", "--offline", "--output", str(first_md),
+                     "--second-data-dir", str(second_dir), "--second-output", str(second_md)]) == 0
+        outputs.append((first_md.read_bytes(), second_md.read_bytes()))
+    assert outputs[0] == outputs[1]
+    text = outputs[0][1].decode("utf-8")
+    assert "saved/model" in outputs[0][0].decode("utf-8") and "other/model" not in text
+    assert "first (V22) reasoning `False`, request body not recorded" in text
+
+    # a field the first measurement did not save is stated as not recorded, never guessed
+    first_json.write_text(json.dumps({**saved, "llm": {"model": "saved/model"}}), encoding="utf-8")
+    first_md, second_md = tmp_path / "n.md", tmp_path / "n_v25.md"
+    assert main(["--data-dir", str(offline_dir), "report", "--offline", "--output", str(first_md),
+                 "--second-data-dir", str(second_dir), "--second-output", str(second_md)]) == 0
+    assert "first (V22) reasoning `not recorded`" in second_md.read_text(encoding="utf-8")
+    assert "reasoning not recorded" in first_md.read_text(encoding="utf-8")

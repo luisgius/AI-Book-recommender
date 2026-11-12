@@ -16,7 +16,6 @@ from app.evaluation.assistant_evaluation import runs as R
 from app.evaluation.assistant_evaluation.judging import PAIRS_FILE, JUDGING_RUNS, judged_counts, load_grades, load_run_data
 from app.evaluation.assistant_evaluation.sets import Request, load_requests
 from app.evaluation.catalog_evaluation.ledger import LEDGER_FILE, SpendLedger, summarize_ledger
-from app.infrastructure.llm.graphs.assistant import ANSWER_CONTEXT_BOOKS
 
 
 def _read_json(path: Path) -> Optional[Any]:
@@ -229,7 +228,12 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
     agent_ids = list(meta.get("agent_sample") or [])
     checks = _read_json(data_dir / "sets" / "checks.json") or {}
     data = load_run_data(data_dir)
-    turns = data["turns"]
+    all_turns = data["turns"]
+    # Set G exists only in the re-measurement (V25); its turns are reported in
+    # their own section, so every other measure covers the same requests in
+    # both measurements.
+    turns = {k: v for k, v in all_turns.items() if v.get("set") != D.SET_G}
+    data = {**data, "turns": turns}
     pairs = _read_json(data_dir / "judgments" / PAIRS_FILE) or {}
     sets_of = {r.request_id: r.set for r in requests}
 
@@ -287,10 +291,15 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
     concl = A.conclusions(judges["primary"]["contrasts"], judges["second"]["contrasts"])
 
     # --- grounding --------------------------------------------------------------------
+    # Books shown to the answer call, as saved with the measurement (never the live code's constant).
+    config = _read_json(data_dir / "system.json")
+    context_books = ((config or {}).get("assistant") or {}).get("answer_context_books")
+    if context_books is None:
+        raise ValueError(f"{data_dir / 'system.json'} does not record assistant.answer_context_books")
     run1 = [rec for rec in turns.values() if rec.get("run") == D.RUN_1 and rec.get("reply")]
     grounding_rows = defaultdict(list)
     for rec in run1:
-        grounding_rows[rec["set"]].append(A.search_grounding(rec["reply"], rec.get("answer_raw") or [], ANSWER_CONTEXT_BOOKS))
+        grounding_rows[rec["set"]].append(A.search_grounding(rec["reply"], rec.get("answer_raw") or [], context_books))
     search_grounding = {name: A.sum_grounding(rows) for name, rows in sorted(grounding_rows.items())}
     search_grounding["all"] = A.sum_grounding([x for rows in grounding_rows.values() for x in rows])
     agent_in_assistant = A.agent_grounding(rec["reply"].get("agent") for rec in run1 if rec["reply"].get("agent"))
@@ -340,7 +349,7 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
         "api_failed": sum(r["api_failed"] for r in turn_rows) + sum(r["api_failed"] for r in agent_rows),
         "api_cancelled": sum(r["api_cancelled"] for r in turn_rows) + sum(r["api_cancelled"] for r in agent_rows),
         "ledger_errors": dict(Counter(f"{e.get('stage')} {e.get('model')}: {e.get('error')}"
-                                      for e in SpendLedger(data_dir / LEDGER_FILE, D.SPEND_CAP_USD).entries()
+                                      for e in SpendLedger(data_dir / LEDGER_FILE, D.spend_cap(data_dir)).entries()
                                       if e.get("error"))),
     }
 
@@ -360,15 +369,14 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
     }
     depth = list(R.load_store(data_dir, R.DEPTH_FILE, "text").values())
     vectors = _read_jsonl(data_dir / "query_vectors" / "qwen__qwen3-embedding-8b.jsonl")
-    ledger = SpendLedger(data_dir / LEDGER_FILE, D.SPEND_CAP_USD)
+    ledger = SpendLedger(data_dir / LEDGER_FILE, D.spend_cap(data_dir))
     stage_seconds = defaultdict(float)
     for row in _read_jsonl(data_dir / "stage_times.jsonl"):
         stage_seconds[row["stage"]] += row["seconds"]
     commits = Counter(rec.get("commit") for rec in list(turns.values()) + list(data["P"].values()) + list(data["agent"].values()))
     dates = sorted(rec.get("date", "") for rec in list(turns.values()) + list(data["agent"].values()) if rec.get("date"))
-    config = _read_json(data_dir / "system.json")
 
-    return {
+    out = {
         "protocol": {"path": D.PROTOCOL_PATH, "commit": D.PROTOCOL_COMMIT},
         "system": config, "commits": dict(commits), "dates": [dates[0], dates[-1]] if dates else None,
         "sets": {"counts": checks.get("sets"), "generator": checks.get("generator"),
@@ -409,6 +417,57 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
         "spend": summarize_ledger(ledger.entries()),
         "stage_seconds": dict(stage_seconds),
         "per_request": {k: v["per_request"] for k, v in judges.items()},
+    }
+    if D.is_v25(data_dir):
+        out["v25"] = v25_results(data_dir, requests, all_turns, rates, ledger)
+    return out
+
+
+def v25_results(data_dir: Path, requests: List[Request], all_turns: Mapping[str, Any], rates: Mapping[str, Any],
+                ledger: SpendLedger) -> Dict[str, Any]:
+    """
+    The re-measurement's own results (V25 addendum): set G, the thresholds as
+    section 4 of the addendum applies them, G's cost and time, the spend cap.
+    """
+    g_rows = []
+    for r in requests:
+        if r.set != D.SET_G:
+            continue
+        record = _turn(all_turns, D.RUN_1, r.request_id)
+        reply = _reply(record)
+        field, form, english = (list(r.notes) + ["", "", ""])[:3]
+        g_rows.append({"request_id": r.request_id, "group": r.category, "language": r.language, "field": field,
+                       "form": form, "text": r.text, "english": english, "route": A.reply_route(reply),
+                       "forced_route": (reply or {}).get("forced_route"),
+                       "message": (reply or {}).get("message"), "search_query": (reply or {}).get("search_query"),
+                       "reason": next((x.get("output", {}).get("reason") for x in (record or {}).get("router_raw") or []
+                                       if isinstance(x.get("output"), dict)), None)})
+    g = A.g_routes(g_rows)
+    clarify_b = (rates.get(D.RUN_1) or {}).get("clarify_b") or {}
+    required = {
+        "out_of_scope_g_valid": g["threshold"],
+        "clarify_b": {"value": clarify_b.get("rate"), "count": clarify_b.get("count"),
+                      "requests": clarify_b.get("requests"), "maximum": D.CLARIFY_B_MAX,
+                      "met": clarify_b.get("rate") is not None and clarify_b["rate"] <= D.CLARIFY_B_MAX},
+    }
+    g_turns = [rec for rec in all_turns.values() if rec.get("set") == D.SET_G and rec.get("reply")]
+    g_cost = [{"route": rec["reply"]["route"], "wall_s": rec["wall_ms"] / 1000.0, **A.turn_cost(rec)} for rec in g_turns]
+    checks = _read_json(data_dir / "sets" / "g_checks.json") or {}
+    return {
+        "addendum": {"path": D.ADDENDUM_PATH, "commit": D.ADDENDUM_COMMIT},
+        "g": {**g, "rows": g_rows},
+        "g_checks": {"generator": checks.get("generator"), "counts": checks.get("counts"),
+                     "first_pass_problems": ((checks.get("G") or {}).get("first_pass") or {}).get("problems"),
+                     "fixes": (checks.get("G") or {}).get("fixes"),
+                     "final_problems": ((checks.get("G") or {}).get("final") or {}).get("problems"),
+                     "language_summary": ((checks.get("G") or {}).get("final") or {}).get("language_summary")},
+        "thresholds": {"required": required, "required_met": all(x["met"] for x in required.values()),
+                       "secondary": {run: A.thresholds(rates[run]) for run in rates}},
+        "g_cost_time": {"by_route": A.by_key(((row["route"], row) for row in g_cost), ("wall_s", "cost_usd", "llm_calls")),
+                        "llm_failed": sum(row["llm_failed"] for row in g_cost),
+                        "turns_without_reply": sorted(k for k, rec in all_turns.items()
+                                                      if rec.get("set") == D.SET_G and not rec.get("reply"))},
+        "spend_cap_usd": ledger.cap_usd,
     }
 
 

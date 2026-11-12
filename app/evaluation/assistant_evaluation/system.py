@@ -22,6 +22,7 @@ The raw outputs of the assistant's routing and answer calls are captured
 (the reply carries only the verified recommendations).
 """
 
+import hashlib
 import contextvars
 import os
 import subprocess
@@ -168,6 +169,13 @@ class CapturingRunnable:
         return getattr(self._inner, name)
 
 
+def openrouter_options_without_key(reasoning: Any) -> Dict[str, Any]:
+    """The OpenRouter request fields the client sends (its extra_body), without the key or the URL."""
+    from app.infrastructure.llm.langchain_llm_client import openrouter_options
+
+    return openrouter_options(None, reasoning)["extra_body"]
+
+
 def git_commit() -> str:
     try:
         out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, timeout=10)
@@ -254,6 +262,7 @@ class CloudSystem:
     def describe(self) -> Dict[str, Any]:
         """The configuration evaluated (no secret)."""
         from app.infrastructure.llm.graphs import assistant as G
+        from app.infrastructure.llm import prompts_assistant as P
         from app.infrastructure.llm.agents import search_agent as A
         from app.domain import value_objects as V
 
@@ -271,7 +280,10 @@ class CloudSystem:
                     "max_tokens": s.max_tokens, "timeout_s": s.timeout_s, "max_retries": s.max_retries,
                     "client_max_retries": s.client_max_retries},
             "assistant": {"router_max_tokens": G.ROUTER_MAX_TOKENS, "answer_context_books": G.ANSWER_CONTEXT_BOOKS,
-                          "max_clarifying_turns": V.MAX_CLARIFYING_TURNS, "max_results": D.ASSISTANT_MAX_RESULTS},
+                          "max_clarifying_turns": V.MAX_CLARIFYING_TURNS, "max_results": D.ASSISTANT_MAX_RESULTS,
+                          "prompts_version": P.ASSISTANT_PROMPTS_VERSION,
+                          "router_prompt_sha256": hashlib.sha256(P.ROUTER_SYSTEM_PROMPT.encode("utf-8")).hexdigest()[:12]},
+            "llm_openrouter_extra_body": openrouter_options_without_key(s.reasoning),
             "agent": {"max_tool_rounds": A.MAX_TOOL_ROUNDS, "max_reflections": A.MAX_REFLECTIONS,
                       "max_recommendations": A.MAX_RECOMMENDATIONS, "tool_results": A.MAX_TOOL_RESULTS},
             "usage_budget": None,

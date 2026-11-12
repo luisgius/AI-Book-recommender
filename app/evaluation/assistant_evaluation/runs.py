@@ -319,6 +319,8 @@ def run_part(system: Any, requests: Sequence[Request], part: str, limit: Optiona
         run_single_turns(system, by_set(requests, D.SET_D), D.RUN_1, limit)
     elif part == "f":
         run_single_turns(system, by_set(requests, D.SET_F), D.RUN_1, limit)
+    elif part == "g":
+        run_single_turns(system, by_set(requests, D.SET_G), D.RUN_1, limit)
     elif part == "e":
         run_e(system, requests, limit)
     elif part == "agent":

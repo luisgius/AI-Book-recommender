@@ -25,7 +25,7 @@ def _load_env() -> None:
 
 
 def _ledger(data_dir: Path) -> SpendLedger:
-    return SpendLedger(data_dir / LEDGER_FILE, D.SPEND_CAP_USD)
+    return SpendLedger(data_dir / LEDGER_FILE, D.spend_cap(data_dir))
 
 
 def _key_snapshot(ledger: SpendLedger, stage: str, when: str) -> None:
@@ -52,7 +52,7 @@ def _stage(stage: str, data_dir: Path, run: Callable[[SpendLedger], Any]) -> int
         with (data_dir / STAGE_TIMES).open("a", encoding="utf-8") as handle:
             handle.write(json.dumps({"stage": stage, "seconds": round(time.perf_counter() - started, 1),
                                      "ended": time.strftime("%Y-%m-%dT%H:%M:%S"), "status": status}) + "\n")
-        log(f"Recorded spend so far: {ledger.total():.4f} USD (cap {D.SPEND_CAP_USD:.2f})")
+        log(f"Recorded spend so far: {ledger.total():.4f} USD (cap {ledger.cap_usd:.2f})")
     return status
 
 
@@ -68,6 +68,25 @@ def cmd_sets(args: argparse.Namespace) -> int:
         log(json.dumps(document["sets"]["counts"]))
 
     return _stage("1-sets", args.data_dir, run)
+
+
+def cmd_seed_v25(args: argparse.Namespace) -> int:
+    from app.evaluation.assistant_evaluation.remeasure import seed
+
+    seed(D.DATA_DIR, D.V25_DIR, log=log)
+    return 0
+
+
+def cmd_set_g(args: argparse.Namespace) -> int:
+    from app.evaluation.assistant_evaluation.set_g import build_set_g
+
+    def run(ledger: SpendLedger) -> None:
+        document = build_set_g(D.V25_DIR / "sets", ledger, log=log)
+        part = document["G"]
+        log(f"G: first-pass problems {len(part['first_pass']['problems'])}, fixes {len(part['fixes'])}, "
+            f"final problems {len(part['final']['problems'])}; language {part['final']['language_summary']}")
+
+    return _stage("1-set-g", D.V25_DIR, run)
 
 
 def _system(args: argparse.Namespace, ledger: SpendLedger, stage: str):
@@ -101,6 +120,11 @@ def cmd_assistant(args: argparse.Namespace) -> int:
     from app.evaluation.assistant_evaluation import runs
 
     def run(ledger: SpendLedger) -> None:
+        if D.is_v25(args.data_dir):
+            from app.evaluation.assistant_evaluation.remeasure import current_instruction_matches
+
+            if not current_instruction_matches(args.data_dir):
+                raise SystemExit("The routing instruction in the code is not the one recorded for this measurement")
         system = _system(args, ledger, "3-assistant")
         (args.data_dir / "system.json").write_text(json.dumps(system.describe(), indent=2, default=str),
                                                    encoding="utf-8")
@@ -127,22 +151,37 @@ def cmd_judge(args: argparse.Namespace) -> int:
 
 def cmd_report(args: argparse.Namespace) -> int:
     from app.evaluation.assistant_evaluation.report import build_markdown
-    from app.evaluation.assistant_evaluation.results import build_results
+    from app.evaluation.assistant_evaluation.report_v25 import build_comparison
 
     if not args.offline:
         log("The report never calls an API or the database; --offline only states it.")
-    results = build_results(args.data_dir)
-    path = args.data_dir / "results.json"
-    path.write_text(json.dumps({k: v for k, v in results.items() if k != "per_request"}, ensure_ascii=False,
-                               indent=2, default=str), encoding="utf-8")
-    (args.data_dir / "per_request.json").write_text(json.dumps(results["per_request"], ensure_ascii=False, indent=1,
-                                                                default=str), encoding="utf-8")
+    results = _write_results(args.data_dir)
     Path(args.output).write_text(build_markdown(results), encoding="utf-8")
     log(f"Wrote {args.output}")
+    # The re-measurement (V25), side by side with the first measurement.
+    second_dir = D.V25_DIR if args.second_data_dir is None else args.second_data_dir
+    if not args.skip_second and (second_dir / "runs" / "turns.jsonl").exists():
+        second = _write_results(second_dir)
+        instructions = json.loads((second_dir / "instructions.json").read_text(encoding="utf-8"))
+        Path(args.second_output).write_text(build_comparison(results, second, instructions, args.data_dir, second_dir), encoding="utf-8")
+        log(f"Wrote {args.second_output}")
     return 0
 
 
+def _write_results(data_dir: Path) -> dict:
+    """build_results(data_dir), saved as results.json and per_request.json in data_dir."""
+    from app.evaluation.assistant_evaluation.results import build_results
+
+    results = build_results(data_dir)
+    (data_dir / "results.json").write_text(json.dumps({k: v for k, v in results.items() if k != "per_request"},
+                                                      ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    (data_dir / "per_request.json").write_text(json.dumps(results["per_request"], ensure_ascii=False, indent=1,
+                                                          default=str), encoding="utf-8")
+    return results
+
+
 PARTS = ("ab1", "d", "f", "e", "ab2", "agent")
+V25_PARTS = PARTS + ("g",)  # G exists only in the re-measurement's request sets
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -155,14 +194,21 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--skip-depth-check", action="store_true")
     r.set_defaults(func=cmd_reference)
     a = sub.add_parser("assistant", help="stage 3: the assistant's turns and the direct agent")
-    a.add_argument("--parts", nargs="+", default=list(PARTS), choices=PARTS)
+    a.add_argument("--parts", nargs="+", default=list(PARTS), choices=V25_PARTS)
     a.add_argument("--limit", type=int, default=None, help="only the first N requests of each part (smoke test)")
     a.set_defaults(func=cmd_assistant)
     sub.add_parser("judge", help="stage 4: judge every new pair with both judges").set_defaults(func=cmd_judge)
     rp = sub.add_parser("report", help="stage 5: results.json and the markdown report from saved files")
     rp.add_argument("--offline", action="store_true", help="no API call and no database connection (always true)")
     rp.add_argument("--output", default=str(D.REPORT_MD))
+    rp.add_argument("--second-data-dir", type=Path, default=None,
+                    help=f"the re-measurement's data (default {D.V25_DIR}); its report is written when it has runs")
+    rp.add_argument("--second-output", default=str(D.V25_REPORT_MD))
+    rp.add_argument("--skip-second", action="store_true", help="only the first measurement's report")
     rp.set_defaults(func=cmd_report)
+    sub.add_parser("seed-v25", help=f"V25: copy the reusable files into {D.V25_DIR} and record both instructions"
+                   ).set_defaults(func=cmd_seed_v25)
+    sub.add_parser("set-g", help="V25: generate and check the held-out set G").set_defaults(func=cmd_set_g)
     return parser
 
 

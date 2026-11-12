@@ -166,6 +166,19 @@ def summary_lines(r: Mapping[str, Any]) -> List[str]:
     return out
 
 
+NOT_RECORDED = "not recorded"
+
+
+def _recorded(saved: Mapping[str, Any], key: str) -> Any:
+    """A value of the system description saved with a measurement, or "not recorded" when it has none.
+
+    The report describes the evaluated system only from what was saved when the measurement
+    ran; it never reads the environment, the application's settings or a default of the code.
+    """
+    value = saved.get(key) if isinstance(saved, Mapping) else None
+    return NOT_RECORDED if key not in (saved or {}) else value
+
+
 def build_markdown(r: Mapping[str, Any]) -> str:
     L: List[str] = []
     spend = r["spend"]
@@ -186,7 +199,7 @@ def build_markdown(r: Mapping[str, Any]) -> str:
           f"- Date of the runs: {dates[0][:10]} (from {dates[0]} to {dates[-1]}). Report regenerated offline from the "
           "saved files (`.venv/bin/python -m app.evaluation.assistant_evaluation report --offline`).",
           "- Models and providers (all through OpenRouter): system LLM "
-          f"`{llm.get('model', D.SYSTEM_LLM)}` (temperature {llm.get('temperature')}, reasoning {llm.get('reasoning')}); "
+          f"`{_recorded(llm, 'model')}` (temperature {_recorded(llm, 'temperature')}, reasoning {_recorded(llm, 'reasoning')}); "
           f"embeddings `{emb.get('model')}` ({emb.get('dimensions')} d) on {emb.get('provider')} with hedge to "
           f"{emb.get('hedge_provider')}; reranker `{rer.get('model')}` on {rer.get('provider')}; request generator "
           f"`{D.GENERATOR_MODEL}`; simulated user `{D.SIMULATED_USER_MODEL}`; judges `{D.PRIMARY_JUDGE}` (primary) and "

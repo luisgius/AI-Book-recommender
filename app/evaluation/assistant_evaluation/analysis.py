@@ -93,6 +93,8 @@ def route_group(request: Any) -> str:
     """Row of the route matrix: A is split into its ambiguous queries and the rest."""
     if request.set == D.SET_A:
         return "A ambiguous" if request.category == D.AMBIGUOUS_CATEGORY else "A other"
+    if request.set == D.SET_G:
+        return "G valid" if request.category == "valid" else "G out of scope"
     return request.set
 
 
@@ -331,3 +333,32 @@ def by_key(rows: Iterable[Tuple[str, Mapping[str, Any]]], fields: Sequence[str])
 def safe_mean(values: Sequence[float]) -> Optional[float]:
     values = [v for v in values if v is not None and not (isinstance(v, float) and math.isnan(v))]
     return float(np.mean(values)) if values else None
+
+
+def g_routes(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    """
+    Set G (V25 addendum): route rates of the 60 valid and the 20 out-of-scope
+    requests, and the threshold on the valid ones (at most OOS_G_MAX out of scope).
+
+    rows: one per G request with "group" ("valid" or "out_of_scope"),
+    "language", "form" (valid) or "kind" (out of scope), and "route".
+    """
+    valid = [r for r in rows if r["group"] == "valid"]
+    oos = [r for r in rows if r["group"] == "out_of_scope"]
+    valid_routes = [r["route"] for r in valid]
+    oos_rate = rate(valid_routes, "out_of_scope")
+    by = lambda items, key: {k: dict(Counter(r["route"] for r in items if r[key] == k))  # noqa: E731
+                             for k in sorted({r[key] for r in items})}
+    return {
+        "valid": {route: rate(valid_routes, route) for route in ROUTES + (ERROR_ROUTE,)},
+        "out_of_scope": {"detection": rate([r["route"] for r in oos], "out_of_scope"),
+                         "routes": dict(Counter(r["route"] for r in oos))},
+        "valid_by_form": by(valid, "form"), "valid_by_language": by(valid, "language"),
+        "valid_by_field": by(valid, "field"), "out_of_scope_by_kind": by(oos, "field"),
+        "threshold": {"value": oos_rate["rate"], "count": oos_rate["count"], "requests": oos_rate["requests"],
+                      "maximum": D.OOS_G_MAX,
+                      "met": oos_rate["rate"] is not None and oos_rate["rate"] <= D.OOS_G_MAX},
+        "valid_refused": [r for r in valid if r["route"] == "out_of_scope"],
+        "valid_clarified": [r for r in valid if r["route"] == "clarify"],
+        "out_of_scope_missed": [r for r in oos if r["route"] != "out_of_scope"],
+    }

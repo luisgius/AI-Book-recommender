@@ -1,0 +1,766 @@
+{
+  "prompt_version": "v1",
+  "seed": 0,
+  "languages": [
+    "es",
+    "en",
+    "fr",
+    "de",
+    "it",
+    "pt"
+  ],
+  "topics": {
+    "cooking": [
+      "sourdough bread baking",
+      "Thai curry cooking",
+      "vegetarian meal prep",
+      "cake decorating",
+      "fermenting vegetables such as kimchi and sauerkraut",
+      "barbecue and smoking meat"
+    ],
+    "computing": [
+      "relational databases and SQL",
+      "cybersecurity for small businesses",
+      "building websites with JavaScript",
+      "Linux system administration",
+      "algorithms and data structures",
+      "electronics projects with a Raspberry Pi"
+    ],
+    "health": [
+      "living with type 2 diabetes",
+      "sleep problems and insomnia",
+      "exercises for back pain",
+      "nutrition during pregnancy",
+      "coping with anxiety",
+      "first aid"
+    ],
+    "travel": [
+      "backpacking in Southeast Asia",
+      "walking the Camino de Santiago",
+      "a road trip around Iceland",
+      "travelling in Japan on a budget",
+      "hiking in the Alps",
+      "visiting Morocco"
+    ],
+    "economics": [
+      "personal finance and saving money",
+      "investing in the stock market for beginners",
+      "inflation and central banks",
+      "starting a small business",
+      "behavioural economics",
+      "the history of money"
+    ],
+    "science": [
+      "black holes",
+      "the science of climate change",
+      "human genetics and DNA",
+      "quantum physics for beginners",
+      "coral reef marine biology",
+      "volcanoes and earthquakes"
+    ],
+    "trades": [
+      "woodworking and carpentry",
+      "home plumbing repairs",
+      "basic household electrical wiring",
+      "welding",
+      "car mechanics",
+      "sewing and tailoring"
+    ],
+    "sport": [
+      "marathon training",
+      "chess openings",
+      "football tactics",
+      "yoga for beginners",
+      "rock climbing",
+      "swimming technique"
+    ],
+    "gardening": [
+      "growing a vegetable garden",
+      "bonsai",
+      "composting",
+      "caring for houseplants",
+      "permaculture",
+      "pruning fruit trees"
+    ],
+    "home and family": [
+      "training a puppy",
+      "keeping backyard chickens",
+      "toddler sleep",
+      "decluttering the home",
+      "planning a wedding",
+      "understanding cat behaviour"
+    ]
+  },
+  "out_of_scope": {
+    "present_fact": [
+      "the current price of bitcoin",
+      "the live score of tonight's tennis final",
+      "whether the nearest post office is open right now",
+      "the traffic on the ring road at this moment",
+      "today's lottery results"
+    ],
+    "calculation": [
+      "what 15 percent of 240 is",
+      "converting 72 degrees Fahrenheit to Celsius",
+      "solving the equation 3x + 7 = 22",
+      "the monthly payment of a 200000 mortgage at 3 percent over 25 years",
+      "how many days there are between 3 March and 19 August"
+    ],
+    "program": [
+      "writing a Python function that removes duplicates from a list",
+      "writing an SQL query that counts orders per customer",
+      "writing a bash script that renames photos by date",
+      "writing a regular expression that validates an email address",
+      "writing an HTML page with a contact form"
+    ],
+    "conversation": [
+      "greeting the assistant and asking how it is",
+      "asking the assistant to tell a joke",
+      "thanking the assistant and saying goodbye",
+      "asking the assistant its favourite colour",
+      "saying they are bored and want to chat"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "g01",
+      "group": "valid",
+      "field": "health",
+      "topic": "living with type 2 diabetes",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g02",
+      "group": "valid",
+      "field": "science",
+      "topic": "quantum physics for beginners",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g03",
+      "group": "valid",
+      "field": "economics",
+      "topic": "the history of money",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g04",
+      "group": "valid",
+      "field": "trades",
+      "topic": "woodworking and carpentry",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g05",
+      "group": "valid",
+      "field": "sport",
+      "topic": "football tactics",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g06",
+      "group": "valid",
+      "field": "sport",
+      "topic": "marathon training",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g07",
+      "group": "valid",
+      "field": "sport",
+      "topic": "swimming technique",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g08",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "barbecue and smoking meat",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g09",
+      "group": "valid",
+      "field": "computing",
+      "topic": "cybersecurity for small businesses",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g10",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "composting",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g11",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "keeping backyard chickens",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g12",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "planning a wedding",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g13",
+      "group": "valid",
+      "field": "travel",
+      "topic": "visiting Morocco",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g14",
+      "group": "valid",
+      "field": "economics",
+      "topic": "starting a small business",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g15",
+      "group": "valid",
+      "field": "economics",
+      "topic": "behavioural economics",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g16",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "understanding cat behaviour",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g17",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "sourdough bread baking",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g18",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "Thai curry cooking",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g19",
+      "group": "valid",
+      "field": "trades",
+      "topic": "sewing and tailoring",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g20",
+      "group": "valid",
+      "field": "trades",
+      "topic": "basic household electrical wiring",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g21",
+      "group": "valid",
+      "field": "health",
+      "topic": "exercises for back pain",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g22",
+      "group": "valid",
+      "field": "health",
+      "topic": "nutrition during pregnancy",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g23",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "caring for houseplants",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g24",
+      "group": "valid",
+      "field": "sport",
+      "topic": "rock climbing",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g25",
+      "group": "valid",
+      "field": "travel",
+      "topic": "a road trip around Iceland",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g26",
+      "group": "valid",
+      "field": "science",
+      "topic": "volcanoes and earthquakes",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g27",
+      "group": "valid",
+      "field": "computing",
+      "topic": "algorithms and data structures",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g28",
+      "group": "valid",
+      "field": "sport",
+      "topic": "yoga for beginners",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g29",
+      "group": "valid",
+      "field": "computing",
+      "topic": "electronics projects with a Raspberry Pi",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g30",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "cake decorating",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g31",
+      "group": "valid",
+      "field": "health",
+      "topic": "first aid",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g32",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "decluttering the home",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g33",
+      "group": "valid",
+      "field": "travel",
+      "topic": "travelling in Japan on a budget",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g34",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "fermenting vegetables such as kimchi and sauerkraut",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g35",
+      "group": "valid",
+      "field": "trades",
+      "topic": "car mechanics",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g36",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "bonsai",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g37",
+      "group": "valid",
+      "field": "computing",
+      "topic": "Linux system administration",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g38",
+      "group": "valid",
+      "field": "science",
+      "topic": "coral reef marine biology",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g39",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "pruning fruit trees",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g40",
+      "group": "valid",
+      "field": "trades",
+      "topic": "welding",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g41",
+      "group": "valid",
+      "field": "computing",
+      "topic": "relational databases and SQL",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g42",
+      "group": "valid",
+      "field": "sport",
+      "topic": "chess openings",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g43",
+      "group": "valid",
+      "field": "travel",
+      "topic": "backpacking in Southeast Asia",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g44",
+      "group": "valid",
+      "field": "computing",
+      "topic": "building websites with JavaScript",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g45",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "permaculture",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g46",
+      "group": "valid",
+      "field": "health",
+      "topic": "sleep problems and insomnia",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g47",
+      "group": "valid",
+      "field": "trades",
+      "topic": "home plumbing repairs",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g48",
+      "group": "valid",
+      "field": "travel",
+      "topic": "hiking in the Alps",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g49",
+      "group": "valid",
+      "field": "science",
+      "topic": "black holes",
+      "language": "es",
+      "form": "keywords"
+    },
+    {
+      "id": "g50",
+      "group": "valid",
+      "field": "travel",
+      "topic": "walking the Camino de Santiago",
+      "language": "en",
+      "form": "keywords"
+    },
+    {
+      "id": "g51",
+      "group": "valid",
+      "field": "economics",
+      "topic": "investing in the stock market for beginners",
+      "language": "fr",
+      "form": "keywords"
+    },
+    {
+      "id": "g52",
+      "group": "valid",
+      "field": "science",
+      "topic": "the science of climate change",
+      "language": "de",
+      "form": "keywords"
+    },
+    {
+      "id": "g53",
+      "group": "valid",
+      "field": "science",
+      "topic": "human genetics and DNA",
+      "language": "it",
+      "form": "keywords"
+    },
+    {
+      "id": "g54",
+      "group": "valid",
+      "field": "health",
+      "topic": "coping with anxiety",
+      "language": "pt",
+      "form": "keywords"
+    },
+    {
+      "id": "g55",
+      "group": "valid",
+      "field": "cooking",
+      "topic": "vegetarian meal prep",
+      "language": "es",
+      "form": "sentence"
+    },
+    {
+      "id": "g56",
+      "group": "valid",
+      "field": "economics",
+      "topic": "inflation and central banks",
+      "language": "en",
+      "form": "sentence"
+    },
+    {
+      "id": "g57",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "toddler sleep",
+      "language": "fr",
+      "form": "sentence"
+    },
+    {
+      "id": "g58",
+      "group": "valid",
+      "field": "gardening",
+      "topic": "growing a vegetable garden",
+      "language": "de",
+      "form": "sentence"
+    },
+    {
+      "id": "g59",
+      "group": "valid",
+      "field": "economics",
+      "topic": "personal finance and saving money",
+      "language": "it",
+      "form": "sentence"
+    },
+    {
+      "id": "g60",
+      "group": "valid",
+      "field": "home and family",
+      "topic": "training a puppy",
+      "language": "pt",
+      "form": "sentence"
+    },
+    {
+      "id": "g-oos01",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a Python function that removes duplicates from a list",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos02",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "converting 72 degrees Fahrenheit to Celsius",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos03",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the traffic on the ring road at this moment",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos04",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "greeting the assistant and asking how it is",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos05",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing an SQL query that counts orders per customer",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos06",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the current price of bitcoin",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos07",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a regular expression that validates an email address",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos08",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "how many days there are between 3 March and 19 August",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos09",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing a bash script that renames photos by date",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos10",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "asking the assistant its favourite colour",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos11",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "asking the assistant to tell a joke",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos12",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "saying they are bored and want to chat",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos13",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "the monthly payment of a 200000 mortgage at 3 percent over 25 years",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos14",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "what 15 percent of 240 is",
+      "language": "en",
+      "form": "any"
+    },
+    {
+      "id": "g-oos15",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "the live score of tonight's tennis final",
+      "language": "fr",
+      "form": "any"
+    },
+    {
+      "id": "g-oos16",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "whether the nearest post office is open right now",
+      "language": "de",
+      "form": "any"
+    },
+    {
+      "id": "g-oos17",
+      "group": "out_of_scope",
+      "field": "program",
+      "topic": "writing an HTML page with a contact form",
+      "language": "it",
+      "form": "any"
+    },
+    {
+      "id": "g-oos18",
+      "group": "out_of_scope",
+      "field": "conversation",
+      "topic": "thanking the assistant and saying goodbye",
+      "language": "pt",
+      "form": "any"
+    },
+    {
+      "id": "g-oos19",
+      "group": "out_of_scope",
+      "field": "present_fact",
+      "topic": "today's lottery results",
+      "language": "es",
+      "form": "any"
+    },
+    {
+      "id": "g-oos20",
+      "group": "out_of_scope",
+      "field": "calculation",
+      "topic": "solving the equation 3x + 7 = 22",
+      "language": "en",
+      "form": "any"
+    }
+  ]
+}

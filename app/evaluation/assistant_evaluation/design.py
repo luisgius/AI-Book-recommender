@@ -47,6 +47,7 @@ SIMULATED_USER_TEMPERATURE = 0.0
 
 # --- Request sets (section 3) ------------------------------------------------------
 SET_A, SET_B, SET_D, SET_E, SET_F = "A", "B", "D", "E", "F"
+SET_G = "G"  # held-out set of the re-measurement (V25 addendum, section 3)
 AMBIGUOUS_CATEGORY = "ambiguous"  # the 10 queries of A reported apart
 E_SIZE = 30
 E_SEED = 0
@@ -113,3 +114,32 @@ CONTRASTS: Tuple[Contrast, ...] = (
              "P at the same number of top positions",
              "Does the agent recommend better than retrieval alone?"),
 )
+
+
+# --- Re-measurement after the revised routing instruction (V25) -------------------
+# docs/notes/2026-11-12-protocolo-evaluacion-asistente-adenda.md, committed in
+# 0a63751 before the instruction changed. The first measurement's files under
+# DATA_DIR are only read; the second measurement lives under V25_DIR and
+# reuses, by copy, what the instruction cannot change: the request sets A-F,
+# P, the depth check and the query vectors. Judgments of pairs already judged
+# are read from V14's and the first measurement's caches.
+ADDENDUM_PATH = "docs/notes/2026-11-12-protocolo-evaluacion-asistente-adenda.md"
+ADDENDUM_COMMIT = "0a63751"
+V25_DIR = Path("data/evaluation/assistant_v25")
+V25_REPORT_MD = Path("data/evaluation/ASSISTANT_EVALUATION_V25.md")
+FIRST_RUNS_COMMIT = "36802ee"  # the commit every run of the first measurement was made at
+INSTRUCTION_COMMIT = "5984e71"  # the commit of the revised routing instruction (before G existed)
+V25_SPEND_CAP_USD = 2.5
+G_VALID = 60
+G_OUT_OF_SCOPE = 20
+OOS_G_MAX = 0.02  # "fuera de alcance" indebido en las 60 válidas de G: como máximo una
+
+
+def is_v25(data_dir: Path) -> bool:
+    """True for the re-measurement's data directory."""
+    return Path(data_dir).resolve() == V25_DIR.resolve()
+
+
+def spend_cap(data_dir: Path) -> float:
+    """The cap of the measurement stored in data_dir (section 9 of the protocol; section 6 of the addendum)."""
+    return V25_SPEND_CAP_USD if is_v25(data_dir) else SPEND_CAP_USD
