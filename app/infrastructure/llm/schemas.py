@@ -25,6 +25,8 @@ from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, BeforeValidator, Field
 
+from .explanation_text import shorten_at_boundary
+
 
 def soft_max_length(limit: int) -> BeforeValidator:
     """
@@ -36,6 +38,20 @@ def soft_max_length(limit: int) -> BeforeValidator:
     """
     def cut(value: Any) -> Any:
         return value[:limit] if isinstance(value, str) else value
+
+    return BeforeValidator(cut)
+
+
+def soft_max_length_at_boundary(limit: int) -> BeforeValidator:
+    """
+    Like soft_max_length, but cuts at a sentence or word boundary and never
+    inside a citation marker (explanation_text.shorten_at_boundary).
+
+    Used for prose shown to the user, where a blind cut leaves broken text
+    such as "... Learning' [C".
+    """
+    def cut(value: Any) -> Any:
+        return shorten_at_boundary(value, limit) if isinstance(value, str) else value
 
     return BeforeValidator(cut)
 
@@ -110,7 +126,8 @@ class GroundedExplanationLLM(BaseModel):
         description="One-sentence summary of why this book is relevant to the query"
     )
 
-    reasoning: Annotated[str, soft_max_length(500)] = Field(
+    # Cut at a boundary: this text becomes the explanation shown to the user.
+    reasoning: Annotated[str, soft_max_length_at_boundary(500)] = Field(
         min_length=20,
         max_length=500,
         description=(

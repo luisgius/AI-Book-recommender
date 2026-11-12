@@ -19,7 +19,11 @@ from typing import Optional
 
 from app.domain.entities import Book, Citation, Explanation
 from app.domain.citation_validation import get_book_field_text, is_valid_snippet
+from .explanation_text import shorten_at_boundary, strip_citation_markers
 from .schemas import CitationLLM, GroundedExplanationLLM
+
+# Longest explanation text stored (the reasoning field's own limit).
+EXPLANATION_MAX_CHARS = 500
 
 
 def filter_valid_citations(
@@ -95,6 +99,7 @@ def validate_grounded_explanation(
     - If no valid citations remain after filtering, returns "no evidence" explanation
     - If citations are weak (avg relevance < 0.3), caps confidence at 0.3
     - If confidence < 0.5, prefixes text with [LOW CONFIDENCE] warning
+    - The text never contains the model's inline citation markers
 
     Args:
         explanation_llm: Pydantic schema from LLM (may contain hallucinations)
@@ -160,8 +165,11 @@ def validate_grounded_explanation(
     if avg_relevance < 0.3:
         confidence = min(confidence, 0.3)
 
-    # Step 5: Build final explanation text with confidence warning if needed
-    final_text = explanation_llm.reasoning
+    # Step 5: Build final explanation text with confidence warning if needed.
+    # The inline [CITE: field] markers are for the model; the verified
+    # citations are returned separately, so the stored text has none.
+    final_text = strip_citation_markers(explanation_llm.reasoning) or strip_citation_markers(explanation_llm.summary)
+    final_text = shorten_at_boundary(final_text, EXPLANATION_MAX_CHARS)
 
     if confidence < 0.5:
         # Prefix with low confidence warning
