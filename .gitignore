@@ -77,3 +77,6 @@ opencode.json
 
 # Vercel CLI project link (local ids, no secrets)
 .vercel
+
+# Thesis source: private, with its own local history; never pushed
+/memoria/
