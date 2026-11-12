@@ -23,7 +23,7 @@ from mcp import Client
 from mcp.client.streamable_http import streamable_http_client
 
 from app.api.v1 import dependencies as deps
-from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings, RerankerSettings
+from app.infrastructure.config.settings import EmbeddingSettings, LLMSettings, RerankerSettings, SearchProfileSettings
 from app.main import app, mcp_endpoint
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -67,6 +67,7 @@ def real_wiring(monkeypatch):
     spy = SpyLLMClient()
     monkeypatch.setattr(deps, "DB_PATH", CATALOG_DB)
     monkeypatch.setattr(deps, "INDEXES_DIR", INDEXES_DIR)
+    monkeypatch.setattr(deps, "_profile_settings", SearchProfileSettings())  # local, vector candidates
     monkeypatch.setattr(deps, "_embedding_settings", EmbeddingSettings())
     monkeypatch.setattr(deps, "_llm_settings", LLMSettings(provider="none"))
     monkeypatch.setattr(deps, "_llm_client", spy)
@@ -99,8 +100,10 @@ async def test_mcp_client_lists_and_calls_every_tool_over_http(real_wiring, mode
                 assert not search.is_error
                 hits = search.structured_content["results"]
                 assert 1 <= len(hits) <= 5
-                assert search.structured_content["search_mode"] == "hybrid"
+                # The default candidate mode: vector search, BM25 only as the fallback
+                assert search.structured_content["search_mode"] == "vector_only"
                 for hit in hits:
+                    assert hit["retrieved_by"] == "vector" and hit["keyword_score"] is None
                     assert catalog.get_by_id(UUID(hit["book_id"])) is not None  # only catalog books
                 book_id = hits[0]["book_id"]
 

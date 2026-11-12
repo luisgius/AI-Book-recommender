@@ -6,7 +6,7 @@ schemas, transport); this module holds their behaviour, so it can be read and
 tested without the protocol. Every tool:
 
 - uses the same SearchService and BookCatalogRepository as the REST API;
-- never calls the LLM: search_books runs plain hybrid search (no query
+- never calls the LLM: search_books runs the plain search (no query
   understanding, explanations off) and similar_books is pure vector search,
   so a public server cannot spend the owner's LLM budget;
 - never writes anything;
@@ -200,7 +200,7 @@ class CatalogTools:
         max_year: Optional[int] = None,
         category: Optional[str] = None,
     ) -> SearchBooksResult:
-        """Hybrid search (BM25 + embeddings, RRF, optional re-ranking); no LLM call."""
+        """The server's search (SearchService.search_with_fallback, optional re-ranking); no LLM call."""
         text = query.strip()
         if not text:
             raise ToolError(
@@ -238,7 +238,7 @@ class CatalogTools:
                 min_year=filters.min_year,
                 max_year=filters.max_year,
             ),
-            search_mode="lexical_only" if response.search_mode == "lexical_only" else "hybrid",
+            search_mode=response.search_mode,
             reranked=any(r.rerank_score is not None for r in response.results),
             results=[to_search_hit(r) for r in response.results],
         )

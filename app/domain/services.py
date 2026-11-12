@@ -20,6 +20,7 @@ from .value_objects import (
     ROUTE_SEARCH, ChatMessage, bound_conversation, count_clarifications, last_user_message,
     SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent,
     RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
+    CANDIDATES_HYBRID, CANDIDATES_VECTOR, CANDIDATE_MODES,
 )
 from .ports import (
     BUDGET_LLM_REQUEST,
@@ -63,16 +64,21 @@ def _elapsed_ms(started: float) -> float:
 
 class SearchService:
     """
-    Orchestrates hybrid search combining lexical (BM25) and semantic (vector) search.
+    Orchestrates the search over lexical (BM25) and semantic (vector) retrieval.
 
     This service implements the core search use case:
-    1. Execute both BM25 and vector searches sequentially
-    2. Fuse results using Reciprocal Rank Fusion (RRF)
-    3. Apply filters to final results
-    4. Optionally re-rank the top `rerank_depth` results with a Reranker
+    1. Retrieve candidates, as the candidate mode says (`candidates`):
+       - "vector": the vector search alone; BM25 is not called
+       - "hybrid": BM25 and vector search, fused with Reciprocal Rank Fusion
+    2. Apply filters to the candidates
+    3. Optionally re-rank the top `rerank_depth` results with a Reranker
        (cross-encoder), always against the user's original query text
-    5. Optionally diversify (MMR) and cut to max_results
-    6. Optionally generate explanations via LLM
+    4. Optionally diversify (MMR) and cut to max_results
+    5. Optionally generate explanations via LLM
+
+    In both modes, when the embedding or the vector search fails (or the
+    daily model budget is spent) the search falls back to BM25 alone and
+    says so in the response (degraded, search_mode "lexical_only").
 
     The service is technology-agnostic and depends only on port protocols.
     """
@@ -88,6 +94,7 @@ class SearchService:
         rerank_depth: int = DEFAULT_RERANK_DEPTH,
         usage_budget: UsageBudget | None = None,
         explanation_workers: int = DEFAULT_EXPLANATION_WORKERS,
+        candidates: str = CANDIDATES_HYBRID,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -113,7 +120,14 @@ class SearchService:
                 skipped and a notice is returned. None (default): no limit.
             explanation_workers: How many explanations are generated at the
                 same time (1 generates them one after another)
+            candidates: Candidate mode, CANDIDATES_VECTOR ("vector") or
+                CANDIDATES_HYBRID ("hybrid", the default here, so the
+                evaluation modules that build their own service keep the
+                published configuration). The application chooses it from
+                SEARCH_CANDIDATES (default "vector", app/api/v1/dependencies.py).
         """
+        if candidates not in CANDIDATE_MODES:
+            raise ValueError(f"candidates must be one of {CANDIDATE_MODES}, got '{candidates}'")
         if explanation_workers < 1:
             raise ValueError(f"explanation_workers must be >= 1, got {explanation_workers}")
         if max_explanations < 0:
@@ -130,6 +144,12 @@ class SearchService:
         self._reranker = reranker
         self._rerank_depth = rerank_depth
         self._usage_budget = usage_budget
+        self._candidates = candidates
+
+    @property
+    def candidate_mode(self) -> str:
+        """The candidate mode: CANDIDATES_VECTOR or CANDIDATES_HYBRID."""
+        return self._candidates
 
     def _spend(self, kind: str) -> bool:
         """
@@ -245,7 +265,7 @@ class SearchService:
         start_time = time.time()
         degraded = False
         degradation_reason = None
-        search_mode = "hybrid"
+        search_mode = "lexical_only"  # set below by the path that runs
         metadata: Optional[SearchMetadata] = None
         rerank_text = rerank_query_text or query.text
 
@@ -290,19 +310,21 @@ class SearchService:
                 logger.error(f"Lexical search also failed: {e}")
                 raise RuntimeError("Both vector and lexical search unavailable") from e
         else:
-            # Try hybrid search, fallback to lexical if vector fails
+            # Search with the configured candidates; fall back to lexical if
+            # the embedding or the vector search fails
             try:
-                results, meta = self._search_hybrid_with_debug(query, rerank_text)
+                results, meta = self._search_models_with_debug(query, rerank_text)
+                search_mode = "hybrid" if self._candidates == CANDIDATES_HYBRID else "vector_only"
                 metadata = SearchMetadata(
-                    fusion_method="rrf",
-                    rrf_k=meta.get("rrf_k", 60),
+                    fusion_method=meta["fusion_method"],
+                    rrf_k=meta.get("rrf_k"),
                     diversification_enabled=bool(query.use_diversification),
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=meta.get("candidates_vector", 0),
                     timings_ms=meta.get("timings_ms", {}),
                 )
             except Exception as e:
-                logger.warning(f"Hybrid search failed, falling back to lexical: {e}")
+                logger.warning(f"Search with vector candidates failed, falling back to lexical: {e}")
                 degraded = True
                 degradation_reason = f"Vector search failed ({str(e)}) - using lexical search only"
                 search_mode = "lexical_only"
@@ -349,6 +371,8 @@ class SearchService:
         - recommendation: Higher weight on vector search (semantic similarity)
         - factual: Higher weight on lexical search (exact keyword matches)
         - exploratory: Balanced hybrid + increased diversification
+        The weights apply to the hybrid candidate mode; in vector mode only
+        the vector search runs (the intent still sets the diversification).
 
         Args:
             query_text: Raw user query in natural language
@@ -509,9 +533,13 @@ class SearchService:
                     results = self._add_explanations(query_text, results)
 
                 search_time_ms = (time.time() - start_time) * 1000
+                # RRF fuses BM25 with vector lists (hybrid mode) and the lists
+                # of the query variations; in vector mode with one variation
+                # nothing is fused
+                fused = self._candidates == CANDIDATES_HYBRID or meta.get("variations_succeeded", 1) > 1
                 metadata = SearchMetadata(
-                    fusion_method="rrf",
-                    rrf_k=60,
+                    fusion_method="rrf" if fused else "none",
+                    rrf_k=60 if fused else None,
                     diversification_enabled=adjusted_diversification,
                     candidates_lexical=meta.get("candidates_lexical", 0),
                     candidates_vector=meta.get("candidates_vector", 0),
@@ -520,7 +548,7 @@ class SearchService:
                 response = SearchResponse(
                     results=results,
                     degraded=False,
-                    search_mode="hybrid",
+                    search_mode="hybrid" if self._candidates == CANDIDATES_HYBRID else "vector_only",
                     latency_ms=search_time_ms,
                     metadata=metadata,
                 )
@@ -571,30 +599,36 @@ class SearchService:
         results = self._search_lexical_only(query, rerank_text, use_reranker=use_reranker, timings=timings)
         return results, {"candidates_lexical": len(results), "timings_ms": timings}
 
-    def _search_hybrid_with_debug(
+    def _search_models_with_debug(
         self, query: SearchQuery, rerank_text: Optional[str] = None
     ) -> tuple[list[SearchResult], Dict]:
         """
-        Hybrid search pipeline: retrieve -> fuse (RRF) -> filter ->
+        Search pipeline with the vector index: retrieve candidates (vector,
+        or BM25 + vector fused with RRF, see `candidates`) -> filter ->
         optional re-rank -> optional MMR -> top-k -> optional explanations.
+
+        Raises whatever the embedding or the vector search raises, so the
+        caller can fall back to lexical search.
 
         Args:
             query: The search query
             rerank_text: Text for the reranker (defaults to query.text)
         """
-        logger.info(f"Executing hybrid search for query: '{query.text}'")
+        logger.info(f"Executing {self._candidates} search for query: '{query.text}'")
 
         candidate_limit = self._retrieval_size(query.max_results) * 2
         timings: Dict[str, float] = {}
+        lexical_results: List[SearchResult] = []
 
-        logger.debug("Executing lexical (BM25) search")
-        started = time.perf_counter()
-        lexical_results = self._lexical_search.search(
-            query_text=query.text,
-            max_results=candidate_limit,
-            filters=query.filters
-        )
-        timings["lexical"] = _elapsed_ms(started)
+        if self._candidates == CANDIDATES_HYBRID:
+            logger.debug("Executing lexical (BM25) search")
+            started = time.perf_counter()
+            lexical_results = self._lexical_search.search(
+                query_text=query.text,
+                max_results=candidate_limit,
+                filters=query.filters
+            )
+            timings["lexical"] = _elapsed_ms(started)
 
         logger.debug("Generating query embedding and executing vector search")
         started = time.perf_counter()
@@ -613,14 +647,19 @@ class SearchService:
             f"{len(vector_results)} vector results"
         )
 
-        rrf_k = 60
-        fused_results = self._fuse_results_rrf(
-            lexical_results=lexical_results,
-            vector_results=vector_results,
-            k=rrf_k,
-        )
-
-        logger.debug(f"Fused into {len(fused_results)} unique results")
+        rrf_k: Optional[int] = None
+        if self._candidates == CANDIDATES_HYBRID:
+            rrf_k = 60
+            fused_results = self._fuse_results_rrf(
+                lexical_results=lexical_results,
+                vector_results=vector_results,
+                k=rrf_k,
+            )
+            logger.debug(f"Fused into {len(fused_results)} unique results")
+        else:
+            # The vector list is the only retrieval list: its positions are
+            # the vector positions, and no result has a keyword position
+            fused_results = self._as_vector_candidates(vector_results)
 
         filtered_results = self._apply_filters(fused_results, query.filters)
 
@@ -653,11 +692,34 @@ class SearchService:
 
         return final_results, {
             "timings_ms": timings,
-            "fusion_method": "rrf",
+            "fusion_method": "rrf" if rrf_k is not None else "none",
             "rrf_k": rrf_k,
             "candidates_lexical": len(lexical_results),
             "candidates_vector": len(vector_results),
         }
+
+    @staticmethod
+    def _as_vector_candidates(vector_results: List[SearchResult]) -> List[SearchResult]:
+        """
+        The vector list as the candidate list (vector mode).
+
+        Each result keeps its position in the vector list as vector_rank and
+        is labelled source "vector"; lexical_rank and lexical_score stay None
+        because keyword search did not run. final_score is the vector score.
+        """
+        candidates = []
+        for result in vector_results:
+            score = result.vector_score if result.vector_score is not None else result.final_score
+            candidates.append(replace(
+                result,
+                source="vector",
+                final_score=score,
+                vector_score=score,
+                vector_rank=result.rank,
+                lexical_score=None,
+                lexical_rank=None,
+            ))
+        return candidates
 
     def _search_lexical_only(
         self,
@@ -733,17 +795,20 @@ class SearchService:
 
     def search(self, query: SearchQuery) -> list[SearchResult]:
         """
-        Execute a hybrid search combining lexical and semantic approaches.
+        Execute a search with the configured candidate mode (no fallback).
 
-        This method implements the following algorithm:
+        This method implements the following algorithm (search_with_fallback
+        adds the lexical fallback and the degradation metadata):
 
         1. **Sequential retrieval:**
-           - Execute BM25 search over book text (title, authors, description, categories)
+           - Hybrid mode only: execute BM25 search over book text (title,
+             authors, description, categories)
            - Generate query embedding and execute vector similarity search
-           - Both searches retrieve up to `query.max_results * 2` candidates
+           - Each search retrieves up to `query.max_results * 2` candidates
              (with a reranker, as if max_results were at least rerank_depth)
 
-        2. **Fusion via Reciprocal Rank Fusion (RRF):**
+        2. **Fusion via Reciprocal Rank Fusion (RRF), hybrid mode only**
+           (in vector mode the vector list is the candidate list):
            - RRF is a rank-based fusion method that combines rankings without
              needing to normalize scores from different systems
            - Formula: RRF_score(book) = Σ(1 / (k + rank_i)) for each system i
@@ -785,7 +850,7 @@ class SearchService:
             ...     print(f"{result.rank}. {result.book.title} (score: {result.final_score:.3f})")
         """
 
-        results, _debug = self._search_hybrid_with_debug(query)
+        results, _debug = self._search_models_with_debug(query)
         return results
 
     def find_similar_books(
@@ -882,7 +947,8 @@ class SearchService:
 
         The strategy determines how many candidates each retrieval method
         contributes before RRF fusion. This biases the final ranking toward
-        the method that best suits the query intent.
+        the method that best suits the query intent. In vector mode only the
+        vector search runs (balanced pool size) and the strategy is ignored.
 
         Args:
             variation_text: The query text for this variation
@@ -893,6 +959,17 @@ class SearchService:
         Returns:
             Ranked list of SearchResult (fused via RRF)
         """
+        if self._candidates == CANDIDATES_VECTOR:
+            # No keyword list, so no balance for the strategy to set: the
+            # vector pool of the balanced strategy, as the vector candidates
+            query_embedding = self._embeddings_store.generate_query_embedding(variation_text)
+            vector_results = self._vector_search.search(
+                query_embedding=query_embedding,
+                max_results=max_results * STRATEGY_POOL_SIZES[RetrievalStrategy.BALANCED]["vector_factor"],
+                filters=filters,
+            )
+            return self._as_vector_candidates(vector_results)
+
         pool_sizes = STRATEGY_POOL_SIZES[strategy]
         bm25_top_k = max_results * pool_sizes["bm25_factor"]
         vector_top_k = max_results * pool_sizes["vector_factor"]
@@ -988,7 +1065,9 @@ class SearchService:
                 book=books_map[bid],
                 final_score=rrf_scores[bid],
                 rank=i + 1,
-                source="hybrid",
+                # Without a keyword list (vector mode) every result comes from
+                # the vector search, whatever the number of variations
+                source="hybrid" if self._candidates == CANDIDATES_HYBRID else "vector",
                 lexical_score=lexical_scores.get(bid),
                 vector_score=vector_scores.get(bid),
                 lexical_rank=lexical_ranks.get(bid),

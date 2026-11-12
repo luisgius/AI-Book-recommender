@@ -41,7 +41,10 @@ class SearchHit(BookSummary):
     """One search result: the book plus its position and scores."""
 
     rank: int = Field(description="Position in the result list, 1 is the best match")
-    score: float = Field(description="Hybrid score (Reciprocal Rank Fusion of keyword and semantic search)")
+    score: float = Field(
+        description="Retrieval score: the cosine similarity when retrieved_by is 'vector', the Reciprocal "
+        "Rank Fusion score when it is 'hybrid', the BM25 score when it is 'lexical'"
+    )
     keyword_score: Optional[float] = Field(
         default=None, description="BM25 keyword score, when keyword search found the book"
     )
@@ -70,8 +73,9 @@ class SearchBooksResult(BaseModel):
 
     query: str
     filters: AppliedFilters
-    search_mode: Literal["hybrid", "lexical_only"] = Field(
-        description="'lexical_only' when the semantic index was unavailable and only keyword search ran"
+    search_mode: Literal["vector_only", "hybrid", "lexical_only"] = Field(
+        description="'vector_only': semantic search supplied the candidates; 'hybrid': keyword and semantic "
+        "search were fused; 'lexical_only': semantic search was unavailable and only keyword search ran"
     )
     reranked: bool = Field(description="True when a cross-encoder re-ordered the top results")
     results: list[SearchHit]

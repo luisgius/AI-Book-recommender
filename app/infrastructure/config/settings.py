@@ -90,6 +90,8 @@ import re
 from dataclasses import dataclass
 from typing import Mapping, Optional, Union
 
+from app.domain.value_objects import CANDIDATE_MODES, CANDIDATES_VECTOR
+
 # Ollama listens on IPv4; "localhost" can resolve to ::1 first on macOS.
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 
@@ -712,6 +714,19 @@ LEXICAL_RANKINGS = ("bm25", "ts_rank_cd")
 VECTOR_SEARCH_MODES = ("approximate", "exact")
 DEFAULT_DATABASE_SCHEMA = "catalog"
 
+# Candidate stage of the search (SEARCH_CANDIDATES), the same in both profiles.
+# "vector" (default): vector search, then the reranker; BM25 only as the
+# fallback when the embedding or the vector search fails or the daily budget
+# of model-backed searches is spent. Chosen after the evaluation on the
+# deployed catalog (data/evaluation/CATALOG_EVALUATION.md, V14): nDCG@10
+# 0.798 for vector + reranker against 0.769 for hybrid + reranker, a
+# significant difference under both judges, which met the condition the
+# protocol declared in advance for leaving the hybrid fusion.
+# "hybrid": BM25 and vector search fused with RRF before the reranker, the
+# configuration of the earlier experiments (the evaluation modules build
+# their own SearchService with it and do not read this variable).
+DEFAULT_SEARCH_CANDIDATES = CANDIDATES_VECTOR
+
 # Postgres schema names used for catalogs: a plain lower-case identifier, so it
 # can be written into SQL without quoting and cannot inject anything.
 SCHEMA_NAME_PATTERN = r"^[a-z_][a-z0-9_]{0,62}$"
@@ -767,6 +782,10 @@ class SearchProfileSettings:
                              "ts_rank_cd" (Postgres full-text ranking)
         PG_VECTOR_SEARCH     "approximate" (default: ANN index) or "exact"
                              (index scans disabled, as in the evaluation)
+        SEARCH_CANDIDATES    "vector" (default: vector search then the
+                             reranker, BM25 only as the fallback) or "hybrid"
+                             (BM25 and vector fused with RRF first); both
+                             profiles (see DEFAULT_SEARCH_CANDIDATES)
         DATABASE_URL, DATABASE_URL_UNPOOLED: see database_url()
     """
 
@@ -774,6 +793,7 @@ class SearchProfileSettings:
     schema: str = DEFAULT_DATABASE_SCHEMA
     lexical_ranking: str = "bm25"
     vector_search: str = "approximate"
+    candidates: str = DEFAULT_SEARCH_CANDIDATES
 
     def __post_init__(self) -> None:
         if self.profile not in SEARCH_PROFILES:
@@ -790,6 +810,8 @@ class SearchProfileSettings:
             raise ValueError(
                 f"PG_VECTOR_SEARCH must be one of {VECTOR_SEARCH_MODES}, got '{self.vector_search}'"
             )
+        if self.candidates not in CANDIDATE_MODES:
+            raise ValueError(f"SEARCH_CANDIDATES must be one of {CANDIDATE_MODES}, got '{self.candidates}'")
 
     @property
     def is_cloud(self) -> bool:
@@ -797,11 +819,16 @@ class SearchProfileSettings:
         return self.profile == "cloud"
 
     def describe(self) -> dict:
-        """Public description for /health (no connection string)."""
+        """
+        Public description for /health (no connection string).
+
+        "candidates" tells the web page which pipeline to describe.
+        """
         if not self.is_cloud:
-            return {"name": self.profile}
+            return {"name": self.profile, "candidates": self.candidates}
         return {
             "name": self.profile,
+            "candidates": self.candidates,
             "schema": self.schema,
             "lexical_ranking": self.lexical_ranking,
             "vector_search": self.vector_search,
@@ -816,6 +843,7 @@ class SearchProfileSettings:
             schema=env.get("DATABASE_SCHEMA", "").strip() or DEFAULT_DATABASE_SCHEMA,
             lexical_ranking=env.get("PG_LEXICAL_RANKING", "").strip().lower() or "bm25",
             vector_search=env.get("PG_VECTOR_SEARCH", "").strip().lower() or "approximate",
+            candidates=env.get("SEARCH_CANDIDATES", "").strip().lower() or DEFAULT_SEARCH_CANDIDATES,
         )
 
 

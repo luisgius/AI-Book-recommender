@@ -11,9 +11,9 @@ DIRECT = "postgresql://user:secret@ep-x.example/db"
 
 def test_defaults_keep_the_local_profile():
     settings = SearchProfileSettings.from_env({})
-    assert settings == SearchProfileSettings("local", "catalog", "bm25", "approximate")
+    assert settings == SearchProfileSettings("local", "catalog", "bm25", "approximate", "vector")
     assert settings.is_cloud is False
-    assert settings.describe() == {"name": "local"}
+    assert settings.describe() == {"name": "local", "candidates": "vector"}
 
 
 def test_cloud_profile_from_env():
@@ -22,8 +22,8 @@ def test_cloud_profile_from_env():
         "PG_LEXICAL_RANKING": "TS_RANK_CD", "PG_VECTOR_SEARCH": "exact", "DATABASE_URL": POOLED,
     })
     assert settings.is_cloud
-    assert settings.describe() == {"name": "cloud", "schema": "eval177", "lexical_ranking": "ts_rank_cd",
-                                   "vector_search": "exact"}
+    assert settings.describe() == {"name": "cloud", "candidates": "vector", "schema": "eval177",
+                                   "lexical_ranking": "ts_rank_cd", "vector_search": "exact"}
     assert "secret" not in repr(settings)  # the connection string is never stored
 
 
@@ -33,10 +33,19 @@ def test_cloud_profile_from_env():
     {"DATABASE_SCHEMA": "x; DROP SCHEMA public"},
     {"PG_LEXICAL_RANKING": "tfidf"},
     {"PG_VECTOR_SEARCH": "fast"},
+    {"SEARCH_CANDIDATES": "bm25"},
 ])
 def test_invalid_values_are_rejected(env):
     with pytest.raises(ValueError):
         SearchProfileSettings.from_env(env)
+
+
+@pytest.mark.parametrize("profile", ["local", "cloud"])
+def test_search_candidates_default_to_vector_in_both_profiles_and_hybrid_is_selectable(profile):
+    assert SearchProfileSettings.from_env({"SEARCH_PROFILE": profile}).candidates == "vector"
+    hybrid = SearchProfileSettings.from_env({"SEARCH_PROFILE": profile, "SEARCH_CANDIDATES": " Hybrid "})
+    assert hybrid.candidates == "hybrid"
+    assert hybrid.describe()["candidates"] == "hybrid"
 
 
 def test_database_url_pooled_direct_and_fallback():
@@ -126,6 +135,17 @@ def test_health_reports_the_profile(cloud, monkeypatch):
         body = TestClient(app).get("/api/v1/health").json()
     finally:
         app.dependency_overrides.clear()
-    assert body["profile"] == {"name": "cloud", "schema": "eval177", "lexical_ranking": "ts_rank_cd",
-                               "vector_search": "exact"}
+    assert body["profile"] == {"name": "cloud", "candidates": "vector", "schema": "eval177",
+                               "lexical_ranking": "ts_rank_cd", "vector_search": "exact"}
     assert body["database"] == {"reachable": True, "latency_ms": 1.0} and body["status"] == "ok"
+
+
+@pytest.mark.parametrize("candidates", ["vector", "hybrid"])
+def test_the_search_service_takes_the_candidate_mode_of_the_settings(cloud, monkeypatch, candidates):
+    monkeypatch.setattr(deps, "_profile_settings",
+                        SearchProfileSettings("cloud", "eval177", "ts_rank_cd", "exact", candidates))
+    monkeypatch.setattr(deps, "get_llm_client", lambda: None)
+    monkeypatch.setattr(deps, "get_reranker", lambda: None)
+    monkeypatch.setattr(deps, "get_usage_budget", lambda: None)
+
+    assert deps.get_search_service().candidate_mode == candidates

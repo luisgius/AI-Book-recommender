@@ -127,7 +127,7 @@ def build_catalog_tools(search_service: SearchService, catalog_repo: BookCatalog
         min_year: Optional[int] = None,
         max_year: Optional[int] = None,
     ) -> str:
-        """Search the catalog with hybrid search (keywords + meaning).
+        """Search the catalog for books matching the query (search by meaning, in any language).
 
         Args:
             query: What to look for, e.g. "spanish civil war novel" or "recetas de pasta".

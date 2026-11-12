@@ -225,6 +225,23 @@ async def test_search_books_returns_compact_records_with_scores(client):
 
 
 @pytest.mark.anyio
+async def test_search_books_in_vector_mode_reports_semantic_retrieval_only(spy):
+    service = SearchService(FakeRepo(BOOKS, "lexical"), FakeRepo(BOOKS, "vector"), FakeEmbeddings(),
+                            llm_client=spy, candidates=value_objects.CANDIDATES_VECTOR)
+    server = create_mcp_server(MCPSettings(), search_service=lambda: service,
+                               catalog=lambda: FakeCatalog(CATALOG_BOOKS))
+    async with Client(server, raise_exceptions=True) as vector_client:
+        result = await vector_client.call_tool("search_books", {"query": "python", "max_results": 2})
+
+    body = result.structured_content
+    assert body["search_mode"] == "vector_only"
+    for hit in body["results"]:
+        assert hit["retrieved_by"] == "vector" and hit["keyword_score"] is None
+        assert hit["score"] == hit["semantic_score"]
+    assert spy.calls == []
+
+
+@pytest.mark.anyio
 async def test_search_books_applies_filters(client):
     result = await client.call_tool(
         "search_books", {"query": "python", "language": "ES", "min_year": 2010, "max_year": 2018})

@@ -539,7 +539,14 @@ def get_evaluate_settings() -> EvaluateEndpointSettings:
 
 
 def get_search_service() -> SearchService:
-    """Provide the Search Service with all dependencies wired."""
+    """
+    Provide the Search Service with all dependencies wired.
+
+    The candidate mode comes from SEARCH_CANDIDATES (SearchProfileSettings):
+    "vector" by default in both profiles, "hybrid" to fuse BM25 and vector
+    search with RRF as in the earlier experiments. The REST search, the MCP
+    server, the search agent's tools and the assistant all use this service.
+    """
     global _search_service
     if _search_service is None:
         _search_service = SearchService(
@@ -551,6 +558,7 @@ def get_search_service() -> SearchService:
             reranker=get_reranker(),
             rerank_depth=get_reranker_settings().depth,
             usage_budget=get_usage_budget(),
+            candidates=get_search_profile_settings().candidates,
         )
     return _search_service
 

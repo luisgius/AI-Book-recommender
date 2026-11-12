@@ -57,7 +57,7 @@ def ask_agent(
     """
     Answer a book request with the LangGraph search agent.
 
-    The agent searches the catalog with tools (hybrid search, book details,
+    The agent searches the catalog with tools (the search, book details,
     similar books), possibly several times, and recommends only books its
     tools returned. The response includes the tool-call trace.
 

@@ -143,7 +143,10 @@ class SearchResult(BaseModel):
     rank: int = Field(description="Position in the result list (1-indexed)")
 
     source: Literal['lexical', 'vector', 'hybrid'] = Field(
-        description="Which search method produced this result."
+        description=(
+            "Which search method produced this result: 'vector' (vector candidates, the default), "
+            "'hybrid' (BM25 and vector lists fused with RRF) or 'lexical' (BM25 alone, the fallback)."
+        )
     )
 
     lexical_score: float | None = Field(
@@ -166,13 +169,13 @@ class SearchResult(BaseModel):
         description=(
             "Cross-encoder relevance score (raw model output, higher is better) when "
             "the optional re-ranking stage scored this result; final_score keeps the "
-            "fusion score. Null without a reranker or beyond the re-ranking depth."
+            "retrieval score. Null without a reranker or beyond the re-ranking depth."
         ),
     )
 
     lexical_rank: int | None = Field(
         default=None, ge=1,
-        description="Position (1-based) in the keyword (BM25) list; null if that list did not return the book",
+        description="Position (1-based) in the keyword (BM25) list; null if that list did not return the book or did not run",
     )
     vector_rank: int | None = Field(
         default=None, ge=1,
@@ -223,7 +226,10 @@ class SearchResponse(BaseModel):
     )
     search_mode: Literal['hybrid', 'lexical_only', 'vector_only'] = Field(
         default="hybrid",
-        description="The search mode used"
+        description=(
+            "The search mode used: 'vector_only' (vector candidates, SEARCH_CANDIDATES=vector), "
+            "'hybrid' (BM25 and vector fused, SEARCH_CANDIDATES=hybrid) or 'lexical_only' (the fallback)"
+        )
     )
     latency_ms: float | None = Field(default=None, description="Search execution time in ms")
     metadata: SearchMetadata | None = Field(

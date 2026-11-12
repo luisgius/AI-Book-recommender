@@ -43,17 +43,20 @@ def search_books(
     service: SearchService = Depends(get_search_service),
 ) -> api.SearchResponse:
     """
-    Search for books using hybrid search (lexical + vector).
+    Search for books.
 
-    This endpoint performs a hybrid search combining BM25 lexical search
-    with semantic vector search, using Reciprocal Rank Fusion (RRF) to
-    merge results.
+    The candidates come from the vector search (SEARCH_CANDIDATES=vector,
+    the default) or from BM25 and vector search fused with Reciprocal Rank
+    Fusion (SEARCH_CANDIDATES=hybrid); the reranker, when configured, then
+    orders them. If the embedding or the vector search fails, or the daily
+    budget of model-backed searches is spent, BM25 alone answers and the
+    response says so (degraded, search_mode "lexical_only").
 
     With use_understanding=true the LLM first interprets the query (intent,
     filters, reformulation) and the search runs over several query
     variations (RAG retrieval step). With use_explanations=true the top
     results get grounded explanations (RAG generation step). Without a
-    configured LLM both options degrade to plain hybrid search.
+    configured LLM both options degrade to the plain search.
 
     Args:
         request: Search request with query text, filters, and options
@@ -152,7 +155,9 @@ def health_check(
     so "ready" only turns false after a failed load.
 
     "profile" names the adapters in use: "local" (SQLite, BM25, FAISS) or
-    "cloud" (Postgres schema, lexical ranking and vector search mode).
+    "cloud" (Postgres schema, lexical ranking and vector search mode), and
+    the candidate mode ("candidates": "vector" or "hybrid"), which the web
+    page reads to describe the pipeline this server runs.
     "database" (cloud profile) says whether Postgres answers a SELECT 1 now;
     "budget" lists the daily limits of a public deployment (None: no limit);
     "uptime_s" is the age of this process.
