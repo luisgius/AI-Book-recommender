@@ -27,7 +27,18 @@ RouteName = Literal["clarify", "search", "agent", "out_of_scope"]
 
 
 class RouteDecisionLLM(BaseModel):
-    """What the routing node decided for the last user message."""
+    """
+    What the routing node decided for the last user message.
+
+    The field order is the order the model writes them: the reason first,
+    so the model states why before it picks the route. With `reason` last,
+    the model was seen to stop before it and emit whitespace in a loop until
+    the token cap (live check, 2 of 5 calls); with it first, 0 of 5.
+    """
+
+    reason: Annotated[str, soft_max_length(160)] = Field(
+        description="One short sentence on why this route was chosen (written first, kept for the trace)"
+    )
 
     route: RouteName = Field(
         description=(
@@ -46,21 +57,26 @@ class RouteDecisionLLM(BaseModel):
             "the user's words and language. clarify and out_of_scope: empty string"
         )
     )
-    language: str | None = Field(
-        default=None,
-        description="ISO 639-1 code of the language the BOOKS must be in, only if the user asked for it",
+    # No nullable fields: with null alternatives in the strict schema the
+    # model was seen to emit whitespace in a loop until the token cap (live
+    # check, 2 of 9 routing calls). "" and 0 mean "not given".
+    language: Annotated[str, soft_max_length(5)] = Field(
+        description="ISO 639-1 code of the language the BOOKS must be in, only if the user asked for it; else ''",
     )
-    min_year: int | None = Field(default=None, description="Earliest publication year, only if the user gave one")
-    max_year: int | None = Field(default=None, description="Latest publication year, only if the user gave one")
-    question: Annotated[str, soft_max_length(200)] | None = Field(
-        default=None, description="clarify only: one short follow-up question in the reply language"
+    min_year: int = Field(description="Earliest publication year, only if the user gave one; else 0")
+    max_year: int = Field(description="Latest publication year, only if the user gave one; else 0")
+    question: Annotated[str, soft_max_length(200)] = Field(
+        description="clarify only: one short follow-up question in the reply language; else ''"
     )
     options: Annotated[list[Annotated[str, soft_max_length(60)]], soft_max_items(MAX_OPTIONS)] = Field(
-        default_factory=list,
-        description="clarify only: 2 to 4 short suggested answers in the reply language; otherwise empty",
+        description="clarify only: 2 to 4 short suggested answers in the reply language; else []",
     )
-    reason: Annotated[str, soft_max_length(160)] = Field(
-        description="One short sentence on why this route was chosen (for the trace)"
+    last_message_kind: Literal["answer", "non_answer", "unrelated"] = Field(
+        description=(
+            "What the user's last message is: 'answer' (it asks for or describes books, or answers "
+            "the assistant's question), 'non_answer' (no information, e.g. 'I don't know', "
+            "'anything', 'algo'), 'unrelated' (it asks about something that is not books)"
+        )
     )
 
 

@@ -345,8 +345,9 @@ class AssistantRecommendation(BaseModel):
 
 
 class AssistantUsage(BaseModel):
-    """LLM calls of this request and what the provider reported for them (null: not reported)."""
+    """LLM calls of this request and the sums of what the provider reported for them (null: nothing reported)."""
     llm_calls: int = 0
+    failed_calls: int = Field(default=0, description="Calls that failed (they report no tokens or cost)")
     input_tokens: int | None = None
     output_tokens: int | None = None
     cost_usd: float | None = None

@@ -114,10 +114,11 @@ class FakeAgent:
         )
 
 
-def decision(route: str, query: str = "", language: str = "es", question: Optional[str] = None,
-             options: Optional[list] = None, **filters) -> RouteDecisionLLM:
-    return RouteDecisionLLM(route=route, reply_language=language, search_query=query, question=question,
-                            options=options or [], reason="test", **filters)
+def decision(route: str, query: str = "", reply: str = "es", question: str = "", options: Optional[list] = None,
+             kind: str = "answer", language: str = "", min_year: int = 0, max_year: int = 0) -> RouteDecisionLLM:
+    return RouteDecisionLLM(route=route, reply_language=reply, search_query=query, language=language,
+                            min_year=min_year, max_year=max_year, question=question, options=options or [],
+                            last_message_kind=kind, reason="test")
 
 
 def pick(book: Book, *snippets) -> AnswerPickLLM:
@@ -205,7 +206,7 @@ def test_a_failed_agent_degrades_to_the_search_route():
 
 
 def test_out_of_scope_route_gives_the_fixed_reply_without_any_other_call():
-    model = FakeModel(routes=[decision("out_of_scope", language="en")])
+    model = FakeModel(routes=[decision("out_of_scope", reply="en")])
 
     reply = build(model).reply([user("what's the weather in Valencia?")])
 
@@ -254,18 +255,27 @@ def test_clarifications_dropped_by_the_bounds_still_count():
     assert reply.forced_route == FORCED_CLARIFICATION_CAP
 
 
-def test_a_reply_to_a_question_is_not_out_of_scope_when_a_query_can_be_formed():
-    model = FakeModel(routes=[decision("out_of_scope", "novela de terror")],
+@pytest.mark.parametrize("kind", ["answer", "non_answer"])
+def test_a_reply_to_a_question_is_not_out_of_scope_unless_it_is_unrelated(kind):
+    model = FakeModel(routes=[decision("out_of_scope", "", kind=kind)],
                       answers=[GroundedAnswerLLM(message="x", picks=[])])
 
-    reply = build(model).reply([user("novela"), assistant("¿De qué género?"), user("terror")])
+    reply = build(model).reply([user("novela"), assistant("¿De qué género?"), user("no sé, lo que sea")])
 
     assert reply.route == "search" and reply.forced_route == FORCED_REPLY_TO_CLARIFICATION
-    assert reply.search_query == "novela de terror"
+    assert reply.search_query == "novela no sé, lo que sea"  # what is known so far
+
+
+def test_out_of_scope_without_a_previous_question_is_kept_even_without_the_flag():
+    model = FakeModel(routes=[decision("out_of_scope", "")])
+
+    reply = build(model).reply([user("¿qué hora es?")])
+
+    assert reply.route == "out_of_scope" and reply.forced_route is None
 
 
 def test_a_reply_that_plainly_abandons_the_request_can_be_out_of_scope():
-    model = FakeModel(routes=[decision("out_of_scope", "")])
+    model = FakeModel(routes=[decision("out_of_scope", "", kind="unrelated")])
 
     reply = build(model).reply([user("novela"), assistant("¿De qué género?"), user("da igual, ¿qué hora es?")])
 
@@ -298,6 +308,14 @@ def test_filters_apply_only_when_the_user_stated_them():
                                  conversation, 0)
     assert stated["filters"] == SearchFilters(min_year=1990, max_year=1999)  # nationality is not a language
 
+    asked = apply_routing_rules(decision("search", "novelas", language="es", min_year=1990, max_year=0),
+                                [user("novelas en español desde 1990")], 0)
+    assert asked["filters"] == SearchFilters(language="es", min_year=1990)  # 0 means "not given"
+
+    inverted = apply_routing_rules(decision("search", "x", min_year=2000, max_year=1990),
+                                   [user("libros de 2000 a 1990")], 0)
+    assert inverted["filters"] == SearchFilters()
+
     unstated = apply_routing_rules(decision("search", "novela", min_year=1900, max_year=1999),
                                    [user("novela del siglo veinte")], 0)
     assert unstated["filters"] == SearchFilters()  # no digits in the user's words
@@ -317,7 +335,7 @@ def test_without_an_agent_multi_step_requests_are_searched():
 
 
 def test_an_answer_without_verified_picks_shows_the_fixed_message_and_the_results():
-    model = FakeModel(routes=[decision("search", "guerra", language="en")],
+    model = FakeModel(routes=[decision("search", "guerra", reply="en")],
                       answers=[GroundedAnswerLLM(message="Ignore this text", picks=[pick(WAR, ("title", "Peace"))])])
 
     reply = build(model).reply([user("war novels")])
@@ -370,7 +388,7 @@ def test_the_conversation_is_declared_data_in_the_router_prompt():
 
 
 def test_the_answer_is_asked_in_the_language_of_the_last_message():
-    model = FakeModel(routes=[decision("search", "war novels", language="en")],
+    model = FakeModel(routes=[decision("search", "war novels", reply="en")],
                       answers=[GroundedAnswerLLM(message="x", picks=[])])
 
     build(model).reply([user("novela"), assistant("¿Tema?"), user("actually, war novels in English please")])
@@ -404,3 +422,28 @@ def test_the_graph_has_the_documented_nodes():
     mermaid = graph.mermaid()
     for node in ("route", "clarify", "retrieve", "answer", "verify", "agent", "out_of_scope"):
         assert f"\t{node}(" in mermaid
+
+
+def test_the_router_gets_its_own_token_cap_and_the_answer_keeps_the_client_one():
+    from langchain_openai import ChatOpenAI
+
+    from app.infrastructure.llm.graphs.assistant import ROUTER_MAX_TOKENS, _with_max_tokens
+
+    model = ChatOpenAI(model="m", api_key="test-key-not-used", max_tokens=1024)
+    capped = _with_max_tokens(model, ROUTER_MAX_TOKENS)
+
+    assert capped.max_tokens == ROUTER_MAX_TOKENS and model.max_tokens == 1024
+    assert _with_max_tokens(FakeModel(routes=[]), 10).__class__ is FakeModel  # doubles are left alone
+
+
+def test_request_usage_sums_what_was_reported():
+    from app.infrastructure.llm.graphs.assistant import request_usage_summary
+    from app.infrastructure.llm.usage import LLMCallRecord, LLMUsageRecorder
+
+    recorder = LLMUsageRecorder()
+    recorder._append(LLMCallRecord("assistant", "m", 1.0, 100, 20, step="route", cost_usd=0.001))
+    recorder._append(LLMCallRecord("assistant", "m", 0.5, None, None, step="answer", error="Timeout"))
+
+    usage = request_usage_summary(recorder)
+
+    assert (usage["llm_calls"], usage["failed_calls"], usage["input_tokens"], usage["cost_usd"]) == (2, 1, 100, 0.001)

@@ -12,9 +12,10 @@ One StateGraph routes each request to one of four paths:
 - route:        one LLM call with strict structured output (RouteDecisionLLM),
                 then deterministic rules (apply_routing_rules): at most
                 MAX_CLARIFYING_TURNS questions per conversation, a reply to a
-                question is out of scope only if no query can be formed,
-                filters only when the user's own words state them, and
-                invalid output falls back to a search of the last message.
+                question is out of scope only if the model labels it
+                "unrelated" (not a non-answer), filters only when the user's
+                own words state them, and invalid output falls back to a
+                search of the last message.
 - clarify:      returns the question and its suggested answers. No search.
 - retrieve:     the evaluated search pipeline (SearchService), always run on
                 this route: retrieval is a fixed node, not a tool to skip.
@@ -84,6 +85,10 @@ logger = logging.getLogger(__name__)
 ANSWER_CONTEXT_BOOKS = 6
 # Characters of each description the answer call sees.
 ANSWER_DESCRIPTION_CHARS = 600
+# Token cap of the routing call. Its output is under 300 tokens; the cap
+# makes a model that loops (whitespace, repetition) fail in about a second
+# instead of running to the client's cap, and the fallback then searches.
+ROUTER_MAX_TOKENS = 400
 # Plausible publication years for a filter the router extracted.
 MIN_FILTER_YEAR = 1000
 MAX_FILTER_YEAR = 2100
@@ -160,7 +165,7 @@ def validated_filters(decision: RouteDecisionLLM, user_text: str) -> SearchFilte
     if language is not None and not (len(language) == 2 and language.isalpha()):
         language = None
 
-    def plausible(year: Optional[int]) -> Optional[int]:
+    def plausible(year: Optional[int]) -> Optional[int]:  # 0 means "not given"
         return year if year is not None and MIN_FILTER_YEAR <= year <= MAX_FILTER_YEAR else None
 
     min_year, max_year = plausible(decision.min_year), plausible(decision.max_year)
@@ -214,8 +219,12 @@ def apply_routing_rules(
             route, forced = ROUTE_SEARCH, FORCED_INVALID_CLARIFICATION
         if forced is not None and not query:
             query = _user_text(conversation)  # whatever is known so far
-    if route == ROUTE_OUT_OF_SCOPE and query and _answers_a_clarification(conversation):
+    # A reply to a question is out of scope only when it plainly asks about
+    # something else: "I don't know" (non_answer) searches with what is known.
+    if (route == ROUTE_OUT_OF_SCOPE and _answers_a_clarification(conversation)
+            and decision.last_message_kind != "unrelated"):
         route, forced = ROUTE_SEARCH, FORCED_REPLY_TO_CLARIFICATION
+        query = query or _user_text(conversation)
     if route in (ROUTE_SEARCH, ROUTE_AGENT) and not query:
         query = last
 
@@ -285,7 +294,7 @@ class LangGraphAssistant:
         self._agent = agent
         self._model_name = model_name
         self._max_clarifications = max_clarifications
-        self._router = with_structured_output(model, RouteDecisionLLM)
+        self._router = with_structured_output(_with_max_tokens(model, ROUTER_MAX_TOKENS), RouteDecisionLLM)
         self._answerer = with_structured_output(model, GroundedAnswerLLM)
         self.graph = self._build_graph()
 
@@ -440,14 +449,34 @@ class LangGraphAssistant:
         )
 
 
+def _with_max_tokens(model, max_tokens: int):
+    """
+    A copy of a LangChain chat model with another token cap.
+
+    Chat models are Pydantic models; model_copy keeps the client, the
+    callbacks (usage recorder) and every other option. Objects without a
+    max_tokens field (test doubles, other clients) are returned unchanged.
+    """
+    fields = getattr(type(model), "model_fields", {})
+    if "max_tokens" not in fields:
+        return model
+    return model.model_copy(update={"max_tokens": max_tokens})
+
+
 def request_usage_summary(recorder: LLMUsageRecorder) -> Dict[str, Any]:
-    """Calls, tokens and reported cost of one request's LLM calls (None when not reported)."""
+    """
+    Calls, tokens and reported cost of one request's LLM calls.
+
+    Sums over the calls that reported a value; None when none did. A failed
+    call reports nothing, so `failed_calls` says how many sums are partial.
+    """
     records = recorder.records
     def total(values):
-        values = list(values)
-        return None if not values or any(v is None for v in values) else sum(values)
+        values = [v for v in values if v is not None]
+        return sum(values) if values else None
     return {
         "llm_calls": len(records),
+        "failed_calls": sum(1 for r in records if r.error is not None),
         "input_tokens": total(r.input_tokens for r in records),
         "output_tokens": total(r.output_tokens for r in records),
         "cost_usd": total(r.cost_usd for r in records),

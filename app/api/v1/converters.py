@@ -273,6 +273,7 @@ def domain_reply_to_api(reply: domain.AssistantReply, latency_ms: float) -> api.
         model=reply.model,
         usage=api.AssistantUsage(
             llm_calls=usage.get("llm_calls", 0),
+            failed_calls=usage.get("failed_calls", 0),
             input_tokens=usage.get("input_tokens"),
             output_tokens=usage.get("output_tokens"),
             cost_usd=usage.get("cost_usd"),

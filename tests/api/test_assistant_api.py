@@ -123,7 +123,8 @@ def test_search_reply_contract(client_with):
     assert body["recommendations"][0]["citations"] == [
         {"field": "description", "snippet": "a whale", "relevance_score": 0.9}]
     assert body["timings_ms"] == {"route": 800.0, "retrieve": 120.0, "answer": 900.0, "verify": 0.1}
-    assert body["usage"] == {"llm_calls": 2, "input_tokens": 1500, "output_tokens": 200, "cost_usd": 0.0004}
+    assert body["usage"] == {"llm_calls": 2, "failed_calls": 0, "input_tokens": 1500, "output_tokens": 200,
+                             "cost_usd": 0.0004}
     assert body["options"] == [] and body["steps"] == [] and body["notices"] == []
     assert "latency_ms" in body
 
