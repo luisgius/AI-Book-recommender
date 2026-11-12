@@ -67,6 +67,18 @@ Embedding environment variables (all optional):
     EMBEDDING_OPENROUTER_PROVIDER  openrouter only: upstream provider to pin
                           (e.g. deepinfra), so every vector comes from the same
                           endpoint; default: OpenRouter's routing
+    EMBEDDING_OPENROUTER_ZDR  openrouter only: "true" (default) routes every
+                          request only to Zero Data Retention endpoints
+                          (provider.zdr); "false" lets OpenRouter use any
+    EMBEDDING_HEDGE_PROVIDER  openrouter only: second provider of hedged query
+                          embeddings (cloud default with the cloud model:
+                          nebius); "none" sends one request, as before
+    EMBEDDING_HEDGE_AFTER_S   seconds before the second provider is asked
+                          (default 1.0; at once if the first request fails)
+    EMBEDDING_HEDGE_PRIMARY_AGAIN_S  seconds before one more request to the
+                          pinned provider (default 2.5; "none": no such request)
+    EMBEDDING_QUERY_CACHE_SIZE  query vectors kept per process, by exact text
+                          (cloud default 256; 0: no cache)
 
 Re-ranking environment variables (all optional):
     RERANKER_PROVIDER     "local" (default: cross-encoder in this process) or
@@ -165,6 +177,19 @@ CLOUD_EMBEDDING_OPENROUTER_PROVIDER = "deepinfra"
 CLOUD_RERANKER_PROVIDER = "openrouter"
 CLOUD_RERANKER_MODEL = "qwen/qwen3-reranker-8b"
 CLOUD_RERANKER_OPENROUTER_PROVIDER = "primeintellect"
+
+# Hedged query embeddings of the cloud profile (V23 investigation,
+# data/evaluation/catalog50k/investigation/FINDINGS.md, question 2): DeepInfra
+# first, Nebius if DeepInfra has not answered after 1.0 s, DeepInfra again at
+# 2.5 s, within the 5 s query deadline (API_QUERY_DEADLINE_S). Measured: 0 of
+# 540 calls failed against 3 of 540 for one provider, same median latency,
+# about 0.17 extra requests per search. Nebius query vectors are usable
+# against the stored DeepInfra documents (nDCG@10 0.689 against 0.682).
+CLOUD_EMBEDDING_HEDGE_PROVIDER = "nebius"
+DEFAULT_EMBEDDING_HEDGE_AFTER_S = 1.0
+DEFAULT_EMBEDDING_HEDGE_PRIMARY_AGAIN_S = 2.5
+# Query vectors kept per process in the cloud profile (a few hundred searches)
+CLOUD_EMBEDDING_QUERY_CACHE_SIZE = 256
 
 # Torch device families accepted for EMBEDDING_DEVICE ("cuda:1" is also valid).
 SUPPORTED_EMBEDDING_DEVICES = ("cpu", "mps", "cuda")
@@ -462,6 +487,11 @@ class EmbeddingSettings:
     provider: str = "local"  # EMBEDDING_PROVIDER: "local" or "openrouter"
     dimensions: Optional[int] = None  # openrouter only: output dimension (MRL models)
     openrouter_provider: Optional[str] = None  # openrouter only: upstream provider to pin
+    openrouter_zdr: bool = False  # openrouter only: Zero Data Retention endpoints only
+    hedge_provider: Optional[str] = None  # openrouter only: second provider of query embeddings
+    hedge_after_s: float = DEFAULT_EMBEDDING_HEDGE_AFTER_S
+    hedge_primary_again_s: Optional[float] = DEFAULT_EMBEDDING_HEDGE_PRIMARY_AGAIN_S
+    query_cache_size: int = 0  # query vectors kept per process (0: none)
 
     def __post_init__(self) -> None:
         if self.provider not in SUPPORTED_MODEL_PROVIDERS:
@@ -485,6 +515,20 @@ class EmbeddingSettings:
             )
         if self.dimensions is not None and self.dimensions < 1:
             raise ValueError(f"EMBEDDING_DIMENSIONS must be >= 1, got {self.dimensions}")
+        if self.provider == "local" and (self.openrouter_zdr or self.hedge_provider):
+            raise ValueError("EMBEDDING_OPENROUTER_ZDR and EMBEDDING_HEDGE_PROVIDER apply only to "
+                             "EMBEDDING_PROVIDER=openrouter")
+        if self.hedge_provider:
+            if not self.openrouter_provider:
+                raise ValueError("EMBEDDING_HEDGE_PROVIDER needs EMBEDDING_OPENROUTER_PROVIDER (the first request's)")
+            if self.hedge_provider == self.openrouter_provider:
+                raise ValueError("EMBEDDING_HEDGE_PROVIDER must differ from EMBEDDING_OPENROUTER_PROVIDER")
+        if self.hedge_after_s < 0:
+            raise ValueError(f"EMBEDDING_HEDGE_AFTER_S must be >= 0, got {self.hedge_after_s}")
+        if self.hedge_primary_again_s is not None and self.hedge_primary_again_s < 0:
+            raise ValueError(f"EMBEDDING_HEDGE_PRIMARY_AGAIN_S must be >= 0, got {self.hedge_primary_again_s}")
+        if self.query_cache_size < 0:
+            raise ValueError(f"EMBEDDING_QUERY_CACHE_SIZE must be >= 0, got {self.query_cache_size}")
 
     @classmethod
     def from_env(cls, env: Optional[Mapping[str, str]] = None) -> "EmbeddingSettings":
@@ -515,12 +559,26 @@ class EmbeddingSettings:
             CLOUD_EMBEDDING_OPENROUTER_PROVIDER if cloud_choice else None
         )
         device = env.get("EMBEDDING_DEVICE", "").strip().lower() or None
+        api = provider == "openrouter"
+        hedge = env.get("EMBEDDING_HEDGE_PROVIDER", "").strip().lower()
+        if hedge == "none":
+            hedge_provider = None
+        else:
+            hedge_provider = hedge or (CLOUD_EMBEDDING_HEDGE_PROVIDER
+                                       if cloud_choice and pinned == CLOUD_EMBEDDING_OPENROUTER_PROVIDER else None)
+        again = env.get("EMBEDDING_HEDGE_PRIMARY_AGAIN_S", "").strip().lower()
+        cache = _optional_int(env.get("EMBEDDING_QUERY_CACHE_SIZE", ""), "EMBEDDING_QUERY_CACHE_SIZE")
         return cls(
             model=model,
             device=device,
             provider=provider,
             dimensions=dimensions,
             openrouter_provider=pinned,
+            openrouter_zdr=api and _flag(env, "EMBEDDING_OPENROUTER_ZDR", True),
+            hedge_provider=hedge_provider,
+            hedge_after_s=float(env.get("EMBEDDING_HEDGE_AFTER_S", "").strip() or DEFAULT_EMBEDDING_HEDGE_AFTER_S),
+            hedge_primary_again_s=None if again == "none" else float(again or DEFAULT_EMBEDDING_HEDGE_PRIMARY_AGAIN_S),
+            query_cache_size=cache if cache is not None else (CLOUD_EMBEDDING_QUERY_CACHE_SIZE if cloud and api else 0),
         )
 
 

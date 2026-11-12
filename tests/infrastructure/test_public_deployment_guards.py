@@ -226,7 +226,8 @@ def test_query_embeddings_use_the_short_deadlines_and_documents_the_long_ones(mo
             data = [{"index": i, "embedding": [0.1] * 1024} for i in range(len(body["input"]))]
             return ApiResponse({"data": data, "usage": {}}, 0.01, 1)
 
-    settings = EmbeddingSettings.from_env({"SEARCH_PROFILE": "cloud"})
+    # The single-request policy (the hedge has its own tests, test_openrouter_hedge.py)
+    settings = EmbeddingSettings.from_env({"SEARCH_PROFILE": "cloud", "EMBEDDING_HEDGE_PROVIDER": "none"})
     query_settings = ApiQuerySettings.from_env({"SEARCH_PROFILE": "cloud"})
     encoder = OpenRouterEmbeddingEncoder.from_settings(settings, query_settings=query_settings)
     http = RecordingHttp()

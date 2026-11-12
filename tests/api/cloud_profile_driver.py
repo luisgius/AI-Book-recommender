@@ -127,7 +127,40 @@ def _fake_post(self, path, body, **call_options):
     raise AssertionError(f"unexpected OpenRouter path {path}")
 
 
+def _fake_post_first(self, path, legs, *, deadline_s):
+    """HedgedPoster.post_first without network: the first leg (DeepInfra) answers at once."""
+    from app.infrastructure.search.openrouter_hedge import NOT_SENT, HedgedResponse, LegOutcome
+
+    # The cloud defaults: DeepInfra, Nebius after 1 s, DeepInfra again at 2.5 s, 5 s deadline,
+    # every request restricted to Zero Data Retention endpoints
+    assert path == "embeddings" and deadline_s == 5.0
+    assert [(leg.start_s, leg.label) for leg in legs] == [(0.0, "deepinfra"), (1.0, "nebius"), (2.5, "deepinfra")]
+    assert all(leg.body["provider"]["zdr"] is True for leg in legs)
+    body = legs[0].body
+    assert body.get("dimensions") == DIM and body["provider"]["order"] == ["deepinfra"]
+    data = [{"index": i, "embedding": [1.0, 0.05] + [0.0] * (DIM - 2)} for i, _ in enumerate(body["input"])]
+    answer = {"data": data, "usage": {"prompt_tokens": 7, "cost": 1e-7}}
+    outcomes = [LegOutcome(label="deepinfra", sent=True, started_s=0.0, latency_s=0.01, body=answer)]
+    outcomes += [LegOutcome(label=leg.label, error=NOT_SENT) for leg in legs[1:]]
+    return HedgedResponse(answer, 0.01, "deepinfra", outcomes)
+
+
+def _block_network() -> None:
+    """Any connection to an address other than this machine fails (the fakes must answer everything)."""
+    import socket
+
+    real_getaddrinfo = socket.getaddrinfo
+
+    def getaddrinfo(host, *args, **kwargs):
+        if host not in (None, "localhost", "127.0.0.1", "::1", "testserver"):
+            raise OSError(f"network blocked in the cloud profile driver: {host}")
+        return real_getaddrinfo(host, *args, **kwargs)
+
+    socket.getaddrinfo = getaddrinfo
+
+
 def main(argv) -> int:
+    _block_network()
     if "--block" in argv:
         sys.meta_path.insert(0, _BlockModelLibraries())
 
@@ -137,7 +170,10 @@ def main(argv) -> int:
     from app.api.v1 import dependencies as deps
     from app.infrastructure.search.openrouter_http import OpenRouterHttp
 
+    from app.infrastructure.search.openrouter_hedge import HedgedPoster
+
     OpenRouterHttp.post = _fake_post
+    HedgedPoster.post_first = _fake_post_first
     deps.load_dotenv = lambda *args, **kwargs: False  # the caller's environment only, never the repository's .env
     deps._postgres_database = FakeDatabase()
     client = TestClient(app.main.app)
