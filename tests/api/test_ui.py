@@ -66,8 +66,8 @@ def _static(name: str) -> str:
 def test_ui_offers_example_queries_in_several_languages():
     """Clickable examples let an examiner try the system at once, in more than one language."""
     page, script = _static("index.html"), _static("app.js")
-    assert 'id="search-examples"' in page and 'id="agent-examples"' in page
-    assert "SEARCH_EXAMPLES" in script and "AGENT_EXAMPLES" in script
+    assert 'id="search-examples"' in page and 'id="assistant-examples"' in page
+    assert "SEARCH_EXAMPLES" in script and "ASSISTANT_EXAMPLES" in script
     import re
 
     languages = set(re.findall(r'lang: "([a-z]{2})"', script))
@@ -77,8 +77,8 @@ def test_ui_offers_example_queries_in_several_languages():
 def test_ui_shows_a_waiting_state_that_mentions_the_cold_start():
     """A slow first request shows a plain-language waiting state with a cancel button."""
     page, script = _static("index.html"), _static("app.js")
-    assert 'id="search-wait"' in page and 'id="agent-wait"' in page
-    assert 'id="search-cancel"' in page and 'id="agent-cancel"' in page
+    assert 'id="search-wait"' in page and 'id="assistant-wait"' in page
+    assert 'id="search-cancel"' in page and 'id="assistant-cancel"' in page
     assert "AbortController" in script and "COLD_START_HINT" in script and "10 y 20 segundos" in script
 
 
@@ -100,21 +100,19 @@ def test_ui_shows_why_each_result_was_returned():
     assert "stageRanks" in script and "Reordenador" in script
 
 
-def test_ui_has_an_agent_mode_with_answer_books_and_steps():
-    """The agent endpoint is reachable from the UI and its tool-call trace is shown."""
-    page, script = _static("index.html"), _static("app.js")
-    assert 'id="tab-agent"' in page and "Preguntar al agente" in page
-    assert 'id="agent-answer"' in page and 'id="agent-books"' in page and 'id="agent-steps"' in page
-    assert '"/agent/ask"' in script
+def test_ui_agent_steps_name_the_books_each_tool_returned():
+    """The agent's trace (shown in the assistant's routing detail) lists the books of each tool call."""
+    script = _static("app.js")
     for tool in ("search_books", "get_book_details", "find_similar_books"):
         assert tool in script
-    assert "dropped_recommendations" in script and "reflections" in script
+    assert "step.books" in script and "tool-books" in script
 
 
-def test_ui_agent_books_open_the_same_detail_view_as_search_results():
+def test_ui_assistant_books_open_the_same_detail_view_as_search_results():
     page, script = _static("index.html"), _static("app.js")
     assert 'id="book-dialog"' in page
-    assert script.count("openBook(") >= 3  # definition, search results, agent recommendations
+    # The assistant reuses the search result card (title opens the dialog) for its books
+    assert script.count("openBook(") >= 2 and "renderResult(result, ranks, \"search\", searchMode)" in script
 
 
 def test_ui_explains_the_pipeline_with_an_inline_diagram():
@@ -153,3 +151,114 @@ def test_ui_static_files_load_nothing_from_other_hosts():
     assert "@import" not in style and not re.search(r"url\(\s*['\"]?https?:", style)
     assert not re.search(r"fetch\(\s*['\"`]https?:", script)
     assert 'const API = "/api/v1"' in script
+
+
+# ---------------------------------------------------------------------------
+# V20: assistant mode (POST /assistant/chat), true stage positions, explanations
+# ---------------------------------------------------------------------------
+
+
+def test_ui_assistant_mode_replaces_the_agent_mode():
+    page, script = _static("index.html"), _static("app.js")
+    assert 'id="tab-assistant"' in page and 'id="panel-assistant"' in page
+    assert 'id="tab-agent"' not in page and "Preguntar al agente" not in page
+    assert '"/assistant/chat"' in script and '"/agent/ask"' not in script
+    assert 'id="chat-thread"' in page and 'id="chat-input"' in page and 'id="chat-new"' in page
+
+
+def test_ui_assistant_examples_cover_the_three_kinds_of_request_in_several_languages():
+    import re
+
+    script = _static("app.js")
+    block = script[script.index("const ASSISTANT_EXAMPLES"):script.index("];", script.index("const ASSISTANT_EXAMPLES"))]
+    assert len(re.findall(r"\{ text:", block)) == 3
+    assert len(set(re.findall(r'lang: "([a-z]{2})"', block))) == 3
+
+
+def test_ui_keeps_the_conversation_in_memory_and_echoes_each_route():
+    """No browser storage; the whole conversation is sent and each assistant turn carries its route."""
+    page, script = _static("index.html"), _static("app.js")
+    for storage in ("localStorage", "sessionStorage", "indexedDB", "document.cookie"):
+        assert storage not in script
+    assert "JSON.stringify({ messages: conversation })" in script
+    assert 'role: "assistant", content: response.message' in script and "route: response.route" in script
+    assert "no se guarda en el navegador ni en el servidor" in " ".join(page.split())
+
+
+def test_ui_follows_the_server_limits_of_the_conversation():
+    """The page's limits are the API's (50 messages) and what the assistant reads of a message (500 characters)."""
+    import re
+
+    from app.api.v1.schemas import MAX_REQUEST_MESSAGES
+    from app.domain.value_objects import MAX_CLARIFYING_TURNS, MAX_MESSAGE_CHARS
+
+    page, script = _static("index.html"), _static("app.js")
+    assert f"const MAX_CHAT_MESSAGES = {MAX_REQUEST_MESSAGES};" in script
+    assert f"const MAX_CHAT_CHARS = {MAX_MESSAGE_CHARS};" in script
+    assert f"const MAX_CLARIFYING_TURNS = {MAX_CLARIFYING_TURNS};" in script
+    textarea = re.search(r'<textarea id="chat-input"[^>]*>', page).group(0)
+    assert f'maxlength="{MAX_MESSAGE_CHARS}"' in textarea
+
+
+def test_ui_shows_clarifying_options_as_buttons_that_send_the_answer():
+    script = _static("app.js")
+    assert 'response.route === "clarify"' in script and "renderOptions(response.options)" in script
+    assert "sendChat(option)" in script
+
+
+def test_ui_routing_detail_covers_every_node_and_forced_route():
+    """Each reply shows the path through the graph with node times, forced routes, the query, filters and steps."""
+    import re
+
+    script = _static("app.js")
+    graph = (Path(UI_DIR).parents[1] / "infrastructure" / "llm" / "graphs" / "assistant.py").read_text(encoding="utf-8")
+    nodes = set(re.findall(r'add_node\("([a-z_]+)"', graph))
+    forced = set(re.findall(r'^FORCED_[A-Z_]+ = "([a-z_]+)"', graph, re.M))
+    assert nodes and forced
+    for node in nodes:
+        assert f"{node}:" in script.split("const NODE_NAMES")[1].split("};")[0]
+    for reason in forced:
+        assert f"{reason}:" in script.split("const FORCED_ROUTE_TEXT")[1].split("};")[0]
+    assert 'el("details", "route-detail")' in script
+    for field in ("timings_ms", "forced_route", "search_query", "filters", "response.steps", "usage"):
+        assert field in script
+
+
+def test_ui_handles_every_outcome_of_the_assistant_endpoint():
+    """Degraded replies (no LLM, budget spent), notices of the graph, 400, 422, 429, 503 and cancellation."""
+    script = _static("app.js")
+    for code in ("llm_unavailable", "llm_budget_spent", "assistant_answer_failed", "agent_failed"):
+        assert code in script.split("const ASSISTANT_NOTICE_TEXT")[1].split("};")[0]
+    assert "ASSISTANT_ERRORS" in script
+    for status in ("400:", "422:", "503:"):
+        assert status in script.split("const ASSISTANT_ERRORS")[1].split("};")[0]
+    assert "s === 429" in script and 'error.name === "AbortError"' in script
+    assert "15 y 60 segundos" in script  # the slow agent route
+
+
+def test_ui_announces_new_replies_without_moving_focus():
+    page, script = _static("index.html"), _static("app.js")
+    assert 'id="chat-live"' in page and 'aria-live="polite"' in page
+    assert "announce(replySummary(response))" in script
+    assert "keepFocus: true" in script and "aria-disabled" in script
+
+
+def test_ui_uses_the_true_stage_positions_and_flags_approximations_only_without_them():
+    script = _static("app.js")
+    for field in ("lexical_rank", "vector_rank", "rerank_rank"):
+        assert field in script
+    assert script.count("Puestos aproximados") == 1  # only in the branch for a server without positions
+
+
+def test_ui_no_longer_strips_citation_markers():
+    """The server stores explanations without [CITE: ...] markers, so the page shows the text as it comes."""
+    assert "CITE" not in _static("app.js")
+
+
+def test_ui_explains_the_assistant_graph_with_an_inline_diagram():
+    page = _static("index.html")
+    assert 'id="graph-title"' in page and page.count('role="img"') >= 2
+    for node in ("route", "clarify", "retrieve", "answer", "verify", "agent", "out_of_scope"):
+        assert node in page.split('id="graph-title"')[1].split("</svg>")[0]
+    for name in ("Enrutar", "Preguntar", "Buscar", "Responder", "Verificar", "Agente", "Fuera de ámbito"):
+        assert f"<strong>{name}" in page

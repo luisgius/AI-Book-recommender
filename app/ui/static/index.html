@@ -23,7 +23,7 @@
   <main id="main">
     <div class="modes" role="tablist" aria-label="Modo">
       <button type="button" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Buscar libros</button>
-      <button type="button" role="tab" id="tab-agent" aria-controls="panel-agent" aria-selected="false" tabindex="-1">Preguntar al agente</button>
+      <button type="button" role="tab" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false" tabindex="-1">Conversar con el asistente</button>
     </div>
 
     <!-- Search mode: hybrid search with optional LLM steps -->
@@ -109,50 +109,47 @@
       </div>
     </section>
 
-    <!-- Agent mode: LangGraph agent that calls the search tools -->
-    <section id="panel-agent" role="tabpanel" aria-labelledby="tab-agent" class="mode-panel" hidden>
-      <form id="agent-form" class="query-form" autocomplete="off">
-        <div class="query-row agent-row">
-          <label for="agent-question" class="query-label">Tu pregunta</label>
-          <textarea id="agent-question" name="question" rows="2" required minlength="3" maxlength="500"
-                    placeholder="p. ej. Busco una novela clásica sobre la culpa, mejor en español"></textarea>
-          <button type="submit" id="agent-button" class="primary">Preguntar</button>
+    <!-- Assistant mode: the LangGraph assistant (POST /assistant/chat) -->
+    <section id="panel-assistant" role="tabpanel" aria-labelledby="tab-assistant" class="mode-panel" hidden>
+      <p class="assistant-intro">Pide libros como se los pedirías a un bibliotecario. Un grafo LangGraph decide, en cada
+        mensaje, si hace falta una pregunta antes de recomendar, si basta una búsqueda o si conviene que el agente haga
+        varias; debajo de cada respuesta puedes abrir el recorrido que siguió.</p>
+      <p id="assistant-off-note" class="message notice" hidden></p>
+
+      <div id="assistant-output" class="output">
+        <ol id="chat-thread" class="thread" aria-label="Conversación"></ol>
+        <div id="empty-assistant" class="empty">
+          <p>Todavía no hay mensajes. Escribe abajo o empieza con uno de los ejemplos.</p>
         </div>
-        <div class="examples" role="group" aria-labelledby="agent-examples-label">
-          <span id="agent-examples-label" class="examples-label">Prueba con:</span>
-          <ul id="agent-examples" class="example-list"></ul>
+        <div id="assistant-wait" class="wait" role="status" aria-live="polite" hidden>
+          <p class="wait-main"></p>
+          <p class="wait-hint"></p>
+          <button type="button" class="link-button" id="assistant-cancel">Cancelar</button>
         </div>
-        <p class="field-note">El agente decide qué herramientas de búsqueda usar, puede buscar varias veces y solo
-          recomienda libros que esas herramientas le han devuelto. Cada pregunta consume una petición al LLM.</p>
-        <p id="agent-off-note" class="message notice" hidden></p>
+        <div id="assistant-message" class="message" role="alert" hidden></div>
+        <!-- Each new reply is read out here; focus stays where the user left it. -->
+        <p id="chat-live" class="sr-only" role="status" aria-live="polite"></p>
+      </div>
+
+      <form id="chat-form" class="query-form chat-form" autocomplete="off">
+        <div class="query-row chat-row">
+          <label for="chat-input" class="query-label">Tu mensaje</label>
+          <textarea id="chat-input" name="message" rows="2" required maxlength="500"
+                    aria-describedby="chat-privacy chat-count"
+                    placeholder="p. ej. Busco una novela sobre la guerra civil española"></textarea>
+          <button type="submit" id="chat-send" class="primary">Enviar</button>
+        </div>
+        <div class="chat-meta">
+          <p id="chat-privacy" class="field-note">La conversación solo existe en esta página: no se guarda en el navegador
+            ni en el servidor, se envía completa a la API en cada mensaje y se pierde al recargar.</p>
+          <p id="chat-count" class="field-note chat-count" aria-live="off"></p>
+          <button type="button" class="secondary" id="chat-new">Nueva conversación</button>
+        </div>
+        <div class="examples" role="group" aria-labelledby="assistant-examples-label">
+          <span id="assistant-examples-label" class="examples-label">Empieza con:</span>
+          <ul id="assistant-examples" class="example-list"></ul>
+        </div>
       </form>
-
-      <div id="agent-output" class="output">
-      <div id="agent-wait" class="wait" role="status" aria-live="polite" hidden>
-        <p class="wait-main"></p>
-        <p class="wait-hint"></p>
-        <button type="button" class="link-button" id="agent-cancel">Cancelar</button>
-      </div>
-      <div id="agent-message" class="message" role="alert" hidden></div>
-
-      <article id="agent-result" class="agent-result" hidden>
-        <h2 class="section-title">Respuesta</h2>
-        <p id="agent-answer" class="agent-answer" tabindex="-1"></p>
-        <p id="agent-meta" class="agent-meta"></p>
-
-        <h2 class="section-title">Libros que recomienda</h2>
-        <p id="agent-dropped" class="field-note" hidden></p>
-        <ol id="agent-books" class="agent-books"></ol>
-
-        <h2 class="section-title">Pasos que ha seguido</h2>
-        <p class="field-note">Llamadas a herramientas, en el orden en que el agente las hizo (traza ReAct del grafo LangGraph).</p>
-        <ol id="agent-steps" class="steps"></ol>
-      </article>
-      <div id="empty-agent" class="empty">
-        <p>Haz una pregunta como se la harías a un bibliotecario. Verás la respuesta, los libros que cita y cada
-          búsqueda que hizo para llegar a ella.</p>
-      </div>
-      </div>
     </section>
 
     <!-- How the pipeline works -->
@@ -205,9 +202,57 @@
         </ol>
       </div>
       <p id="how-config" class="field-note"></p>
-      <p class="field-note">El modo <em>Preguntar al agente</em> usa estas mismas etapas como herramientas: un grafo
-        LangGraph deja que el LLM decida qué buscar, lee las respuestas, puede volver a buscar y, antes de responder,
-        descarta cualquier libro que ninguna herramienta haya devuelto.</p>
+
+      <h3 class="how-title">El asistente: un grafo que decide el camino</h3>
+      <div class="how-grid how-grid-wide">
+        <svg class="pipeline graph" viewBox="0 0 360 420" role="img" aria-labelledby="graph-title graph-desc">
+          <title id="graph-title">Grafo del asistente</title>
+          <desc id="graph-desc">La conversación llega al nodo de enrutado, que elige uno de cuatro caminos: preguntar, buscar,
+            el agente o fuera de ámbito. El camino de búsqueda recupera libros, el LLM responde y una verificación comprueba
+            libros y citas. Si el agente falla, se pasa a la búsqueda. Todos los caminos terminan en la respuesta.</desc>
+          <g class="dg-node"><rect x="120" y="8" width="120" height="36" rx="18"/><text x="180" y="31">Conversación</text></g>
+          <g class="dg-node"><rect x="120" y="66" width="120" height="40" rx="6"/><text x="180" y="84">Enrutar</text><text x="180" y="99" class="dg-small">route · LLM</text></g>
+          <g class="dg-node"><rect x="4" y="140" width="74" height="50" rx="6"/><text x="41" y="162">Preguntar</text><text x="41" y="179" class="dg-small">clarify</text></g>
+          <g class="dg-node"><rect x="98" y="140" width="74" height="50" rx="6"/><text x="135" y="162">Buscar</text><text x="135" y="179" class="dg-small">retrieve</text></g>
+          <g class="dg-node"><rect x="192" y="140" width="74" height="50" rx="6"/><text x="229" y="162">Agente</text><text x="229" y="179" class="dg-small">agent · LLM</text></g>
+          <g class="dg-node"><rect x="282" y="140" width="74" height="50" rx="6"/><text x="319" y="157">Fuera de</text><text x="319" y="171">ámbito</text><text x="319" y="185" class="dg-small dg-tiny">out_of_scope</text></g>
+          <g class="dg-node"><rect x="98" y="216" width="74" height="42" rx="6"/><text x="135" y="235">Responder</text><text x="135" y="250" class="dg-small">answer · LLM</text></g>
+          <g class="dg-node"><rect x="98" y="282" width="74" height="42" rx="6"/><text x="135" y="301">Verificar</text><text x="135" y="316" class="dg-small">verify</text></g>
+          <g class="dg-node"><rect x="120" y="372" width="120" height="36" rx="18"/><text x="180" y="395">Respuesta</text></g>
+          <g class="dg-edges">
+            <path d="M180 44 V64"/>
+            <path d="M165 106 L45 138"/>
+            <path d="M175 106 L137 138"/>
+            <path d="M185 106 L227 138"/>
+            <path d="M195 106 L315 138"/>
+            <path d="M135 190 V214"/>
+            <path d="M135 258 V280"/>
+            <path d="M135 324 L162 370"/>
+            <path d="M41 190 V390 H118"/>
+            <path d="M319 190 V390 H242"/>
+            <path d="M245 190 L200 370"/>
+            <path class="dg-fallback" d="M212 190 V204 H184 V176 H174"/>
+          </g>
+          <text x="188" y="218" class="dg-small dg-left">si falla</text>
+        </svg>
+        <ol class="stages">
+          <li><strong>Conversación.</strong> La página envía la conversación entera en cada mensaje; el servidor no guarda nada.</li>
+          <li><strong>Enrutar</strong> <span class="tag">LLM</span>. Una llamada con salida estructurada elige el camino y el
+            código la corrige: como mucho dos preguntas, filtros solo si el usuario los escribió y búsqueda si la salida no es válida.</li>
+          <li><strong>Preguntar.</strong> Devuelve una pregunta con dos a cuatro respuestas sugeridas, sin buscar todavía.</li>
+          <li><strong>Buscar.</strong> Ejecuta la búsqueda evaluada (BM25, embeddings, RRF y reordenador) con la petición
+            resumida en una consulta.</li>
+          <li><strong>Responder</strong> <span class="tag">LLM</span>. Recomienda hasta tres de los libros recuperados y cita
+            sus datos (RAG).</li>
+          <li><strong>Verificar.</strong> Descarta los libros que no estaban entre los resultados y las citas que no aparecen
+            literalmente en el libro.</li>
+          <li><strong>Agente</strong> <span class="tag">LLM</span>. Para peticiones de varios pasos: llama a las herramientas de
+            búsqueda las veces que necesite; si falla, se usa el camino de búsqueda.</li>
+          <li><strong>Fuera de ámbito.</strong> Una respuesta fija, sin búsqueda ni más llamadas al LLM.</li>
+        </ol>
+      </div>
+      <p class="field-note">Sin LLM, o con el límite diario de LLM agotado, el asistente no falla: hace la búsqueda simple
+        del último mensaje y lo dice.</p>
     </details>
 
     <details id="about" class="explainer about">
@@ -231,7 +276,7 @@
     </details>
   </main>
 
-  <!-- Book detail view, shared by search results and agent recommendations -->
+  <!-- Book detail view, shared by search results and the assistant's books -->
   <dialog id="book-dialog" class="book-dialog" aria-labelledby="dialog-title">
     <div class="dialog-head">
       <h2 id="dialog-title" class="book-title"></h2>

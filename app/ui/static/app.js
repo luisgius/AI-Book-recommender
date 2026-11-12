@@ -3,7 +3,7 @@
 // HTML), so catalog text cannot inject markup.
 //
 // Sections: constants, API access, waiting states and messages, rendering of
-// a book (card, why-row, detail dialog), search mode, agent mode, start-up.
+// a book (card, why-row, detail dialog), search mode, assistant mode, start-up.
 
 const API = "/api/v1";
 const $ = (id) => document.getElementById(id);
@@ -21,10 +21,12 @@ const SEARCH_EXAMPLES = [
   { text: "recetas de cocina tradicional", lang: "es" },
   { text: "poesia d'amore", lang: "it" },
 ];
-const AGENT_EXAMPLES = [
-  { text: "Busco una novela clásica sobre la culpa, mejor en español", lang: "es" },
-  { text: "I want to learn Python from scratch: which book should I start with?", lang: "en" },
-  { text: "Quelque chose comme Frankenstein, mais plus récent", lang: "fr" },
+// Assistant openers: a specific request (searches at once), a vague one (should
+// get a clarifying question) and a multi-step one (should go to the agent).
+const ASSISTANT_EXAMPLES = [
+  { text: "Recomiéndame un libro de cocina mexicana", lang: "es" },
+  { text: "I'd like something good to read", lang: "en" },
+  { text: "Trouve un livre d'introduction au machine learning, puis des livres similaires à celui-là", lang: "fr" },
 ];
 
 const LANGUAGE_NAMES = {
@@ -65,6 +67,16 @@ const NOTICE_TEXT = {
     + "Hasta las 00:00 UTC no hay interpretación de la consulta, explicaciones ni agente; la búsqueda funciona igual.",
   llm_unavailable: "Este servidor no tiene un LLM configurado (falta OPENROUTER_API_KEY), así que no se ha "
     + "interpretado la consulta ni se han generado explicaciones. La búsqueda funciona igual.",
+};
+// The same notices, as the assistant explains them (it degrades to a plain search),
+// and the assistant's own codes (app/infrastructure/llm/graphs/assistant.py).
+const ASSISTANT_NOTICE_TEXT = {
+  llm_unavailable: "Este servidor no tiene un LLM configurado (falta OPENROUTER_API_KEY): el asistente no puede "
+    + "preguntar ni redactar una respuesta, así que ha hecho una búsqueda simple de tu último mensaje.",
+  llm_budget_spent: "Se ha alcanzado el límite diario de peticiones al LLM de esta demostración: hasta las 00:00 UTC "
+    + "el asistente hace una búsqueda simple de tu último mensaje, sin preguntar ni redactar una respuesta.",
+  assistant_answer_failed: "El LLM no ha podido redactar la respuesta: se muestran los resultados de la búsqueda sin recomendación.",
+  agent_failed: "El agente ha fallado y el asistente ha usado el camino de búsqueda.",
 };
 const NO_LLM_NOTE = "Este servidor no tiene un LLM configurado (falta OPENROUTER_API_KEY, ver .env.example): "
   + "las opciones con LLM y el agente no están disponibles. La búsqueda funciona sin ellas.";
@@ -145,9 +157,9 @@ function describeError(error, what) {
   return { title: `Ha fallado la petición para ${what} (error ${s}).`, body: "Vuelve a intentarlo en unos segundos." };
 }
 
-function showMessage(id, error, what) {
+function showMessage(id, error, what, overrides = {}) {
   const el = $(id);
-  const { title, body } = describeError(error, what);
+  const { title, body } = overrides[error.status] || describeError(error, what);
   const strong = document.createElement("p");
   strong.className = "message-title";
   strong.textContent = title;
@@ -172,7 +184,7 @@ function showMessage(id, error, what) {
  * Show a waiting state that says, in plain words, how long the request may
  * take. Returns {signal, stop}: abort signal for fetch and a stop function.
  */
-function startWaiting(waitId, buttonId, steps) {
+function startWaiting(waitId, buttonId, steps, { keepFocus = false } = {}) {
   const box = $(waitId);
   const main = box.querySelector(".wait-main");
   const hint = box.querySelector(".wait-hint");
@@ -183,7 +195,10 @@ function startWaiting(waitId, buttonId, steps) {
   main.textContent = steps[0].text;
   hint.textContent = steps[0].hint || "";
   box.hidden = false;
-  button.disabled = true;
+  // keepFocus: the button stays focusable (aria-disabled), so focus is not lost
+  // when the user sent with it; the caller ignores clicks while waiting.
+  if (keepFocus) button.setAttribute("aria-disabled", "true");
+  else button.disabled = true;
   button.setAttribute("aria-busy", "true");
 
   let shown = 0;
@@ -201,10 +216,11 @@ function startWaiting(waitId, buttonId, steps) {
     clearInterval(timer);
     box.hidden = true;
     button.disabled = false;
+    button.removeAttribute("aria-disabled");
     button.removeAttribute("aria-busy");
   };
   box.querySelector(".link-button").onclick = () => controller.abort();
-  return { signal: controller.signal, stop };
+  return { signal: controller.signal, stop, abort: () => controller.abort() };
 }
 
 // ---------------------------------------------------------------------------
@@ -289,9 +305,11 @@ function ordinal(n) {
 }
 
 /**
- * Position of each result in each stage, among the results shown.
- * The API returns the stage scores, not the stage positions over the full
- * candidate lists, so positions are computed here over the visible list.
+ * Position of each result in each stage.
+ * The API returns the true positions (lexical_rank, vector_rank, rerank_rank:
+ * the place of the book in each stage's full list). A server without them
+ * only gives the stage scores; then the positions are computed here among
+ * the results shown and the page says they are approximate.
  */
 function stageRanks(results) {
   const ranksBy = (key) => {
@@ -299,13 +317,20 @@ function stageRanks(results) {
     scored.sort((a, b) => b[key] - a[key]);
     return new Map(scored.map((r, i) => [r.book.id, i + 1]));
   };
+  const given = (key) => new Map(results.filter((r) => isValue(r[key])).map((r) => [r.book.id, r[key]]));
+  const exact = results.some((r) => "lexical_rank" in r);
   return {
-    lexical: ranksBy("lexical_score"),
-    vector: ranksBy("vector_score"),
-    rerank: ranksBy("rerank_score"),
-    anyRerank: results.some((r) => r.rerank_score !== null && r.rerank_score !== undefined),
+    exact,
+    lexical: exact ? given("lexical_rank") : ranksBy("lexical_score"),
+    vector: exact ? given("vector_rank") : ranksBy("vector_score"),
+    rerank: exact ? given("rerank_rank") : ranksBy("rerank_score"),
+    anyRerank: results.some((r) => isValue(r.rerank_score) || isValue(r.rerank_rank)),
     total: results.length,
   };
+}
+
+function isValue(value) {
+  return value !== null && value !== undefined;
 }
 
 function trailStep(name, detail, value, found) {
@@ -346,38 +371,62 @@ function renderWhy(node, result, ranks, mode, searchMode) {
     trail.append(trailStep("Reordenador", null, rerankText, Boolean(rr)));
     trail.append(trailStep("Resultado", null, ordinal(result.rank), true));
     pairs.push(
-      ["Origen (source)", { lexical: "solo palabras clave", vector: "solo significado", hybrid: "ambas búsquedas" }[result.source] || result.source],
+      ["Origen (source)", { lexical: "solo palabras clave", vector: "solo significado", hybrid: "fusión RRF de las dos listas" }[result.source] || result.source],
       ["BM25 (lexical_score)", formatRaw(result.lexical_score)],
       ["Similitud coseno (vector_score)", formatRaw(result.vector_score)],
       ["Reordenador (rerank_score)", formatRaw(result.rerank_score)],
       ["Fusión RRF (final_score)", formatRaw(result.final_score, 6)],
       ["Puesto final (rank)", String(result.rank)],
     );
-    node.querySelector(".raw").append(el("p", "field-note",
-      `Los puestos por etapa se calculan entre los ${ranks.total} resultados mostrados, a partir de estas puntuaciones.`));
+    if (ranks.exact) {
+      pairs.push(
+        ["Puesto en BM25 (lexical_rank)", isValue(result.lexical_rank) ? String(result.lexical_rank) : "sin valor"],
+        ["Puesto por significado (vector_rank)", isValue(result.vector_rank) ? String(result.vector_rank) : "sin valor"],
+        ["Puesto tras reordenar (rerank_rank)", isValue(result.rerank_rank) ? String(result.rerank_rank) : "sin valor"],
+      );
+      node.querySelector(".raw").append(el("p", "field-note",
+        "Cada puesto por etapa es la posición del libro en la lista completa de esa etapa, antes de quedarse con los resultados mostrados."));
+    } else {
+      node.querySelector(".raw").append(el("p", "field-note",
+        `Puestos aproximados: este servidor no da la posición en cada etapa, así que se calcula entre los ${ranks.total} resultados mostrados, a partir de estas puntuaciones.`));
+    }
   }
   for (const [label, value] of pairs) raw.append(el("dt", null, label), el("dd", null, value));
 }
 
-function renderExplanation(node, explanation) {
-  if (!explanation) return;
+/**
+ * The box under a book with a reason and its verified citations: the LLM
+ * explanation of a search result, or why the assistant recommends the book.
+ * The server returns the text without the model's inline citation markers.
+ */
+function fillReasonBox(node, { label, text, citations, warning, note }) {
   const box = node.querySelector(".explanation");
   box.hidden = false;
-  box.classList.toggle("ungrounded", !explanation.grounded);
-  // The model marks its sources inline as "[CITE: field]"; the verified
-  // citations are listed below, so the markers are removed from the text.
-  box.querySelector(".explanation-text").textContent =
-    explanation.text.replace(/\s*\[CITE:[^\]]*\]/g, "");
+  box.classList.toggle("ungrounded", Boolean(warning));
+  box.querySelector(".explanation-label").textContent = label;
+  box.querySelector(".explanation-text").textContent = text;
   const list = box.querySelector(".citations");
-  for (const citation of explanation.citations) {
+  list.replaceChildren();
+  for (const citation of citations) {
     const item = document.createElement("li");
     item.append(el("span", "field", FIELD_NAMES[citation.field] || citation.field),
       document.createTextNode(`«${citation.snippet}»`));
     list.append(item);
   }
-  box.querySelector(".explanation-model").textContent = explanation.grounded
-    ? `Citas comprobadas contra los datos del libro. Modelo: ${explanation.model}`
-    : `Ninguna cita se pudo comprobar en los datos del libro: léase con cautela. Modelo: ${explanation.model}`;
+  box.querySelector(".explanation-model").textContent = note;
+}
+
+function renderExplanation(node, explanation) {
+  if (!explanation) return;
+  fillReasonBox(node, {
+    label: "Por qué encaja, según el LLM",
+    text: explanation.text,
+    citations: explanation.citations,
+    warning: !explanation.grounded,
+    note: explanation.grounded
+      ? `Citas comprobadas contra los datos del libro. Modelo: ${explanation.model}`
+      : `Ninguna cita se pudo comprobar en los datos del libro: léase con cautela. Modelo: ${explanation.model}`,
+  });
 }
 
 function renderResult(result, ranks, mode, searchMode) {
@@ -393,7 +442,9 @@ function renderResult(result, ranks, mode, searchMode) {
   node.querySelector(".description").textContent = shorten(book.description, 300);
   node.querySelector(".attribution").replaceChildren(...renderAttribution(book));
   renderExplanation(node, result.explanation);
-  renderWhy(node, result, ranks, mode, searchMode);
+  // A book recommended by the agent was not ranked by a search: no why-row.
+  if (mode === "agent") node.querySelector(".why").remove();
+  else renderWhy(node, result, ranks, mode, searchMode);
   const similar = node.querySelector(".similar");
   similar.setAttribute("aria-label", `Libros similares a ${book.title}`);
   similar.addEventListener("click", () => showSimilar(book));
@@ -401,7 +452,7 @@ function renderResult(result, ranks, mode, searchMode) {
 }
 
 // ---------------------------------------------------------------------------
-// Book detail dialog (shared by search results and agent recommendations)
+// Book detail dialog (shared by search results and the assistant's books)
 // ---------------------------------------------------------------------------
 
 let dialogBook = null;
@@ -470,14 +521,21 @@ function setStatus(text) {
   $("status").textContent = text;
 }
 
-function showNotices(response) {
-  const box = $("notice");
-  const lines = (response.notices || []).map((code) => NOTICE_TEXT[code] || code);
+/** Plain-Spanish lines for the notice codes of a response (texts: first table that has the code). */
+function noticeLines(response, ...tables) {
+  const codes = response.notices || [];
+  const lines = codes.map((code) => tables.map((t) => t[code]).find(Boolean) || code);
   // A degraded search without a budget notice (e.g. the vector index failed).
-  if (response.degraded && !(response.notices || []).includes("search_budget_spent")) {
+  if (response.degraded && !codes.includes("search_budget_spent")) {
     lines.push("La búsqueda por significado no estaba disponible y se ha usado solo la búsqueda por palabras clave "
       + "(BM25). Los resultados son válidos, pero no tienen en cuenta sinónimos ni otros idiomas.");
   }
+  return lines;
+}
+
+function showNotices(response) {
+  const box = $("notice");
+  const lines = noticeLines(response, NOTICE_TEXT);
   box.replaceChildren(...lines.map((line) => el("p", null, line)));
   if (response.degraded && response.degradation_reason) {
     box.append(el("p", "message-tech", `Detalle técnico: ${response.degradation_reason}`));
@@ -609,10 +667,72 @@ function backToSearch() {
 }
 
 // ---------------------------------------------------------------------------
-// Agent mode
+// Assistant mode (POST /assistant/chat, the LangGraph assistant)
 // ---------------------------------------------------------------------------
 
-/** One tool call of the agent: tool, arguments in plain words, books returned. */
+// The server keeps nothing: the page holds the conversation in this variable
+// only (no browser storage, no cookie) and sends all of it with each message.
+// Each assistant turn carries the `route` of the reply that produced it,
+// because the server counts the clarifying questions already asked from the
+// routes it receives (an assistant turn without one counts as a question).
+let conversation = [];
+let chatWait = null;
+// Bumped by "Nueva conversación": a reply to an older conversation is ignored.
+let chatGeneration = 0;
+
+// Limits of the request (app/api/v1/schemas.py: at most 50 messages of up to
+// 5000 characters) and of what the assistant reads of each message
+// (app/domain/value_objects.py: the first 500 characters), so the box stops
+// at 500 and the conversation at 50 messages.
+const MAX_CHAT_MESSAGES = 50;
+const MAX_CHAT_CHARS = 500;
+const MAX_CLARIFYING_TURNS = 2;
+
+const ROUTE_NAMES = {
+  clarify: "Pregunta aclaratoria", search: "Búsqueda", agent: "Agente", out_of_scope: "Fuera de ámbito",
+};
+// Graph nodes in the order they can run (a failed agent goes on to retrieve).
+const NODE_ORDER = ["route", "clarify", "agent", "retrieve", "answer", "verify", "out_of_scope"];
+const NODE_NAMES = {
+  route: "Enrutar", clarify: "Preguntar", agent: "Agente", retrieve: "Buscar",
+  answer: "Responder", verify: "Verificar", out_of_scope: "Fuera de ámbito",
+};
+// Why code overrode the model's route (forced_route).
+const FORCED_ROUTE_TEXT = {
+  clarification_cap: "El modelo quería hacer otra pregunta, pero ya se habían hecho las dos permitidas: "
+    + "el código ha pasado a buscar con lo que se sabe.",
+  invalid_clarification: "El modelo quería preguntar, pero sin pregunta o con menos de dos respuestas sugeridas: "
+    + "el código ha pasado a buscar.",
+  reply_to_clarification: "El modelo marcó tu respuesta a su pregunta como fuera de ámbito, pero no hablaba de otra "
+    + "cosa: el código ha buscado con lo que se sabe.",
+  invalid_router_output: "La llamada de enrutado falló o devolvió una salida no válida: el código ha buscado tu último mensaje.",
+  agent_failed: "El agente falló: el código ha pasado al camino de búsqueda.",
+};
+// Errors of this endpoint, in its own terms (see assistant_endpoints.py).
+const ASSISTANT_ERRORS = {
+  400: { title: "El servidor no ha aceptado la conversación.",
+    body: "La conversación debe terminar con un mensaje tuyo. Empieza una nueva conversación si el problema se repite." },
+  422: { title: "El mensaje no es válido.",
+    body: `Cada mensaje puede tener hasta ${MAX_CHAT_CHARS} caracteres y la conversación hasta ${MAX_CHAT_MESSAGES} mensajes. Tu texto sigue en el cuadro.` },
+  503: { title: "La búsqueda no está disponible ahora mismo, así que el asistente no puede responder.",
+    body: "Suele ser un índice que aún no ha cargado o un servicio externo que no responde. Vuelve a intentarlo en unos segundos; tu texto sigue en el cuadro." },
+};
+
+function formatMs(ms) {
+  if (!isValue(ms)) return "";
+  return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1).replace(".", ",")} s`;
+}
+
+/** The nodes the request went through, in graph order (from the per-node timings). */
+function routePath(response) {
+  return NODE_ORDER.filter((node) => node in (response.timings_ms || {}));
+}
+
+function usedLlm(response) {
+  return !(response.notices || []).some((code) => code === "llm_unavailable" || code === "llm_budget_spent");
+}
+
+/** One tool call of the agent: tool, arguments in plain words, books it returned. */
 function renderStep(step, titles) {
   const li = el("li", "agent-step");
   li.append(el("p", "tool-name", TOOL_NAMES[step.tool] || step.tool));
@@ -626,7 +746,15 @@ function renderStep(step, titles) {
     args.append(el("dt", null, ARGUMENT_NAMES[key] || key), el("dd", null, shown));
   }
   if (args.children.length) li.append(args);
-  li.append(el("p", "tool-count", step.result_count === 1 ? "Devolvió 1 libro." : `Devolvió ${step.result_count} libros.`));
+  const books = step.books || [];
+  const count = step.result_count === 0 ? "No devolvió ningún libro."
+    : step.result_count === 1 ? "Devolvió 1 libro:" : `Devolvió ${step.result_count} libros:`;
+  li.append(el("p", "tool-count", books.length ? count : count.replace(/:$/, ".")));
+  if (books.length) {
+    const list = el("ol", "tool-books");
+    list.append(...books.map((book) => el("li", null, book.title || `id ${book.book_id.slice(0, 8)}…`)));
+    li.append(list);
+  }
   const raw = document.createElement("details");
   raw.className = "raw";
   raw.append(el("summary", null, "Llamada exacta"), el("pre", "raw-call",
@@ -635,100 +763,360 @@ function renderStep(step, titles) {
   return li;
 }
 
-function renderAgent(response) {
-  $("agent-answer").textContent = response.answer;
-  const meta = [`Modelo: ${response.model}`, `${(response.latency_ms / 1000).toFixed(1)} s`,
-    response.steps.length === 1 ? "1 llamada a herramientas" : `${response.steps.length} llamadas a herramientas`];
-  if (response.reflections) meta.push(response.reflections === 1 ? "1 nueva búsqueda tras la verificación" : `${response.reflections} nuevas búsquedas tras la verificación`);
-  $("agent-meta").textContent = meta.join(". ") + ".";
-
-  const titles = new Map(response.recommendations.map((r) => [r.book.id, r.book.title]));
-  const books = $("agent-books");
-  books.replaceChildren();
-  for (const rec of response.recommendations) {
-    const li = el("li", "agent-book");
-    const h = el("h3", "book-title");
-    const button = el("button", "title-button", rec.book.title);
-    button.type = "button";
-    button.setAttribute("aria-label", `${rec.book.title}: ver ficha`);
-    button.addEventListener("click", () => openBook(rec.book));
-    h.append(button);
-    const facts = el("p", "facts");
-    fillFacts(facts, rec.book);
-    li.append(h, el("p", "authors", rec.book.authors.join(", ") || "Autor desconocido"), facts, el("p", "reason", rec.reason));
-    books.append(li);
-  }
-  if (!response.recommendations.length) books.append(el("li", "field-note", "El agente no ha recomendado ningún libro concreto."));
-
-  const dropped = $("agent-dropped");
-  dropped.hidden = !response.dropped_recommendations;
-  dropped.textContent = response.dropped_recommendations === 1
-    ? "Se ha descartado 1 recomendación porque ninguna herramienta había devuelto ese libro."
-    : `Se han descartado ${response.dropped_recommendations} recomendaciones porque ninguna herramienta había devuelto esos libros.`;
-
-  const steps = $("agent-steps");
-  steps.replaceChildren(...response.steps.map((step) => renderStep(step, titles)));
-  const verify = el("li", "agent-step verify");
-  verify.append(el("p", "tool-name", "Verificación"),
-    el("p", "tool-count", "Cada libro de la respuesta se ha comprobado contra lo que devolvieron las herramientas."));
-  steps.append(verify);
-
-  $("agent-result").hidden = false;
-  $("empty-agent").hidden = true;
+function renderUserTurn(text) {
+  const li = el("li", "turn user");
+  li.append(el("p", "turn-who", "Tú"), el("p", "turn-text", text));
+  return li;
 }
 
-async function runAgent(event) {
-  event.preventDefault();
-  const question = $("agent-question").value.trim();
-  if (question.length < 3) return;
-  $("agent-message").hidden = true;
-  reserveSpace("agent-output");
-  $("empty-agent").hidden = true;
-  $("agent-result").classList.add("stale");
-  const wait = startWaiting("agent-wait", "agent-button", [
-    { text: "El agente está buscando…", hint: "Suele tardar entre 15 y 60 segundos: hace varias búsquedas y lee los resultados antes de responder." },
-    { after: 10, text: "El agente sigue trabajando…", hint: "Puede estar repitiendo una búsqueda o comprobando sus recomendaciones. " + COLD_START_HINT },
-  ]);
+/** Suggested answers of a clarifying question: each one is sent as the next message. */
+function renderOptions(options) {
+  const group = el("div", "options-group");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", "Respuestas sugeridas");
+  group.append(el("p", "options-label", "Respuestas sugeridas (o escribe la tuya en el cuadro):"));
+  const list = el("ul", "option-list");
+  for (const option of options) {
+    const li = document.createElement("li");
+    const button = el("button", "option", option);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      if (chatWait || button.disabled) return;
+      button.classList.add("chosen");
+      sendChat(option);
+    });
+    li.append(button);
+    list.append(li);
+  }
+  group.append(list);
+  return group;
+}
+
+/** Suggested answers can only be chosen while their question is the last reply. */
+function setOptionsEnabled(enabled) {
+  const turns = $("chat-thread").querySelectorAll(".turn.assistant");
+  turns.forEach((turn, i) => {
+    const current = enabled && i === turns.length - 1;
+    for (const button of turn.querySelectorAll(".option")) {
+      button.disabled = !current;
+      if (current) button.classList.remove("chosen");
+    }
+  });
+}
+
+/** Recommended books first (reason and citations), then the rest of the search results. */
+function renderAssistantBooks(response) {
+  const box = el("div", "assistant-books");
+  const results = response.results || [];
+  const searchMode = response.degraded ? "lexical_only" : "hybrid";
+  const ranks = stageRanks(results);
+  const byId = new Map(results.map((r) => [r.book.id, r]));
+  const recommended = new Set();
+
+  if (response.recommendations.length) {
+    const n = response.recommendations.length;
+    box.append(el("h3", "section-title", n === 1 ? "Libro que recomienda" : `Libros que recomienda (${n})`));
+    const list = el("ol", "results recs");
+    response.recommendations.forEach((rec, i) => {
+      recommended.add(rec.book.id);
+      const result = byId.get(rec.book.id);
+      const node = result
+        ? renderResult(result, ranks, "search", searchMode)
+        : renderResult({ book: rec.book, rank: i + 1 }, null, "agent", null);
+      const verified = rec.citations.length > 0;
+      fillReasonBox(node, {
+        label: "Por qué lo recomienda el asistente",
+        text: rec.reason,
+        citations: rec.citations,
+        warning: false,
+        note: verified
+          ? "Citas comprobadas contra los datos del libro."
+          : "El agente solo puede recomendar libros que le ha devuelto una de sus herramientas.",
+      });
+      list.append(node);
+    });
+    box.append(list);
+  }
+
+  const rest = results.filter((r) => !recommended.has(r.book.id));
+  if (rest.length) {
+    const details = el("details", "more-results");
+    // Without recommendations the results are the answer: shown open.
+    details.open = !response.recommendations.length;
+    details.append(el("summary", null, response.recommendations.length
+      ? `Resto de resultados de la búsqueda (${rest.length})` : `Resultados de la búsqueda (${rest.length})`));
+    const list = el("ol", "results");
+    list.append(...rest.map((r) => renderResult(r, ranks, "search", searchMode)));
+    details.append(list);
+    box.append(details);
+  }
+  return box;
+}
+
+function filtersText(filters) {
+  if (!filters) return "ninguno";
+  return Object.entries(filters)
+    .filter(([, value]) => isValue(value))
+    .map(([key, value]) => `${FILTER_NAMES[key] || key}: ${key === "language" ? languageName(value) : value}`)
+    .join("; ") || "ninguno";
+}
+
+/**
+ * How LangGraph handled the request: the path through the graph with the time
+ * of each node, a forced route and why, the condensed query and filters, the
+ * agent's steps and the LLM usage. Collapsed by default.
+ */
+function renderRouteDetail(response) {
+  const details = el("details", "route-detail");
+  const path = routePath(response);
+  const llm = usedLlm(response);
+  const summary = document.createElement("summary");
+  summary.append(el("span", "route-badge", llm ? ROUTE_NAMES[response.route] || response.route : "Búsqueda sin LLM"));
+  const line = (llm ? path : ["retrieve"]).map((node) => NODE_NAMES[node] || node).join(" → ");
+  summary.append(el("span", "route-line", `${line} · ${formatMs(response.latency_ms)}`));
+  if (response.forced_route) summary.append(el("span", "route-forced", "ruta corregida por el código"));
+  details.append(summary);
+
+  const body = el("div", "route-body");
+  body.append(el("p", "route-title", "Recorrido por el grafo del asistente"));
+  const chain = el("ol", "path");
+  chain.setAttribute("aria-label", "Nodos por los que pasó la petición, en orden");
+  for (const node of path) {
+    const li = el("li", "path-node");
+    li.append(el("span", "path-name", NODE_NAMES[node] || node), el("code", "path-id", node),
+      el("span", "path-time", formatMs(response.timings_ms[node])));
+    chain.append(li);
+  }
+  body.append(chain);
+
+  const facts = el("dl", "route-facts");
+  const add = (label, value) => facts.append(el("dt", null, label), el("dd", null, value));
+  if (!llm) {
+    add("Por qué", "Sin LLM no hay enrutado ni respuesta redactada: el endpoint busca el último mensaje tal cual.");
+  }
+  if (response.forced_route) {
+    add("Ruta corregida", `${FORCED_ROUTE_TEXT[response.forced_route] || response.forced_route} (${response.forced_route})`);
+  }
+  if (response.search_query) {
+    const label = response.route === "agent" ? "Petición para el agente" : llm ? "Consulta condensada" : "Consulta buscada";
+    add(label, `«${response.search_query}»`);
+  }
+  if (response.route === "search") {
+    add("Filtros", filtersText(response.filters));
+    add("Resultados", `${response.results.length}${response.degraded ? " (solo palabras clave)" : ""}`);
+  }
+  add("Preguntas aclaratorias", `${response.clarifications} de ${MAX_CLARIFYING_TURNS} en esta conversación`);
+  const usage = response.usage || {};
+  if (usage.llm_calls) {
+    const parts = [`${usage.llm_calls} ${usage.llm_calls === 1 ? "llamada" : "llamadas"}`];
+    if (usage.failed_calls) parts.push(`${usage.failed_calls} fallida${usage.failed_calls === 1 ? "" : "s"}`);
+    if (isValue(usage.input_tokens)) parts.push(`${usage.input_tokens} tokens de entrada y ${usage.output_tokens ?? 0} de salida`);
+    if (isValue(usage.cost_usd)) parts.push(`${usage.cost_usd.toFixed(4)} USD`);
+    add("LLM", `${response.model || "modelo desconocido"}: ${parts.join(", ")}`);
+  }
+  body.append(facts);
+
+  if (response.steps.length) {
+    body.append(el("p", "route-title", "Pasos del agente"));
+    body.append(el("p", "field-note", "Llamadas a herramientas en el orden en que el agente las hizo (traza ReAct)."));
+    const titles = new Map();
+    for (const step of response.steps) for (const b of step.books || []) titles.set(b.book_id, b.title);
+    for (const rec of response.recommendations) titles.set(rec.book.id, rec.book.title);
+    const steps = el("ol", "steps");
+    steps.append(...response.steps.map((step) => renderStep(step, titles)));
+    const verify = el("li", "agent-step verify");
+    verify.append(el("p", "tool-name", "Verificación"),
+      el("p", "tool-count", "Cada libro recomendado se ha comprobado contra lo que devolvieron las herramientas."));
+    steps.append(verify);
+    body.append(steps);
+  }
+  details.append(body);
+  return details;
+}
+
+function renderAssistantTurn(response) {
+  const li = el("li", "turn assistant");
+  li.dataset.route = response.route;
+  li.append(el("p", "turn-who", "Asistente"), el("p", "turn-text", response.message));
+  if (response.route === "clarify" && response.options.length) li.append(renderOptions(response.options));
+  // The routing line goes right under the reply, before any list of books.
+  li.append(renderRouteDetail(response));
+  // "No LLM on this server" is already said once above the conversation.
+  const shown = { ...response, notices: (response.notices || []).filter(
+    (code) => !(code === "llm_unavailable" && !$("assistant-off-note").hidden)) };
+  const lines = noticeLines(shown, ASSISTANT_NOTICE_TEXT, NOTICE_TEXT);
+  if (lines.length) {
+    const box = el("div", "message notice");
+    box.append(...lines.map((line) => el("p", null, line)));
+    li.append(box);
+  }
+  if (response.recommendations.length || response.results.length) li.append(renderAssistantBooks(response));
+  return li;
+}
+
+/** Read the new reply to assistive technology without moving focus. */
+function announce(text) {
+  const live = $("chat-live");
+  live.textContent = "";
+  setTimeout(() => { live.textContent = text; }, 50);
+}
+
+function replySummary(response) {
+  const parts = [`El asistente responde: ${response.message}`];
+  if (response.route === "clarify" && response.options.length) parts.push(`Respuestas sugeridas: ${response.options.join("; ")}.`);
+  const n = response.recommendations.length;
+  if (n) parts.push(n === 1 ? "Recomienda 1 libro." : `Recomienda ${n} libros.`);
+  else if (response.results.length) parts.push(`${response.results.length} resultados de búsqueda.`);
+  return parts.join(" ");
+}
+
+/** Bring the start of a new reply into view if it is below the screen (focus stays put). */
+function revealTurn(node) {
+  const top = node.getBoundingClientRect().top;
+  if (top > window.innerHeight * 0.75 || top < 0) {
+    node.scrollIntoView({ block: "start", behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  }
+}
+
+function updateChatCount() {
+  const full = conversation.length >= MAX_CHAT_MESSAGES;
+  $("chat-count").textContent = full
+    ? `La conversación ha llegado al máximo de ${MAX_CHAT_MESSAGES} mensajes que acepta el servidor: empieza una nueva.`
+    : `Hasta ${MAX_CHAT_CHARS} caracteres por mensaje. Mensajes en la conversación: ${conversation.length} de ${MAX_CHAT_MESSAGES}.`;
+  $("chat-count").classList.toggle("full", full);
+}
+
+async function sendChat(rawText) {
+  const text = rawText.trim().slice(0, MAX_CHAT_CHARS);
+  if (!text || chatWait) return;
+  if (conversation.length + 1 > MAX_CHAT_MESSAGES) {
+    updateChatCount();
+    announce($("chat-count").textContent);
+    return;
+  }
+  const generation = chatGeneration;
+  const hadFocusOnOption = document.activeElement && document.activeElement.classList.contains("option");
+  $("assistant-message").hidden = true;
+  conversation.push({ role: "user", content: text });
+  const userNode = renderUserTurn(text);
+  $("chat-thread").append(userNode);
+  $("empty-assistant").hidden = true;
+  $("chat-input").value = "";
+  setOptionsEnabled(false);
+  // A chosen option is now disabled: keep focus in the message box, not on <body>.
+  if (hadFocusOnOption) $("chat-input").focus({ preventScroll: true });
+  updateChatCount();
+
+  chatWait = startWaiting("assistant-wait", "chat-send", [
+    { text: "El asistente está pensando…", hint: "Primero decide el camino: una pregunta, una búsqueda o el agente." },
+    { after: 6, text: "El asistente sigue trabajando…",
+      hint: "Si ha elegido al agente puede tardar entre 15 y 60 segundos: busca varias veces y comprueba sus recomendaciones." },
+    { after: 25, text: "Sigue en marcha…", hint: COLD_START_HINT },
+  ], { keepFocus: true });
+
   try {
-    const response = await callApi("/agent/ask", { method: "POST", body: JSON.stringify({ question }), signal: wait.signal });
-    renderAgent(response);
-    $("agent-answer").focus();
+    const response = await callApi("/assistant/chat", {
+      method: "POST", body: JSON.stringify({ messages: conversation }), signal: chatWait.signal,
+    });
+    if (generation !== chatGeneration) return;
+    conversation.push({ role: "assistant", content: response.message || ROUTE_NAMES[response.route], route: response.route });
+    const node = renderAssistantTurn(response);
+    $("chat-thread").append(node);
+    announce(replySummary(response));
+    revealTurn(node);
   } catch (error) {
-    if (error.name !== "AbortError") {
-      showMessage("agent-message", error, "preguntar al agente");
-      // The error says the same as the start-up note: show it once.
-      $("agent-off-note").hidden = true;
+    if (generation !== chatGeneration) return;
+    // The message got no reply: take it back, so the conversation is as it
+    // was, and return its text to the box to send again.
+    conversation.pop();
+    userNode.remove();
+    setOptionsEnabled(true);
+    $("chat-input").value = text;
+    $("empty-assistant").hidden = conversation.length > 0;
+    if (error.name === "AbortError") {
+      announce("Mensaje cancelado. El texto ha vuelto al cuadro.");
+      $("chat-input").focus();
+    } else {
+      showMessage("assistant-message", error, "responder", ASSISTANT_ERRORS);
     }
   } finally {
-    $("agent-result").classList.remove("stale");
-    wait.stop();
+    if (generation === chatGeneration) {
+      chatWait.stop();
+      chatWait = null;
+      updateChatCount();
+    }
   }
+}
+
+function newConversation() {
+  chatGeneration += 1;
+  if (chatWait) {
+    chatWait.abort();
+    chatWait.stop();
+    chatWait = null;
+  }
+  conversation = [];
+  $("chat-thread").replaceChildren();
+  $("assistant-message").hidden = true;
+  $("empty-assistant").hidden = false;
+  $("chat-input").value = "";
+  updateChatCount();
+  announce("Conversación nueva. La anterior se ha borrado de la página.");
+  $("chat-input").focus();
+}
+
+function setupAssistant() {
+  renderExamples("assistant-examples", ASSISTANT_EXAMPLES, (text) => {
+    // An opener starts the conversation; later it only fills the box.
+    if (!conversation.length && !chatWait) sendChat(text);
+    else {
+      $("chat-input").value = text;
+      $("chat-input").focus();
+    }
+  });
+  $("chat-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendChat($("chat-input").value);
+  });
+  // Enter sends the message; Shift+Enter adds a new line.
+  $("chat-input").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      $("chat-form").requestSubmit();
+    }
+  });
+  $("chat-new").addEventListener("click", newConversation);
+  updateChatCount();
 }
 
 // ---------------------------------------------------------------------------
 // Tabs, examples, health and start-up
 // ---------------------------------------------------------------------------
 
+const TABS = ["search", "assistant"];
+
 function selectTab(name) {
-  for (const [tab, panel] of [["tab-search", "panel-search"], ["tab-agent", "panel-agent"]]) {
-    const active = tab === `tab-${name}`;
-    $(tab).setAttribute("aria-selected", String(active));
-    $(tab).tabIndex = active ? 0 : -1;
-    $(panel).hidden = !active;
+  for (const tab of TABS) {
+    const active = tab === name;
+    $(`tab-${tab}`).setAttribute("aria-selected", String(active));
+    $(`tab-${tab}`).tabIndex = active ? 0 : -1;
+    $(`panel-${tab}`).hidden = !active;
   }
 }
 
 function setupTabs() {
-  const tabs = [$("tab-search"), $("tab-agent")];
+  const tabs = TABS.map((name) => $(`tab-${name}`));
   tabs.forEach((tab, i) => {
-    tab.addEventListener("click", () => selectTab(i === 0 ? "search" : "agent"));
+    tab.addEventListener("click", () => selectTab(TABS[i]));
     // Arrow keys move between tabs (WAI-ARIA tabs pattern).
     tab.addEventListener("keydown", (event) => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
       event.preventDefault();
-      const next = event.key === "Home" ? 0 : event.key === "End" ? 1 : 1 - i;
+      const last = tabs.length - 1;
+      const next = event.key === "Home" ? 0 : event.key === "End" ? last
+        : (i + (event.key === "ArrowRight" ? 1 : last)) % tabs.length;
       tabs[next].focus();
-      selectTab(next === 0 ? "search" : "agent");
+      selectTab(TABS[next]);
     });
   });
 }
@@ -779,9 +1167,10 @@ async function loadHealth() {
       for (const id of ["use-understanding", "use-explanations"]) $(id).disabled = true;
       $("llm-off-note").textContent = NO_LLM_NOTE;
       $("llm-off-note").hidden = false;
-      $("agent-off-note").textContent = "El agente necesita un LLM y este servidor no tiene ninguno configurado "
-        + "(falta OPENROUTER_API_KEY). Puedes usar la búsqueda de libros, que funciona sin él.";
-      $("agent-off-note").hidden = false;
+      $("assistant-off-note").textContent = "Este servidor no tiene un LLM configurado (falta OPENROUTER_API_KEY): "
+        + "el asistente no puede hacer preguntas ni redactar respuestas, y cada mensaje se responde con una búsqueda "
+        + "simple de su texto. La búsqueda de libros funciona igual.";
+      $("assistant-off-note").hidden = false;
     }
   } catch (error) {
     box.textContent = error.status === 0 ? "No se puede contactar con el servidor" : "El servidor no responde bien";
@@ -796,20 +1185,9 @@ function start() {
     $("query").value = text;
     $("search-form").requestSubmit();
   });
-  renderExamples("agent-examples", AGENT_EXAMPLES, (text) => {
-    $("agent-question").value = text;
-    $("agent-question").focus();
-  });
   $("search-form").addEventListener("submit", runSearch);
-  $("agent-form").addEventListener("submit", runAgent);
   $("similar-back").addEventListener("click", backToSearch);
-  // Enter sends the question; Shift+Enter adds a new line.
-  $("agent-question").addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      $("agent-form").requestSubmit();
-    }
-  });
+  setupAssistant();
   loadHealth();
 }
 

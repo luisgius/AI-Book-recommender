@@ -253,18 +253,83 @@ button[aria-busy="true"] { cursor: progress; }
 .result-foot { margin-top: 0.8rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem 1rem; }
 .attribution { margin: 0; font-size: 0.8rem; color: var(--muted); flex: 1 1 18rem; }
 
-/* ---------- Agent ---------- */
+/* ---------- Assistant (conversation) ---------- */
 
-.agent-result { margin-top: 1.5rem; }
-.agent-answer { font: 1.08rem/1.65 var(--serif); margin: 0 0 0.4rem; white-space: pre-line; max-width: 40rem; }
-.agent-answer:focus { outline: none; }
-.agent-answer:focus-visible { outline: 3px solid var(--focus); }
-.agent-meta { font-size: 0.85rem; color: var(--muted); margin: 0 0 1.75rem; }
-.agent-books { list-style: none; padding: 0; margin: 0 0 1.75rem; display: grid; gap: 0; }
-.agent-book { padding: 0.9rem 0; border-top: 1px solid var(--line); }
-.agent-book:last-child { border-bottom: 1px solid var(--line); }
-.agent-book .book-title { font-size: 1.12rem; }
-.reason { margin: 0.5rem 0 0; font: 0.96rem/1.55 var(--serif); }
+.assistant-intro { margin: 0 0 1rem; color: var(--muted); max-width: 40rem; }
+#assistant-off-note { margin: 0 0 1.25rem; }
+.thread { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
+.turn { min-width: 0; }
+.turn p { margin: 0; }
+.turn-who { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.2rem !important; }
+.turn-text { font: 1.05rem/1.6 var(--serif); white-space: pre-line; overflow-wrap: anywhere; max-width: 40rem; }
+.turn.user {
+  justify-self: end; max-width: min(34rem, 88%); padding: 0.6rem 0.9rem;
+  background: var(--accent-wash); border-radius: var(--radius) var(--radius) 2px var(--radius);
+}
+.turn.user .turn-who { text-align: right; }
+.turn.assistant { border-top: 1px solid var(--line); padding-top: 1rem; }
+.turn .message { margin-top: 0.8rem; }
+
+.options-group { margin-top: 0.8rem; }
+.options-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem !important; }
+.option-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.option {
+  font: 0.98rem/1.3 var(--serif); color: var(--accent); background: var(--sheet); text-align: left;
+  border: 1px solid var(--accent); border-radius: 999px; padding: 0.45rem 0.9rem; min-height: 2.5rem;
+}
+.option:hover:not(:disabled) { background: var(--accent-wash); }
+.option:disabled { color: var(--muted); border-color: var(--line); opacity: 1; }
+.option.chosen:disabled { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+
+.assistant-books { margin-top: 1rem; }
+.assistant-books .section-title { font-size: 1rem; }
+.recs .explanation-label { font-size: 0.8rem; }
+.more-results { margin-top: 0.75rem; }
+.more-results > summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 0.35rem 0; width: max-content; max-width: 100%; }
+.more-results[open] > summary { margin-bottom: 0.3rem; }
+
+/* How LangGraph handled the request: a one-line summary that opens the detail. */
+.route-detail { margin-top: 0.9rem; font-size: 0.88rem; }
+.route-detail > summary {
+  cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.6rem;
+  padding: 0.35rem 0; color: var(--muted); list-style-position: outside;
+}
+.route-detail > summary::before { content: "\25B8"; color: var(--accent); }
+.route-detail[open] > summary::before { content: "\25BE"; }
+.route-detail > summary::-webkit-details-marker { display: none; }
+.route-detail > summary { list-style: none; }
+.route-badge {
+  font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
+  padding: 0 0.55rem; font-size: 0.8rem; line-height: 1.5;
+}
+.route-line { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.route-forced { color: var(--warn-ink); font-weight: 600; }
+.route-body { padding: 0.75rem 0.9rem; background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); margin-top: 0.3rem; }
+.route-title { font-weight: 600; margin: 0 0 0.5rem; }
+.route-body .route-title:not(:first-child) { margin-top: 1rem; }
+.path { list-style: none; padding: 0; margin: 0 0 0.8rem; display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem 1.4rem; }
+.path-node {
+  position: relative; display: grid; gap: 0 0.5rem; grid-template-columns: auto auto; align-items: baseline;
+  padding: 0.3rem 0.6rem; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--paper);
+}
+.path-node + .path-node::before {
+  content: "\2192"; position: absolute; left: -1.15rem; top: 50%; transform: translateY(-50%); color: var(--accent);
+}
+.path-name { font-weight: 600; }
+.path-id { grid-column: 1; font: 0.75rem var(--mono); color: var(--muted); }
+.path-time { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+.route-facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; }
+.route-facts dt { color: var(--muted); }
+.route-facts dd { margin: 0; overflow-wrap: anywhere; }
+.route-body .steps { margin-top: 0.6rem; }
+.tool-books { margin: 0.25rem 0 0; padding-left: 1.2rem; font: 0.9rem/1.45 var(--serif); }
+
+.chat-form { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.chat-row textarea { min-height: 3.4rem; }
+.chat-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 1rem; }
+.chat-meta .field-note { flex: 1 1 22rem; }
+.chat-count { flex-basis: 100% !important; margin-top: 0 !important; }
+.chat-count.full { color: var(--warn-ink); font-weight: 600; }
 
 /* The trace is a real sequence, so it is numbered. */
 .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
@@ -299,10 +364,15 @@ button[aria-busy="true"] { cursor: progress; }
 .pipeline text { font: 13px var(--sans); fill: var(--ink); text-anchor: middle; }
 .pipeline .dg-small { font-size: 11px; fill: var(--muted); }
 .pipeline .dg-left { text-anchor: start; }
+.pipeline .dg-tiny { font-size: 10px; }
 .dg-node rect { fill: var(--sheet); stroke: var(--line-strong); stroke-width: 1; }
 .dg-optional rect { stroke-dasharray: 4 3; fill: var(--paper); }
 .dg-edges path { fill: none; stroke: var(--accent); stroke-width: 1.4; marker-end: url(#arrow); }
 .dg-arrowhead { fill: var(--accent); }
+.dg-edges .dg-fallback { stroke-dasharray: 4 3; }
+.pipeline.graph { max-width: 20rem; }
+.how-title { font: 600 1rem/1.3 var(--serif); margin: 2rem 0 0.8rem; }
+.how-grid-wide { grid-template-columns: 20rem 1fr; }
 
 /* ---------- Book dialog ---------- */
 
@@ -336,8 +406,12 @@ button[aria-busy="true"] { cursor: progress; }
   .top { padding-top: 1.5rem; }
   h1 { font-size: 1.6rem; }
   .settings-grid, .how-grid { grid-template-columns: 1fr; }
-  .agent-row { grid-template-columns: 1fr; }
-  .agent-row .primary { justify-self: start; }
+  .chat-row { grid-template-columns: 1fr; }
+  .chat-row .primary { justify-self: start; }
+  .how-grid-wide { grid-template-columns: 1fr; }
+  .pipeline.graph { max-width: 18rem; justify-self: center; }
+  .route-facts { grid-template-columns: 1fr; }
+  .route-facts dd { margin-bottom: 0.3rem; }
   .pipeline { max-width: 13rem; justify-self: center; }
   .result > :not(.result-head) { margin-left: 0; }
   .result-head { grid-template-columns: 1.8rem 1fr; }
