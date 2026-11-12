@@ -13,6 +13,7 @@ from app.api.mcp import MCP_PATH, load_mcp_settings, mount_mcp_server
 from app.api.v1.search_endpoints import router as search_router
 from app.api.v1.evaluation_endpoints import router as evaluation_router
 from app.api.v1.agent_endpoints import router as agent_router
+from app.api.v1.assistant_endpoints import router as assistant_router
 from app.api.v1.usage_endpoints import router as usage_router
 
 
@@ -39,6 +40,7 @@ app = FastAPI(
 app.include_router(search_router, prefix="/api/v1", tags=["search"])
 app.include_router(evaluation_router, prefix="/api/v1", tags=["evaluation", "recommendation"])
 app.include_router(agent_router, prefix="/api/v1", tags=["agent"])
+app.include_router(assistant_router, prefix="/api/v1", tags=["assistant"])
 app.include_router(usage_router, prefix="/api/v1", tags=["usage"])
 
 # Minimal web UI for manual testing and demos (static files, no build step)

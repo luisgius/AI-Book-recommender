@@ -303,3 +303,86 @@ class AgentAskResponse(BaseModel):
     )
     reflections: int = Field(ge=0, description="Re-searches after a failed verification")
     latency_ms: float
+
+
+# ---------------------------------------------------------------------------
+# Conversational assistant (the LangGraph entry point)
+# ---------------------------------------------------------------------------
+
+AssistantRoute = Literal['clarify', 'search', 'agent', 'out_of_scope']
+
+# Hard limits of one request body (422 beyond them). The assistant then keeps
+# only the most recent turns and cuts long messages (value_objects.py).
+MAX_REQUEST_MESSAGES = 50
+MAX_REQUEST_MESSAGE_CHARS = 5000
+
+
+class ChatMessage(BaseModel):
+    """One turn of the conversation, as the client keeps it."""
+    role: Literal['user', 'assistant']
+    content: str = Field(min_length=1, max_length=MAX_REQUEST_MESSAGE_CHARS)
+    route: AssistantRoute | None = Field(
+        default=None,
+        description=(
+            "On assistant turns, the `route` of the reply that produced them. The server stores "
+            "nothing, so this is how it counts the clarifying questions already asked; an assistant "
+            "turn without it counts as one."
+        ),
+    )
+
+
+class AssistantChatRequest(BaseModel):
+    """Request body for POST /assistant/chat: the whole conversation, ending with a user message."""
+    messages: list[ChatMessage] = Field(min_length=1, max_length=MAX_REQUEST_MESSAGES)
+    max_results: int | None = Field(default=None, ge=1, le=50, description="Results on the search route (default 10)")
+
+
+class AssistantRecommendation(BaseModel):
+    """A recommended book with the reason and, on the search route, verified citations."""
+    book: Book
+    reason: str
+    citations: list[Citation] = Field(default_factory=list)
+
+
+class AssistantUsage(BaseModel):
+    """LLM calls of this request and what the provider reported for them (null: not reported)."""
+    llm_calls: int = 0
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cost_usd: float | None = None
+
+
+class AssistantChatResponse(BaseModel):
+    """Reply of the assistant to the last user message."""
+    route: AssistantRoute = Field(description="Path the request took")
+    message: str = Field(description="Text to show: the question, the answer or the fixed reply")
+    options: list[str] = Field(default_factory=list, description="Suggested answers (route 'clarify')")
+    search_query: str | None = Field(
+        default=None, description="The conversation condensed into one query (routes 'search' and 'agent')"
+    )
+    filters: SearchFilters | None = Field(default=None, description="Filters applied (route 'search')")
+    results: list[SearchResult] = Field(default_factory=list, description="Search results (route 'search')")
+    degraded: bool = Field(default=False, description="True if the search ran in degraded mode")
+    recommendations: list[AssistantRecommendation] = Field(
+        default_factory=list, description="Books the answer recommends (routes 'search' and 'agent')"
+    )
+    steps: list[AgentStep] = Field(default_factory=list, description="Tool calls of the agent (route 'agent')")
+    notices: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Codes of skipped steps: those of POST /search plus 'assistant_answer_failed' (results "
+            "without a written answer) and 'agent_failed' (the agent failed, the search route ran)"
+        ),
+    )
+    forced_route: str | None = Field(
+        default=None,
+        description=(
+            "Why the route differs from the model's choice: 'clarification_cap', "
+            "'invalid_clarification', 'reply_to_clarification', 'invalid_router_output', 'agent_failed'"
+        ),
+    )
+    clarifications: int = Field(ge=0, description="Clarifying questions asked so far, this reply included")
+    timings_ms: dict[str, float] = Field(default_factory=dict, description="Milliseconds per graph node")
+    model: str | None = None
+    usage: AssistantUsage = Field(default_factory=AssistantUsage)
+    latency_ms: float

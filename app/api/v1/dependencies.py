@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 
 from app.domain.ports import (
     BookCatalogRepository,
+    ConversationalAssistant,
     LexicalSearchRepository,
     VectorSearchRepository,
     EmbeddingsStore,
@@ -69,6 +70,8 @@ _llm_client: Optional[LLMClient] = None
 _llm_initialized: bool = False
 _search_agent: Optional[SearchAgent] = None
 _agent_initialized: bool = False
+_assistant: Optional[ConversationalAssistant] = None
+_assistant_initialized: bool = False
 _reranker_settings: Optional[RerankerSettings] = None
 _reranker: Optional[Reranker] = None
 _reranker_initialized: bool = False
@@ -392,6 +395,37 @@ def get_search_agent() -> Optional[SearchAgent]:
     return _search_agent
 
 
+def get_assistant() -> Optional[ConversationalAssistant]:
+    """
+    Provide the conversational assistant (LangGraph router graph), or None without an LLM.
+
+    Same wiring in both profiles: the chat model of the LLM client, the
+    search service of the profile in use and the search agent for multi-step
+    requests (when the agent cannot be built, those requests are searched).
+    """
+    global _assistant, _assistant_initialized
+    if _assistant_initialized:
+        return _assistant
+    _assistant_initialized = True
+
+    model = getattr(get_llm_client(), "model", None)
+    if model is None:
+        return None
+    try:
+        from app.infrastructure.llm.graphs.assistant import LangGraphAssistant
+
+        _assistant = LangGraphAssistant(
+            model=model,
+            search_service=get_search_service(),
+            agent=get_search_agent(),
+            model_name=get_llm_settings().model,
+        )
+    except Exception as e:
+        logger.warning(f"Assistant unavailable: {e}")
+        _assistant = None
+    return _assistant
+
+
 def get_reranker_settings() -> RerankerSettings:
     """Provide the reranker settings, read once from the environment (and .env)."""
     global _reranker_settings
@@ -578,6 +612,7 @@ def reset_dependencies() -> None:
     global _vector_repository, _search_service
     global _llm_settings, _llm_client, _llm_initialized
     global _search_agent, _agent_initialized, _embedding_settings
+    global _assistant, _assistant_initialized
     global _reranker_settings, _reranker, _reranker_initialized
     global _profile_settings, _postgres_database
     global _usage_recorder, _usage_since, _usage_settings
@@ -599,6 +634,8 @@ def reset_dependencies() -> None:
     _llm_initialized = False
     _search_agent = None
     _agent_initialized = False
+    _assistant = None
+    _assistant_initialized = False
     _reranker_settings = None
     _reranker = None
     _reranker_initialized = False

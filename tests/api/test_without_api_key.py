@@ -28,6 +28,7 @@ def test_without_key_or_provider_the_llm_is_off(fresh_environment):
     assert settings.provider == "none" and not settings.enabled
     assert deps.get_llm_client() is None
     assert deps.get_search_agent() is None
+    assert deps.get_assistant() is None
 
 
 def test_an_openrouter_key_alone_turns_the_llm_on(fresh_environment, monkeypatch):

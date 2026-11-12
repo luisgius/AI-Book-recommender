@@ -49,6 +49,7 @@ def assert_every_endpoint_answers(report: dict) -> None:
     assert statuses["similar"] == [200, 3]
     assert statuses["ui"] == 200
     assert statuses["mcp"] == 200
+    assert statuses["assistant"] == "LangGraphAssistant"
 
 
 def test_cloud_profile_serves_every_endpoint_without_importing_model_libraries():

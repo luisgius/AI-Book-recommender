@@ -156,6 +156,7 @@ def main(argv) -> int:
             headers={"Accept": "application/json, text/event-stream", "Host": "127.0.0.1:8000"})
         statuses["mcp"] = mcp.status_code
         statuses["usage"] = client.get("/api/v1/usage").json()
+        statuses["assistant"] = type(deps.get_assistant()).__name__  # built, not called (no LLM call)
     print(json.dumps({
         "statuses": statuses,
         "forbidden_imported": sorted(m for m in sys.modules if m.split(".")[0] in FORBIDDEN),

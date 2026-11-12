@@ -221,3 +221,61 @@ def api_request_to_domain(request: api.SearchRequest) -> domain_vo.SearchQuery:
         use_diversification=request.use_diversification if request.use_diversification is not None else False,
         diversity_lambda=request.diversity_lambda if request.diversity_lambda is not None else 0.6,
     )
+
+
+def api_messages_to_domain(messages: list[api.ChatMessage]) -> list[domain_vo.ChatMessage]:
+    """Convert the conversation of an assistant request to domain ChatMessages."""
+    return [domain_vo.ChatMessage(role=m.role, content=m.content, route=m.route) for m in messages]
+
+
+def domain_reply_to_api(reply: domain.AssistantReply, latency_ms: float) -> api.AssistantChatResponse:
+    """
+    Convert a domain AssistantReply to the API response.
+
+    Args:
+        reply: Domain AssistantReply
+        latency_ms: Time the endpoint took
+    """
+    response = reply.search_response
+    filters = reply.filters
+    usage = reply.usage or {}
+    return api.AssistantChatResponse(
+        route=reply.route,
+        message=reply.message,
+        options=list(reply.options),
+        search_query=reply.search_query,
+        filters=(
+            api.SearchFilters(language=filters.language, category=filters.category,
+                              min_year=filters.min_year, max_year=filters.max_year)
+            if filters is not None else None
+        ),
+        results=[domain_search_result_to_api(r) for r in response.results] if response is not None else [],
+        degraded=response.degraded if response is not None else False,
+        recommendations=[
+            api.AssistantRecommendation(
+                book=domain_book_to_api(r.book),
+                reason=r.reason,
+                citations=[
+                    api.Citation(field=c.chunk_id, snippet=c.snippet, relevance_score=c.relevance_score)
+                    for c in r.citations
+                ],
+            )
+            for r in reply.recommendations
+        ],
+        steps=[
+            api.AgentStep(tool=s.tool, arguments=s.arguments, result_count=s.result_count)
+            for s in (reply.agent_answer.steps if reply.agent_answer is not None else [])
+        ],
+        notices=list(reply.notices),
+        forced_route=reply.forced_route,
+        clarifications=reply.clarifications,
+        timings_ms=dict(reply.timings_ms),
+        model=reply.model,
+        usage=api.AssistantUsage(
+            llm_calls=usage.get("llm_calls", 0),
+            input_tokens=usage.get("input_tokens"),
+            output_tokens=usage.get("output_tokens"),
+            cost_usd=usage.get("cost_usd"),
+        ),
+        latency_ms=latency_ms,
+    )
