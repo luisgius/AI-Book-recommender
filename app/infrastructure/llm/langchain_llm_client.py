@@ -73,6 +73,18 @@ def openrouter_reasoning(reasoning: Reasoning) -> Optional[dict]:
     return {"effort": reasoning}
 
 
+# OpenRouter providers that accept the reasoning switch but keep thinking when
+# it is off. Measured on 2026-11-12 (V25) for deepseek/deepseek-v4.1-flash by
+# sending the same answer call to each of its providers in turn: Novita
+# reasoned until the token cap under {"enabled": false}, {"effort": "none"},
+# both together, {"max_tokens": 0} and the top-level reasoning_effort "none";
+# every other provider that answered spent 0 reasoning tokens. This explains
+# 4 of the 5 answer calls of V22 that hit their 1024-token cap. OpenRouter
+# lists Novita as supporting "reasoning", so require_parameters does not
+# exclude it.
+PROVIDERS_IGNORING_REASONING_OFF = ("novita",)
+
+
 def openrouter_options(base_url: Optional[str], reasoning: Reasoning) -> dict:
     """
     Client options of an OpenRouter chat model (LangChain's OpenAI client).
@@ -82,12 +94,16 @@ def openrouter_options(base_url: Optional[str], reasoning: Reasoning) -> dict:
     - extra_body: OpenRouter-only request fields. "require_parameters" makes
       OpenRouter route only to providers that support every parameter sent
       (JSON schema, thinking switch, token cap), so none of them is silently
-      ignored. No identifying headers (HTTP-Referer, X-Title) are sent.
+      ignored. With thinking off, the providers known to keep thinking anyway
+      (PROVIDERS_IGNORING_REASONING_OFF) are excluded with "ignore". No
+      identifying headers (HTTP-Referer, X-Title) are sent.
     """
     extra_body: dict = {"provider": {"require_parameters": True}}
     reasoning_field = openrouter_reasoning(reasoning)
     if reasoning_field is not None:
         extra_body["reasoning"] = reasoning_field
+    if reasoning is False:
+        extra_body["provider"]["ignore"] = list(PROVIDERS_IGNORING_REASONING_OFF)
     return {
         "base_url": base_url or DEFAULT_OPENROUTER_URL,
         "api_key": openrouter_api_key(),

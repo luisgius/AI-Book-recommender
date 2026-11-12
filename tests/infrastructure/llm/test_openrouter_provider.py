@@ -163,8 +163,18 @@ class TestOpenRouterChatModel:
         assert kwargs["base_url"] == DEFAULT_OPENROUTER_URL
         assert kwargs["api_key"] == "test-key"
         assert (kwargs["max_tokens"], kwargs["timeout"]) == (1024, 60)
-        assert kwargs["extra_body"] == {"provider": {"require_parameters": True}, "reasoning": {"enabled": False}}
+        assert kwargs["extra_body"] == {"provider": {"require_parameters": True, "ignore": ["novita"]},
+                                        "reasoning": {"enabled": False}}
         assert "num_ctx" not in kwargs and "num_predict" not in kwargs and "default_headers" not in kwargs
+
+    @pytest.mark.parametrize("reasoning", [True, "low", None])
+    def test_providers_are_excluded_only_when_thinking_is_off(self, openrouter_key, reasoning):
+        # Novita keeps thinking with reasoning off (V25), so it is excluded
+        # then and only then: with thinking on it is a valid provider.
+        with patch.object(llm_client_module, "init_chat_model") as init_model:
+            init_model.return_value = Mock()
+            build_chat_model("openrouter", "m", reasoning=reasoning)
+        assert init_model.call_args.kwargs["extra_body"]["provider"] == {"require_parameters": True}
 
     def test_custom_base_url(self, openrouter_key):
         with patch.object(llm_client_module, "init_chat_model") as init_model:
