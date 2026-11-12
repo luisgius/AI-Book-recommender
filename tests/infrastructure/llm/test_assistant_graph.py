@@ -387,6 +387,17 @@ def test_the_conversation_is_declared_data_in_the_router_prompt():
     assert "<conversation>" in model.router.inputs[0][1][1]
 
 
+def test_out_of_scope_is_defined_by_what_is_asked_not_by_topic():
+    # V25: the router's out_of_scope is a criterion on what the message asks
+    # for; no list of topics (V22 refused cooking and computing requests).
+    from app.infrastructure.llm.prompts_assistant import ROUTER_SYSTEM_PROMPT
+
+    line = next(l for l in ROUTER_SYSTEM_PROMPT.splitlines() if l.startswith('- "out_of_scope"'))
+    assert "not by its topic" in line
+    assert "any topic can be the subject of a book" in line
+    assert all(word not in line.lower() for word in ("weather", "maths", "code", "cooking", "recipe"))
+
+
 def test_the_answer_is_asked_in_the_language_of_the_last_message():
     model = FakeModel(routes=[decision("search", "war novels", reply="en")],
                       answers=[GroundedAnswerLLM(message="x", picks=[])])

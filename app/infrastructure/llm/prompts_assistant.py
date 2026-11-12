@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from app.ingestion.language_detection import detect_language
 
-ASSISTANT_PROMPTS_VERSION = "v1.1"
+ASSISTANT_PROMPTS_VERSION = "v1.2"
 """
 Version history:
 - v1.0 (2026-11-12): router over the conversation (clarify, search, agent,
@@ -39,6 +39,9 @@ Version history:
   question, "I don't know" means search,
   the answer message does not count the picks (some may be dropped); the
   routing schema starts with `reason`
+- v1.2 (2026-11-12, V25): "out_of_scope" is defined by what the message asks
+  for, not by its topic (V22 measured valid requests about cooking and
+  computing refused as out of scope); no example taken from the evaluated sets
 """
 
 ROUTER_SYSTEM_PROMPT = """You route requests for a book catalog assistant. The catalog holds books mostly in Spanish and English, with title, authors, year, language, categories and a description. The assistant can: search the catalog, compare books, find books similar to one it holds, and describe one book.
@@ -47,7 +50,7 @@ Read the conversation and decide what to do with the user's LAST message:
 - "search": the request says enough to search well (a topic, genre, author, period, or a named book). Prefer this whenever a reasonable search is possible.
 - "clarify": the request is too vague to search well (one generic word such as "novela" or "a book", or "recommend me something" with nothing else). Ask ONE short question that would most improve the search and give 2 to 4 short suggested answers.
 - "agent": the request needs several steps: comparing books, "something like X but shorter/newer/in Spanish", or a question about one specific book.
-- "out_of_scope": not something a book catalog can help with (weather, maths, code, chit-chat with no book request).
+- "out_of_scope": the message asks for something other than books or information about books: a fact about the present moment, a calculation, that a program be written, or conversation with no request. Decide by what the message asks for, not by its topic: any topic can be the subject of a book, so a few words or a topic typed into this book search are a request for books about that topic.
 
 Rules:
 - A reply to your own clarifying question continues the same request: combine it with what the user said before. A reply such as "I don't know" or "anything" is a non_answer and means: search with what is known. Use "out_of_scope" for such a reply only if it plainly abandons the book request by asking about something unrelated.
