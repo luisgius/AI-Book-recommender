@@ -1,0 +1,3581 @@
+{
+  "protocol": {
+    "path": "docs/notes/2026-11-12-protocolo-evaluacion-catalogo.md",
+    "commit": "9abf48e"
+  },
+  "queries": {
+    "counts_by_stratum": {
+      "A": 44,
+      "B": 72,
+      "C": 40,
+      "D": 12
+    },
+    "counts_by_stratum_language": {
+      "A/en": 24,
+      "A/es": 20,
+      "B/en": 6,
+      "B/es": 6,
+      "B/fr": 6,
+      "B/de": 6,
+      "B/it": 6,
+      "B/pt": 6,
+      "B/ca": 6,
+      "B/nl": 6,
+      "B/ru": 6,
+      "B/zh": 6,
+      "B/ja": 6,
+      "B/ar": 6,
+      "C/es": 10,
+      "C/en": 10,
+      "C/fr": 10,
+      "C/de": 10,
+      "D/en": 1,
+      "D/es": 1,
+      "D/fr": 1,
+      "D/de": 1,
+      "D/it": 1,
+      "D/pt": 1,
+      "D/ca": 1,
+      "D/nl": 1,
+      "D/ru": 1,
+      "D/zh": 1,
+      "D/ja": 1,
+      "D/ar": 1
+    },
+    "counts_by_stratum_type": {
+      "A/original": 44,
+      "B/thematic": 36,
+      "B/descriptive": 24,
+      "B/known_item": 12,
+      "C/thematic": 24,
+      "C/descriptive": 16,
+      "D/unanswerable": 12
+    },
+    "generator": {
+      "model": "google/gemini-3.8-flash",
+      "temperature": 0.7,
+      "reasoning": {
+        "effort": "low"
+      },
+      "prompt_version": "v1"
+    },
+    "first_pass_problems": [
+      {
+        "query_id": "c05-fr",
+        "check": "language",
+        "detail": "not fr: ca 2.53, fr 1.53, la 1.00"
+      },
+      {
+        "query_id": "c08-fr",
+        "check": "language",
+        "detail": "not fr: ca 1.17, pt 1.17, es 0.17"
+      },
+      {
+        "query_id": "c09-fr",
+        "check": "language",
+        "detail": "not fr: ca 1.17, fr 0.67, la 0.50"
+      },
+      {
+        "query_id": "b-ca-6",
+        "check": "title words",
+        "detail": "contains ['tirant']"
+      },
+      {
+        "query_id": "b-ar-6",
+        "check": "title words",
+        "detail": "contains ['الى']"
+      }
+    ],
+    "fixes": [
+      {
+        "round": 1,
+        "query_id": "b-ar-6",
+        "reasons": [
+          "title words: contains ['الى']",
+          "known item: the work named in target_title / target_author was not found in the catalog by title and author; choose a more widely known work, and give its title exactly as published"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "رواية الطيب صالح عن رحلة مصطفى سعيد إلى بريطانيا وعودته إلى قرية على ضفاف النيل",
+          "need": "The user is seeking the famous Sudanese post-colonial novel by Tayeb Salih about the life and contradictions of Mustafa Sa'eed between London and a Sudanese village.",
+          "target_title": "موسم الهجرة إلى الشمال",
+          "target_author": "الطيب صالح"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "سيرة ذاتية لعميد الأدب العربي يروي فيها معاناته مع فقدان البصر في طفولته ودراسته في الأزهر وفرنسا",
+          "need": "The user is looking for Taha Hussein's celebrated multi-volume autobiography chronicling his childhood in rural Egypt, losing his eyesight, and his education at Al-Azhar and in France.",
+          "target_title": "الأيام",
+          "target_author": "طه حسين"
+        }
+      },
+      {
+        "round": 1,
+        "query_id": "b-ca-6",
+        "reasons": [
+          "title words: contains ['tirant']",
+          "known item: the work named in target_title / target_author was not found in the catalog by title and author; choose a more widely known work, and give its title exactly as published"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "novel·la de cavalleries valenciana amb Tirant i Carmesina",
+          "need": "The reader is searching for Joanot Martorell's classic 15th-century chivalric romance featuring the knight of Brittany and the princess of the Byzantine Empire.",
+          "target_title": "Tirant lo Blanc",
+          "target_author": "Joanot Martorell"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "novel·la de Mercè Rodoreda sobre la Natàlia que cria coloms a Gràcia durant la República i la guerra",
+          "need": "The reader is searching for Mercè Rodoreda's famous novel centered on the character Natàlia (Colometa) living in Barcelona's Gràcia neighborhood through the Second Republic, the Civil War, and the postwar era.",
+          "target_title": "La plaça del Diamant",
+          "target_author": "Mercè Rodoreda"
+        }
+      },
+      {
+        "round": 1,
+        "query_id": "b-zh-6",
+        "reasons": [
+          "known item: the work named in target_title / target_author was not found in the catalog by title and author; choose a more widely known work, and give its title exactly as published"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "曹雪芹写贾宝玉林黛玉大观园荣国府兴衰的小说",
+          "need": "The reader is looking for the famous 18th-century Chinese masterwork chronicling the decline of the Jia clan and the tragic romance between Jia Baoyu and Lin Daiyu.",
+          "target_title": "红楼梦",
+          "target_author": "曹雪芹"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "孙悟空猪八戒保护唐僧去西天取经的神魔小说",
+          "need": "The user is looking for the classic 16th-century Chinese epic novel about the monk Xuanzang and his disciples (including Sun Wukong and Zhu Bajie) traveling to the Western Regions to retrieve Buddhist scriptures.",
+          "target_title": "西游记",
+          "target_author": "吴承恩"
+        }
+      },
+      {
+        "round": 1,
+        "query_id": "c05-fr",
+        "reasons": [
+          "language: not fr: ca 2.53, fr 1.53, la 1.00"
+        ],
+        "before": {
+          "type": "thematic",
+          "text": "récits d'horreur gothique et légendes de vampires en Europe de l'Est",
+          "need": "The user wants Gothic horror tales and vampire legends set in Eastern Europe."
+        },
+        "after": {
+          "type": "thematic",
+          "text": "romans fantastiques épouvante gothique histoires de vampires Europe orientale",
+          "need": "The user wants Gothic horror tales and vampire legends set in Eastern Europe."
+        }
+      },
+      {
+        "round": 1,
+        "query_id": "c08-fr",
+        "reasons": [
+          "language: not fr: ca 1.17, pt 1.17, es 0.17"
+        ],
+        "before": {
+          "type": "thematic",
+          "text": "romans d'espionnage Guerre froide à Berlin mur de Berlin",
+          "need": "The user wants historical fiction set in Berlin during the Cold War focused on espionage and spy operations around the Berlin Wall."
+        },
+        "after": {
+          "type": "thematic",
+          "text": "romans historiques d'espionnage pendant la guerre froide autour du mur de Berlin",
+          "need": "The user wants historical fiction set in Berlin during the Cold War focused on espionage and spy operations around the Berlin Wall."
+        }
+      },
+      {
+        "round": 1,
+        "query_id": "c09-fr",
+        "reasons": [
+          "language: not fr: ca 1.17, fr 0.67, la 0.50"
+        ],
+        "before": {
+          "type": "descriptive",
+          "text": "pièces de théâtre comédie romantique quiproquos et dialogues d'esprit",
+          "need": "The user is searching for humorous romantic comedy plays or dramatic texts featuring mistaken identities and witty dialogue."
+        },
+        "after": {
+          "type": "descriptive",
+          "text": "pièce de théâtre comique sentimentale quiproquo amoureux dialogues spirituels",
+          "need": "The user is searching for humorous romantic comedy plays or dramatic texts featuring mistaken identities and witty dialogue."
+        }
+      },
+      {
+        "round": 2,
+        "query_id": "b-ca-6",
+        "reasons": [
+          "language: not ca: es 2.42, ca 1.67, fr 1.42"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "novel·la de Mercè Rodoreda sobre la Natàlia que cria coloms a Gràcia durant la República i la guerra",
+          "need": "The reader is searching for Mercè Rodoreda's famous novel centered on the character Natàlia (Colometa) living in Barcelona's Gràcia neighborhood through the Second Republic, the Civil War, and the postwar era.",
+          "target_title": "La plaça del Diamant",
+          "target_author": "Mercè Rodoreda"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "obra de teatre d'Àngel Guimerà on el pastor Manelic baixa dels cims i s'enfronta a l'amo Sebastià",
+          "need": "The reader is searching for Àngel Guimerà's classic realistic drama set in rural Catalonia, featuring the shepherd Manelic and his conflict with the landowner Sebastià over Marta.",
+          "target_title": "Terra baixa",
+          "target_author": "Àngel Guimerà"
+        }
+      },
+      {
+        "round": 2,
+        "query_id": "b-zh-6",
+        "reasons": [
+          "known item: the work named in target_title / target_author was not found in the catalog by title and author; choose a more widely known work, and give its title exactly as published"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "孙悟空猪八戒保护唐僧去西天取经的神魔小说",
+          "need": "The user is looking for the classic 16th-century Chinese epic novel about the monk Xuanzang and his disciples (including Sun Wukong and Zhu Bajie) traveling to the Western Regions to retrieve Buddhist scriptures.",
+          "target_title": "西游记",
+          "target_author": "吴承恩"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "鲁迅描写未庄一个底层贫民用精神胜利法麻痹自我最终被处决的中篇小说",
+          "need": "The user is searching for Lu Xun's most famous novella depicting the tragic life and absurd psychological coping mechanism ('spiritual victory') of an illiterate peasant named Ah Q in the village of Weizhuang.",
+          "target_title": "阿Q正传",
+          "target_author": "鲁迅"
+        }
+      },
+      {
+        "round": 3,
+        "query_id": "b-ca-6",
+        "reasons": [
+          "title words: contains ['baixa']"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "obra de teatre d'Àngel Guimerà on el pastor Manelic baixa dels cims i s'enfronta a l'amo Sebastià",
+          "need": "The reader is searching for Àngel Guimerà's classic realistic drama set in rural Catalonia, featuring the shepherd Manelic and his conflict with the landowner Sebastià over Marta.",
+          "target_title": "Terra baixa",
+          "target_author": "Àngel Guimerà"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "narració de Mercè Rodoreda centrada en la vida de la Natàlia al barri de Gràcia durant la República i la guerra",
+          "need": "The reader is searching for Mercè Rodoreda's famous postwar novel about a working-class woman nicknamed Colometa surviving in Barcelona through the Republic, the Civil War, and the dictatorship.",
+          "target_title": "La plaça del Diamant",
+          "target_author": "Mercè Rodoreda"
+        }
+      },
+      {
+        "round": 3,
+        "query_id": "b-zh-6",
+        "reasons": [
+          "known item: the work named in target_title / target_author was not found in the catalog by title and author; choose a more widely known work, and give its title exactly as published"
+        ],
+        "before": {
+          "type": "known_item",
+          "text": "鲁迅描写未庄一个底层贫民用精神胜利法麻痹自我最终被处决的中篇小说",
+          "need": "The user is searching for Lu Xun's most famous novella depicting the tragic life and absurd psychological coping mechanism ('spiritual victory') of an illiterate peasant named Ah Q in the village of Weizhuang.",
+          "target_title": "阿Q正传",
+          "target_author": "鲁迅"
+        },
+        "after": {
+          "type": "known_item",
+          "text": "曹雪芹笔下贾宝玉林黛玉爱情悲剧与荣宁二府衰亡的古典章回巨著",
+          "need": "The user is looking for the quintessential 18th-century Chinese masterpiece depicting the decline of the aristocratic Jia family and the tragic love triangle between Jia Baoyu, Lin Daiyu, and Xue Baochai.",
+          "target_title": "红楼梦",
+          "target_author": "曹雪芹"
+        }
+      }
+    ],
+    "final_problems": [],
+    "language_summary": {
+      "undecided": 26,
+      "ok": 98
+    },
+    "language_undecided": {
+      "b-en-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "early Victorian gothic horror novels"
+      },
+      "b-en-3": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "post-apocalyptic science fiction survival"
+      },
+      "b-fr-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "fr",
+        "text": "roman policier historique XIXe siècle"
+      },
+      "b-fr-2": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "fr",
+        "text": "philosophie politique Lumières liberté"
+      },
+      "b-de-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Deutsche Philosophie Aufklärung 18. Jahrhundert"
+      },
+      "b-de-2": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Historische Romane Weimarer Republik Berlin"
+      },
+      "b-de-3": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Science-Fiction Dystopie künstliche Intelligenz"
+      },
+      "b-it-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "it",
+        "text": "romanzo storico risorgimento italiano"
+      },
+      "b-it-2": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "it",
+        "text": "filosofia morale illuminismo"
+      },
+      "b-pt-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "pt",
+        "text": "ficção científica exploração espacial"
+      },
+      "b-pt-2": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "pt",
+        "text": "ensaios filosofia política iluminismo"
+      },
+      "b-pt-3": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "pt",
+        "text": "poesia lírica barroca século XVII"
+      },
+      "b-ca-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "ca",
+        "text": "poesia catalana contemporània segle XX"
+      },
+      "b-nl-1": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "nl",
+        "text": "historische romans gouden eeuw amsterdam"
+      },
+      "b-nl-2": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "nl",
+        "text": "filosofie ethiek moderne technologie"
+      },
+      "b-nl-3": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "nl",
+        "text": "post-apocalyptische sciencefiction overleving"
+      },
+      "b-ja-1": {
+        "verdict": "undecided",
+        "evidence": "Han characters only (Chinese or Japanese)",
+        "language": "ja",
+        "text": "平安時代 歴史小説 女性"
+      },
+      "c01-en": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "science fiction generation ship space colonization novels"
+      },
+      "c01-de": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Science-Fiction Romane Generationsraumschiff Weltraumkolonisierung"
+      },
+      "c03-en": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "classic British locked-room murder mystery amateur detective novels"
+      },
+      "c07-en": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "Celtic mythology fantasy novels fae folklore"
+      },
+      "c08-de": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Spionageromane Kalter Krieg Schauplatz Berlin Berliner Mauer"
+      },
+      "c09-en": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "en",
+        "text": "romantic comedy plays mistaken identity witty dialogue"
+      },
+      "c09-de": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "romantische Theaterkomödien Verwechslungsspiele geistreiche Dialoge"
+      },
+      "d-de": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "de",
+        "text": "Öffnungszeiten Bürgeramt Berlin Neukölln heute"
+      },
+      "d-nl": {
+        "verdict": "undecided",
+        "evidence": "no function word",
+        "language": "nl",
+        "text": "uitslagen voetbal eredivisie gisteravond"
+      }
+    },
+    "known_item_targets": {
+      "b-en-6": [
+        "5e04bbf8-3d66-5d6c-8356-f2d0f82e526d"
+      ],
+      "b-es-6": [
+        "0b15d0a1-8cb5-532c-8746-1907932e2509"
+      ],
+      "b-fr-6": [
+        "e77e47e0-c24c-5991-88b6-77021dbc7121"
+      ],
+      "b-de-6": [
+        "1877951e-6a0d-53f7-ad63-d17fe86e4e00"
+      ],
+      "b-it-6": [
+        "e2ece4d1-2872-53c7-af04-68ccd46db970"
+      ],
+      "b-pt-6": [
+        "6f39b84d-61ce-54b7-9976-67c574574c7a"
+      ],
+      "b-ca-6": [
+        "35fac723-6a15-5217-bc0e-764ca307b53b"
+      ],
+      "b-nl-6": [
+        "426febd9-c579-54ad-8c71-d6be3738f91c"
+      ],
+      "b-ru-6": [
+        "a0e6c076-7683-52c5-80ec-c0422b953d98"
+      ],
+      "b-zh-6": [],
+      "b-ja-6": [
+        "a4bae60e-1a30-5313-b4bc-fd220c81923b"
+      ],
+      "b-ar-6": [
+        "66ccf9f1-60c4-5906-b0df-3c88ee3a933e"
+      ]
+    }
+  },
+  "parity": {
+    "database_bytes": 656932864,
+    "parity": {
+      "local_works": 50000,
+      "neon_works": 50000,
+      "same_ids": true,
+      "text_hash_equal": 50000,
+      "content_hash_equal": 50000
+    },
+    "explain": {
+      "exact_settings": {
+        "enable_indexscan": "off",
+        "enable_bitmapscan": "off",
+        "enable_indexonlyscan": "off"
+      },
+      "exact_plan": [
+        "Incremental Sort  (cost=11310.34..11316.81 rows=100 width=304)",
+        "  Sort Key: nearest.distance, nearest.id",
+        "  Presorted Key: nearest.distance",
+        "  CTE nearest",
+        "    ->  Limit  (cost=11298.66..11310.31 rows=100 width=1249)",
+        "          ->  Gather Merge  (cost=11298.66..17121.87 rows=49999 width=1249)",
+        "                Workers Planned: 2",
+        "                ->  Sort  (cost=10298.64..10350.72 rows=20833 width=1249)",
+        "                      Sort Key: ((w.embedding <=> '[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]'::halfvec))",
+        "                      ->  Parallel Seq Scan on works w  (cost=0.00..9502.42 rows=20833 width=1249)",
+        "                            Filter: (embedding IS NOT NULL)",
+        "  ->  CTE Scan on nearest  (cost=0.00..2.00 rows=100 width=304)"
+      ],
+      "exact_is_sequential_scan": true,
+      "approximate_plan": [
+        "Incremental Sort  (cost=75.22..81.69 rows=100 width=304)",
+        "  Sort Key: nearest.distance, nearest.id",
+        "  Presorted Key: nearest.distance",
+        "  CTE nearest",
+        "    ->  Limit  (cost=0.00..75.19 rows=100 width=1249)",
+        "          ->  Index Scan using works_embedding_ann on works w  (cost=0.00..37593.00 rows=50000 width=1249)",
+        "                Order By: (embedding <=> '[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]'::halfvec)",
+        "                Filter: (embedding IS NOT NULL)",
+        "  ->  CTE Scan on nearest  (cost=0.00..2.00 rows=100 width=304)"
+      ],
+      "approximate_uses_ann_index": true
+    },
+    "vector_index": "lakebase_ann",
+    "checked_at": "2026-11-12T11:12:41"
+  },
+  "runs": {
+    "lines": {
+      "S1": 168,
+      "S2": 168,
+      "S3": 168,
+      "S4": 168,
+      "S5": 168,
+      "S6": 168,
+      "S6b": 168,
+      "E1": 168,
+      "E2": 168
+    },
+    "failures": {
+      "S1": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "S2": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "S3": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "S4": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "S5": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "S6": {
+        "queries": 168,
+        "fallbacks": [],
+        "llm_lists_completed": 3,
+        "llm_answer_unusable": 1
+      },
+      "S6b": {
+        "queries": 168,
+        "fallbacks": [],
+        "llm_unknown_ids": 1,
+        "llm_lists_completed": 2,
+        "llm_answer_unusable": 1
+      },
+      "E1": {
+        "queries": 168,
+        "fallbacks": []
+      },
+      "E2": {
+        "queries": 168,
+        "fallbacks": []
+      }
+    },
+    "latency_ab": {
+      "S1": {
+        "median_ms": {
+          "lexical": 200.60000000000002
+        },
+        "total_median_ms": 200.60000000000002,
+        "total_p95_ms": 706.65
+      },
+      "S2": {
+        "median_ms": {
+          "embedding": 2327.1,
+          "vector": 129.5
+        },
+        "total_median_ms": 2459.1,
+        "total_p95_ms": 33258.025
+      },
+      "S3": {
+        "median_ms": {
+          "lexical": 111.19999999999999,
+          "embedding": 2327.1,
+          "vector": 102.05000000000001,
+          "fusion": 0.0
+        },
+        "total_median_ms": 2546.75,
+        "total_p95_ms": 33382.825
+      },
+      "S4": {
+        "median_ms": {
+          "embedding": 2327.1,
+          "vector": 129.5,
+          "rerank": 643.2
+        },
+        "total_median_ms": 3099.05,
+        "total_p95_ms": 34031.15
+      },
+      "S5": {
+        "median_ms": {
+          "lexical": 111.19999999999999,
+          "embedding": 2327.1,
+          "vector": 102.05000000000001,
+          "fusion": 0.0,
+          "rerank": 648.1
+        },
+        "total_median_ms": 3263.95,
+        "total_p95_ms": 34150.3
+      },
+      "S6": {
+        "median_ms": {
+          "lexical": 111.19999999999999,
+          "embedding": 2327.1,
+          "vector": 102.05000000000001,
+          "fusion": 0.0,
+          "llm": 2675.25
+        },
+        "total_median_ms": 5467.950000000001,
+        "total_p95_ms": 36173.05
+      },
+      "S6b": {
+        "median_ms": {
+          "lexical": 111.19999999999999,
+          "embedding": 2327.1,
+          "vector": 102.05000000000001,
+          "fusion": 0.0,
+          "llm": 2760.95
+        },
+        "total_median_ms": 5613.799999999999,
+        "total_p95_ms": 35962.65
+      },
+      "E1": {
+        "median_ms": {
+          "embedding": 2327.1,
+          "vector": 426.1
+        },
+        "total_median_ms": 2736.4,
+        "total_p95_ms": 33402.775
+      },
+      "E2": {
+        "median_ms": {
+          "embedding": 404.15,
+          "vector": 1.8
+        },
+        "total_median_ms": 406.0,
+        "total_p95_ms": 904.95
+      }
+    }
+  },
+  "pool": {
+    "needs": 138,
+    "pairs": 4996,
+    "per_need": {
+      "n": 138,
+      "min": 17,
+      "median": 34.0,
+      "mean": 36.20289855072464,
+      "max": 100
+    },
+    "pairs_by_stratum": {
+      "A": 1452,
+      "B": 2315,
+      "C": 839,
+      "D": 390
+    }
+  },
+  "judgments": {
+    "primary": {
+      "model": "z-ai/glm-5.3-flash",
+      "graded_pairs": 4996
+    },
+    "second": {
+      "model": "minimax/minimax-m3.1-flash",
+      "graded_pairs": 4996
+    },
+    "runs": [
+      {
+        "model": "minimax/minimax-m3.1-flash",
+        "pairs": 4996,
+        "judged_in_run": 4996,
+        "failed_calls_in_run": 24,
+        "errors": {
+          "LengthFinishReasonError": 24
+        },
+        "passes": 3,
+        "unjudged": 0,
+        "date": "2026-11-12T12:41:35"
+      },
+      {
+        "model": "z-ai/glm-5.3-flash",
+        "pairs": 4996,
+        "judged_in_run": 4996,
+        "failed_calls_in_run": 7,
+        "errors": {
+          "LengthFinishReasonError": 7
+        },
+        "passes": 3,
+        "unjudged": 0,
+        "date": "2026-11-12T12:45:03"
+      }
+    ],
+    "agreement": {
+      "config": {
+        "grades": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "confusion_matrix": "rows: original grade 0-3, columns: LLM grade 0-3",
+        "mean_signed_difference": "mean of LLM grade - original grade (positive: the LLM grades higher)",
+        "quadratic_weighted_kappa_ci95": "percentile bootstrap over pairs, 2000 resamples, seed 0",
+        "binary": "kappa and agreement after mapping grades to grade >= threshold"
+      },
+      "overall": {
+        "n": 4996,
+        "exact_agreement": 0.7169735788630904,
+        "within_one_agreement": 0.977982385908727,
+        "quadratic_weighted_kappa": 0.8496021037028012,
+        "quadratic_weighted_kappa_ci95": [
+          0.8396884273314773,
+          0.8585003387528916
+        ],
+        "binary": {
+          "at_least_1": {
+            "kappa": 0.7804398901669148,
+            "agreement": 0.9041232986389112
+          },
+          "at_least_2": {
+            "kappa": 0.75422932479173,
+            "agreement": 0.8877101681345076
+          }
+        },
+        "mean_signed_difference": 0.11829463570856685,
+        "confusion_matrix": [
+          [
+            1369,
+            265,
+            2,
+            3
+          ],
+          [
+            202,
+            1125,
+            304,
+            93
+          ],
+          [
+            3,
+            147,
+            413,
+            293
+          ],
+          [
+            4,
+            5,
+            93,
+            675
+          ]
+        ],
+        "grade_distribution": {
+          "original": [
+            1639,
+            1724,
+            856,
+            777
+          ],
+          "llm": [
+            1578,
+            1542,
+            812,
+            1064
+          ]
+        }
+      },
+      "by_language": {
+        "ar": {
+          "n": 241,
+          "exact_agreement": 0.7302904564315352,
+          "within_one_agreement": 0.979253112033195,
+          "quadratic_weighted_kappa": 0.8510989944548277,
+          "quadratic_weighted_kappa_ci95": [
+            0.8043406866483319,
+            0.8910287424191216
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7473605391239236,
+              "agreement": 0.8838174273858921
+            },
+            "at_least_2": {
+              "kappa": 0.7636049750853376,
+              "agreement": 0.8962655601659751
+            }
+          },
+          "mean_signed_difference": 0.16597510373443983,
+          "confusion_matrix": [
+            [
+              72,
+              19,
+              0,
+              0
+            ],
+            [
+              9,
+              51,
+              16,
+              5
+            ],
+            [
+              0,
+              4,
+              26,
+              10
+            ],
+            [
+              0,
+              0,
+              2,
+              27
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              91,
+              81,
+              40,
+              29
+            ],
+            "llm": [
+              81,
+              74,
+              44,
+              42
+            ]
+          }
+        },
+        "ca": {
+          "n": 237,
+          "exact_agreement": 0.6962025316455697,
+          "within_one_agreement": 0.9704641350210971,
+          "quadratic_weighted_kappa": 0.8419308801698233,
+          "quadratic_weighted_kappa_ci95": [
+            0.7964400168318079,
+            0.8836356710378117
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7768711752706732,
+              "agreement": 0.8987341772151899
+            },
+            "at_least_2": {
+              "kappa": 0.7250470056406768,
+              "agreement": 0.8776371308016878
+            }
+          },
+          "mean_signed_difference": 0.10548523206751055,
+          "confusion_matrix": [
+            [
+              70,
+              6,
+              0,
+              0
+            ],
+            [
+              18,
+              50,
+              15,
+              7
+            ],
+            [
+              0,
+              7,
+              11,
+              17
+            ],
+            [
+              0,
+              0,
+              2,
+              34
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              76,
+              90,
+              35,
+              36
+            ],
+            "llm": [
+              88,
+              63,
+              28,
+              58
+            ]
+          }
+        },
+        "de": {
+          "n": 1081,
+          "exact_agreement": 0.6540240518038853,
+          "within_one_agreement": 0.9851988899167438,
+          "quadratic_weighted_kappa": 0.806804379386459,
+          "quadratic_weighted_kappa_ci95": [
+            0.7847844001560412,
+            0.8277013261103509
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7430157744189079,
+              "agreement": 0.913968547641073
+            },
+            "at_least_2": {
+              "kappa": 0.701814969482814,
+              "agreement": 0.8538390379278445
+            }
+          },
+          "mean_signed_difference": 0.11840888066604996,
+          "confusion_matrix": [
+            [
+              183,
+              60,
+              0,
+              0
+            ],
+            [
+              33,
+              265,
+              88,
+              15
+            ],
+            [
+              0,
+              54,
+              142,
+              81
+            ],
+            [
+              0,
+              1,
+              42,
+              117
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              243,
+              401,
+              277,
+              160
+            ],
+            "llm": [
+              216,
+              380,
+              272,
+              213
+            ]
+          }
+        },
+        "en": {
+          "n": 1033,
+          "exact_agreement": 0.7599225556631172,
+          "within_one_agreement": 0.978702807357212,
+          "quadratic_weighted_kappa": 0.8746656498019806,
+          "quadratic_weighted_kappa_ci95": [
+            0.8534149925046233,
+            0.8934073663196604
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.800124140547023,
+              "agreement": 0.9022265246853823
+            },
+            "at_least_2": {
+              "kappa": 0.8081674522253566,
+              "agreement": 0.9186834462729913
+            }
+          },
+          "mean_signed_difference": 0.10358180058083252,
+          "confusion_matrix": [
+            [
+              388,
+              66,
+              0,
+              2
+            ],
+            [
+              30,
+              193,
+              46,
+              14
+            ],
+            [
+              2,
+              16,
+              61,
+              44
+            ],
+            [
+              1,
+              3,
+              24,
+              143
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              456,
+              283,
+              123,
+              171
+            ],
+            "llm": [
+              421,
+              278,
+              131,
+              203
+            ]
+          }
+        },
+        "es": {
+          "n": 859,
+          "exact_agreement": 0.7334109429569267,
+          "within_one_agreement": 0.9732246798603027,
+          "quadratic_weighted_kappa": 0.8570796768296605,
+          "quadratic_weighted_kappa_ci95": [
+            0.8315309523985396,
+            0.8806988170406104
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7842360459755496,
+              "agreement": 0.9080325960419092
+            },
+            "at_least_2": {
+              "kappa": 0.7795002840933672,
+              "agreement": 0.8963911525029103
+            }
+          },
+          "mean_signed_difference": 0.1362048894062864,
+          "confusion_matrix": [
+            [
+              225,
+              42,
+              0,
+              1
+            ],
+            [
+              34,
+              192,
+              47,
+              20
+            ],
+            [
+              0,
+              19,
+              64,
+              54
+            ],
+            [
+              2,
+              0,
+              10,
+              149
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              268,
+              293,
+              137,
+              161
+            ],
+            "llm": [
+              261,
+              253,
+              121,
+              224
+            ]
+          }
+        },
+        "fr": {
+          "n": 239,
+          "exact_agreement": 0.6903765690376569,
+          "within_one_agreement": 0.9623430962343096,
+          "quadratic_weighted_kappa": 0.8387734519539677,
+          "quadratic_weighted_kappa_ci95": [
+            0.7918785229732481,
+            0.8794977763200287
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7740422796203154,
+              "agreement": 0.895397489539749
+            },
+            "at_least_2": {
+              "kappa": 0.73637366399148,
+              "agreement": 0.8786610878661087
+            }
+          },
+          "mean_signed_difference": 0.2301255230125523,
+          "confusion_matrix": [
+            [
+              74,
+              17,
+              1,
+              0
+            ],
+            [
+              7,
+              42,
+              15,
+              8
+            ],
+            [
+              0,
+              5,
+              14,
+              19
+            ],
+            [
+              0,
+              0,
+              2,
+              35
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              92,
+              72,
+              38,
+              37
+            ],
+            "llm": [
+              81,
+              64,
+              32,
+              62
+            ]
+          }
+        },
+        "it": {
+          "n": 232,
+          "exact_agreement": 0.7543103448275862,
+          "within_one_agreement": 0.9655172413793104,
+          "quadratic_weighted_kappa": 0.8085106382978724,
+          "quadratic_weighted_kappa_ci95": [
+            0.7462838410685134,
+            0.8619172991323971
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.8015487124077075,
+              "agreement": 0.9181034482758621
+            },
+            "at_least_2": {
+              "kappa": 0.671484375,
+              "agreement": 0.875
+            }
+          },
+          "mean_signed_difference": 0.16810344827586207,
+          "confusion_matrix": [
+            [
+              58,
+              11,
+              0,
+              0
+            ],
+            [
+              8,
+              82,
+              16,
+              8
+            ],
+            [
+              0,
+              5,
+              15,
+              9
+            ],
+            [
+              0,
+              0,
+              0,
+              20
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              69,
+              114,
+              29,
+              20
+            ],
+            "llm": [
+              66,
+              98,
+              31,
+              37
+            ]
+          }
+        },
+        "ja": {
+          "n": 192,
+          "exact_agreement": 0.71875,
+          "within_one_agreement": 0.96875,
+          "quadratic_weighted_kappa": 0.8223866790009251,
+          "quadratic_weighted_kappa_ci95": [
+            0.7620639011097362,
+            0.8723994289882608
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.8660578386605784,
+              "agreement": 0.9427083333333334
+            },
+            "at_least_2": {
+              "kappa": 0.6845180136319376,
+              "agreement": 0.859375
+            }
+          },
+          "mean_signed_difference": 0.14583333333333334,
+          "confusion_matrix": [
+            [
+              54,
+              5,
+              0,
+              0
+            ],
+            [
+              6,
+              50,
+              15,
+              6
+            ],
+            [
+              0,
+              6,
+              17,
+              12
+            ],
+            [
+              0,
+              0,
+              4,
+              17
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              59,
+              77,
+              35,
+              21
+            ],
+            "llm": [
+              60,
+              61,
+              36,
+              35
+            ]
+          }
+        },
+        "nl": {
+          "n": 246,
+          "exact_agreement": 0.7195121951219512,
+          "within_one_agreement": 0.9959349593495935,
+          "quadratic_weighted_kappa": 0.862620997766195,
+          "quadratic_weighted_kappa_ci95": [
+            0.823057147402083,
+            0.8949002881890493
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.6917065978621453,
+              "agreement": 0.8617886178861789
+            },
+            "at_least_2": {
+              "kappa": 0.8153923121821063,
+              "agreement": 0.926829268292683
+            }
+          },
+          "mean_signed_difference": 0.016260162601626018,
+          "confusion_matrix": [
+            [
+              66,
+              11,
+              0,
+              0
+            ],
+            [
+              23,
+              70,
+              8,
+              1
+            ],
+            [
+              0,
+              9,
+              12,
+              16
+            ],
+            [
+              0,
+              0,
+              1,
+              29
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              77,
+              102,
+              37,
+              30
+            ],
+            "llm": [
+              89,
+              90,
+              21,
+              46
+            ]
+          }
+        },
+        "pt": {
+          "n": 248,
+          "exact_agreement": 0.7701612903225806,
+          "within_one_agreement": 0.9798387096774194,
+          "quadratic_weighted_kappa": 0.8639226976028276,
+          "quadratic_weighted_kappa_ci95": [
+            0.8102864487243013,
+            0.9071363187516562
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7947315387937239,
+              "agreement": 0.907258064516129
+            },
+            "at_least_2": {
+              "kappa": 0.7773621605446248,
+              "agreement": 0.9032258064516129
+            }
+          },
+          "mean_signed_difference": 0.06048387096774194,
+          "confusion_matrix": [
+            [
+              74,
+              11,
+              0,
+              0
+            ],
+            [
+              10,
+              62,
+              14,
+              2
+            ],
+            [
+              1,
+              5,
+              22,
+              10
+            ],
+            [
+              1,
+              1,
+              2,
+              33
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              85,
+              88,
+              38,
+              37
+            ],
+            "llm": [
+              86,
+              79,
+              38,
+              45
+            ]
+          }
+        },
+        "ru": {
+          "n": 226,
+          "exact_agreement": 0.7256637168141593,
+          "within_one_agreement": 0.9734513274336283,
+          "quadratic_weighted_kappa": 0.8682369402985075,
+          "quadratic_weighted_kappa_ci95": [
+            0.8272298440700172,
+            0.9059143487071927
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.739459815546772,
+              "agreement": 0.8761061946902655
+            },
+            "at_least_2": {
+              "kappa": 0.7509477210614476,
+              "agreement": 0.8893805309734514
+            }
+          },
+          "mean_signed_difference": 0.13274336283185842,
+          "confusion_matrix": [
+            [
+              74,
+              13,
+              1,
+              0
+            ],
+            [
+              14,
+              38,
+              14,
+              5
+            ],
+            [
+              0,
+              5,
+              11,
+              10
+            ],
+            [
+              0,
+              0,
+              0,
+              41
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              88,
+              71,
+              26,
+              41
+            ],
+            "llm": [
+              88,
+              56,
+              26,
+              56
+            ]
+          }
+        },
+        "zh": {
+          "n": 162,
+          "exact_agreement": 0.6728395061728395,
+          "within_one_agreement": 0.9876543209876543,
+          "quadratic_weighted_kappa": 0.8474089211022063,
+          "quadratic_weighted_kappa_ci95": [
+            0.7948492274764488,
+            0.8872072010679926
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.7597966532514298,
+              "agreement": 0.9135802469135802
+            },
+            "at_least_2": {
+              "kappa": 0.7020689655172414,
+              "agreement": 0.8518518518518519
+            }
+          },
+          "mean_signed_difference": 0.018518518518518517,
+          "confusion_matrix": [
+            [
+              31,
+              4,
+              0,
+              0
+            ],
+            [
+              10,
+              30,
+              10,
+              2
+            ],
+            [
+              0,
+              12,
+              18,
+              11
+            ],
+            [
+              0,
+              0,
+              4,
+              30
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              35,
+              52,
+              41,
+              34
+            ],
+            "llm": [
+              41,
+              46,
+              32,
+              43
+            ]
+          }
+        }
+      },
+      "pairs": 4996
+    },
+    "grade_distribution": {
+      "primary": {
+        "0": 1639,
+        "1": 1724,
+        "2": 856,
+        "3": 777
+      },
+      "second": {
+        "0": 1578,
+        "2": 812,
+        "1": 1542,
+        "3": 1064
+      }
+    }
+  },
+  "metrics": {
+    "primary": {
+      "summary_ab": {
+        "S1": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.3359229329657162,
+            "ci": [
+              0.287139132836115,
+              0.384288798971271
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.5267241379310345,
+            "ci": [
+              0.4672413793103448,
+              0.5836206896551724
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.7368773946360154,
+            "ci": [
+              0.6695869252873563,
+              0.8024425287356322
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.46377107194050304,
+            "ci": [
+              0.41823718382199043,
+              0.5075815550609557
+            ]
+          },
+          "judged_at_10": {
+            "mean": 0.9155172413793103,
+            "ci": [
+              0.8620689655172413,
+              0.960344827586207
+            ]
+          }
+        },
+        "S2": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.6832951277267286,
+            "ci": [
+              0.6473195697606497,
+              0.7174666178092244
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.8560344827586208,
+            "ci": [
+              0.8120689655172414,
+              0.8956896551724137
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.966235632183908,
+            "ci": [
+              0.9389367816091954,
+              0.9877873563218391
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8368908293309775,
+            "ci": [
+              0.8117443771779436,
+              0.8622788948811423
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S3": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.591728725625883,
+            "ci": [
+              0.5542889094173602,
+              0.6282766773127881
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.778448275862069,
+            "ci": [
+              0.7327586206896551,
+              0.8206896551724138
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9561781609195402,
+            "ci": [
+              0.9260057471264367,
+              0.9813218390804599
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.901994171808558,
+            "ci": [
+              0.8856250222648259,
+              0.918020388925623
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S4": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.7982615225132392,
+            "ci": [
+              0.7721456302198865,
+              0.823137600775817
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.896551724137931,
+            "ci": [
+              0.8620689655172412,
+              0.9267241379310346
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9899425287356322,
+            "ci": [
+              0.9741379310344828,
+              1.0
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8368908293309775,
+            "ci": [
+              0.8117443771779436,
+              0.8622788948811423
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S5": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.7692297041378,
+            "ci": [
+              0.7396510527032774,
+              0.7973407164654099
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.8827586206896553,
+            "ci": [
+              0.846551724137931,
+              0.9155387931034481
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9892241379310345,
+            "ci": [
+              0.9719827586206896,
+              1.0
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.901994171808558,
+            "ci": [
+              0.8856250222648259,
+              0.918020388925623
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S6": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.8109924101151281,
+            "ci": [
+              0.7815444755457496,
+              0.8381008124520218
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.9017241379310345,
+            "ci": [
+              0.868103448275862,
+              0.9318965517241379
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9856321839080461,
+            "ci": [
+              0.9669540229885057,
+              1.0
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.901994171808558,
+            "ci": [
+              0.8856250222648259,
+              0.918020388925623
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S6b": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.8124581937405655,
+            "ci": [
+              0.7832277557886854,
+              0.8397724455380081
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.9060344827586208,
+            "ci": [
+              0.8732758620689655,
+              0.9344827586206897
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9813218390804599,
+            "ci": [
+              0.9612068965517241,
+              0.9956896551724138
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.901994171808558,
+            "ci": [
+              0.8856250222648259,
+              0.918020388925623
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "E1": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.6832951277267286,
+            "ci": [
+              0.6473195697606497,
+              0.7174666178092244
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.8560344827586208,
+            "ci": [
+              0.8120689655172414,
+              0.8956896551724137
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.966235632183908,
+            "ci": [
+              0.9389367816091954,
+              0.9877873563218391
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8380367125237074,
+            "ci": [
+              0.812632489825693,
+              0.8634064999755374
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "E2": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.4255670717407146,
+            "ci": [
+              0.3790850630558603,
+              0.4704818958263314
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.6853448275862071,
+            "ci": [
+              0.6250000000000001,
+              0.742241379310345
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.8217672413793102,
+            "ci": [
+              0.7622826867816093,
+              0.8755028735632184
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.5535879486597072,
+            "ci": [
+              0.5176070889075388,
+              0.5903633504961363
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        }
+      },
+      "contrasts": {
+        "H1": {
+          "system": "S3",
+          "baseline": "S2",
+          "question": "Does hybrid fusion add to vector search alone?",
+          "queries": 116,
+          "difference": -0.0915664021008455,
+          "ci": [
+            -0.12792847502697605,
+            -0.0549330106308323
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H2": {
+          "system": "S5",
+          "baseline": "S3",
+          "question": "Does the reranker add to the hybrid?",
+          "queries": 116,
+          "difference": 0.1775009785119169,
+          "ci": [
+            0.1460403417254581,
+            0.20993160505785952
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H3": {
+          "system": "S5",
+          "baseline": "S4",
+          "question": "With a reranker, do the BM25 candidates add anything?",
+          "queries": 116,
+          "difference": -0.029031818375439247,
+          "ci": [
+            -0.044527008964753555,
+            -0.014088062407274293
+          ],
+          "p": 0.00019998000199980003,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H4": {
+          "system": "S2",
+          "baseline": "S1",
+          "question": "Does vector search beat BM25?",
+          "queries": 116,
+          "difference": 0.3473721947610124,
+          "ci": [
+            0.2927386339496238,
+            0.40146501397618
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H5": {
+          "system": "S6",
+          "baseline": "S5",
+          "question": "Does the LLM as re-ranker beat the cross-encoder? (run 1; run 2 is the replication)",
+          "queries": 116,
+          "difference": 0.04176270597732835,
+          "ci": [
+            0.011930717273977348,
+            0.07153234997579912
+          ],
+          "p": 0.007499250074992501,
+          "in_family": true,
+          "p_holm": 0.007499250074992501
+        },
+        "H6": {
+          "system": "E2",
+          "baseline": "E1",
+          "question": "Do the two embedding models differ in quality?",
+          "queries": 116,
+          "difference": -0.25772805598601395,
+          "ci": [
+            -0.30245626691723804,
+            -0.2139650316687494
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H5-rep": {
+          "system": "S6b",
+          "baseline": "S5",
+          "question": "H5 on the second run of S6 (replication, outside the family)",
+          "queries": 116,
+          "difference": 0.043228489602765444,
+          "ci": [
+            0.01286000571427971,
+            0.07333625933124333
+          ],
+          "p": 0.0036996300369963003,
+          "in_family": false,
+          "p_holm": null
+        }
+      },
+      "by_language": {
+        "ar": {
+          "queries": 6,
+          "S1": 0.28296441760610797,
+          "S2": 0.6756958677117209,
+          "S3": 0.5775578787909681,
+          "S4": 0.7720243732862938,
+          "S5": 0.7792572780974099,
+          "S6": 0.8886654384084981,
+          "S6b": 0.875747945192097,
+          "E1": 0.6756958677117209,
+          "E2": 0.3277140507509018
+        },
+        "ca": {
+          "queries": 6,
+          "S1": 0.4435570799780133,
+          "S2": 0.569761051452746,
+          "S3": 0.5854314826381766,
+          "S4": 0.7528957867291357,
+          "S5": 0.7035176058455095,
+          "S6": 0.873864969483531,
+          "S6b": 0.8509165103782622,
+          "E1": 0.569761051452746,
+          "E2": 0.362276871693825
+        },
+        "de": {
+          "queries": 6,
+          "S1": 0.35857275752624346,
+          "S2": 0.6645370317348053,
+          "S3": 0.5791092278112174,
+          "S4": 0.8074846080410877,
+          "S5": 0.7589763217541,
+          "S6": 0.7782473404026712,
+          "S6b": 0.7737460727873201,
+          "E1": 0.6645370317348053,
+          "E2": 0.5230443163638102
+        },
+        "en": {
+          "queries": 30,
+          "S1": 0.42473204078755455,
+          "S2": 0.6165177709665449,
+          "S3": 0.6098806009755716,
+          "S4": 0.7673274246894367,
+          "S5": 0.724727295909901,
+          "S6": 0.7931639805307105,
+          "S6b": 0.807317910100108,
+          "E1": 0.6165177709665449,
+          "E2": 0.34675632103551546
+        },
+        "es": {
+          "queries": 26,
+          "S1": 0.3765458885817097,
+          "S2": 0.7231065827090146,
+          "S3": 0.5664357676569856,
+          "S4": 0.8094616794841328,
+          "S5": 0.7834799409324381,
+          "S6": 0.7531387155934651,
+          "S6b": 0.7781341773918408,
+          "E1": 0.7231065827090146,
+          "E2": 0.506501838425324
+        },
+        "fr": {
+          "queries": 6,
+          "S1": 0.24421324482897874,
+          "S2": 0.7469690565951285,
+          "S3": 0.5404375570037452,
+          "S4": 0.8101461800500166,
+          "S5": 0.7704979310330807,
+          "S6": 0.8622056842460873,
+          "S6b": 0.8704178699081161,
+          "E1": 0.7469690565951285,
+          "E2": 0.4659168703613939
+        },
+        "it": {
+          "queries": 6,
+          "S1": 0.4226718199372286,
+          "S2": 0.6940835489853528,
+          "S3": 0.5668192812263064,
+          "S4": 0.7790208099525041,
+          "S5": 0.7963084330629938,
+          "S6": 0.7865256358204995,
+          "S6b": 0.663939468538827,
+          "E1": 0.6940835489853528,
+          "E2": 0.5169958045734061
+        },
+        "ja": {
+          "queries": 6,
+          "S1": 0.04594355010756442,
+          "S2": 0.6823969233459927,
+          "S3": 0.6162784857392669,
+          "S4": 0.8052008636310332,
+          "S5": 0.7759879598473592,
+          "S6": 0.8090922956862842,
+          "S6b": 0.7916804366501556,
+          "E1": 0.6823969233459927,
+          "E2": 0.33267313749958644
+        },
+        "nl": {
+          "queries": 6,
+          "S1": 0.43516513147122965,
+          "S2": 0.656685094476212,
+          "S3": 0.6315869434276041,
+          "S4": 0.829648344811779,
+          "S5": 0.7748563908532796,
+          "S6": 0.8241678798998057,
+          "S6b": 0.8207183165431792,
+          "E1": 0.656685094476212,
+          "E2": 0.4705174954217138
+        },
+        "pt": {
+          "queries": 6,
+          "S1": 0.3006012192669956,
+          "S2": 0.6976854977566812,
+          "S3": 0.5660872628848385,
+          "S4": 0.8321039127704876,
+          "S5": 0.8001460919482692,
+          "S6": 0.875575769111456,
+          "S6b": 0.8749430224142328,
+          "E1": 0.6976854977566812,
+          "E2": 0.418618333053098
+        },
+        "ru": {
+          "queries": 6,
+          "S1": 0.20546176215630385,
+          "S2": 0.8483482805901105,
+          "S3": 0.5146631743572722,
+          "S4": 0.8666533034647377,
+          "S5": 0.8599365259916031,
+          "S6": 0.9002085808306902,
+          "S6b": 0.8995728810118058,
+          "E1": 0.8483482805901105,
+          "E2": 0.3775720701191418
+        },
+        "zh": {
+          "queries": 6,
+          "S1": 0.0,
+          "S2": 0.7581594034962157,
+          "S3": 0.7581594034962157,
+          "S4": 0.8335735179737918,
+          "S5": 0.8335735179737918,
+          "S6": 0.8512119981110566,
+          "S6b": 0.8773382363617523,
+          "E1": 0.7581594034962157,
+          "E2": 0.5036781987962918
+        }
+      },
+      "by_type": {
+        "descriptive": {
+          "queries": 24,
+          "S1": 0.20061046033573682,
+          "S2": 0.7281619577791926,
+          "S3": 0.5540390046466523,
+          "S4": 0.8150148602583848,
+          "S5": 0.7984301310638141,
+          "S6": 0.8324136271289424,
+          "S6b": 0.826534700548809,
+          "E1": 0.7281619577791926,
+          "E2": 0.49639738815417944
+        },
+        "known_item": {
+          "queries": 12,
+          "S1": 0.5580404270215745,
+          "S2": 0.803233201851362,
+          "S3": 0.7695954386502253,
+          "S4": 0.846282164230471,
+          "S5": 0.853192871269398,
+          "S6": 0.9553829899072431,
+          "S6b": 0.9545087945100605,
+          "E1": 0.803233201851362,
+          "E2": 0.41796340399825
+        },
+        "original": {
+          "queries": 44,
+          "S1": 0.3979823648077211,
+          "S2": 0.6385826929938098,
+          "S3": 0.5829831358411567,
+          "S4": 0.7781920562648601,
+          "S5": 0.7362772560689085,
+          "S6": 0.754139696939518,
+          "S6b": 0.7705313219459754,
+          "E1": 0.6385826929938098,
+          "E2": 0.4203495067918261
+        },
+        "thematic": {
+          "queries": 36,
+          "S1": 0.27624166667129935,
+          "S2": 0.6680530809904421,
+          "S3": 0.5682553561185886,
+          "S4": 0.7956150977476397,
+          "S5": 0.7620502447830142,
+          "S6": 0.8180680549454048,
+          "S6b": 0.8069676100275145,
+          "E1": 0.6680530809904421,
+          "E2": 0.387258440538979
+        }
+      },
+      "stratum_c": {
+        "needs": 10,
+        "ndcg_at_10_by_language": {
+          "S1": {
+            "es": 0.24220845497109494,
+            "en": 0.5481711911799972,
+            "fr": 0.31920547166128493,
+            "de": 0.18319874189929602
+          },
+          "S2": {
+            "es": 0.6681128436562492,
+            "en": 0.7298660983643301,
+            "fr": 0.618377564396558,
+            "de": 0.6599273099712661
+          },
+          "S3": {
+            "es": 0.4782888524882005,
+            "en": 0.6704826168824796,
+            "fr": 0.45926107002203775,
+            "de": 0.46285530722306173
+          },
+          "S4": {
+            "es": 0.7878656418325549,
+            "en": 0.7880943867591754,
+            "fr": 0.6876441545026415,
+            "de": 0.7927358935117806
+          },
+          "S5": {
+            "es": 0.7375210750728776,
+            "en": 0.7611717712528502,
+            "fr": 0.7647611763965085,
+            "de": 0.75853459114501
+          },
+          "S6": {
+            "es": 0.7499759383545445,
+            "en": 0.7520696296036495,
+            "fr": 0.7457920973153626,
+            "de": 0.7369367933723042
+          },
+          "S6b": {
+            "es": 0.7375031262656154,
+            "en": 0.7730877474557799,
+            "fr": 0.7532761397078216,
+            "de": 0.7161194110780358
+          },
+          "E1": {
+            "es": 0.6681128436562492,
+            "en": 0.7298660983643301,
+            "fr": 0.618377564396558,
+            "de": 0.6599273099712661
+          },
+          "E2": {
+            "es": 0.48179690913097756,
+            "en": 0.5259066077771128,
+            "fr": 0.4632726672208731,
+            "de": 0.4123170547196485
+          }
+        },
+        "mean_pairwise_top10_overlap": {
+          "S1": 0.065,
+          "S2": 0.4883333333333333,
+          "S3": 0.21499999999999997,
+          "S4": 0.5666666666666665,
+          "S5": 0.48000000000000004,
+          "S6": 0.45500000000000007,
+          "S6b": 0.49166666666666664,
+          "E1": 0.4883333333333333,
+          "E2": 0.4016666666666666
+        }
+      },
+      "s6_replication": {
+        "identical_top10": 5,
+        "queries": 116,
+        "mean_abs_ndcg_difference": 0.04061475529676297
+      }
+    },
+    "second": {
+      "summary_ab": {
+        "S1": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.3438452751062945,
+            "ci": [
+              0.29436750389239325,
+              0.39307194096384007
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.5241379310344828,
+            "ci": [
+              0.4629310344827586,
+              0.5827586206896551
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.7089319923371648,
+            "ci": [
+              0.6382902298850575,
+              0.7769426484674329
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.4553053785572488,
+            "ci": [
+              0.4110335624160614,
+              0.49810913531726625
+            ]
+          },
+          "judged_at_10": {
+            "mean": 0.9155172413793103,
+            "ci": [
+              0.8620689655172413,
+              0.960344827586207
+            ]
+          }
+        },
+        "S2": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.7003992294917023,
+            "ci": [
+              0.6619684106863082,
+              0.7369439866487849
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.85,
+            "ci": [
+              0.8068965517241381,
+              0.8887931034482759
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9533045977011495,
+            "ci": [
+              0.9202586206896551,
+              0.9798850574712644
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8290141263382573,
+            "ci": [
+              0.8047729330882554,
+              0.8542443544291357
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S3": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.601172552074941,
+            "ci": [
+              0.5616285641439105,
+              0.6395314399158022
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.7767241379310346,
+            "ci": [
+              0.7293103448275863,
+              0.8198275862068967
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.941235632183908,
+            "ci": [
+              0.9043067528735632,
+              0.9727011494252874
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8959156163637224,
+            "ci": [
+              0.880202539380465,
+              0.9111477746676075
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S4": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.8061009505743717,
+            "ci": [
+              0.7781042072513036,
+              0.8318960623606328
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.8948275862068965,
+            "ci": [
+              0.860344827586207,
+              0.9258620689655173
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.971551724137931,
+            "ci": [
+              0.9474137931034483,
+              0.9913793103448276
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8290141263382573,
+            "ci": [
+              0.8047729330882554,
+              0.8542443544291357
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S5": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.771533921090512,
+            "ci": [
+              0.7439862987186071,
+              0.79751895097153
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.8775862068965519,
+            "ci": [
+              0.8387931034482758,
+              0.9129310344827587
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9727011494252873,
+            "ci": [
+              0.9482758620689655,
+              0.9913793103448276
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8959156163637224,
+            "ci": [
+              0.880202539380465,
+              0.9111477746676075
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S6": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.8033844805514797,
+            "ci": [
+              0.7718194198343459,
+              0.8328047978011942
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.9,
+            "ci": [
+              0.8655172413793103,
+              0.9310344827586207
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9719827586206896,
+            "ci": [
+              0.9446839080459771,
+              0.9942528735632183
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8959156163637224,
+            "ci": [
+              0.880202539380465,
+              0.9111477746676075
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "S6b": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.8017506345319195,
+            "ci": [
+              0.7691342558419825,
+              0.8318701664609706
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.892241379310345,
+            "ci": [
+              0.8551724137931036,
+              0.9249999999999999
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9806034482758621,
+            "ci": [
+              0.959051724137931,
+              0.9956896551724138
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8959156163637224,
+            "ci": [
+              0.880202539380465,
+              0.9111477746676075
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "E1": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.7003992294917023,
+            "ci": [
+              0.6619684106863082,
+              0.7369439866487849
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.85,
+            "ci": [
+              0.8068965517241381,
+              0.8887931034482759
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.9533045977011495,
+            "ci": [
+              0.9202586206896551,
+              0.9798850574712644
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.8300846075811524,
+            "ci": [
+              0.8057138644271579,
+              0.8551194707237373
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "E2": {
+          "queries": 116,
+          "ndcg_at_10": {
+            "mean": 0.45979319830856835,
+            "ci": [
+              0.41212603831831507,
+              0.5066216218463393
+            ]
+          },
+          "p_at_10": {
+            "mean": 0.7146551724137932,
+            "ci": [
+              0.6551724137931035,
+              0.7698275862068966
+            ]
+          },
+          "mrr_at_10": {
+            "mean": 0.8642344006568144,
+            "ci": [
+              0.8096354166666667,
+              0.9148727422003283
+            ]
+          },
+          "recall_at_100": {
+            "mean": 0.5580121597034732,
+            "ci": [
+              0.5214360803750304,
+              0.5941728477960236
+            ]
+          },
+          "judged_at_10": {
+            "mean": 1.0,
+            "ci": [
+              1.0,
+              1.0
+            ]
+          }
+        }
+      },
+      "contrasts": {
+        "H1": {
+          "system": "S3",
+          "baseline": "S2",
+          "question": "Does hybrid fusion add to vector search alone?",
+          "queries": 116,
+          "difference": -0.09922667741676124,
+          "ci": [
+            -0.12993338465615414,
+            -0.06848391362073912
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H2": {
+          "system": "S5",
+          "baseline": "S3",
+          "question": "Does the reranker add to the hybrid?",
+          "queries": 116,
+          "difference": 0.1703613690155708,
+          "ci": [
+            0.13972838612058275,
+            0.20083600204807742
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H3": {
+          "system": "S5",
+          "baseline": "S4",
+          "question": "With a reranker, do the BM25 candidates add anything?",
+          "queries": 116,
+          "difference": -0.03456702948385981,
+          "ci": [
+            -0.05363300458306382,
+            -0.013540718758874042
+          ],
+          "p": 0.00039996000399960006,
+          "in_family": true,
+          "p_holm": 0.0007999200079992001
+        },
+        "H4": {
+          "system": "S2",
+          "baseline": "S1",
+          "question": "Does vector search beat BM25?",
+          "queries": 116,
+          "difference": 0.3565539543854078,
+          "ci": [
+            0.30419250587625135,
+            0.40836462583718636
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H5": {
+          "system": "S6",
+          "baseline": "S5",
+          "question": "Does the LLM as re-ranker beat the cross-encoder? (run 1; run 2 is the replication)",
+          "queries": 116,
+          "difference": 0.03185055946096783,
+          "ci": [
+            0.006914128361778859,
+            0.05657116026145143
+          ],
+          "p": 0.013398660133986601,
+          "in_family": true,
+          "p_holm": 0.013398660133986601
+        },
+        "H6": {
+          "system": "E2",
+          "baseline": "E1",
+          "question": "Do the two embedding models differ in quality?",
+          "queries": 116,
+          "difference": -0.2406060311831339,
+          "ci": [
+            -0.2867469941647478,
+            -0.19547504945592106
+          ],
+          "p": 9.999000099990002e-05,
+          "in_family": true,
+          "p_holm": 0.0005999400059994001
+        },
+        "H5-rep": {
+          "system": "S6b",
+          "baseline": "S5",
+          "question": "H5 on the second run of S6 (replication, outside the family)",
+          "queries": 116,
+          "difference": 0.030216713441407767,
+          "ci": [
+            0.0044020694843969095,
+            0.05642476730457559
+          ],
+          "p": 0.0240975902409759,
+          "in_family": false,
+          "p_holm": null
+        }
+      },
+      "by_language": {
+        "ar": {
+          "queries": 6,
+          "S1": 0.32682262608718243,
+          "S2": 0.6516665730021857,
+          "S3": 0.5661063797340431,
+          "S4": 0.7904523741895364,
+          "S5": 0.7639949675734853,
+          "S6": 0.8599889862144917,
+          "S6b": 0.8583094180099063,
+          "E1": 0.6516665730021857,
+          "E2": 0.3653487747470092
+        },
+        "ca": {
+          "queries": 6,
+          "S1": 0.4622908946384064,
+          "S2": 0.557223633838567,
+          "S3": 0.6066450147359919,
+          "S4": 0.71115150992491,
+          "S5": 0.7183699456281243,
+          "S6": 0.8648653494042834,
+          "S6b": 0.8380594281122318,
+          "E1": 0.557223633838567,
+          "E2": 0.34121791295344744
+        },
+        "de": {
+          "queries": 6,
+          "S1": 0.35732368930734415,
+          "S2": 0.6915187603840142,
+          "S3": 0.5948006870145226,
+          "S4": 0.8651990779213569,
+          "S5": 0.803029884897512,
+          "S6": 0.795290332342073,
+          "S6b": 0.8021447876447477,
+          "E1": 0.6915187603840142,
+          "E2": 0.5053798579447025
+        },
+        "en": {
+          "queries": 30,
+          "S1": 0.4111068545104352,
+          "S2": 0.6548352492429597,
+          "S3": 0.5934189185553779,
+          "S4": 0.779548422494145,
+          "S5": 0.7365491116995082,
+          "S6": 0.7621719480767909,
+          "S6b": 0.7699436787866828,
+          "E1": 0.6548352492429597,
+          "E2": 0.41687807629052004
+        },
+        "es": {
+          "queries": 26,
+          "S1": 0.4056308810915124,
+          "S2": 0.7609214348982032,
+          "S3": 0.6406435045544732,
+          "S4": 0.8148704827864424,
+          "S5": 0.7814123246094365,
+          "S6": 0.7851180578589154,
+          "S6b": 0.7976311651731164,
+          "E1": 0.7609214348982032,
+          "E2": 0.520304131505159
+        },
+        "fr": {
+          "queries": 6,
+          "S1": 0.3068855487820949,
+          "S2": 0.7453940384000121,
+          "S3": 0.5920062966049419,
+          "S4": 0.8829114733123663,
+          "S5": 0.8151020433650614,
+          "S6": 0.8549059110603073,
+          "S6b": 0.8521169931563342,
+          "E1": 0.7453940384000121,
+          "E2": 0.5982683520364632
+        },
+        "it": {
+          "queries": 6,
+          "S1": 0.39534117108364825,
+          "S2": 0.6194231894631285,
+          "S3": 0.5273056301384847,
+          "S4": 0.7686180959789296,
+          "S5": 0.7592297914758034,
+          "S6": 0.7353213938238862,
+          "S6b": 0.6030162787831569,
+          "E1": 0.6194231894631285,
+          "E2": 0.507663632526628
+        },
+        "ja": {
+          "queries": 6,
+          "S1": 0.03643109476602411,
+          "S2": 0.7680497666204769,
+          "S3": 0.632387493641388,
+          "S4": 0.8257317904788879,
+          "S5": 0.7926552437586633,
+          "S6": 0.8210659436384619,
+          "S6b": 0.8234495137004961,
+          "E1": 0.7680497666204769,
+          "E2": 0.39229046327073025
+        },
+        "nl": {
+          "queries": 6,
+          "S1": 0.3614021493607967,
+          "S2": 0.6139753537669724,
+          "S3": 0.5237816047122307,
+          "S4": 0.8040797658300264,
+          "S5": 0.738373139352448,
+          "S6": 0.767431717797959,
+          "S6b": 0.7925239319716316,
+          "E1": 0.6139753537669724,
+          "E2": 0.3997465594186152
+        },
+        "pt": {
+          "queries": 6,
+          "S1": 0.3577782167127557,
+          "S2": 0.7378060882938863,
+          "S3": 0.5768343402219275,
+          "S4": 0.8597644502443577,
+          "S5": 0.8112351245392403,
+          "S6": 0.8984464909698385,
+          "S6b": 0.9012541172183169,
+          "E1": 0.7378060882938863,
+          "E2": 0.44025814028118626
+        },
+        "ru": {
+          "queries": 6,
+          "S1": 0.2301318373680434,
+          "S2": 0.8706398173009863,
+          "S3": 0.5457333624700538,
+          "S4": 0.863625543025549,
+          "S5": 0.8612299430345022,
+          "S6": 0.8995097136507976,
+          "S6b": 0.8962616980374211,
+          "E1": 0.8706398173009863,
+          "E2": 0.4559840969964541
+        },
+        "zh": {
+          "queries": 6,
+          "S1": 0.0,
+          "S2": 0.7138520849956693,
+          "S3": 0.7138520849956693,
+          "S4": 0.7842367589866234,
+          "S5": 0.7842367589866234,
+          "S6": 0.8222361273205885,
+          "S6b": 0.8272559912992854,
+          "E1": 0.7138520849956693,
+          "E2": 0.5441357591487975
+        }
+      },
+      "by_type": {
+        "descriptive": {
+          "queries": 24,
+          "S1": 0.1921012354716041,
+          "S2": 0.7077717473524959,
+          "S3": 0.52985580062398,
+          "S4": 0.8055749248959598,
+          "S5": 0.7849742093907822,
+          "S6": 0.7914842064820342,
+          "S6b": 0.7916155378589166,
+          "E1": 0.7077717473524959,
+          "E2": 0.47467754451013316
+        },
+        "known_item": {
+          "queries": 12,
+          "S1": 0.5272363372807604,
+          "S2": 0.7742131458201084,
+          "S3": 0.7353755492838299,
+          "S4": 0.8021925188860054,
+          "S5": 0.8024770621878798,
+          "S6": 0.9222933942374666,
+          "S6b": 0.9155827856329548,
+          "E1": 0.7742131458201084,
+          "E2": 0.43211170927752773
+        },
+        "original": {
+          "queries": 44,
+          "S1": 0.4025019930254894,
+          "S2": 0.6745358893897836,
+          "S3": 0.6063453864461033,
+          "S4": 0.7843582314660179,
+          "S5": 0.7380700363436901,
+          "S6": 0.7508695822437755,
+          "S6b": 0.756625194840029,
+          "E1": 0.6745358893897836,
+          "E2": 0.47019442798110356
+        },
+        "thematic": {
+          "queries": 36,
+          "S1": 0.3121860700144723,
+          "S2": 0.7024903278218274,
+          "S3": 0.5976603675189762,
+          "S4": 0.8343288793885342,
+          "S5": 0.7931596521039912,
+          "S6": 0.8358665677451972,
+          "S6b": 0.8257166304592207,
+          "E1": 0.7024903278218274,
+          "E2": 0.44638484980699583
+        }
+      },
+      "stratum_c": {
+        "needs": 10,
+        "ndcg_at_10_by_language": {
+          "S1": {
+            "es": 0.27081054172096447,
+            "en": 0.5330903876874462,
+            "fr": 0.3421145619639489,
+            "de": 0.17789370741741167
+          },
+          "S2": {
+            "es": 0.6825102305460573,
+            "en": 0.7089461378745828,
+            "fr": 0.6533462505478894,
+            "de": 0.6672631769098292
+          },
+          "S3": {
+            "es": 0.4723990729014602,
+            "en": 0.6722691137144876,
+            "fr": 0.5641283228919072,
+            "de": 0.45076119078504095
+          },
+          "S4": {
+            "es": 0.8101794092999336,
+            "en": 0.8039962640008851,
+            "fr": 0.7656804126265614,
+            "de": 0.8084243735627167
+          },
+          "S5": {
+            "es": 0.7628584167202116,
+            "en": 0.7879206495604884,
+            "fr": 0.7936545648537778,
+            "de": 0.7779033799742961
+          },
+          "S6": {
+            "es": 0.7985054146665018,
+            "en": 0.7694178863178754,
+            "fr": 0.7599177073185748,
+            "de": 0.7829168151378253
+          },
+          "S6b": {
+            "es": 0.7970312322032113,
+            "en": 0.8003418128947566,
+            "fr": 0.7904311121341854,
+            "de": 0.7607047054055629
+          },
+          "E1": {
+            "es": 0.6825102305460573,
+            "en": 0.7089461378745828,
+            "fr": 0.6533462505478894,
+            "de": 0.6672631769098292
+          },
+          "E2": {
+            "es": 0.5220536149293342,
+            "en": 0.573739913676214,
+            "fr": 0.4993520082724423,
+            "de": 0.4060952266022547
+          }
+        },
+        "mean_pairwise_top10_overlap": {
+          "S1": 0.065,
+          "S2": 0.4883333333333333,
+          "S3": 0.21499999999999997,
+          "S4": 0.5666666666666665,
+          "S5": 0.48000000000000004,
+          "S6": 0.45500000000000007,
+          "S6b": 0.49166666666666664,
+          "E1": 0.4883333333333333,
+          "E2": 0.4016666666666666
+        }
+      },
+      "s6_replication": {
+        "identical_top10": 5,
+        "queries": 116,
+        "mean_abs_ndcg_difference": 0.03540931673081274
+      }
+    }
+  },
+  "conclusions": {
+    "H1": "sustained",
+    "H2": "sustained",
+    "H3": "sustained",
+    "H4": "sustained",
+    "H5": "sustained",
+    "H6": "sustained",
+    "H5-rep": "sustained"
+  },
+  "overlap_s2_e1": {
+    "top10": 1.0,
+    "top100": 0.995,
+    "all_queries_top10": 1.0
+  },
+  "operational": {
+    "qwen/qwen3-embedding-8b": {
+      "calls": 504,
+      "failed_calls": 51,
+      "median_ms": 399.2,
+      "p95_ms": 1977.0399999999986,
+      "queries_compared": 167,
+      "queries_top10_changed": 116,
+      "queries_vector_changed": 132,
+      "errors": {
+        "OpenRouterError": 51
+      },
+      "complete": true
+    },
+    "baai/bge-m3": {
+      "calls": 504,
+      "failed_calls": 6,
+      "median_ms": 398.29999999999995,
+      "p95_ms": 728.28,
+      "queries_compared": 168,
+      "queries_top10_changed": 10,
+      "queries_vector_changed": 94,
+      "errors": {
+        "OpenRouterError": 6
+      },
+      "complete": true
+    }
+  },
+  "decision_rule": {
+    "condition_1_h6": false,
+    "criteria": {
+      "latency": {
+        "better": true,
+        "worse_over_10pct": false
+      },
+      "failed_calls": {
+        "better": true,
+        "worse_over_10pct": false
+      },
+      "top10_changes": {
+        "better": true,
+        "worse_over_10pct": false
+      }
+    },
+    "bge_better_on": [
+      "latency",
+      "failed_calls",
+      "top10_changes"
+    ],
+    "condition_2_operational": true,
+    "outcome": "keep qwen/qwen3-embedding-8b"
+  },
+  "hybrid_rule": {
+    "s4_significantly_better_than_s5": true,
+    "outcome": "the rule's condition for changing is met: S4 (vector candidates + reranker, without BM25) beats the deployed S5 under both judges"
+  },
+  "unanswerable": {
+    "reclassification": {
+      "d-en": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-es": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-fr": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-de": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-it": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-pt": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-ca": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-nl": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-ru": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-zh": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-ja": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      },
+      "d-ar": {
+        "primary_works_graded_2_or_3": 0,
+        "second_works_graded_2_or_3": 0,
+        "reclassified": false
+      }
+    },
+    "d_kept": [
+      "d-en",
+      "d-es",
+      "d-fr",
+      "d-de",
+      "d-it",
+      "d-pt",
+      "d-ca",
+      "d-nl",
+      "d-ru",
+      "d-zh",
+      "d-ja",
+      "d-ar"
+    ],
+    "answered_ab_queries": 103,
+    "ab_without_answer": [
+      "q01",
+      "q04",
+      "q06",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q30",
+      "q31",
+      "q35"
+    ],
+    "answered_scores": {
+      "n": 103,
+      "min": 0.001238007600021252,
+      "median": 0.9432431801266798,
+      "mean": 0.7862255572934145,
+      "max": 0.9994210276525055
+    },
+    "unanswerable_scores": {
+      "n": 12,
+      "min": 7.216558052505894e-05,
+      "median": 0.0007453229042309828,
+      "mean": 0.01267071116801398,
+      "max": 0.07044496309331474
+    },
+    "unanswerable_score_by_query": {
+      "d-en": 0.0008281485647707118,
+      "d-es": 0.001411896540846381,
+      "d-fr": 0.0630690729977182,
+      "d-de": 0.0006624972436912539,
+      "d-it": 0.07044496309331474,
+      "d-pt": 7.216558052505894e-05,
+      "d-ca": 0.012286485215692493,
+      "d-nl": 0.00011054643232056182,
+      "d-ru": 0.0004952641871077579,
+      "d-zh": 0.001979719607897229,
+      "d-ja": 0.00023460352630827878,
+      "d-ar": 0.0004531710259750832
+    },
+    "auc": 0.9902912621359223,
+    "best_threshold": {
+      "threshold": 0.12919106370201713,
+      "youden_j": 0.9611650485436893,
+      "tpr": 0.9611650485436893,
+      "fpr": 0.0,
+      "accuracy": 0.9652173913043478
+    }
+  },
+  "explanations": {
+    "records": 120,
+    "queries": 40,
+    "v10_summary": {
+      "n": 120,
+      "parsed": 120,
+      "parsed_share": 1.0,
+      "citations": 389,
+      "valid_citations": 383,
+      "citation_precision": 0.9845758354755784,
+      "zero_valid_share": 0.0,
+      "in_query_language_share": 0.39166666666666666,
+      "median_latency_s": 2.4057883539935574,
+      "cost_usd": 0.0769293736,
+      "cost_per_explanation_usd": 0.0006410781133333334
+    },
+    "in_query_language": 115,
+    "parsed": 120,
+    "language_undecided": 2,
+    "in_query_language_by_language": {
+      "ca": {
+        "in_language": 2,
+        "explanations": 3
+      },
+      "ar": {
+        "in_language": 3,
+        "explanations": 3
+      },
+      "de": {
+        "in_language": 6,
+        "explanations": 6
+      },
+      "en": {
+        "in_language": 23,
+        "explanations": 24
+      },
+      "es": {
+        "in_language": 23,
+        "explanations": 24
+      },
+      "fr": {
+        "in_language": 6,
+        "explanations": 6
+      },
+      "it": {
+        "in_language": 12,
+        "explanations": 12
+      },
+      "ja": {
+        "in_language": 6,
+        "explanations": 6
+      },
+      "nl": {
+        "in_language": 9,
+        "explanations": 9
+      },
+      "pt": {
+        "in_language": 3,
+        "explanations": 3
+      },
+      "ru": {
+        "in_language": 15,
+        "explanations": 15
+      },
+      "zh": {
+        "in_language": 7,
+        "explanations": 9
+      }
+    },
+    "detected_languages": {
+      "None": 2,
+      "ar": 3,
+      "ca": 2,
+      "de": 6,
+      "en": 25,
+      "es": 24,
+      "fr": 6,
+      "it": 12,
+      "ja": 6,
+      "nl": 9,
+      "pt": 3,
+      "ru": 15,
+      "zh": 7
+    }
+  },
+  "annotation": {
+    "pairs": 200,
+    "population": 3767,
+    "by_language": {
+      "en": 52,
+      "de": 11,
+      "nl": 12,
+      "pt": 11,
+      "es": 44,
+      "fr": 11,
+      "ar": 10,
+      "it": 11,
+      "ru": 10,
+      "zh": 8,
+      "ca": 11,
+      "ja": 9
+    }
+  },
+  "human_agreement": null,
+  "spend": {
+    "by_stage": {
+      "1-queries": {
+        "calls": 42,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.08513400000000003
+      },
+      "2-embed": {
+        "calls": 2137,
+        "failed_calls": 2,
+        "calls_without_cost": 2,
+        "cost_usd": 0.08968978000000001
+      },
+      "2-runs": {
+        "calls": 672,
+        "failed_calls": 2,
+        "calls_without_cost": 2,
+        "cost_usd": 0.9504724857999994
+      },
+      "3-judge": {
+        "calls": 10023,
+        "failed_calls": 31,
+        "calls_without_cost": 31,
+        "cost_usd": 0.8204718170000025
+      },
+      "5-operational": {
+        "calls": 1008,
+        "failed_calls": 57,
+        "calls_without_cost": 57,
+        "cost_usd": 0.00022462000000000006
+      },
+      "6-explanations": {
+        "calls": 123,
+        "failed_calls": 3,
+        "calls_without_cost": 3,
+        "cost_usd": 0.07692937359999995
+      }
+    },
+    "by_model": {
+      "google/gemini-3.8-flash": {
+        "calls": 42,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.08513400000000003
+      },
+      "qwen/qwen3-embedding-8b": {
+        "calls": 672,
+        "failed_calls": 51,
+        "calls_without_cost": 51,
+        "cost_usd": 0.00020958000000000004
+      },
+      "baai/bge-m3": {
+        "calls": 2473,
+        "failed_calls": 8,
+        "calls_without_cost": 8,
+        "cost_usd": 0.0897048199999997
+      },
+      "qwen/qwen3-reranker-8b": {
+        "calls": 336,
+        "failed_calls": 0,
+        "calls_without_cost": 0,
+        "cost_usd": 0.5645030000000001
+      },
+      "deepseek/deepseek-v4.1-flash": {
+        "calls": 459,
+        "failed_calls": 5,
+        "calls_without_cost": 5,
+        "cost_usd": 0.4628988594000002
+      },
+      "minimax/minimax-m3.1-flash": {
+        "calls": 5020,
+        "failed_calls": 24,
+        "calls_without_cost": 24,
+        "cost_usd": 0.4720327650000014
+      },
+      "z-ai/glm-5.3-flash": {
+        "calls": 5003,
+        "failed_calls": 7,
+        "calls_without_cost": 7,
+        "cost_usd": 0.34843905199999936
+      }
+    },
+    "total_usd": 2.0229220764000018,
+    "calls": 14005,
+    "key_usage_snapshots": [
+      {
+        "date": "2026-11-12T10:03:39+00:00",
+        "stage": "1-queries",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.331373504,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T10:06:25+00:00",
+        "stage": "1-queries",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.374242754,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T10:06:39+00:00",
+        "stage": "1-queries",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.388124504,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T10:07:08+00:00",
+        "stage": "1-queries",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.399312254,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T10:10:53+00:00",
+        "stage": "2-parity",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.416507504,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T10:12:42+00:00",
+        "stage": "2-parity",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.416507504,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T10:12:52+00:00",
+        "stage": "2-embed",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.416507504,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:05:44+00:00",
+        "stage": "2-embed",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.421528514,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:05:51+00:00",
+        "stage": "2-runs",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.424722524,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:07:57+00:00",
+        "stage": "2-embed",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 1.442329494,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:11:33+00:00",
+        "stage": "2-embed",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.208121278,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:13:47+00:00",
+        "stage": "2-runs",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.402350978,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:24:57+00:00",
+        "stage": "2-embed",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.452471738,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:30:58+00:00",
+        "stage": "2-runs",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.461909938,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:30:59+00:00",
+        "stage": "2-runs",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.461909938,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:31:05+00:00",
+        "stage": "3-judge",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.461909938,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:31:32+00:00",
+        "stage": "5-operational",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.480619352,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:31:37+00:00",
+        "stage": "6-explanations",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.480619352,
+        "when": "start"
+      },
+      {
+        "date": "2026-11-12T11:33:17+00:00",
+        "stage": "6-explanations",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 2.673462622,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:43:03+00:00",
+        "stage": "5-operational",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.319695599,
+        "when": "end"
+      },
+      {
+        "date": "2026-11-12T11:45:04+00:00",
+        "stage": "3-judge",
+        "operation": "key_usage",
+        "model": "-",
+        "cost_usd": null,
+        "key_usage_usd": 3.363606047,
+        "when": "end"
+      }
+    ]
+  },
+  "stage_seconds": {
+    "1-queries": 195.3,
+    "2-parity": 7.2,
+    "2-embed": 936.9000000000001,
+    "2-runs": 477.29999999999995,
+    "6-explanations": 100.3,
+    "5-operational": 691.5,
+    "3-judge": 839.2
+  }
+}

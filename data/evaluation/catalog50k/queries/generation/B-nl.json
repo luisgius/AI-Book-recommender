@@ -1,0 +1,47 @@
+{
+  "call_id": "B-nl",
+  "model": "google/gemini-3.8-flash",
+  "provider": "Google",
+  "date": "2026-11-12T10:04:35+00:00",
+  "request": {
+    "model": "google/gemini-3.8-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "You are helping to build a test collection for a multilingual book search engine.\n\nThe catalog has 50,000 works (novels, essays, poetry, plays, non-fiction, scholarly open-access books).\nShare of works by language of the work: English (en) 41.8%, Spanish (es) 14.5%, French (fr) 6.2%, German (de) 4.1%, Italian (it) 3.5%, Portuguese (pt) 3.5%, Catalan (ca) 1.9%, Dutch (nl) 3.5%, Russian (ru) 3.5%, Chinese (zh) 3.2%, Japanese (ja) 3.5%, Arabic (ar) 3.5%.\nMost frequent subjects in the catalog: Science fiction, Fiction, Novels, Fantasy, Essay, Historical fiction, Poetry, Non-fiction, History, British Literature, Crime fiction, Horror fiction, Philosophy & Ethics, Historical Novels, Adventure, Detective fiction, Autobiography, Biography, Thriller, Adventure fiction, American Literature, Children's literature, Mystery fiction, Science-Fiction & Fantasy, Romance, Mythology, Legends & Folklore, Essays, Letters & Speeches, History - Other, French Literature, Plays/Films/Dramas, Comedy, Biographies, Young adult fiction, Children's fiction, Classics of Literature, Drama, Crime literature, Short Stories, Social life and customs, Humour, England, Children & Young Adult Reading, History - European, Travel Writing, Fairy tale, History - Modern (1750+), Description and travel, Religion/Spirituality, Crime, Thrillers and Mystery, Memoir, LGBT-related literature, Romantic fiction, Juvenile fiction, German Literature, United States, France, Early works to 1800, Spy fiction, Philosophy, History - Ancient.\n\nYou will not see the catalog itself nor any search result.\n\nWrite 6 search queries in Dutch (language code \"nl\"), as real readers would type them into the search box of this catalog:\n- 3 \"thematic\" queries: a subject, genre or theme, a few words (e.g. a topic and a period).\n- 2 \"descriptive\" queries: a sentence describing the kind of book wanted (in English it would start like \"a novel about ...\", \"a book that explains ...\").\n- 1 \"known_item\" query: a reader looking for one specific, widely known work written in Dutch or very famous among Dutch readers, described by its plot, characters or author WITHOUT using any word of its title (not even translated) and without the title's characters for Chinese or Japanese.\n\nRules:\n- Every query must be written entirely in Dutch.\n- Vary subjects and periods; do not repeat a query.\n- For each query give \"need\": one or two sentences in English describing what the reader wants (what a relevant book must be about). A relevance assessor will grade books against this description.\n- For the known_item query also give \"target_title\" (the work's title in its original language) and \"target_author\".\n\nAnswer with JSON: {\"queries\": [{\"type\": \"thematic\" | \"descriptive\" | \"known_item\", \"text\": \"...\", \"need\": \"...\", \"target_title\": \"... or null\", \"target_author\": \"... or null\"}]}"
+      }
+    ],
+    "temperature": 0.7,
+    "reasoning": {
+      "effort": "low"
+    },
+    "response_format": {
+      "type": "json_object"
+    }
+  },
+  "raw_output": "{\n  \"queries\": [\n    {\n      \"type\": \"thematic\",\n      \"text\": \"historische romans gouden eeuw amsterdam\",\n      \"need\": \"The user is looking for historical fiction novels set in Amsterdam during the Dutch Golden Age (17th century).\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"thematic\",\n      \"text\": \"filosofie ethiek moderne technologie\",\n      \"need\": \"The reader wants non-fiction essays or philosophical studies exploring ethics and moral questions in relation to modern technology and digital society.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"thematic\",\n      \"text\": \"post-apocalyptische sciencefiction overleving\",\n      \"need\": \"The user seeks science fiction novels featuring post-apocalyptic settings and survival struggles following global catastrophes.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"descriptive\",\n      \"text\": \"een psychologische roman over het verlies van een kind en rouwverwerking binnen een huwelijk\",\n      \"need\": \"The reader is searching for a psychological novel that depicts how a married couple copes with grief and emotional strain following the death of their child.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"descriptive\",\n      \"text\": \"een historisch boek dat uitlegt hoe het dagelijks leven eruitzag tijdens de bezetting in nederland\",\n      \"need\": \"The user wants a historical non-fiction work describing daily social conditions, rationing, and ordinary life in the Netherlands during the German occupation in World War II.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"known_item\",\n      \"text\": \"roman van willem frederik hermans over geoloog alfred issendorf op expeditie naar meteorieten in noorwegen\",\n      \"need\": \"The user is looking for Willem Frederik Hermans' famous novel about the young Dutch geology student Alfred Issendorf and his failing scientific expedition in Finnmark, Norway.\",\n      \"target_title\": \"Nooit meer slapen\",\n      \"target_author\": \"Willem Frederik Hermans\"\n    }\n  ]\n}",
+  "usage": {
+    "prompt_tokens": 717,
+    "completion_tokens": 549,
+    "total_tokens": 1266,
+    "cost": 0.0025965,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0025965,
+      "upstream_inference_prompt_cost": 0.00053775,
+      "upstream_inference_completions_cost": 0.00205875
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "latency_s": 6.927
+}

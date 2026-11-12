@@ -1,0 +1,47 @@
+{
+  "call_id": "B-fr",
+  "model": "google/gemini-3.8-flash",
+  "provider": "Google",
+  "date": "2026-11-12T10:04:01+00:00",
+  "request": {
+    "model": "google/gemini-3.8-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "You are helping to build a test collection for a multilingual book search engine.\n\nThe catalog has 50,000 works (novels, essays, poetry, plays, non-fiction, scholarly open-access books).\nShare of works by language of the work: English (en) 41.8%, Spanish (es) 14.5%, French (fr) 6.2%, German (de) 4.1%, Italian (it) 3.5%, Portuguese (pt) 3.5%, Catalan (ca) 1.9%, Dutch (nl) 3.5%, Russian (ru) 3.5%, Chinese (zh) 3.2%, Japanese (ja) 3.5%, Arabic (ar) 3.5%.\nMost frequent subjects in the catalog: Science fiction, Fiction, Novels, Fantasy, Essay, Historical fiction, Poetry, Non-fiction, History, British Literature, Crime fiction, Horror fiction, Philosophy & Ethics, Historical Novels, Adventure, Detective fiction, Autobiography, Biography, Thriller, Adventure fiction, American Literature, Children's literature, Mystery fiction, Science-Fiction & Fantasy, Romance, Mythology, Legends & Folklore, Essays, Letters & Speeches, History - Other, French Literature, Plays/Films/Dramas, Comedy, Biographies, Young adult fiction, Children's fiction, Classics of Literature, Drama, Crime literature, Short Stories, Social life and customs, Humour, England, Children & Young Adult Reading, History - European, Travel Writing, Fairy tale, History - Modern (1750+), Description and travel, Religion/Spirituality, Crime, Thrillers and Mystery, Memoir, LGBT-related literature, Romantic fiction, Juvenile fiction, German Literature, United States, France, Early works to 1800, Spy fiction, Philosophy, History - Ancient.\n\nYou will not see the catalog itself nor any search result.\n\nWrite 6 search queries in French (language code \"fr\"), as real readers would type them into the search box of this catalog:\n- 3 \"thematic\" queries: a subject, genre or theme, a few words (e.g. a topic and a period).\n- 2 \"descriptive\" queries: a sentence describing the kind of book wanted (in English it would start like \"a novel about ...\", \"a book that explains ...\").\n- 1 \"known_item\" query: a reader looking for one specific, widely known work written in French or very famous among French readers, described by its plot, characters or author WITHOUT using any word of its title (not even translated) and without the title's characters for Chinese or Japanese.\n\nRules:\n- Every query must be written entirely in French.\n- Vary subjects and periods; do not repeat a query.\n- For each query give \"need\": one or two sentences in English describing what the reader wants (what a relevant book must be about). A relevance assessor will grade books against this description.\n- For the known_item query also give \"target_title\" (the work's title in its original language) and \"target_author\".\n\nAnswer with JSON: {\"queries\": [{\"type\": \"thematic\" | \"descriptive\" | \"known_item\", \"text\": \"...\", \"need\": \"...\", \"target_title\": \"... or null\", \"target_author\": \"... or null\"}]}"
+      }
+    ],
+    "temperature": 0.7,
+    "reasoning": {
+      "effort": "low"
+    },
+    "response_format": {
+      "type": "json_object"
+    }
+  },
+  "raw_output": "{\n  \"queries\": [\n    {\n      \"type\": \"thematic\",\n      \"text\": \"roman policier historique XIXe siècle\",\n      \"need\": \"The reader is looking for detective or crime fiction novels set specifically during the 19th century.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"thematic\",\n      \"text\": \"philosophie politique Lumières liberté\",\n      \"need\": \"The user wants non-fiction essays or philosophical treatises from or about the Age of Enlightenment dealing with political liberty and governance.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"thematic\",\n      \"text\": \"récits de voyage exploration arctique\",\n      \"need\": \"The reader is searching for travel literature, memoirs, or historical accounts detailing polar expeditions and Arctic exploration.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"descriptive\",\n      \"text\": \"un roman d'anticipation dystopique sur le contrôle des esprits et la surveillance de masse\",\n      \"need\": \"The user wants a dystopian science-fiction novel centered on totalitarian regimes that enforce surveillance, censorship, and psychological manipulation.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"descriptive\",\n      \"text\": \"un essai historique qui analyse les causes économiques et sociales de la Révolution française\",\n      \"need\": \"The reader seeks historical non-fiction analyzing the social tensions, fiscal crises, and economic conditions leading up to the French Revolution of 1789.\",\n      \"target_title\": null,\n      \"target_author\": null\n    },\n    {\n      \"type\": \"known_item\",\n      \"text\": \"Meursault tue un Arabe sur une plage sous le soleil d'Alger\",\n      \"need\": \"The reader is looking for the famous philosophical novel featuring the detached protagonist Meursault, who murders a man on an Algerian beach.\",\n      \"target_title\": \"L'Étranger\",\n      \"target_author\": \"Albert Camus\"\n    }\n  ]\n}",
+  "usage": {
+    "prompt_tokens": 717,
+    "completion_tokens": 507,
+    "total_tokens": 1224,
+    "cost": 0.002439,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.002439,
+      "upstream_inference_prompt_cost": 0.00053775,
+      "upstream_inference_completions_cost": 0.00190125
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "latency_s": 5.05
+}

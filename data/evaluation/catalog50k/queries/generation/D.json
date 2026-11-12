@@ -1,0 +1,47 @@
+{
+  "call_id": "D",
+  "model": "google/gemini-3.8-flash",
+  "provider": "Google",
+  "date": "2026-11-12T10:05:17+00:00",
+  "request": {
+    "model": "google/gemini-3.8-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "You are helping to build a test collection for a multilingual book search engine.\n\nThe catalog has 50,000 works (novels, essays, poetry, plays, non-fiction, scholarly open-access books).\nShare of works by language of the work: English (en) 41.8%, Spanish (es) 14.5%, French (fr) 6.2%, German (de) 4.1%, Italian (it) 3.5%, Portuguese (pt) 3.5%, Catalan (ca) 1.9%, Dutch (nl) 3.5%, Russian (ru) 3.5%, Chinese (zh) 3.2%, Japanese (ja) 3.5%, Arabic (ar) 3.5%.\nMost frequent subjects in the catalog: Science fiction, Fiction, Novels, Fantasy, Essay, Historical fiction, Poetry, Non-fiction, History, British Literature, Crime fiction, Horror fiction, Philosophy & Ethics, Historical Novels, Adventure, Detective fiction, Autobiography, Biography, Thriller, Adventure fiction, American Literature, Children's literature, Mystery fiction, Science-Fiction & Fantasy, Romance, Mythology, Legends & Folklore, Essays, Letters & Speeches, History - Other, French Literature, Plays/Films/Dramas, Comedy, Biographies, Young adult fiction, Children's fiction, Classics of Literature, Drama, Crime literature, Short Stories, Social life and customs, Humour, England, Children & Young Adult Reading, History - European, Travel Writing, Fairy tale, History - Modern (1750+), Description and travel, Religion/Spirituality, Crime, Thrillers and Mystery, Memoir, LGBT-related literature, Romantic fiction, Juvenile fiction, German Literature, United States, France, Early works to 1800, Spy fiction, Philosophy, History - Ancient.\n\nYou will not see the catalog itself nor any search result.\n\nWrite 12 queries that a user might type into this search box but that a book catalog cannot answer at all, because no book can satisfy them: practical, real-time or personal requests (for example the timetable of a train, today's weather, the price of a flight, a phone number, the opening hours of a shop). One query in each of these languages: English (en), Spanish (es), French (fr), German (de), Italian (it), Portuguese (pt), Catalan (ca), Dutch (nl), Russian (ru), Chinese (zh), Japanese (ja), Arabic (ar).\n\nRules: each query entirely in its language; varied requests; do not mention books, reading or literature.\nFor each query give \"need\" in English (what the user wants).\n\nAnswer with JSON: {\"queries\": [{\"language\": \"<code>\", \"text\": \"...\", \"need\": \"...\"}]}"
+      }
+    ],
+    "temperature": 0.7,
+    "reasoning": {
+      "effort": "low"
+    },
+    "response_format": {
+      "type": "json_object"
+    }
+  },
+  "raw_output": "{\n  \"queries\": [\n    {\"language\": \"en\", \"text\": \"train schedule from London to Edinburgh tomorrow morning\", \"need\": \"Real-time timetable for trains between London and Edinburgh tomorrow.\"},\n    {\"language\": \"es\", \"text\": \"pronóstico del tiempo para Madrid este fin de semana\", \"need\": \"Weather forecast for Madrid for the upcoming weekend.\"},\n    {\"language\": \"fr\", \"text\": \"vols pas chers Paris New York départ vendredi\", \"need\": \"Live pricing and availability for flights from Paris to New York departing this Friday.\"},\n    {\"language\": \"de\", \"text\": \"Öffnungszeiten Bürgeramt Berlin Neukölln heute\", \"need\": \"Current opening hours for the local administrative office in Berlin Neukölln today.\"},\n    {\"language\": \"it\", \"text\": \"numero di telefono farmacia di turno più vicina\", \"need\": \"Phone number of the nearest on-call pharmacy.\"},\n    {\"language\": \"pt\", \"text\": \"cotação do dólar hoje em reais\", \"need\": \"Real-time exchange rate of the US Dollar to Brazilian Real.\"},\n    {\"language\": \"ca\", \"text\": \"com arribar a l'hospital Clínic amb metro\", \"need\": \"Public transit directions to get to Hospital Clínic via metro.\"},\n    {\"language\": \"nl\", \"text\": \"uitslagen voetbal eredivisie gisteravond\", \"need\": \"Recent match results and scores from yesterday evening's Eredivisie football matches.\"},\n    {\"language\": \"ru\", \"text\": \"доставка пиццы круглосуточно рядом со мной\", \"need\": \"Locating 24/7 pizza delivery services nearby.\"},\n    {\"language\": \"zh\", \"text\": \"北京今天空气质量指数实时查询\", \"need\": \"Real-time Air Quality Index (AQI) measurement for Beijing today.\"},\n    {\"language\": \"ja\", \"text\": \"渋谷駅周辺の現在空いているコインパーキング\", \"need\": \"Real-time availability of coin parking spaces around Shibuya Station.\"},\n    {\"language\": \"ar\", \"text\": \"مواقيت صلاة الفجر والظهر اليوم في القاهرة\", \"need\": \"Daily prayer times for Fajr and Dhuhr in Cairo today.\"}\n  ]\n}",
+  "usage": {
+    "prompt_tokens": 594,
+    "completion_tokens": 494,
+    "total_tokens": 1088,
+    "cost": 0.002298,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.002298,
+      "upstream_inference_prompt_cost": 0.0004455,
+      "upstream_inference_completions_cost": 0.0018525
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "latency_s": 5.193
+}

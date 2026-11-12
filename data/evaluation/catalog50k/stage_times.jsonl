@@ -1,0 +1,10 @@
+{"stage": "1-queries", "seconds": 165.9, "ended": "2026-11-12T11:06:25"}
+{"stage": "1-queries", "seconds": 29.4, "ended": "2026-11-12T11:07:08"}
+{"stage": "2-parity", "seconds": 7.2, "ended": "2026-11-12T11:12:42"}
+{"stage": "2-embed", "seconds": 132.7, "ended": "2026-11-12T12:07:57"}
+{"stage": "2-runs", "seconds": 476.4, "ended": "2026-11-12T12:13:47"}
+{"stage": "2-embed", "seconds": 804.2, "ended": "2026-11-12T12:24:57"}
+{"stage": "2-runs", "seconds": 0.9, "ended": "2026-11-12T12:30:59"}
+{"stage": "6-explanations", "seconds": 100.3, "ended": "2026-11-12T12:33:17"}
+{"stage": "5-operational", "seconds": 691.5, "ended": "2026-11-12T12:43:03"}
+{"stage": "3-judge", "seconds": 839.2, "ended": "2026-11-12T12:45:04"}
