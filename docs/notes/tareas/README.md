@@ -27,13 +27,17 @@ Estado: `[ ]` pendiente, `[~]` en curso, `[x]` hecha y validada, `[-]` aplazada.
 - [x] **V17** Despliegue público: catálogo de 30.000 obras en Neon y backend en Vercel, con límites de gasto
 - [x] **V18** Ampliación del catálogo desplegado de 30.000 a 50.000 obras en el plan gratuito de Neon, con carga sin filas muertas
 - [x] **V09** Ejecución en un comando (`make demo`, `make test`, `make eval`), README para el tribunal, CI y arranque sin clave de API
+- [x] **V19** Interfaz web para el tribunal: modo agente, por qué aparece cada resultado, estados de espera y diagrama del flujo (nota pendiente hasta cerrar el chat)
+- [x] **V20** Asistente LangGraph como entrada conversacional (enruta, pregunta para aclarar, busca o delega en el agente) y explicaciones en paralelo
 
 ## En curso
 
 
 ## Pendientes
 
-- [ ] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
+- [~] **V21** Chat del asistente en la interfaz web y detalles de la API que necesita
+- [ ] **V22** Evaluación del agente y del asistente con protocolo declarado antes de ejecutar
+- [~] **V14** Evaluación sobre el catálogo nuevo: consultas ampliadas y multilingües, pool juzgado por el juez LLM, hoja de anotación humana, precisión de citas
 
 ## Aplazadas (con motivo)
 
