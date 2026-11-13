@@ -1,7 +1,7 @@
 # V27 · Hoja de revisión de las consultas y peticiones generadas por un LLM
 
 - **Fecha:** 2026-11-13
-- **Estado:** hoja y herramienta hechas; **la revisión no está hecha**: el autor todavía no ha rellenado la hoja, de modo que no hay ningún veredicto ni ningún resultado
+- **Estado:** hoja y herramienta hechas. Cuando se escribió esta nota la revisión no estaba hecha; **el autor la hizo el 2026-11-13** y su resultado está en la sección «Resultado de la revisión (2026-11-13)», al final. El texto de esta nota anterior a esa sección se conserva como estaba el día en que se escribió
 - **Capa:** evaluación (`app/evaluation/query_review.py`), datos (`data/evaluation/query_review/`), documentación (`docs/notes/`)
 - **Commits:** sin guardar en git cuando se escribió esta nota
 
@@ -57,15 +57,15 @@ Los tests de `tests/evaluation/test_query_review.py` comprueban, con ficheros pe
 
 ## Límites
 
-- **La revisión no está hecha.** Esta tarea entrega la herramienta y la hoja; no hay ni un veredicto, y no se puede afirmar nada sobre la calidad de las consultas y las peticiones.
+- **(Cuando se escribió la nota; ya hecha, véase el resultado al final.) La revisión no está hecha.** Esta tarea entrega la herramienta y la hoja; no hay ni un veredicto, y no se puede afirmar nada sobre la calidad de las consultas y las peticiones.
 - **Revisa una sola persona, el autor**, que además conoce el diseño de la evaluación. No hay segundo revisor ni medida de acuerdo entre revisores.
 - **Un veredicto es un juicio, no una medida.** `ok`, `dudosa` y `mal` se definen en las instrucciones, pero el límite entre `ok` y `dudosa` lo pone quien revisa.
 - **Quien no lee un idioma de la hoja** (hay doce en B y seis en G, además de los de C y E) solo puede comprobar que el texto corresponde a la necesidad, con un traductor; no valora si suena natural, y la hoja lo dice.
 
 ## Pendiente
 
-- **Que el autor rellene la hoja** y ejecute `summary`. El texto del TFG tiene un marcador pendiente para el resultado de esta revisión.
-- **Decidir qué se hace con las filas `mal` y `dudosa`** cuando haya veredictos: si alguna cambia lo medido, hay que declararlo y repetir lo que haga falta. Esa decisión no está tomada.
+- **(Hecho el 2026-11-13, véase el resultado al final.) Que el autor rellene la hoja** y ejecute `summary`. El texto del TFG tiene un marcador pendiente para el resultado de esta revisión.
+- **Decidir qué se hace con las filas `mal` y `dudosa`** cuando haya veredictos: si alguna cambia lo medido, hay que declararlo y repetir lo que haga falta. Esa decisión sigue sin tomarse: no hay filas `mal` y las 16 `dudosa` están en la sección final, con lo que queda abierto (recalcular sin ellas y segundo revisor).
 
 ## Cómo reproducirlo
 
@@ -83,3 +83,41 @@ El primero construye la hoja y las instrucciones (se niega a sobrescribir una ho
 - Datos (`data/evaluation/query_review/`): `review_sheet.csv`, `INSTRUCCIONES.md` y, cuando se ejecute `summary`, `query_review.json`.
 - Entradas que lee: `data/evaluation/catalog50k/queries/queries.json` (estratos B, C y D) y `data/evaluation/assistant/sets/` y `data/evaluation/assistant_v25/sets/` (conjuntos E, F y G).
 - Protocolos y tareas relacionadas: `docs/notes/2026-11-12-protocolo-evaluacion-catalogo.md` (sección 3), `docs/notes/2026-11-12-protocolo-evaluacion-asistente.md`, V14 (`V14-evaluacion-catalogo-desplegado.md`), V22 (`V22-evaluacion-asistente.md`) y V25 (`V25-revision-ruta-asistente.md`).
+
+## Resultado de la revisión (2026-11-13)
+
+El autor rellenó la hoja el 2026-11-13 y se ejecutó `summary`. Las cifras salen de `data/evaluation/query_review/query_review.json` y de `data/evaluation/query_review/review_sheet.csv`. Se revisaron **254 de 254** filas: **238 `ok`, 16 `dudosa` y 0 `mal`**.
+
+| Evaluación | Estrato | Filas | Revisadas | ok | dudosa | mal |
+|---|---|---|---|---|---|---|
+| catálogo | B | 72 | 72 | 71 | 1 | 0 |
+| catálogo | C | 40 | 40 | 39 | 1 | 0 |
+| catálogo | D | 12 | 12 | 12 | 0 | 0 |
+| asistente | E | 30 | 30 | 23 | 7 | 0 |
+| asistente | F | 20 | 20 | 16 | 4 | 0 |
+| asistente | G | 80 | 80 | 77 | 3 | 0 |
+
+Ninguna fila se marcó `mal`: ninguna está en otro idioma, ninguna deja de corresponder a su necesidad y ninguna de D podría responderla un libro. Las 16 `dudosa`, agrupadas por el tipo de duda que el autor anotó en `comment`:
+
+| Tipo de duda | Filas | Identificadores |
+|---|---|---|
+| Redacción poco natural o traducida literalmente (en `b-zh-6`, suena a reseña y no a búsqueda) | 7 | `b-zh-6`, `c09-fr`, `e-b-ca-1`, `f07`, `g18`, `g50`, `g54` |
+| Petición vaga que añade una restricción que la necesidad no tiene (idioma o literatura de un país) | 3 | `e-b-ca-4`, `e-b-de-2`, `e-b-ja-4` |
+| Petición vaga ambigua: una palabra suele entenderse como otro género o categoría y podría llevar a otro tipo de libro | 3 | `e-b-fr-5`, `e-b-pt-4`, `e-b-ru-5` |
+| Título en inglés dentro de una petición en otro idioma (en `f03` y en `f07`, además, no se nombra al autor) | 2 | `f03`, `f04` |
+| Título ambiguo: varias obras se llaman igual y la pregunta por el autor no basta para distinguirlas | 1 | `f20` |
+
+Los tipos son una agrupación de esta nota; el veredicto y el comentario de cada fila están en `query_review.json`.
+
+Límites, dichos sin adornos:
+
+- Revisó **una sola persona, el autor**, que conoce el diseño de la evaluación. No hay segundo revisor ni acuerdo entre revisores.
+- La revisión comprueba la forma (idioma, naturalidad, tipo) y la correspondencia con la necesidad. No mide si las consultas son representativas de las de usuarios reales.
+- **No se ha recalculado ninguna métrica sin las filas dudosas.** Las cifras publicadas de V14, V22 y V25 siguen siendo las de antes de la revisión; esta no las cambia.
+
+Queda abierto:
+
+- Recalcular las métricas sin las 16 filas dudosas (o declarar que no se hace) y ver si algo cambia.
+- Una revisión por una segunda persona.
+
+Para regenerar el resumen: `.venv/bin/python -m app.evaluation.query_review summary --sheet data/evaluation/query_review/review_sheet.csv`.

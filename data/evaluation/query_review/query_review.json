@@ -1,0 +1,149 @@
+{
+  "sheet": "data/evaluation/query_review/review_sheet.csv",
+  "total": {
+    "items": 254,
+    "reviewed": 254,
+    "ok": 238,
+    "dudosa": 16,
+    "mal": 0
+  },
+  "by_evaluation": {
+    "catalogo": {
+      "B": {
+        "items": 72,
+        "reviewed": 72,
+        "ok": 71,
+        "dudosa": 1,
+        "mal": 0,
+        "flagged": [
+          {
+            "item_id": "b-zh-6",
+            "verdict": "dudosa",
+            "comment": "Suena a reseña literaria más que a búsqueda: quien cita a Cao Xueqin, Jia Baoyu, Lin Daiyu y las dos mansiones ya conoce el título. La necesidad sí coincide."
+          }
+        ]
+      },
+      "C": {
+        "items": 40,
+        "reviewed": 40,
+        "ok": 39,
+        "dudosa": 1,
+        "mal": 0,
+        "flagged": [
+          {
+            "item_id": "c09-fr",
+            "verdict": "dudosa",
+            "comment": "«pièce de théâtre comique sentimentale» suena a traducción literal; un lector francés escribiría «comédie romantique». La necesidad se entiende."
+          }
+        ]
+      },
+      "D": {
+        "items": 12,
+        "reviewed": 12,
+        "ok": 12,
+        "dudosa": 0,
+        "mal": 0,
+        "flagged": []
+      }
+    },
+    "asistente": {
+      "E": {
+        "items": 30,
+        "reviewed": 30,
+        "ok": 23,
+        "dudosa": 7,
+        "mal": 0,
+        "flagged": [
+          {
+            "item_id": "e-b-ca-1",
+            "verdict": "dudosa",
+            "comment": "«antologia de versos» es poco natural (lo habitual es «antologia de poesia» o «antologia poètica»). Como versión vaga de la necesidad sí vale."
+          },
+          {
+            "item_id": "e-b-ca-4",
+            "verdict": "dudosa",
+            "comment": "Añade la restricción «en català», que no está en need (need pide ambientación en la Barcelona de posguerra, no idioma)."
+          },
+          {
+            "item_id": "e-b-de-2",
+            "verdict": "dudosa",
+            "comment": "Añade «deutsche», que no está en need (need pide ambientación en el Berlín de Weimar, no literatura alemana), y pierde lo histórico."
+          },
+          {
+            "item_id": "e-b-fr-5",
+            "verdict": "dudosa",
+            "comment": "«documentaire» en francés suele entenderse como película documental; para un libro sería «essai» o «livre d'histoire». Ambigua."
+          },
+          {
+            "item_id": "e-b-ja-4",
+            "verdict": "dudosa",
+            "comment": "Añade la restricción «海外文学» (literatura extranjera), que no está en need."
+          },
+          {
+            "item_id": "e-b-pt-4",
+            "verdict": "dudosa",
+            "comment": "«romance de época» suele entenderse como novela romántica de época, no como novela histórica sobre los descubrimientos; puede llevar a otro género."
+          },
+          {
+            "item_id": "e-b-ru-5",
+            "verdict": "dudosa",
+            "comment": "«этнография» no es la categoría general de la necesidad (mitología y creencias eslavas); encajaría mejor «мифология» o «история религии»."
+          }
+        ]
+      },
+      "F": {
+        "items": 20,
+        "reviewed": 20,
+        "ok": 16,
+        "dudosa": 4,
+        "mal": 0,
+        "flagged": [
+          {
+            "item_id": "f03",
+            "verdict": "dudosa",
+            "comment": "Mezcla idiomas: en una consulta en francés se esperaría «Le Sursis», no el título inglés «The Reprieve». Tampoco nombra a Sartre («l'auteur»)."
+          },
+          {
+            "item_id": "f04",
+            "verdict": "dudosa",
+            "comment": "Mezcla idiomas: un lector japonés escribiría «十二国記», no «The Twelve Kingdoms»."
+          },
+          {
+            "item_id": "f07",
+            "verdict": "dudosa",
+            "comment": "«desarrollo inicial como obras del autor» es una expresión vaga y poco natural; no queda claro qué se compara. No nombra al autor."
+          },
+          {
+            "item_id": "f20",
+            "verdict": "dudosa",
+            "comment": "La pregunta es natural, pero «كتاب الفلاحة» es título de varias obras andalusíes (Ibn al-'Awwam, Ibn Bassal, Abu l-Jayr), y al preguntar además por el autor queda ambigua."
+          }
+        ]
+      },
+      "G": {
+        "items": 80,
+        "reviewed": 80,
+        "ok": 77,
+        "dudosa": 3,
+        "mal": 0,
+        "flagged": [
+          {
+            "item_id": "g18",
+            "verdict": "dudosa",
+            "comment": "Cadena de palabras poco natural, calco de «Thai curry cooking»; además «caril» es portugués europeo y el resto de filas pt son brasileñas."
+          },
+          {
+            "item_id": "g50",
+            "verdict": "dudosa",
+            "comment": "Poco natural en inglés: lo habitual es «Camino de Santiago»; «Santiago» solo es ambiguo."
+          },
+          {
+            "item_id": "g54",
+            "verdict": "dudosa",
+            "comment": "Cadena poco natural: «lidar» suelto, calco de «anxiety coping strategies». Lo habitual sería «como lidar com a ansiedade»."
+          }
+        ]
+      }
+    }
+  }
+}
