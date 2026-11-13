@@ -38,7 +38,7 @@
   "suscripcion_meses": {
     "valor": ["2025-12", "2026-01", "2026-02", "2026-10", "2026-11"],
     "unidad": "meses",
-    "fuente": "Meses con actividad en el historial del repositorio: git log --all --format=%ad --date=format:%Y-%m | sort | uniq -c. Dato del autor: debe confirmar que pago la suscripcion esos meses."
+    "fuente": "Meses con actividad en el historial del repositorio: git log --all --format=%ad --date=format:%Y-%m | sort | uniq -c. Segun el autor (2026-11-13), mantiene la suscripcion de forma continua y la usa tambien fuera del trabajo; por eso solo se imputan los meses con actividad."
   },
   "software_libre": {
     "valor": "0",

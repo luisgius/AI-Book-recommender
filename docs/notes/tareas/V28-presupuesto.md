@@ -1,7 +1,7 @@
 # V28 · Presupuesto del proyecto
 
 - **Fecha:** 2026-11-13
-- **Estado:** hecha; las cifras del autor (precio del portátil, suscripción y sus meses) están pendientes de su confirmación
+- **Estado:** hecha; queda por confirmar la moneda del precio del portátil
 - **Capa:** documentación (`docs/notes/presupuesto/`) y un script (`scripts/presupuesto.py`)
 - **Commits:** sin commit todavía
 
@@ -62,7 +62,7 @@ Sin red. Imprime la tabla y reescribe `docs/notes/presupuesto/PRESUPUESTO.md`.
 
 ## Pendiente
 
-- **El autor debe confirmar** el precio y la moneda del portátil (unos 2 000 EUR, aproximado), el precio de la suscripción (20 USD al mes) y los meses en que la pagó.
+- **El autor debe confirmar** el precio y la moneda del portátil (unos 2 000 EUR, aproximado), y el precio de la suscripción (20 USD al mes). El 2026-11-13 el autor indicó que mantiene la suscripción de forma continua y la usa también fuera del trabajo; por eso solo se imputan los cinco meses con actividad en el repositorio.
 - **Horas del tutor:** no están incluidas.
 - **Cuotas patronales** de la Seguridad Social: no incluidas (salario bruto).
 - Las horas son nominales, no medidas; la memoria debe decirlo.
