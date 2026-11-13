@@ -1,0 +1,17 @@
+API Key,Model,Value,% of Total
+ai-book,Qwen3 Reranker 8B,2.717001,42.86
+ai-book,DeepSeek V4.1 Flash,1.430441,22.56
+ai-book,MiniMax M3.1 Flash,0.597146,9.42
+ai-book,GLM 5.3 Flash,0.542838,8.56
+ai-book,Gemini 3.8 Flash,0.241424,3.81
+ai-book,Nano Banana 2 (Gemini 3.1 Flash Image),0.201969,3.19
+ai-book,Qwen3.8 Flash,0.150138,2.37
+ai-book,Qwen3 Reranker 0.6B,0.136382,2.15
+ai-book,GLM 5.3,0.131289,2.07
+ai-book,Qwen3 Embedding 8B,0.093093,1.47
+ai-book,bge-m3,0.089617,1.41
+ai-book,Claude Haiku 5.5,0.002831,0.04
+ai-book,GPT-6 Luna,0.001876,0.03
+ai-book,Mistral Small 4,0.001344,0.02
+ai-book,Qwen3 Embedding 4B,0.001265,0.02
+ai-book,Multilingual-E5-Large,0.000701,0.01

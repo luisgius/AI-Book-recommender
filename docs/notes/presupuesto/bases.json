@@ -1,0 +1,53 @@
+{
+  "fecha_verificacion": "2026-11-13",
+  "horas": {
+    "valor": 300,
+    "unidad": "horas",
+    "fuente": "Carga nominal del TFG: 12 creditos, \"entre las 300 y 360 horas de trabajo efectivo\" (guia de la escuela, .tfg-reference/text/Recomendaciones-Escritura-Defensa-TFG-7_11_18.txt, linea 8). Se usa el limite inferior. El autor no llevo registro de horas."
+  },
+  "salario_anual": {
+    "valor": "24105.37",
+    "unidad": "EUR por anio (bruto, sin cuota patronal)",
+    "fuente": "XIX Convenio colectivo estatal de empresas de consultoria, tecnologias de la informacion y estudios de mercado y de la opinion publica. Tablas salariales actualizadas: Resolucion de 13 de abril de 2026, BOE num. 100, 24 de abril de 2026, BOE-A-2026-9024 (https://www.boe.es/boe/dias/2026/04/24/pdfs/BOE-A-2026-9024.pdf). Area 3, Grupo C, Nivel 3, total 2026 = salario base 22136,89 + plus convenio 1968,48."
+  },
+  "horas_anuales": {
+    "valor": 1800,
+    "unidad": "horas por anio",
+    "fuente": "Jornada maxima anual del articulo 20.1 del convenio, BOE num. 92, 16 de abril de 2025, BOE-A-2025-7766 (https://www.boe.es/boe/dias/2025/04/16/pdfs/BOE-A-2025-7766.pdf)."
+  },
+  "portatil_precio": {
+    "valor": "2000",
+    "unidad": "EUR",
+    "fuente": "Dato del autor: MacBook comprado en 2024, precio aproximado."
+  },
+  "portatil_amortizacion": {
+    "valor": "0.25",
+    "unidad": "fraccion anual (lineal)",
+    "fuente": "Coeficiente maximo para \"Equipos para procesos de informacion\" en la tabla del articulo 12.1.a de la Ley 27/2014 del Impuesto sobre Sociedades (https://www.boe.es/buscar/act.php?id=BOE-A-2014-12328)."
+  },
+  "openrouter_csv": {
+    "valor": "docs/notes/presupuesto/openrouter_usage_2026-10-14_2026-11-13.csv",
+    "unidad": "ruta del fichero (USD)",
+    "fuente": "Exportacion de uso de OpenRouter de la clave del proyecto, del 2026-10-14 al 2026-11-13; columnas API Key, Model, Value, % of Total; 16 modelos."
+  },
+  "suscripcion_mensual": {
+    "valor": "20",
+    "unidad": "USD por mes",
+    "fuente": "Dato del autor: suscripcion a un asistente de IA generativa (Claude) usado en el desarrollo y la redaccion."
+  },
+  "suscripcion_meses": {
+    "valor": ["2025-12", "2026-01", "2026-02", "2026-10", "2026-11"],
+    "unidad": "meses",
+    "fuente": "Meses con actividad en el historial del repositorio: git log --all --format=%ad --date=format:%Y-%m | sort | uniq -c. Dato del autor: debe confirmar que pago la suscripcion esos meses."
+  },
+  "software_libre": {
+    "valor": "0",
+    "unidad": "EUR",
+    "fuente": "Python, FastAPI, PostgreSQL en el plan gratuito de Neon, plan gratuito de Vercel y TinyTeX (requirements.txt y docs/notes/2026-11-11-propuesta-nube-y-mcp.md)."
+  },
+  "tipo_cambio": {
+    "valor": "1.1081",
+    "unidad": "USD por 1 EUR",
+    "fuente": "Tipo de cambio de referencia del euro del Banco Central Europeo del 12 de noviembre de 2026 (https://www.ecb.europa.eu/stats/exchange/eurofxref/shared/pdf/2026/11/20261112.pdf)."
+  }
+}
