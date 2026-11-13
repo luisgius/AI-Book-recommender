@@ -1,7 +1,7 @@
 # V14 · Evaluación del sistema desplegado sobre su catálogo real
 
 - **Fecha:** 2026-11-12
-- **Estado:** hecha; los juicios son solo de LLM hasta que el autor rellene la hoja de anotación humana; el resultado sobre el modelo de embeddings se comprobó después en la tarea V23 y se mantiene
+- **Estado:** hecha; los juicios son solo de LLM hasta que el autor rellene la hoja de anotación humana (el 2026-11-13 la rellenó: véase la adenda al final); el resultado sobre el modelo de embeddings se comprobó después en la tarea V23 y se mantiene
 - **Capa:** evaluación (`app/evaluation/catalog_evaluation/`), datos (`data/evaluation/catalog50k/`), documentación (`docs/notes/`)
 - **Commits:** protocolo en `9abf48e` (antes de cualquier resultado); implementación y resultados en `ac35110`
 
@@ -222,7 +222,7 @@ Cuarenta consultas de A y B elegidas al azar (semilla 0), los tres primeros resu
 
 ### Hoja de anotación humana
 
-`data/evaluation/catalog50k/annotation/annotation_sheet.csv` contiene 200 pares tomados de los 3767 pares juzgados de A y B (semilla 0, estratificados por idioma y por nota del juez principal, sin mostrar ninguna nota de los jueces), con instrucciones en español en `INSTRUCCIONES.md`. **Está producida pero sin rellenar: la tiene que rellenar el autor.** Después se calcula el acuerdo con `annotation-agreement --sheet <fichero>` (comando completo en la sección de reproducción). Hasta entonces, ningún acuerdo con personas se ha medido en este catálogo.
+`data/evaluation/catalog50k/annotation/annotation_sheet.csv` contiene 200 pares tomados de los 3767 pares juzgados de A y B (semilla 0, estratificados por idioma y por nota del juez principal, sin mostrar ninguna nota de los jueces), con instrucciones en español en `INSTRUCCIONES.md`. **Está producida pero sin rellenar: la tiene que rellenar el autor.** Después se calcula el acuerdo con `annotation-agreement --sheet <fichero>` (comando completo en la sección de reproducción). Hasta entonces, ningún acuerdo con personas se ha medido en este catálogo. *(Actualización del 2026-11-13: el autor la rellenó; véase «Adenda 2026-11-13» al final.)*
 
 ### Coste y tiempo
 
@@ -269,7 +269,7 @@ El informe lista diez. Todas están anotadas con su motivo.
 
 ## Pendiente
 
-- **Hoja de anotación humana:** la tiene que rellenar el autor; después se calcula el acuerdo.
+- **Hoja de anotación humana:** la tiene que rellenar el autor; después se calcula el acuerdo. *(Hecho el 2026-11-13 con un solo anotador; véase la adenda al final. Sigue pendiente un segundo anotador.)*
 - **Aplicar el resultado de la regla híbrida al despliegue:** la condición para pasar de híbrido más reranker a vectorial más reranker se cumple (S4 supera a S5 con los dos jueces). No se cambió el despliegue; es una tarea aparte, y BM25 se conserva como recurso cuando falla el proveedor de embeddings.
 - **Investigar el resultado de los embeddings y los fallos:** hecha en la tarea V23 (`V23-comprobacion-embeddings.md`, 2026-11-12). No se encontró ningún defecto; la cifra de H6 y la decisión de mantener el modelo desplegado se mantienen. Aplicar su recomendación sobre las llamadas fallidas es la tarea V24.
 - **Evaluación del agente y del asistente:** tarea posterior con su propio protocolo; esta evaluación no los mide.
@@ -293,3 +293,62 @@ El primer comando regenera el informe sin red, desde las ejecuciones, los juicio
 - Informe: `data/evaluation/CATALOG_EVALUATION.md`.
 - Protocolo: `docs/notes/2026-11-12-protocolo-evaluacion-catalogo.md`.
 - Resultados anteriores a los que se conecta: `data/evaluation/RETRIEVAL_ABLATION.md`, `data/evaluation/BM25_PADDING.md`, `data/evaluation/LLM_RECOMMENDER.md`, `data/evaluation/API_MODELS.md`.
+
+## Adenda 2026-11-13: la hoja de anotación rellenada por el autor
+
+- **Fecha:** 2026-11-13
+- **Estado:** hecha; el acuerdo con los jueces LLM se midió con **un solo anotador, el autor**; no se recalculó ninguna métrica con sus notas
+
+### Qué se hizo
+
+- El autor puso nota de 0 a 3 a la hoja de 200 pares. La hoja rellenada es `data/evaluation/catalog50k/annotation/annotation_sheet_filled.csv`; la hoja en blanco, `annotation_sheet.csv`, se queda como se generó. **184 pares tienen nota y 16 se dejaron vacíos** (las instrucciones permiten dejar vacía la celda si no se puede decidir; esos pares no cuentan).
+- Se ejecutó `.venv/bin/python -m app.evaluation.catalog_evaluation annotation-agreement --sheet data/evaluation/catalog50k/annotation/annotation_sheet_filled.csv`, que escribe `data/evaluation/catalog50k/annotation/human_agreement.json`.
+- Se regeneró el informe con `report --offline` sobre una copia de los datos y se comparó con el publicado: la única diferencia era la entrada `human_agreement` de `results.json` y las dos líneas de acuerdo de la sección «Human annotation sheet» de `data/evaluation/CATALOG_EVALUATION.md`. Solo entonces se sustituyeron los dos ficheros publicados.
+- Arreglo en `read_sheet` (`app/evaluation/catalog_evaluation/annotation.py`): ahora abre la hoja con `utf-8-sig`. La exportación de la hoja de cálculo empieza con una marca de orden de bytes y el comando fallaba con `KeyError: 'pair_id'`. Hay un test (`tests/evaluation/test_catalog_evaluation.py`).
+
+### Cifras (de `human_agreement.json`)
+
+Notas del autor sobre los 184 pares: nota 0, 39; nota 1, 52; nota 2, 89; nota 3, 4. Kappa ponderado cuadrático (intervalo del 95 % por bootstrap sobre pares, 2000 remuestreos, semilla 0):
+
+| Medida | `z-ai/glm-5.3-flash` (principal) | `minimax/minimax-m3.1-flash` (segundo) |
+|---|---|---|
+| Pares | 184 | 184 |
+| Kappa ponderado cuadrático | 0.272 [0.137, 0.396] | 0.301 [0.171, 0.425] |
+| Acuerdo exacto | 0.342 | 0.304 |
+| Acuerdo a menos de un punto | 0.804 | 0.815 |
+| Kappa binario, nota >= 1 (acuerdo) | 0.310 (0.739) | 0.282 (0.745) |
+| Kappa binario, nota >= 2 (acuerdo) | 0.177 (0.587) | 0.251 (0.625) |
+| Diferencia media con signo (juez menos autor) | -0.065 | +0.152 |
+| Notas del juez 0 / 1 / 2 / 3 | 53 / 66 / 31 / 34 | 46 / 58 / 28 / 52 |
+
+Matriz de confusión (filas: nota del autor 0 a 3; columnas: nota del juez 0 a 3):
+
+| Autor | glm 0 | glm 1 | glm 2 | glm 3 | minimax 0 | minimax 1 | minimax 2 | minimax 3 |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 22 | 12 | 2 | 3 | 19 | 15 | 0 | 5 |
+| 1 | 13 | 20 | 8 | 11 | 12 | 17 | 10 | 13 |
+| 2 | 18 | 32 | 20 | 19 | 14 | 25 | 18 | 32 |
+| 3 | 0 | 2 | 1 | 1 | 1 | 1 | 0 | 2 |
+
+Por idioma el JSON da el kappa de cada uno de los doce idiomas, con entre 6 y 52 pares cada uno (inglés 52, español 43, el resto entre 6 y 11). Con el juez principal el kappa va de -0.37 (catalán, 11 pares) a 0.52 (alemán, 9 pares); en inglés es 0.51 y en español 0.14. Con tan pocos pares, los intervalos por idioma son muy anchos (el de catalán, por ejemplo, va de -0.70 a 0.02) y no permiten comparar idiomas.
+
+### Qué significan
+
+- El acuerdo del autor con los dos jueces es **bajo**: kappa de 0.27 y 0.30, con intervalos que quedan lejos de los valores que suelen tomarse como acuerdo alto, y acuerdo exacto de un tercio de los pares.
+- El acuerdo es mejor a menos de un punto (0.80 y 0.82) que exacto: el desacuerdo es sobre todo de un grado, no entre extremos.
+- Donde el JSON muestra el desacuerdo es en el uso de las notas altas. El autor puso nota 3 solo 4 veces (2.2 %) y nota 2 en 89 pares (48.4 %); los jueces pusieron nota 3 en 34 pares (glm) y 52 (minimax). De los 89 pares con nota 2 del autor, glm dio 3 a 19 y minimax a 32, y dieron 0 o 1 a 50 (glm) y 39 (minimax). La diferencia media con signo es pequeña (-0.065 y +0.152) porque los desacuerdos van en las dos direcciones y se compensan.
+- La distribución de notas de los jueces sobre esta hoja no es la del pool: la muestra se estratificó por la nota del juez principal (véase «Hoja de anotación humana»), de modo que los jueces están representados por diseño en todas las notas.
+- El JSON no dice por qué el autor y los jueces discrepan. No se ha comprobado ninguna explicación (por ejemplo, que el autor lea la escala de forma más estricta, o que los jueces valoren la descripción de otra manera); decirlo sería una hipótesis.
+
+### Límites
+
+- **Un solo anotador, y es el autor del sistema.** No hay medida de acuerdo entre personas, así que no se sabe cuánto de la distancia con los jueces es desacuerdo del autor con cualquier otra persona. El autor conoce el sistema que se evalúa, aunque la hoja no mostraba ninguna nota de los jueces.
+- **16 de 200 pares sin nota** (8 %); el acuerdo se calcula sobre los 184.
+- **No se recalculó ninguna métrica con las notas del autor.** Las tablas de nDCG@10 y los contrastes del informe siguen usando solo los juicios de los dos jueces LLM, y el resto de este documento no cambia.
+- Los intervalos son por bootstrap sobre pares; con 184 pares son anchos (unos 0.26 de amplitud).
+
+### Qué queda abierto
+
+- **Un segundo anotador**, para medir el acuerdo entre personas y poder separar el acuerdo del juez con una persona del acuerdo entre personas.
+- **Recalcular las métricas y los contrastes con notas de personas**, o al menos comprobar si cambia alguna conclusión al sustituir las notas de los jueces por las del autor en los 184 pares; no se ha hecho.
+- **Qué puede afirmar el texto del TFG:** que, sobre este catálogo, el acuerdo de un anotador (el autor) con los dos jueces LLM es bajo (kappa ponderado cuadrático 0.27 y 0.30, 184 pares), con el desacuerdo concentrado en las notas altas (los jueces dan 3 mucho más que el autor). **Qué no puede afirmar:** que los jueces sean fiables ni que no lo sean para este catálogo; que el desacuerdo se deba a un defecto de los jueces y no a las notas del autor; que las conclusiones de la evaluación se mantengan o cambien con notas humanas.

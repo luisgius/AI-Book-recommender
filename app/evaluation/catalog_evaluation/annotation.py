@@ -116,9 +116,13 @@ def build_sheet(queries: Sequence[EvalQuery], grades: Mapping[str, Mapping[str, 
 
 
 def read_sheet(path: Path) -> Dict[str, int]:
-    """{pair_id: grade} of the filled rows (empty or invalid grades are skipped)."""
+    """{pair_id: grade} of the filled rows (empty or invalid grades are skipped).
+
+    Spreadsheets often export CSV with a byte-order mark; "utf-8-sig" reads
+    the file with or without it.
+    """
     out = {}
-    with path.open(encoding="utf-8", newline="") as handle:
+    with path.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle):
             raw = (row.get("grade") or "").strip()
             if raw in ("0", "1", "2", "3"):

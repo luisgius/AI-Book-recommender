@@ -1,0 +1,1625 @@
+{
+  "filled_rows": 184,
+  "judges": {
+    "z-ai/glm-5.3-flash": {
+      "pairs": 184,
+      "config": {
+        "grades": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "confusion_matrix": "rows: original grade 0-3, columns: LLM grade 0-3",
+        "mean_signed_difference": "mean of LLM grade - original grade (positive: the LLM grades higher)",
+        "quadratic_weighted_kappa_ci95": "percentile bootstrap over pairs, 2000 resamples, seed 0",
+        "binary": "kappa and agreement after mapping grades to grade >= threshold"
+      },
+      "overall": {
+        "n": 184,
+        "exact_agreement": 0.3423913043478261,
+        "within_one_agreement": 0.8043478260869565,
+        "quadratic_weighted_kappa": 0.27164179104477615,
+        "quadratic_weighted_kappa_ci95": [
+          0.13700834025935793,
+          0.39637378558913405
+        ],
+        "binary": {
+          "at_least_1": {
+            "kappa": 0.3096764108175707,
+            "agreement": 0.7391304347826086
+          },
+          "at_least_2": {
+            "kappa": 0.17653986574019553,
+            "agreement": 0.5869565217391305
+          }
+        },
+        "mean_signed_difference": -0.06521739130434782,
+        "confusion_matrix": [
+          [
+            22,
+            12,
+            2,
+            3
+          ],
+          [
+            13,
+            20,
+            8,
+            11
+          ],
+          [
+            18,
+            32,
+            20,
+            19
+          ],
+          [
+            0,
+            2,
+            1,
+            1
+          ]
+        ],
+        "grade_distribution": {
+          "original": [
+            39,
+            52,
+            89,
+            4
+          ],
+          "llm": [
+            53,
+            66,
+            31,
+            34
+          ]
+        }
+      },
+      "by_language": {
+        "ar": {
+          "n": 6,
+          "exact_agreement": 0.16666666666666666,
+          "within_one_agreement": 1.0,
+          "quadratic_weighted_kappa": 0.48275862068965514,
+          "quadratic_weighted_kappa_ci95": [
+            0.0,
+            0.625
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.6666666666666666
+            },
+            "at_least_2": {
+              "kappa": 0.3999999999999999,
+              "agreement": 0.6666666666666666
+            }
+          },
+          "mean_signed_difference": -0.5,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              2,
+              4,
+              0
+            ],
+            "llm": [
+              2,
+              2,
+              1,
+              1
+            ]
+          }
+        },
+        "ca": {
+          "n": 11,
+          "exact_agreement": 0.09090909090909091,
+          "within_one_agreement": 0.7272727272727273,
+          "quadratic_weighted_kappa": -0.36601307189542487,
+          "quadratic_weighted_kappa_ci95": [
+            -0.6980165875484261,
+            0.022258382642997863
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8181818181818182
+            },
+            "at_least_2": {
+              "kappa": -0.5230769230769232,
+              "agreement": 0.18181818181818182
+            }
+          },
+          "mean_signed_difference": -0.2727272727272727,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              2,
+              1
+            ],
+            [
+              2,
+              4,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              4,
+              7,
+              0
+            ],
+            "llm": [
+              2,
+              5,
+              2,
+              2
+            ]
+          }
+        },
+        "de": {
+          "n": 9,
+          "exact_agreement": 0.4444444444444444,
+          "within_one_agreement": 0.8888888888888888,
+          "quadratic_weighted_kappa": 0.5199999999999999,
+          "quadratic_weighted_kappa_ci95": [
+            -0.06303022606045217,
+            0.8421052631578947
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.3571428571428572,
+              "agreement": 0.7777777777777778
+            },
+            "at_least_2": {
+              "kappa": 0.55,
+              "agreement": 0.7777777777777778
+            }
+          },
+          "mean_signed_difference": 0.2222222222222222,
+          "confusion_matrix": [
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              2,
+              2,
+              5,
+              0
+            ],
+            "llm": [
+              2,
+              2,
+              3,
+              2
+            ]
+          }
+        },
+        "en": {
+          "n": 52,
+          "exact_agreement": 0.4807692307692308,
+          "within_one_agreement": 0.8653846153846154,
+          "quadratic_weighted_kappa": 0.5085592011412268,
+          "quadratic_weighted_kappa_ci95": [
+            0.27750776017690026,
+            0.6921394941375759
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.3846153846153846,
+              "agreement": 0.6923076923076923
+            },
+            "at_least_2": {
+              "kappa": 0.4742647058823529,
+              "agreement": 0.7884615384615384
+            }
+          },
+          "mean_signed_difference": 0.25,
+          "confusion_matrix": [
+            [
+              16,
+              8,
+              1,
+              1
+            ],
+            [
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              2,
+              3,
+              4,
+              4
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              26,
+              12,
+              13,
+              1
+            ],
+            "llm": [
+              22,
+              15,
+              6,
+              9
+            ]
+          }
+        },
+        "es": {
+          "n": 43,
+          "exact_agreement": 0.32558139534883723,
+          "within_one_agreement": 0.7674418604651163,
+          "quadratic_weighted_kappa": 0.14322841466936176,
+          "quadratic_weighted_kappa_ci95": [
+            -0.15079122095669145,
+            0.41536804706863645
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.1863173216885008,
+              "agreement": 0.6976744186046512
+            },
+            "at_least_2": {
+              "kappa": 0.16774193548387095,
+              "agreement": 0.5813953488372093
+            }
+          },
+          "mean_signed_difference": -0.023255813953488372,
+          "confusion_matrix": [
+            [
+              4,
+              2,
+              1,
+              2
+            ],
+            [
+              3,
+              6,
+              1,
+              2
+            ],
+            [
+              5,
+              7,
+              4,
+              5
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              9,
+              12,
+              21,
+              1
+            ],
+            "llm": [
+              12,
+              15,
+              7,
+              9
+            ]
+          }
+        },
+        "fr": {
+          "n": 10,
+          "exact_agreement": 0.3,
+          "within_one_agreement": 0.7,
+          "quadratic_weighted_kappa": 0.024390243902438935,
+          "quadratic_weighted_kappa_ci95": [
+            -0.3889604810996564,
+            0.4624135944700459
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": -0.17647058823529393,
+              "agreement": 0.6
+            },
+            "at_least_2": {
+              "kappa": 0.19999999999999996,
+              "agreement": 0.6
+            }
+          },
+          "mean_signed_difference": -0.2,
+          "confusion_matrix": [
+            [
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              0,
+              1
+            ],
+            [
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              1,
+              4,
+              5,
+              0
+            ],
+            "llm": [
+              3,
+              4,
+              1,
+              2
+            ]
+          }
+        },
+        "it": {
+          "n": 10,
+          "exact_agreement": 0.6,
+          "within_one_agreement": 0.9,
+          "quadratic_weighted_kappa": 0.25531914893617025,
+          "quadratic_weighted_kappa_ci95": [
+            -0.14481000926784043,
+            0.8
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.9
+            },
+            "at_least_2": {
+              "kappa": 0.44444444444444453,
+              "agreement": 0.7
+            }
+          },
+          "mean_signed_difference": -0.3,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              2,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              4,
+              6,
+              0
+            ],
+            "llm": [
+              1,
+              6,
+              2,
+              1
+            ]
+          }
+        },
+        "ja": {
+          "n": 7,
+          "exact_agreement": 0.14285714285714285,
+          "within_one_agreement": 0.8571428571428571,
+          "quadratic_weighted_kappa": -0.18867924528301883,
+          "quadratic_weighted_kappa_ci95": [
+            -0.7843137254901962,
+            0.41666666666666663
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8571428571428571
+            },
+            "at_least_2": {
+              "kappa": -0.40000000000000013,
+              "agreement": 0.2857142857142857
+            }
+          },
+          "mean_signed_difference": -0.14285714285714285,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              3,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              3,
+              4,
+              0
+            ],
+            "llm": [
+              1,
+              3,
+              2,
+              1
+            ]
+          }
+        },
+        "nl": {
+          "n": 11,
+          "exact_agreement": 0.18181818181818182,
+          "within_one_agreement": 0.7272727272727273,
+          "quadratic_weighted_kappa": 0.108108108108108,
+          "quadratic_weighted_kappa_ci95": [
+            -0.496,
+            0.5319374845970589
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.42105263157894735,
+              "agreement": 0.8181818181818182
+            },
+            "at_least_2": {
+              "kappa": -0.18461538461538485,
+              "agreement": 0.36363636363636365
+            }
+          },
+          "mean_signed_difference": -0.36363636363636365,
+          "confusion_matrix": [
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              3,
+              1,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              1,
+              3,
+              6,
+              1
+            ],
+            "llm": [
+              3,
+              4,
+              2,
+              2
+            ]
+          }
+        },
+        "pt": {
+          "n": 11,
+          "exact_agreement": 0.18181818181818182,
+          "within_one_agreement": 0.6363636363636364,
+          "quadratic_weighted_kappa": -0.23529411764705888,
+          "quadratic_weighted_kappa_ci95": [
+            -0.6153846153846156,
+            0.014958742871010547
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8181818181818182
+            },
+            "at_least_2": {
+              "kappa": -0.18918918918918926,
+              "agreement": 0.2727272727272727
+            }
+          },
+          "mean_signed_difference": -0.6363636363636364,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              2,
+              4,
+              2,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              1,
+              9,
+              1
+            ],
+            "llm": [
+              2,
+              5,
+              2,
+              2
+            ]
+          }
+        },
+        "ru": {
+          "n": 8,
+          "exact_agreement": 0.125,
+          "within_one_agreement": 0.75,
+          "quadratic_weighted_kappa": 0.0,
+          "quadratic_weighted_kappa_ci95": [
+            -0.4444444444444444,
+            0.3846153846153846
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.625
+            },
+            "at_least_2": {
+              "kappa": -0.11111111111111116,
+              "agreement": 0.375
+            }
+          },
+          "mean_signed_difference": -0.625,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              2,
+              2,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              3,
+              5,
+              0
+            ],
+            "llm": [
+              3,
+              3,
+              1,
+              1
+            ]
+          }
+        },
+        "zh": {
+          "n": 6,
+          "exact_agreement": 0.5,
+          "within_one_agreement": 0.8333333333333334,
+          "quadratic_weighted_kappa": 0.0,
+          "quadratic_weighted_kappa_ci95": [
+            -0.6363636363636365,
+            0.7692307692307692
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": null,
+              "agreement": 1.0
+            },
+            "at_least_2": {
+              "kappa": 0.25,
+              "agreement": 0.6666666666666666
+            }
+          },
+          "mean_signed_difference": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              2,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              2,
+              4,
+              0
+            ],
+            "llm": [
+              0,
+              2,
+              2,
+              2
+            ]
+          }
+        }
+      }
+    },
+    "minimax/minimax-m3.1-flash": {
+      "pairs": 184,
+      "config": {
+        "grades": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "confusion_matrix": "rows: original grade 0-3, columns: LLM grade 0-3",
+        "mean_signed_difference": "mean of LLM grade - original grade (positive: the LLM grades higher)",
+        "quadratic_weighted_kappa_ci95": "percentile bootstrap over pairs, 2000 resamples, seed 0",
+        "binary": "kappa and agreement after mapping grades to grade >= threshold"
+      },
+      "overall": {
+        "n": 184,
+        "exact_agreement": 0.30434782608695654,
+        "within_one_agreement": 0.8152173913043478,
+        "quadratic_weighted_kappa": 0.3006665887030756,
+        "quadratic_weighted_kappa_ci95": [
+          0.1708182993124052,
+          0.42500964962204124
+        ],
+        "binary": {
+          "at_least_1": {
+            "kappa": 0.2824427480916031,
+            "agreement": 0.7445652173913043
+          },
+          "at_least_2": {
+            "kappa": 0.25106182161396895,
+            "agreement": 0.625
+          }
+        },
+        "mean_signed_difference": 0.15217391304347827,
+        "confusion_matrix": [
+          [
+            19,
+            15,
+            0,
+            5
+          ],
+          [
+            12,
+            17,
+            10,
+            13
+          ],
+          [
+            14,
+            25,
+            18,
+            32
+          ],
+          [
+            1,
+            1,
+            0,
+            2
+          ]
+        ],
+        "grade_distribution": {
+          "original": [
+            39,
+            52,
+            89,
+            4
+          ],
+          "llm": [
+            46,
+            58,
+            28,
+            52
+          ]
+        }
+      },
+      "by_language": {
+        "ar": {
+          "n": 6,
+          "exact_agreement": 0.3333333333333333,
+          "within_one_agreement": 1.0,
+          "quadratic_weighted_kappa": 0.625,
+          "quadratic_weighted_kappa_ci95": [
+            0.0,
+            0.7272727272727273
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.6666666666666666
+            },
+            "at_least_2": {
+              "kappa": 1.0,
+              "agreement": 1.0
+            }
+          },
+          "mean_signed_difference": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              2,
+              4,
+              0
+            ],
+            "llm": [
+              2,
+              0,
+              2,
+              2
+            ]
+          }
+        },
+        "ca": {
+          "n": 11,
+          "exact_agreement": 0.18181818181818182,
+          "within_one_agreement": 0.7272727272727273,
+          "quadratic_weighted_kappa": -0.23749999999999982,
+          "quadratic_weighted_kappa_ci95": [
+            -0.5921302177858438,
+            0.17091817468847098
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.9090909090909091
+            },
+            "at_least_2": {
+              "kappa": -0.30508474576271194,
+              "agreement": 0.36363636363636365
+            }
+          },
+          "mean_signed_difference": 0.18181818181818182,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              2
+            ],
+            [
+              1,
+              3,
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              4,
+              7,
+              0
+            ],
+            "llm": [
+              1,
+              4,
+              2,
+              4
+            ]
+          }
+        },
+        "de": {
+          "n": 9,
+          "exact_agreement": 0.3333333333333333,
+          "within_one_agreement": 0.8888888888888888,
+          "quadratic_weighted_kappa": 0.5263157894736843,
+          "quadratic_weighted_kappa_ci95": [
+            -0.0150375939849623,
+            0.8125
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.3571428571428572,
+              "agreement": 0.7777777777777778
+            },
+            "at_least_2": {
+              "kappa": 0.55,
+              "agreement": 0.7777777777777778
+            }
+          },
+          "mean_signed_difference": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              2,
+              2,
+              5,
+              0
+            ],
+            "llm": [
+              2,
+              2,
+              2,
+              3
+            ]
+          }
+        },
+        "en": {
+          "n": 52,
+          "exact_agreement": 0.40384615384615385,
+          "within_one_agreement": 0.8653846153846154,
+          "quadratic_weighted_kappa": 0.5066577896138482,
+          "quadratic_weighted_kappa_ci95": [
+            0.2942702640395521,
+            0.6726178064721823
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.3076923076923077,
+              "agreement": 0.6538461538461539
+            },
+            "at_least_2": {
+              "kappa": 0.5112781954887218,
+              "agreement": 0.8076923076923077
+            }
+          },
+          "mean_signed_difference": 0.3269230769230769,
+          "confusion_matrix": [
+            [
+              14,
+              11,
+              0,
+              1
+            ],
+            [
+              4,
+              4,
+              0,
+              4
+            ],
+            [
+              2,
+              3,
+              2,
+              6
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              26,
+              12,
+              13,
+              1
+            ],
+            "llm": [
+              20,
+              18,
+              2,
+              12
+            ]
+          }
+        },
+        "es": {
+          "n": 43,
+          "exact_agreement": 0.27906976744186046,
+          "within_one_agreement": 0.7906976744186046,
+          "quadratic_weighted_kappa": 0.1742983751846381,
+          "quadratic_weighted_kappa_ci95": [
+            -0.10050717838328446,
+            0.4534711713362633
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.1568627450980392,
+              "agreement": 0.7209302325581395
+            },
+            "at_least_2": {
+              "kappa": 0.2080173347778982,
+              "agreement": 0.6046511627906976
+            }
+          },
+          "mean_signed_difference": 0.37209302325581395,
+          "confusion_matrix": [
+            [
+              3,
+              2,
+              0,
+              4
+            ],
+            [
+              3,
+              4,
+              3,
+              2
+            ],
+            [
+              3,
+              5,
+              4,
+              9
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              9,
+              12,
+              21,
+              1
+            ],
+            "llm": [
+              9,
+              11,
+              7,
+              16
+            ]
+          }
+        },
+        "fr": {
+          "n": 10,
+          "exact_agreement": 0.2,
+          "within_one_agreement": 0.8,
+          "quadratic_weighted_kappa": 0.07894736842105254,
+          "quadratic_weighted_kappa_ci95": [
+            -0.40453827247190993,
+            0.5
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": -0.11111111111111116,
+              "agreement": 0.8
+            },
+            "at_least_2": {
+              "kappa": 0.0,
+              "agreement": 0.5
+            }
+          },
+          "mean_signed_difference": 0.2,
+          "confusion_matrix": [
+            [
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              1,
+              1
+            ],
+            [
+              1,
+              2,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              1,
+              4,
+              5,
+              0
+            ],
+            "llm": [
+              1,
+              5,
+              1,
+              3
+            ]
+          }
+        },
+        "it": {
+          "n": 10,
+          "exact_agreement": 0.4,
+          "within_one_agreement": 0.9,
+          "quadratic_weighted_kappa": 0.18181818181818177,
+          "quadratic_weighted_kappa_ci95": [
+            -0.3208991143627261,
+            0.5901639344262295
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.9
+            },
+            "at_least_2": {
+              "kappa": 0.23076923076923084,
+              "agreement": 0.6
+            }
+          },
+          "mean_signed_difference": -0.1,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              1,
+              0
+            ],
+            [
+              1,
+              2,
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              4,
+              6,
+              0
+            ],
+            "llm": [
+              1,
+              5,
+              2,
+              2
+            ]
+          }
+        },
+        "ja": {
+          "n": 7,
+          "exact_agreement": 0.0,
+          "within_one_agreement": 0.7142857142857143,
+          "quadratic_weighted_kappa": -0.15189873417721533,
+          "quadratic_weighted_kappa_ci95": [
+            -0.7843137254901962,
+            0.36363636363636365
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8571428571428571
+            },
+            "at_least_2": {
+              "kappa": -0.40000000000000013,
+              "agreement": 0.2857142857142857
+            }
+          },
+          "mean_signed_difference": 0.14285714285714285,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              3,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              3,
+              4,
+              0
+            ],
+            "llm": [
+              1,
+              3,
+              0,
+              3
+            ]
+          }
+        },
+        "nl": {
+          "n": 11,
+          "exact_agreement": 0.2727272727272727,
+          "within_one_agreement": 0.8181818181818182,
+          "quadratic_weighted_kappa": 0.07111111111111101,
+          "quadratic_weighted_kappa_ci95": [
+            -0.49382716049382713,
+            0.640032608695652
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.2978723404255319,
+              "agreement": 0.7272727272727273
+            },
+            "at_least_2": {
+              "kappa": -0.06451612903225801,
+              "agreement": 0.45454545454545453
+            }
+          },
+          "mean_signed_difference": -0.45454545454545453,
+          "confusion_matrix": [
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              2,
+              0
+            ],
+            [
+              1,
+              2,
+              2,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              1,
+              3,
+              6,
+              1
+            ],
+            "llm": [
+              4,
+              2,
+              4,
+              1
+            ]
+          }
+        },
+        "pt": {
+          "n": 11,
+          "exact_agreement": 0.18181818181818182,
+          "within_one_agreement": 0.6363636363636364,
+          "quadratic_weighted_kappa": -0.23529411764705888,
+          "quadratic_weighted_kappa_ci95": [
+            -0.6337792289867283,
+            0.016260162601625883
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8181818181818182
+            },
+            "at_least_2": {
+              "kappa": -0.18918918918918926,
+              "agreement": 0.2727272727272727
+            }
+          },
+          "mean_signed_difference": -0.6363636363636364,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              2,
+              4,
+              2,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              1,
+              9,
+              1
+            ],
+            "llm": [
+              2,
+              5,
+              2,
+              2
+            ]
+          }
+        },
+        "ru": {
+          "n": 8,
+          "exact_agreement": 0.375,
+          "within_one_agreement": 0.75,
+          "quadratic_weighted_kappa": 0.08333333333333337,
+          "quadratic_weighted_kappa_ci95": [
+            -0.3999999999999999,
+            0.6428571428571428
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.75
+            },
+            "at_least_2": {
+              "kappa": 0.25,
+              "agreement": 0.625
+            }
+          },
+          "mean_signed_difference": -0.125,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              2,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              3,
+              5,
+              0
+            ],
+            "llm": [
+              2,
+              2,
+              2,
+              2
+            ]
+          }
+        },
+        "zh": {
+          "n": 6,
+          "exact_agreement": 0.3333333333333333,
+          "within_one_agreement": 0.8333333333333334,
+          "quadratic_weighted_kappa": 0.15999999999999992,
+          "quadratic_weighted_kappa_ci95": [
+            -0.33333333333333326,
+            0.6666666666666667
+          ],
+          "binary": {
+            "at_least_1": {
+              "kappa": 0.0,
+              "agreement": 0.8333333333333334
+            },
+            "at_least_2": {
+              "kappa": 0.25,
+              "agreement": 0.6666666666666666
+            }
+          },
+          "mean_signed_difference": 0.16666666666666666,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "grade_distribution": {
+            "original": [
+              0,
+              2,
+              4,
+              0
+            ],
+            "llm": [
+              1,
+              1,
+              2,
+              2
+            ]
+          }
+        }
+      }
+    }
+  }
+}

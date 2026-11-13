@@ -330,6 +330,9 @@ Score: the reranker's score of the first result of S5. AUC 0.990. Best threshold
 
 `data/evaluation/catalog50k/annotation/annotation_sheet.csv`: 200 pairs drawn from the 3767 judged pairs of A and B (seed 0, stratified by language and primary grade, shuffled), no judge grade shown; instructions in Spanish in `INSTRUCCIONES.md`. After filling it: `.venv/bin/python -m app.evaluation.catalog_evaluation annotation-agreement --sheet <file>`.
 
+- Human vs `z-ai/glm-5.3-flash`: 184 pairs, quadratic kappa 0.272 [0.137, 0.396], exact 0.342.
+- Human vs `minimax/minimax-m3.1-flash`: 184 pairs, quadratic kappa 0.301 [0.171, 0.425], exact 0.304.
+
 ## Cost and time
 
 | Stage | Calls | Failed | Without reported cost | USD |

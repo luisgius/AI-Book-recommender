@@ -284,6 +284,10 @@ def test_annotation_sheet_is_blind_and_agreement_command(tmp_path):
         writer.writeheader()
         writer.writerows(rows)
     assert len(read_sheet(filled)) == 19
+    # a spreadsheet export starts with a byte-order mark: the sheet must read the same
+    with_bom = tmp_path / "filled_bom.csv"
+    with_bom.write_bytes(b"\xef\xbb\xbf" + filled.read_bytes())
+    assert read_sheet(with_bom) == read_sheet(filled)
     result = annotation_agreement(filled, key, {"judge": grades}, {x.query_id: x.language for x in queries})
     row = result["judges"]["judge"]
     assert row["pairs"] == 19
