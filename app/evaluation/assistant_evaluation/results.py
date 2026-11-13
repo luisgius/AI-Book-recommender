@@ -8,7 +8,7 @@ caches (V14's, read only, and this task's), the ledger and the stage times.
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Collection, Dict, List, Mapping, Optional
 
 from app.evaluation.assistant_evaluation import analysis as A
 from app.evaluation.assistant_evaluation import design as D
@@ -222,12 +222,30 @@ def _group(rows, field):
     return dict(out)
 
 
-def build_results(data_dir: Path) -> Dict[str, Any]:
+def _without(data: Mapping[str, Any], exclude: Collection[str]) -> Dict[str, Any]:
+    """The run data without the turns, conversations and direct-agent runs of the excluded requests (P is by text)."""
+    return {**data, "turns": {k: v for k, v in data["turns"].items() if v.get("request_id") not in exclude},
+            "conversations": {k: v for k, v in data["conversations"].items() if k not in exclude},
+            "agent": {k: v for k, v in data["agent"].items() if k not in exclude}}
+
+
+def build_results(data_dir: Path, exclude: Collection[str] = ()) -> Dict[str, Any]:
+    """
+    The results document of one measurement. `exclude` names requests left out
+    of every measure, with their turns, conversation and direct-agent run. It
+    is empty for the published results; only the sensitivity analysis of the
+    manual review (app/evaluation/review_sensitivity.py) fills it. Raises
+    ValueError if it names a request this measurement does not have.
+    """
     requests = load_requests(data_dir / "sets" / "requests.json")
+    unknown = sorted(set(exclude) - {r.request_id for r in requests})
+    if unknown:
+        raise ValueError(f"requests to exclude that {data_dir} does not have: {unknown}")
+    requests = [r for r in requests if r.request_id not in exclude]
     meta = _read_json(data_dir / "sets" / "requests.json") or {}
-    agent_ids = list(meta.get("agent_sample") or [])
+    agent_ids = [rid for rid in meta.get("agent_sample") or [] if rid not in exclude]
     checks = _read_json(data_dir / "sets" / "checks.json") or {}
-    data = load_run_data(data_dir)
+    data = _without(load_run_data(data_dir), exclude)
     all_turns = data["turns"]
     # Set G exists only in the re-measurement (V25); its turns are reported in
     # their own section, so every other measure covers the same requests in

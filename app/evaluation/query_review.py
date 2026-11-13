@@ -20,10 +20,13 @@ The `sheet` command writes one row per generated item, ordered by evaluation,
 stratum and id, with two empty columns the author fills (verdict: ok, dudosa
 or mal, empty if not reviewed; comment), and the instructions in Spanish.
 The `summary` command checks a filled sheet (same item ids, known verdicts)
-and counts its verdicts per evaluation and stratum.
+and counts its verdicts per evaluation and stratum. The `sensitivity`
+command recomputes the evaluations' figures without the items marked dudosa
+or mal (app/evaluation/review_sensitivity.py).
 
     python -m app.evaluation.query_review sheet
     python -m app.evaluation.query_review summary --sheet data/evaluation/query_review/review_sheet.csv
+    python -m app.evaluation.query_review sensitivity
 """
 
 import argparse
@@ -362,6 +365,20 @@ def cmd_summary(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_sensitivity(args: argparse.Namespace) -> int:
+    from app.evaluation import review_sensitivity as RS  # imported here: it imports this module
+
+    try:
+        document = RS.write_report(args.sheet, args.out_dir)
+    except RS.SensitivityError as error:
+        raise SystemExit(f"error: {error}") from error
+    changes = sum(d["changes"] for e in document["evaluations"].values() for d in e["decisions"]
+                  if d["kind"] == RS.DECLARED)
+    log(f"Wrote {args.out_dir / RS.JSON_FILE} and {RS.MD_FILE}: {len(document['excluded'])} items excluded, "
+        f"{changes} declared decisions change")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m app.evaluation.query_review",
                                      description="Manual review of the LLM-generated queries and requests")
@@ -373,6 +390,11 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("--sheet", type=Path, default=OUT_DIR / SHEET_FILE)
     m.add_argument("--output", type=Path, default=OUT_DIR / SUMMARY_FILE)
     m.set_defaults(func=cmd_summary)
+    v = sub.add_parser("sensitivity", help="recompute the evaluations' figures without the dudosa and mal items "
+                                           "(exploratory, decided after the results; see review_sensitivity.py)")
+    v.add_argument("--sheet", type=Path, default=OUT_DIR / SHEET_FILE)
+    v.add_argument("--out-dir", type=Path, default=OUT_DIR)
+    v.set_defaults(func=cmd_sensitivity)
     return parser
 
 

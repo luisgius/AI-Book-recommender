@@ -1,7 +1,7 @@
 # V27 · Hoja de revisión de las consultas y peticiones generadas por un LLM
 
 - **Fecha:** 2026-11-13
-- **Estado:** hoja y herramienta hechas. Cuando se escribió esta nota la revisión no estaba hecha; **el autor la hizo el 2026-11-13** y su resultado está en la sección «Resultado de la revisión (2026-11-13)», al final. El texto de esta nota anterior a esa sección se conserva como estaba el día en que se escribió
+- **Estado:** hoja y herramienta hechas. Cuando se escribió esta nota la revisión no estaba hecha; **el autor la hizo el 2026-11-13** y su resultado está en la sección «Resultado de la revisión (2026-11-13)». Ese mismo día se recalcularon las dos evaluaciones sin las filas dudosas: véase «Análisis de sensibilidad sin las filas dudosas (2026-11-13)», al final. El texto de esta nota anterior a esas secciones se conserva como estaba el día en que se escribió
 - **Capa:** evaluación (`app/evaluation/query_review.py`), datos (`data/evaluation/query_review/`), documentación (`docs/notes/`)
 - **Commits:** sin guardar en git cuando se escribió esta nota
 
@@ -65,7 +65,7 @@ Los tests de `tests/evaluation/test_query_review.py` comprueban, con ficheros pe
 ## Pendiente
 
 - **(Hecho el 2026-11-13, véase el resultado al final.) Que el autor rellene la hoja** y ejecute `summary`. El texto del TFG tiene un marcador pendiente para el resultado de esta revisión.
-- **Decidir qué se hace con las filas `mal` y `dudosa`** cuando haya veredictos: si alguna cambia lo medido, hay que declararlo y repetir lo que haga falta. Esa decisión sigue sin tomarse: no hay filas `mal` y las 16 `dudosa` están en la sección final, con lo que queda abierto (recalcular sin ellas y segundo revisor).
+- **Decidir qué se hace con las filas `mal` y `dudosa`** cuando haya veredictos: si alguna cambia lo medido, hay que declararlo y repetir lo que haga falta. Esa decisión sigue sin tomarse: no hay filas `mal` y las 16 `dudosa` están en la sección final, con lo que queda abierto (recalcular sin ellas y segundo revisor). **Recalcular sin ellas: hecho el 2026-11-13, véase «Análisis de sensibilidad sin las filas dudosas (2026-11-13)», al final; no cambia ninguna decisión declarada.** Sigue abierto el segundo revisor.
 
 ## Cómo reproducirlo
 
@@ -113,11 +113,69 @@ Límites, dichos sin adornos:
 
 - Revisó **una sola persona, el autor**, que conoce el diseño de la evaluación. No hay segundo revisor ni acuerdo entre revisores.
 - La revisión comprueba la forma (idioma, naturalidad, tipo) y la correspondencia con la necesidad. No mide si las consultas son representativas de las de usuarios reales.
-- **No se ha recalculado ninguna métrica sin las filas dudosas.** Las cifras publicadas de V14, V22 y V25 siguen siendo las de antes de la revisión; esta no las cambia.
+- **Cuando se escribió esta sección no se había recalculado ninguna métrica sin las filas dudosas** (se hizo después, el mismo día: véase la sección siguiente). Las cifras publicadas de V14, V22 y V25 siguen siendo las de antes de la revisión; ni esta revisión ni el recálculo las cambian.
 
-Queda abierto:
+Quedaba abierto (el primer punto se hizo después, véase la sección siguiente):
 
 - Recalcular las métricas sin las 16 filas dudosas (o declarar que no se hace) y ver si algo cambia.
 - Una revisión por una segunda persona.
 
 Para regenerar el resumen: `.venv/bin/python -m app.evaluation.query_review summary --sheet data/evaluation/query_review/review_sheet.csv`.
+
+## Análisis de sensibilidad sin las filas dudosas (2026-11-13)
+
+### Qué se ha hecho
+
+- Se recalcularon las dos evaluaciones (catálogo V14; asistente V22 y su repetición V25) sin las 16 filas `dudosa`, para ver si las conclusiones dependen de ellas. Se hace con una orden nueva: `.venv/bin/python -m app.evaluation.query_review sensitivity`. Lee la hoja y los ficheros ya guardados; no usa red, ni LLM, ni base de datos.
+- Código nuevo: `app/evaluation/review_sensitivity.py`, y la orden `sensitivity` en `app/evaluation/query_review.py`. Un cambio pequeño en `app/evaluation/assistant_evaluation/results.py`: `build_results` acepta ahora `exclude`, la lista de peticiones que se dejan fuera con sus turnos, su conversación y su ejecución del agente directo. Vacía, que es lo que usan los resultados publicados, no cambia nada.
+- Ficheros que escribe, en `data/evaluation/query_review/`: `SENSITIVITY.md` (el informe, en inglés, como los demás informes de evaluación) y `sensitivity.json` (las decisiones, y cada cifra recalculada que cambia, con su valor publicado y el nuevo). No escribe nada más.
+- Tests: `tests/evaluation/test_review_sensitivity.py`.
+
+### Por qué
+
+El autor lo pidió después de su revisión, para saber si las conclusiones de las evaluaciones dependen de las filas que marcó como dudosas. Hasta entonces solo se sabía cuántas eran y por qué, no si importaban.
+
+### Cómo se protege de errores
+
+- Con nada excluido, el código reproduce **exactamente** los resultados publicados (`results.json` de las tres medidas: en el catálogo, las métricas de A y B, los contrastes, el estrato C con los dos jueces, las conclusiones y las dos reglas de la sección 8; en el asistente, el fichero entero). Lo comprueba un test (`test_no_exclusion_reproduces_the_published_figures_exactly`) y lo comprueba la propia orden antes de informar: si una sola cifra no coincide, se detiene.
+- Usa las mismas funciones, el mismo número de remuestreos (10.000), la misma semilla (0), el mismo nivel (0,05) y las mismas familias de Holm que los informes publicados. Rechaza (error) un identificador a excluir que una medida no tenga.
+
+### Resultado
+
+Cifras de `SENSITIVITY.md`; las cifras completas están en ese informe y en `sensitivity.json`.
+
+| Evaluación | Elementos excluidos | Consultas o peticiones antes y después | Cifras recalculadas que cambian |
+|---|---|---|---|
+| catálogo (V14), estratos A y B | 2 (`b-zh-6`, `c09-fr`; la segunda es del estrato C) | 116 a 115 | 253 de 435 |
+| asistente, primera medida (V22) | 12 | H7: 116 a 115; H8 (conjunto E): 30 a 23; H9 (conjunto F): 20 a 16 | 471 de 869 |
+| asistente, repetición (V25) | 15 | igual que V22 (G tiene 3 excluidas) | 514 de 1010 |
+
+- **No cambia ninguna decisión declarada** (57 comprobadas): cada contraste declarado mantiene su significación con cada juez y su conclusión, cada umbral de rutas mantiene su resultado y las dos reglas de la sección 8 del protocolo del catálogo mantienen el suyo.
+- **Los contrastes que más se mueven** (diferencia de nDCG@10):
+  - Catálogo: H4 (S2 menos S1), juez primario, de +0,347 a +0,342 (el que más se mueve; el resto cambia en milésimas).
+  - Asistente V22: H9, segundo juez, de +0,095 a +0,144; con el segundo juez el intervalo deja de contener el cero, pero el p de Holm sigue siendo 0,125, así que no es significativo.
+  - Asistente V25: H9, segundo juez, de +0,087 a +0,133, con p de Holm de 0,282 a 0,255 (tampoco significativo).
+  - H8 (conjunto E, 30 a 23 peticiones): en V22 sigue siendo significativo (p de Holm de 0,002 a 0,016); en V25 sigue sin serlo (de 0,145 a 0,248 con el juez primario).
+- **Los umbrales de rutas** no cambian: por ejemplo, en V22 las preguntas innecesarias en A+B pasan de 9,5 % (11/116) a 9,6 % (11/115) con un máximo de 2,0 %, y siguen sin cumplirse; en V25 la medida secundaria (A+B) sigue cumpliéndose y la obligatoria (peticiones G válidas fuera de alcance, 3,3 % a 3,5 % con máximo de 2,0 %) sigue sin cumplirse.
+- **Una marca mecánica del informe sí cambia** (no es una decisión declarada): en la tabla «qué cambió» de V25, «segundos medianos del turno del agente: la segunda medida es peor» pasa de sí (10,4 a 11,9) a no (10,3 a 11,0). Es la única de las marcas mecánicas del informe que cambia.
+- Las 16 `dudosa` no estaban repartidas por igual: los conjuntos E y F pierden una parte grande (7 de 30 y 4 de 20), así que sus cifras descriptivas se mueven más que las de A y B, que pierden una consulta de 116.
+
+### Alternativas descartadas
+
+| Alternativa | Por qué no |
+|---|---|
+| Editar los informes publicados | Cambiaría resultados ya medidos y declarados. El análisis es aparte: escribe su propio informe y no toca ni los informes ni los `results.json` |
+| Excluir solo las filas `mal` | No hay ninguna: no habría excluido nada |
+| Quitar del estrato C la necesidad entera en lugar de la versión dudosa | Se pierde más de lo que el autor puso en duda: él marcó una versión (`c09-fr`) y la necesidad se entiende. Se quita la versión y la necesidad conserva las otras (de 60 a 57 pares de versiones en el solape de los 10 primeros) |
+| Reescribir las estadísticas para el análisis | Se reutilizan las funciones de los informes publicados, con lo que cualquier diferencia viene de los elementos excluidos y no de otro código; la prueba de reproducción lo comprueba |
+
+### Límites
+
+- **Se decidió después de ver los resultados y no está en ningún protocolo.** Es exploratorio, se informa sea cual sea su dirección y no sustituye a ningún resultado publicado.
+- **No todo se puede recalcular.** El informe lista lo que deja como estaba: las tablas por idioma y por tipo, las latencias por etapa, las secciones 9 y 10 del catálogo, la hoja de anotación humana y el acuerdo entre jueces; las cuentas de juicios por necesidad; el gasto y las llamadas por etapa y el cruce con la clave, que salen de un registro que no dice a qué petición sirvió cada entrada; las respuestas que llegaron al tope de tokens (V25); y el inventario de las ejecuciones. La condición 2 de la regla de embeddings usa las medidas operativas publicadas (las 168 consultas).
+- **Una sola persona revisó**, el autor, y para los idiomas que no lee se apoyó en una traducción (su declaración del 2026-11-13). Por eso su juicio sobre la naturalidad en esos idiomas es menos fiable, y el recálculo hereda ese límite.
+- La exclusión de `b-zh-6` afecta también al asistente, porque sus conjuntos B y D son los estratos B y D del catálogo (mismos identificadores): también sale del conjunto B de V22 y V25, de los umbrales sobre A+B y sobre B, de la estabilidad de rutas y, si estaba, de la muestra del agente directo.
+
+### Queda abierto
+
+- Una revisión por una segunda persona.
