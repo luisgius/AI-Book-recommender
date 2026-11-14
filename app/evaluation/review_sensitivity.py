@@ -192,16 +192,19 @@ def published_catalog(data_dir: Path = CD.DATA_DIR) -> Dict[str, Any]:
             "conclusions": r["conclusions"], "hybrid_rule": r["hybrid_rule"], "decision_rule": r["decision_rule"]}
 
 
-def catalog_figures(data_dir: Path = CD.DATA_DIR, exclude: Collection[str] = ()) -> Dict[str, Any]:
+def catalog_figures(data_dir: Path = CD.DATA_DIR, exclude: Collection[str] = (),
+                    strata: Collection[str] = CD.STATISTICAL_STRATA) -> Dict[str, Any]:
     """
     The figures of published_catalog, recomputed from the saved runs and
     judgments without the queries in `exclude`, with the calls of
-    catalog_evaluation.results.build_results.
+    catalog_evaluation.results.build_results. `strata` are the strata the
+    summary and the contrasts are computed over (the protocol's A and B by
+    default; the post hoc scope analysis of V29 passes others).
     """
     queries = [q for q in load_queries(data_dir / "queries" / "queries.json") if q.query_id not in exclude]
     runs = load_runs(data_dir, CD.SYSTEM_NAMES)
     pool = _read_json(data_dir / POOL_FILE)
-    ab_ids = [q.query_id for q in queries if q.stratum in CD.STATISTICAL_STRATA]
+    ab_ids = [q.query_id for q in queries if q.stratum in strata]
     metrics = {}
     for label, judge in zip(JUDGES, (CD.PRIMARY_JUDGE, CD.SECOND_JUDGE)):
         scores = CA.per_query(queries, runs, load_grades(data_dir, judge, pool), CD.SYSTEM_NAMES)

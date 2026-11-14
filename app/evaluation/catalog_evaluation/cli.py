@@ -259,6 +259,16 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_scope(args: argparse.Namespace) -> int:
+    """V29 part A: the post hoc scope analysis on subsets of the saved results (no network)."""
+    from app.evaluation.catalog_evaluation.scope import write_scope
+
+    out_dir = args.data_dir / "scope"
+    write_scope(args.data_dir, out_dir)
+    log(f"Wrote {out_dir / 'SCOPE.md'} and {out_dir / 'scope.json'}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m app.evaluation.catalog_evaluation", description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=D.DATA_DIR)
@@ -286,6 +296,8 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument("--output", type=Path, default=None,
                     help=f"default: {D.REPORT_MD.name} next to --data-dir ({D.REPORT_MD})")
     rp.set_defaults(func=cmd_report)
+    sub.add_parser("scope", help="post hoc scope analysis on subsets of the queries (V29, no network)"
+                   ).set_defaults(func=cmd_scope)
     return parser
 
 
