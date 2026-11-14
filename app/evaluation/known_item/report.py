@@ -14,6 +14,8 @@ from app.evaluation.known_item import analysis as KA
 from app.evaluation.known_item import design as D
 from app.evaluation.known_item.runner import load_sample
 
+DEVIATIONS_FILE = "deviations.json"  # optional: [{"desviacion": ..., "motivo": ...}], written by hand
+
 METRIC_NAMES = {"mrr_at_10": "MRR@10", "success_at_1": "éxito@1", "success_at_10": "éxito@10",
                 "ndcg_at_10": "nDCG@10"}
 
@@ -42,9 +44,50 @@ def build_results(data_dir: Path) -> Dict[str, Any]:
         "contrasts": family,
         "secondary_without_zh_ja": KA.secondary_contrasts(scores, test),
         "decision": KA.decision(family),
+        "deviations": _deviations(data_dir, errors, missing),
+        "limits": protocol_limits(),
         "spend": summarize_ledger(ledger.entries()),
         "cap_usd": D.SPEND_CAP_USD,
     }
+
+
+def protocol_limits(path: Path = D.PROTOCOL_PATH) -> List[str]:
+    """The bullet points of section 9 (Límites) of the protocol, verbatim (one string per bullet)."""
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    start = text.find("## 9.")
+    end = text.find("## 10.", start)
+    if start < 0:
+        return []
+    bullets: List[str] = []
+    for line in text[start:end if end > 0 else None].splitlines()[1:]:
+        if line.startswith("- "):
+            bullets.append(line[2:].strip())
+        elif line.startswith("  ") and bullets:
+            bullets[-1] += " " + line.strip()
+    return bullets
+
+
+def _deviations(data_dir: Path, errors: Mapping[str, int], missing: Mapping[str, int]) -> List[Dict[str, str]]:
+    """Deviations written by hand (deviations.json) plus those the run files show (fallbacks, missing runs)."""
+    path = data_dir / DEVIATIONS_FILE
+    found: List[Dict[str, str]] = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    for system in D.SYSTEM_NAMES:
+        if errors.get(system):
+            found.append({"desviacion": f"{errors[system]} consultas de prueba de {system} sin orden reordenado",
+                          "motivo": "el reranker falló tres veces; se guarda el orden base y el error, como en V14"})
+        if missing.get(system):
+            found.append({"desviacion": f"{missing[system]} consultas de prueba sin ejecución de {system}",
+                          "motivo": "la ejecución no se completó"})
+    return found
+
+
+OUTCOME_ES = {
+    True: "la memoria debe limitar su conclusión a las consultas descriptivas y decir que, para este tipo de "
+          "consulta, los candidatos léxicos ayudan",
+    False: "la conclusión de V14 se extiende a este tipo de consulta sobre este catálogo",
+}
 
 
 def _summary_table(summary: Mapping[str, Any], query_type: str, systems: List[str]) -> List[str]:
@@ -90,9 +133,14 @@ def build_markdown(results: Mapping[str, Any]) -> str:
                      "Significativo"], rows)
     lines += ["## Decisión (regla de la sección 8 del protocolo)", ""]
     for qt, row in results["decision"]["per_type"].items():
-        better = ", ".join(row["fusion_significantly_better"]) or "ninguna fusión"
-        lines.append(f"- {qt}: significativamente mejor que S4: {better}. Resultado: {row['outcome']}.")
-    lines += ["", "## Lectura secundaria sin chino ni japonés (fuera de la familia, p sin corregir)", ""]
+        better = row["fusion_significantly_better"]
+        which = (f"{' y '.join(better)} {'son' if len(better) > 1 else 'es'} significativamente mejor"
+                 f"{'es' if len(better) > 1 else ''} que S4" if better
+                 else "ninguna fusión es significativamente mejor que S4")
+        lines.append(f"- {qt} ({D.QUERY_TYPE_NAMES[qt]}): {which}; {OUTCOME_ES[bool(better)]}.")
+    lines += ["", "## Lectura secundaria sin chino ni japonés (fuera de la familia, p sin corregir)", "",
+              "Estas seis diferencias no forman parte de la familia de contrastes: son descriptivas y sus p no se "
+              "corrigen.", ""]
     rows = [[name, f"{r['system']} - {r['baseline']}", str(r["queries"]), _f(r["difference"], signed=True),
              _ci(r["ci"], signed=True), _p(r["p"])] for name, r in results["secondary_without_zh_ja"].items()]
     lines += _table(["Contraste", "Diferencia de", "n", "Diferencia", "IC 95 %", "p"], rows)
@@ -106,8 +154,16 @@ def build_markdown(results: Mapping[str, Any]) -> str:
     lines += ["## Errores y gasto", "",
               f"Ejecuciones con error (se guarda el orden base, como en V14): {results['test']['run_errors']}. "
               f"Consultas sin ejecución: {results['test']['missing_runs']}.", "",
-              f"Gasto registrado: {spend['total_usd']:.4f} USD en {spend['calls']} llamadas "
+              f"Gasto real según el registro de gasto: {spend['total_usd']:.4f} USD en {spend['calls']} llamadas "
               f"(tope {results['cap_usd']:.2f} USD).", ""]
+    lines += _table(["Modelo", "Llamadas", "Llamadas fallidas", "Coste (USD)"],
+                    [[m, str(r["calls"]), str(r["failed_calls"]), f"{r['cost_usd']:.4f}"]
+                     for m, r in spend["by_model"].items()])
+    lines += ["## Desviaciones", ""]
+    lines += ([f"- {d['desviacion']}. Motivo: {d['motivo']}." for d in results["deviations"]]
+              or ["Ninguna: la ejecución siguió el protocolo sin cambios."])
+    lines += ["", "## Límites (sección 9 del protocolo)", ""]
+    lines += [f"- {limit}" for limit in results["limits"]]
     return "\n".join(lines).rstrip() + "\n"
 
 

@@ -280,4 +280,8 @@ def test_fusions_weight_choice_and_report_offline(tmp_path):
     assert results["test"]["summary"][D.T][D.S1]["mrr_at_10"]["mean"] == pytest.approx(1.0)
     assert results["test"]["summary"][D.T][D.S2]["mrr_at_10"]["mean"] == pytest.approx(1 / 3)
     assert set(results["contrasts"]) == {c.name for c in D.CONTRASTS}
-    assert (tmp_path / D.REPORT_FILE).read_text(encoding="utf-8").startswith("# Evaluación")
+    report = (tmp_path / D.REPORT_FILE).read_text(encoding="utf-8")
+    assert report.startswith("# Evaluación")
+    assert "## Desviaciones" in report and "## Límites (sección 9 del protocolo)" in report
+    assert len(results["limits"]) == 7  # the seven bullets of the protocol's section 9
+    assert "fuera de la familia" in report

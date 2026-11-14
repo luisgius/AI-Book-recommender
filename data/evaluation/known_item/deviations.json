@@ -1,0 +1,10 @@
+[
+  {"desviacion": "La primera ejecución de `run` se paró por el límite de dos horas de la orden en segundo plano que la lanzó, con 882 de las 900 consultas guardadas en el paso de base de datos, y se reanudó a las 13:10 con la misma orden; la reanudación no repitió ninguna consulta guardada ni ningún embedding",
+   "motivo": "límite de tiempo del entorno que ejecutaba la orden, no un fallo del código; la ejecución es reanudable según la sección 10"},
+  {"desviacion": "En el paso de base de datos la conexión a Postgres se cortó siete veces por tiempo de espera; el adaptador abrió una conexión nueva y repitió la consulta, y el paso tardó en total unas dos horas y cuarto en lugar de unos diez minutos",
+   "motivo": "fallos de red o del proveedor; son llamadas gratuitas y deterministas, y no se cambió ningún resultado guardado"},
+  {"desviacion": "Veinticuatro peticiones al reranker agotaron el tiempo de espera y el adaptador las repitió al cabo de un segundo; ninguna consulta llegó a los tres intentos fallidos, las 450 consultas de prueba tienen orden reordenado y el registro de gasto no tiene llamadas con error",
+   "motivo": "fallos del proveedor; la repetición la hace el adaptador de V14 sin cambios"},
+  {"desviacion": "Durante la ejecución, antes de leer ningún resultado, se amplió el código del informe (`report.py`) para incluir las frases de la regla de decisión en español, los límites de la sección 9, esta sección y el gasto por modelo; el análisis (`analysis.py`) y el diseño no se tocaron",
+   "motivo": "el encargo pide que el informe repita los límites, liste las desviaciones y aplique la regla de decisión en una frase por tipo"}
+]
