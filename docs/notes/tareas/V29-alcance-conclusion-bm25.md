@@ -124,7 +124,7 @@ Gasto real: 0.9695 USD en 1764 llamadas (900 de embeddings, 864 del reranker), c
 Están en `deviations.json` y en `KNOWN_ITEM.md`.
 
 - La primera ejecución de `run` se paró por el límite de dos horas de la orden en segundo plano que la lanzó, con 882 de las 900 consultas guardadas en el paso de base de datos, y se reanudó a las 13:10 con la misma orden. La reanudación no repitió ninguna consulta guardada ni ningún embedding.
-- La conexión a Postgres se cortó siete veces por tiempo de espera; el adaptador abrió una conexión nueva y repitió la consulta. El paso tardó unas dos horas y cuarto en lugar de unos diez minutos.
+- La conexión a Postgres se cortó siete veces por tiempo de espera; el adaptador abrió una conexión nueva y repitió la consulta. El paso tardó unas dos horas y cuarto en lugar de unos diez minutos. Corrección de la causa (2026-11-14): el registro de energía del sistema mostró que el Mac estuvo en reposo por inactividad desde las 11:02, despertando brevemente cada 15 minutos y conectado a la corriente; las esperas atribuidas aquí a Postgres, y también la parada por el límite de dos horas del punto anterior, eran la máquina dormida (véase «Repetición de la medida»).
 - Veinticuatro peticiones al reranker agotaron el tiempo de espera y el adaptador las repitió al cabo de un segundo. Ninguna consulta llegó a los tres intentos fallidos.
 - Durante la ejecución, antes de leer ningún resultado, se amplió `report.py` (frases de la regla de decisión, límites, desviaciones y gasto por modelo). `analysis.py` y el diseño no se tocaron.
 
@@ -137,6 +137,42 @@ El tope se planeó en 1 USD y se subió a 1.50 USD antes de guardar el protocolo
 - **Decisión del autor, no tomada en esta tarea:** si el modo de candidatos por defecto vuelve al híbrido, dado que la fusión gana en las consultas por autor y pierde en las descriptivas. No se cambió el valor por defecto del dominio.
 - Redactar en la memoria el alcance de la conclusión de V14 según las dos partes (descriptivas: los candidatos léxicos bajan el resultado; título y título con autor: sin diferencia; autor: ayudan).
 
+## Repetición de la medida (2026-11-14)
+
+**Por qué.** La primera ejecución de la parte B tardó horas y el autor pidió ejecutarla de nuevo. El registro de energía del sistema (`pmset -g log`) mostró después que el Mac había entrado en reposo por inactividad a las 11:02 y despertaba solo unos 45 segundos cada 15 minutos, aunque estaba conectado a la corriente. Las esperas que se habían atribuido a la base de datos eran la máquina dormida. Ningún resultado de la primera ejecución se perdió ni se cambió; la quinta entrada de su `deviations.json` registra la causa real.
+
+**Qué se hizo.** Una repetición completa en `data/evaluation/known_item/replication/`, con la misma muestra, las mismas consultas y la misma división en mitades, que recalcula todo lo demás (embeddings de consulta, S1, S2, fusiones, elección del peso y reranker), lanzada con `caffeinate -i`. Se añadió la orden `compare` (`app/evaluation/known_item/compare.py`, tests en `tests/evaluation/test_known_item_compare.py`), que escribe `REPLICATION.md` y `replication.json`. Commit `6403e35`.
+
+**Por qué no otras alternativas.**
+
+| Alternativa | Por qué no |
+|---|---|
+| No repetir | Los resultados estaban completos, pero una repetición responde si las esperas les afectaron y cuesta menos de 1 USD |
+| Sobrescribir la primera ejecución con la segunda | El protocolo prohíbe repetir para obtener otra cifra: la primera ejecución sigue siendo el resultado que se informa y la repetición se informa a su lado |
+| Repetir solo el paso gratuito de base de datos | No mostraría si el paso de pago, el del reranker, es estable |
+
+**Resultado** (cifras de `data/evaluation/known_item/replication/REPLICATION.md`).
+
+- Duración: 15 min en una invocación, frente a 3 h 51 min en dos invocaciones, con la máquina en reposo, de la primera. Gasto según el registro: 0.9704 USD frente a 0.9695 USD, con tope de 1.50 USD en cada una.
+- Peso elegido en desarrollo: w = 0.25 en las dos ejecuciones.
+- Contrastes en la mitad de prueba, original y réplica (diferencia, p de Holm):
+
+| Contraste | Original | Réplica | Misma conclusión |
+|---|---|---|---|
+| C1-T | +0.001, 1.000 | +0.001, 1.000 | sí |
+| C2-T | +0.000, 1.000 | +0.000, 1.000 | sí |
+| C1-TA | +0.000, 1.000 | +0.000, 1.000 | sí |
+| C2-TA | +0.000, 1.000 | +0.000, 1.000 | sí |
+| C1-A | +0.067, <0.001 | +0.069, <0.001 | sí |
+| C2-A | +0.029, 0.022 | +0.024, 0.020 | sí |
+
+- La regla de decisión de la sección 8 da la misma conclusión en los tres tipos de consulta. Ninguna decisión cambia.
+- Las listas léxicas (S1) son idénticas en las 900 consultas. Los vectores de consulta son idénticos bit a bit en 336 de 900 y difieren en 564, con una similitud del coseno mínima de 0.991630; el proveedor (deepinfra) fue el mismo en las dos ejecuciones para las 900 consultas, así que devolvió vectores ligeramente distintos para el mismo texto. Por eso la lista completa de S2 difiere en 561 de 900 consultas, y la de las fusiones y de los sistemas con reranker hereda esa diferencia (S4, S5 y S5w: 269 de 450 consultas de prueba). Del reranker, 3 de las 450 consultas de prueba tienen algún libro con puntuación distinta en las dos ejecuciones (mayor cambio 5.1e-09).
+- Los cambios en la métrica principal son pequeños: en T y TA a lo sumo una consulta por sistema, y en A entre 0 y 13 consultas según el sistema.
+- En el paso de embeddings el proveedor respondió siete veces «Model busy, retry later» (HTTP 429); el adaptador repitió cada petición y las 900 consultas quedaron codificadas.
+
+**Qué significa.** La medida no se reproduce bit a bit, porque el proveedor de embeddings no devuelve siempre el mismo vector, pero sus conclusiones fueron estables en esta repetición, y las esperas de la primera ejecución no las afectaron. Una repetición no es un estudio de varianza: no dice cuánto varían las cifras en general, solo que en una segunda ejecución no cambió ninguna decisión.
+
 ## Cómo reproducirlo
 
 ```
@@ -144,15 +180,20 @@ El tope se planeó en 1 USD y se subió a 1.50 USD antes de guardar el protocolo
 .venv/bin/python -m app.evaluation.known_item sample
 .venv/bin/python -m app.evaluation.known_item run
 .venv/bin/python -m app.evaluation.known_item report
-.venv/bin/python -m pytest tests/evaluation/test_catalog_scope.py tests/evaluation/test_known_item.py
+caffeinate -i .venv/bin/python -m app.evaluation.known_item --data-dir data/evaluation/known_item/replication run
+.venv/bin/python -m app.evaluation.known_item compare --with data/evaluation/known_item/replication
+.venv/bin/python -m pytest tests/evaluation/test_catalog_scope.py tests/evaluation/test_known_item.py tests/evaluation/test_known_item_compare.py
 ```
+
+La orden `run` de la repetición necesita la muestra (`sample.json`) en su carpeta. `compare` no usa red: compara `--data-dir` (por defecto la carpeta original) con la de `--with` y escribe `REPLICATION.md` y `replication.json` en esta última. Los ordenadores portátiles pueden entrar en reposo con la corriente conectada: conviene lanzar `run` con `caffeinate -i`.
 
 `scope` y `report` no usan red. `sample` solo lee la copia local del catálogo. `run` llama a Postgres, al servicio de embeddings y al reranker (de pago, con tope), es reanudable y se para al llegar al tope de gasto.
 
 ## Ficheros
 
-- Código: `app/evaluation/catalog_evaluation/scope.py`, `app/evaluation/catalog_evaluation/cli.py`, `app/evaluation/known_item/`.
-- Tests: `tests/evaluation/test_catalog_scope.py`, `tests/evaluation/test_known_item.py`.
+- Código: `app/evaluation/catalog_evaluation/scope.py`, `app/evaluation/catalog_evaluation/cli.py`, `app/evaluation/known_item/` (incluye `compare.py`).
+- Tests: `tests/evaluation/test_catalog_scope.py`, `tests/evaluation/test_known_item.py`, `tests/evaluation/test_known_item_compare.py`.
+- Repetición de la parte B (`data/evaluation/known_item/replication/`): `REPLICATION.md`, `replication.json` y los ficheros de la propia ejecución.
 - Datos de la parte A: `data/evaluation/catalog50k/scope/SCOPE.md`, `scope.json`.
 - Datos de la parte B (`data/evaluation/known_item/`): `PROTOCOL.md`, `KNOWN_ITEM.md`, `sample.json`, `results.json`, `weight_selection.json`, `deviations.json`, `rerank_estimate.json`, `rerank_scores.jsonl`, `spend_ledger.jsonl`, `query_embeddings/` y `runs/`.
 - Relacionadas: `docs/notes/2026-11-12-protocolo-evaluacion-catalogo.md`, V14 (`V14-evaluacion-catalogo-desplegado.md`) y V24.
