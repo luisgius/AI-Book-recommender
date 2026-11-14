@@ -85,6 +85,11 @@ def population(queries: Sequence[EvalQuery], grades: Mapping[str, Mapping[str, i
     return items
 
 
+def book_cells(book: Any) -> Dict[str, str]:
+    """The title, authors and description of a work as the sheets show them (shared by V14 and V31)."""
+    return {"title": book.title, "authors": "; ".join(book.authors), "description": (book.description or "").strip()}
+
+
 def build_sheet(queries: Sequence[EvalQuery], grades: Mapping[str, Mapping[str, int]], books_by_id: Mapping[str, Any],
                 out_dir: Path, n: int = D.ANNOTATION_PAIRS, seed: int = D.SEED) -> Dict[str, Any]:
     """Write the sheet, the key and the instructions; returns a summary (strata sizes, no grades)."""
@@ -102,8 +107,7 @@ def build_sheet(queries: Sequence[EvalQuery], grades: Mapping[str, Mapping[str, 
             book = books_by_id[item["work_id"]]
             query = by_id[item["query_id"]]
             writer.writerow({"pair_id": pair_id, "query": query.text, "need": query.need, "language": query.language,
-                             "title": book.title, "authors": "; ".join(book.authors),
-                             "description": (book.description or "").strip(), "grade": ""})
+                             **book_cells(book), "grade": ""})
             key[pair_id] = {"need_id": item["need_id"], "query_id": item["query_id"], "work_id": item["work_id"]}
     (out_dir / KEY_FILE).write_text(json.dumps(key, indent=2), encoding="utf-8")
     sheet_path = out_dir / SHEET_FILE
@@ -115,8 +119,11 @@ def build_sheet(queries: Sequence[EvalQuery], grades: Mapping[str, Mapping[str, 
     return {"pairs": len(sample), "population": len(items), "by_language": strata}
 
 
-def read_sheet(path: Path) -> Dict[str, int]:
-    """{pair_id: grade} of the filled rows (empty or invalid grades are skipped).
+VALID_GRADES = ("0", "1", "2", "3")
+
+
+def read_cells(path: Path, column: str = "grade") -> Dict[str, str]:
+    """{pair_id: text of `column`, stripped} of every row ("" when the cell or the column is missing).
 
     Spreadsheets often export CSV with a byte-order mark; "utf-8-sig" reads
     the file with or without it.
@@ -124,10 +131,13 @@ def read_sheet(path: Path) -> Dict[str, int]:
     out = {}
     with path.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle):
-            raw = (row.get("grade") or "").strip()
-            if raw in ("0", "1", "2", "3"):
-                out[row["pair_id"]] = int(raw)
+            out[row["pair_id"]] = (row.get(column) or "").strip()
     return out
+
+
+def read_sheet(path: Path, column: str = "grade") -> Dict[str, int]:
+    """{pair_id: grade} of the filled rows (empty or invalid grades are skipped)."""
+    return {pair_id: int(raw) for pair_id, raw in read_cells(path, column).items() if raw in VALID_GRADES}
 
 
 def annotation_agreement(sheet: Path, key: Mapping[str, Mapping[str, str]],

@@ -1,0 +1,7799 @@
+{
+  "r001": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "1414c3b5-b0b3-5414-81b2-c0856c1e1bc5",
+    "ranks": {
+      "S2": 1,
+      "S3": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": "p073"
+  },
+  "r002": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d8aa2777-a3df-5928-b642-6ad11ddb8b16",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r003": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "ab2665ab-1679-5ec0-8719-75c7fdd0415b",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r004": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "06ffb51c-1f5e-5363-baa8-3865d1f242ff",
+    "ranks": {
+      "S2": 4,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r005": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "50b02ff9-45b4-5e2c-8d38-74adc0b2f31b",
+    "ranks": {
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r006": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "878bee1c-9428-58fe-9b0b-6e6c024cd5b5",
+    "ranks": {
+      "S2": 3,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": "p186"
+  },
+  "r007": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "a4758989-fb57-5b2d-9170-eaaa8038ac5c",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r008": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "a1a1c15b-0dee-5c0d-8f4d-25809c74d7a7",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r009": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "6d6f6592-19ad-51dd-8f9a-f4cf69ec180f",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r010": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e8c2f1be-4246-5ef5-b76f-6f15a9c1bbc2",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r011": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "9747d611-9241-5de3-9ac1-d6a07f84b01e",
+    "ranks": {
+      "S2": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r012": {
+    "query_id": "b-en-4",
+    "need_id": "b-en-4",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "973f0489-4f07-5359-99a6-422ac923c0b9",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r013": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e66a79b9-0efb-54a6-ac31-62ea4f9ce8a5",
+    "ranks": {
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r014": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "8265e62e-0b23-5ad8-9154-e576cb3b6369",
+    "ranks": {
+      "S2": 1,
+      "S3": 4,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r015": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "643f577f-9c3f-549b-9ba5-cbf0bb95d5a9",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r016": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d60fe0bd-21b8-5f06-ac40-92fdbe7de5b0",
+    "ranks": {
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r017": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "53c606d5-6b0e-59c9-b81d-350b10cee406",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r018": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d27a1691-4f7a-5f43-a2a5-a10ca557ad17",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r019": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "ffbcbba5-0593-5586-8d80-309cf25b6df8",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r020": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "836c92b2-06b2-5143-b245-cef2ea4f0ff7",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r021": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d017bf8b-43f9-50ff-9cea-e0379ea29c0c",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r022": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "24cbb2ee-c7f8-5dea-86c7-23c6110fc51a",
+    "ranks": {
+      "S2": 3,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r023": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "a28a0ad0-352c-5666-9ddf-970cb58a60dc",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r024": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "f164aaee-2737-538a-86c3-e26642b542af",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r025": {
+    "query_id": "b-es-5",
+    "need_id": "b-es-5",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "2ea18695-0a2c-5632-a80f-aa72df4c5a0e",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r026": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3f61bcee-2f81-5d5f-bf6d-3e2e6460143f",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r027": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "18fd0821-5111-5c07-812c-6176d87d9f4f",
+    "ranks": {
+      "S2": 1,
+      "S3": 3,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r028": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7649878a-0e4e-5c9a-b6d4-ebfedec6f168",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r029": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dbc34c6b-cb87-5d9e-8b84-fd5ffc9d35a8",
+    "ranks": {
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": "p167"
+  },
+  "r030": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "a69282c5-669e-59b0-8b2e-1f576ff555ee",
+    "ranks": {
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r031": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "960c1b5a-bbb6-5c22-80ff-16d5423e0b33",
+    "ranks": {
+      "S2": 5,
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r032": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "068ff60a-b337-5591-8536-bfd34f063f86",
+    "ranks": {
+      "S3": 1,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r033": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9abff2fc-7e0d-5ac4-a35a-26c92ea53638",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": "p015"
+  },
+  "r034": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9ebe8294-9090-5b24-9b99-2d640d5bac76",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": "p179"
+  },
+  "r035": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2067cfd3-c969-5fc8-8571-b785f642acd7",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r036": {
+    "query_id": "q18",
+    "need_id": "q18",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3526e35b-dcf2-5ee7-a640-ce69be2dc709",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r037": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "717988ca-b755-5ba5-8e52-3e66657ae25f",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r038": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "01a08ead-1800-5e21-9be7-c371267d80d5",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r039": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "8515ddb0-54ff-5cdc-8e2a-91ba7b099359",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r040": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0c6f840b-802a-562f-993c-a7cc2d779038",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r041": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7cdb1733-4763-50ad-b7d1-65a1feb89af6",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r042": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "baba8154-3bb5-5849-91a1-0b20216a541e",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r043": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "4df0969a-b578-589c-b2da-d5fcbb641a4c",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r044": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "1022ed0d-89d6-5e85-a909-ae3d2ee0d897",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r045": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "26630817-315e-50e1-b643-3bb73b4571c1",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r046": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "bdcf432a-2ee9-5fb0-a5e3-73d92060b9ee",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r047": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "07d88e8b-0603-5004-ab5a-105f7765709d",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r048": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9794e1f9-00a9-5950-85e7-0b8425f463f9",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r049": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "16c334a6-2d7c-5fa7-a9a5-09d2cc440a4f",
+    "ranks": {
+      "S3": 5,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r050": {
+    "query_id": "q16",
+    "need_id": "q16",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "74e0d9d1-e14b-579b-906b-210e9d7da3a8",
+    "ranks": {
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r051": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "5e04bbf8-3d66-5d6c-8356-f2d0f82e526d",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r052": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "fd2f544e-e644-51a0-89b4-3e24cdb6bd69",
+    "ranks": {
+      "S2": 4,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r053": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "26105dde-e019-5f93-aa14-7692df3d6140",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r054": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e2e73e0a-7ce6-5575-85ad-2849bbfd37e4",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r055": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "45ce310b-21c7-5be8-83e5-b8c81e824754",
+    "ranks": {
+      "S2": 2,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r056": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "38b5d522-559a-5528-b35b-bec60ca89e4f",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r057": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "6ceae1ec-e11d-5025-8cec-60a316d73a9c",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r058": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b905a0b7-6a06-529d-b254-7afd2f2e2903",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r059": {
+    "query_id": "b-en-6",
+    "need_id": "b-en-6",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e1d46c2c-11fc-52d0-8406-79de8efef263",
+    "ranks": {
+      "S2": 5,
+      "S3": 2,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r060": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "238c78a5-81f1-5804-9967-fefdf9c811b2",
+    "ranks": {
+      "S2": 3,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r061": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e6f4ff6d-fe0e-5264-89e0-97852c5c845c",
+    "ranks": {
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r062": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "fdae2090-056a-5d85-83a2-347f7feff0a6",
+    "ranks": {
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r063": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "9a6041d9-2a77-52a0-9d66-42d686ab5d52",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r064": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "3e94571f-7a5e-553c-93f5-d37c5d4b4e44",
+    "ranks": {
+      "S2": 1,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r065": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "de634a28-bd39-51b1-9671-314ad86747f0",
+    "ranks": {
+      "S2": 2,
+      "S3": 3,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r066": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b96d98a0-d77f-5700-bd6d-0945fa8d625b",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r067": {
+    "query_id": "b-en-1",
+    "need_id": "b-en-1",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "15fcab89-36f2-5857-ac82-9a3cf5c12a72",
+    "ranks": {
+      "S2": 4,
+      "S3": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r068": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b923efaa-6795-5772-bacc-687e330dbdc6",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r069": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "bc115679-eb97-56be-94e9-6eb29d2f150c",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r070": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b8cd7256-eccf-567c-9ea7-39bc82867904",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r071": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "bc1f2568-8c86-5666-960e-16584979eff6",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r072": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "5ab8b6af-a971-5d5b-b8d2-0476e80ee6e6",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r073": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "6dc9c4ef-846b-539c-a6c2-7ff1e3d35160",
+    "ranks": {
+      "S2": 4,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r074": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "960c1b5a-bbb6-5c22-80ff-16d5423e0b33",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": "p054"
+  },
+  "r075": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "18fd0821-5111-5c07-812c-6176d87d9f4f",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r076": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "17bf8a2e-2a6f-588d-b341-4459041c1ee4",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r077": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r078": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "1f3e62db-9154-50c5-b923-5bcc2a9631e9",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": "p077"
+  },
+  "r079": {
+    "query_id": "b-es-2",
+    "need_id": "b-es-2",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "dbc34c6b-cb87-5d9e-8b84-fd5ffc9d35a8",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r080": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b5e027e1-6e5e-5f38-969e-fc1767dc3234",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r081": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "8aed67c7-a829-53b0-9301-0d6dd2e90fbd",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r082": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "24e26ff1-9974-5df6-b94a-cdf4ccb3c366",
+    "ranks": {
+      "S2": 1,
+      "S3": 3,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r083": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r084": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "41f2f9b3-be03-59d3-a5df-214f38fbc9bb",
+    "ranks": {
+      "S2": 5,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r085": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "cd0756e0-3f99-5b24-bc93-b83666d29024",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r086": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "da9d1191-47cc-5904-94a0-8efd77135c32",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": "p119"
+  },
+  "r087": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5f540232-f2c5-5db1-8193-cd4047acc89f",
+    "ranks": {
+      "S2": 2,
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r088": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9eb866af-c4fb-5f44-88e1-b67bee99f2bd",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r089": {
+    "query_id": "q35",
+    "need_id": "q35",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "43324dd6-b3ca-5fcc-a1f0-0c052083538d",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r090": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "6f2fe13f-c2a3-58dd-89c9-8c28f7300a54",
+    "ranks": {
+      "S2": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": "p089"
+  },
+  "r091": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "84b1876c-510b-5762-a9de-e7f7b5249b35",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r092": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "28a34fd7-c874-51a3-9c6f-8755e4ac7b0d",
+    "ranks": {
+      "S2": 3,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r093": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "12526549-342c-5097-87a8-7b3b57a5cca1",
+    "ranks": {
+      "S3": 3,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r094": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "fad3bbf7-5a1d-5e5b-b58e-b9c86902321e",
+    "ranks": {
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r095": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "1ba732b5-9e60-5c24-a6a7-d7d1609ea6f6",
+    "ranks": {
+      "S2": 4,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r096": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "bc73548b-8868-5943-8916-60b7e79fe1ba",
+    "ranks": {
+      "S2": 2,
+      "S3": 5,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r097": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "a49c32ae-2563-575c-8923-b8471a1a8d14",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r098": {
+    "query_id": "q43",
+    "need_id": "q43",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f42f6977-5f75-5735-87e0-c405e742a634",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r099": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r100": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S2": 4,
+      "S3": 4,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r101": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "1f6906d6-0c9e-565c-b6cb-396ce1d3cef3",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r102": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "845057ec-37a0-5cf9-99be-27af621d5b79",
+    "ranks": {
+      "S2": 5,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r103": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0f3404dc-08b4-5579-a974-7dd86622218d",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r104": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "ba5ce04f-08dc-5366-9203-933fd318e4c8",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r105": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S2": 3,
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r106": {
+    "query_id": "q05",
+    "need_id": "q05",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0abef12a-1ff4-5caf-9c6e-218bbaa8c029",
+    "ranks": {
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r107": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S2": 5,
+      "S3": 2
+    },
+    "earlier_pair_id": "p033"
+  },
+  "r108": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "4142334a-030a-5224-97ab-20d1a0da1b5a",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r109": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "d70f72d1-7407-548c-acd0-c1837712c458",
+    "ranks": {
+      "S2": 2,
+      "S3": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r110": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "fb2d4ec3-6f78-5e71-8142-fbe2b42218f6",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r111": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "df6221cb-786b-51c9-a48f-d12bea27bd55",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r112": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S2": 3,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r113": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7eecbeb6-04f3-569e-8a0c-bb86128b7e15",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r114": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "05747af6-9f25-5b10-ac34-7f9f61f18524",
+    "ranks": {
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r115": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0393567f-b43b-5bce-bdea-e36d15ec2411",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r116": {
+    "query_id": "q25",
+    "need_id": "q25",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "01eb0e71-cc86-5699-9eaf-8293089b8932",
+    "ranks": {
+      "S3": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r117": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9fcf913b-ae4e-5dd4-a37f-3c35b1cd28a7",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r118": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "56522b85-0274-5467-ab5d-91dfab14f814",
+    "ranks": {
+      "S2": 2,
+      "S3": 4,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r119": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "96ef0f2c-2663-50ee-87a6-c6ff07171fee",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r120": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "615d9b7f-3544-59d8-9ba4-15b1d01bed0e",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r121": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2fd515bd-de34-5491-ad89-7d5952e76963",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r122": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "ec451ef7-537b-5ca0-bfaa-cfed59182853",
+    "ranks": {
+      "S2": 3,
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r123": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b3edffac-a74d-5314-aa54-dae0fa377838",
+    "ranks": {
+      "S2": 1,
+      "S3": 3,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r124": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b804d0ff-ebe3-5d39-8f5e-fc74fe4e8ef6",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r125": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "45e04f26-a988-5c27-b780-08182eba52f7",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r126": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2ea18695-0a2c-5632-a80f-aa72df4c5a0e",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r127": {
+    "query_id": "q33",
+    "need_id": "q33",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "1e78122c-dd6f-53fe-9342-03a4e0697bd3",
+    "ranks": {
+      "S2": 4,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r128": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "ad951d00-2b25-511f-879e-325c0378bb25",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r129": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dbec5787-240c-5dde-8fc1-38897e8de455",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r130": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dece701f-5720-5334-bf03-8dc8a8540d2c",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r131": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "4143f5d6-5c18-5bfa-900d-e6c081cddea5",
+    "ranks": {
+      "S2": 5,
+      "S3": 1,
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r132": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "fd029816-12d6-5b7d-ae57-6c9cf1739c53",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r133": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "35d40d2e-124e-5b59-a4a0-9a84d938c4ec",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r134": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b69f8e49-6d46-5734-92a3-a94fcd08ccb9",
+    "ranks": {
+      "S2": 2,
+      "S3": 4,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r135": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "53020da5-d3af-5643-89a7-263d860c71a5",
+    "ranks": {
+      "S2": 4,
+      "S3": 3
+    },
+    "earlier_pair_id": "p048"
+  },
+  "r136": {
+    "query_id": "q26",
+    "need_id": "q26",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "97894920-8c6c-56c8-9259-2625e0cb3695",
+    "ranks": {
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r137": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "2a116ad5-13dc-5d5e-b319-33af4e89ee50",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r138": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b4911722-10bb-545e-a887-37ba906cce9f",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r139": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "31de28c4-9fe0-5c17-b22c-7ccd7a715141",
+    "ranks": {
+      "S3": 3,
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r140": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "531fe4e6-8dc8-5e76-9fed-54a7a61fb999",
+    "ranks": {
+      "S3": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r141": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "3121c477-dd93-5f8b-b565-e85107725968",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r142": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "fad79b5f-3733-51cc-9f26-3691d2beddc8",
+    "ranks": {
+      "S2": 4,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r143": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "497ef521-2d95-5b83-972b-154c762a8f70",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r144": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "afcfd12b-283b-5f72-a5ab-7b048f471565",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r145": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e62ecee9-0b1c-5501-b9e1-4088ec562b85",
+    "ranks": {
+      "S3": 2,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r146": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "243290b5-3857-5356-bb44-60125ceaa1dc",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r147": {
+    "query_id": "b-en-3",
+    "need_id": "b-en-3",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "fccecb0d-9469-572c-9581-e7724bdb4d65",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r148": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "127428bf-d948-50da-9c4d-118e39d69199",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r149": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b4737de8-3e98-527c-8bac-d1da6f4b18a5",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r150": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "6db533a6-5b14-5438-ba95-dbfe5a4a0c02",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r151": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "9497252b-a30b-5aba-91c8-6b0ccfd7b65e",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r152": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2bb8d99b-0ead-5d4d-9c86-a5fb9aaf946f",
+    "ranks": {
+      "S3": 5,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r153": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f1613b40-0e5a-5d57-ae0d-fe3aab733423",
+    "ranks": {
+      "S3": 3,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r154": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "000f810f-07c7-5aa3-a3e2-5c61c1992311",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r155": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "26aa9cad-9ac6-5a57-af4b-8b955b3b4c80",
+    "ranks": {
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r156": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "68132f73-a524-5149-8d4f-7493be11cfba",
+    "ranks": {
+      "S3": 4,
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r157": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "54fb46ea-0976-5040-878a-fee97c75676a",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r158": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "4a56201e-2f4d-5b5b-8c8c-d2e0ac8ee75a",
+    "ranks": {
+      "S2": 5,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r159": {
+    "query_id": "q24",
+    "need_id": "q24",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "cbfc7561-9e97-53c4-8f7b-33b3ac23aef6",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r160": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "ed747a80-eb06-5c3c-9f46-e6c5d1d9e2f3",
+    "ranks": {
+      "S2": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r161": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "01f4f283-3ef4-5831-b7d0-862b03eaa9a5",
+    "ranks": {
+      "S2": 2,
+      "S3": 3,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r162": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "60ea68df-78ac-59be-ae51-a8174f5d5757",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r163": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "42940757-1f66-5a4c-b3ed-028a4026efe1",
+    "ranks": {
+      "S2": 4,
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r164": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "6b661a44-1048-5fc5-b357-e0184df6359f",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r165": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "3d556742-fccb-5256-b544-47e02764583d",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r166": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "09d8e6b6-71b7-5324-9c04-540c38aecb8b",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r167": {
+    "query_id": "b-en-5",
+    "need_id": "b-en-5",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "8b0f38fd-8b3d-5353-977d-03dfeedda956",
+    "ranks": {
+      "S2": 3,
+      "S3": 2,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r168": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f69e4031-e36b-5698-b701-c21b3f09c26c",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r169": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "78bfe2ad-41fa-5bec-b062-9861d8c84193",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r170": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dee758aa-b975-5ec7-84fa-325be87c7ec4",
+    "ranks": {
+      "S2": 5,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r171": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "71765aab-13c2-5de9-ad88-50ae60602d69",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r172": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "a2c2481d-e5a1-5fc4-b809-9a33d00a7450",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": "p004"
+  },
+  "r173": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2f99f0fd-850e-5bc1-99c8-c003347765b3",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r174": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "8d6ca385-aedd-5031-b073-7c6527afedcf",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r175": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3c73e502-56ed-599b-8537-3569041c876e",
+    "ranks": {
+      "S3": 5,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r176": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2b32b369-ac55-597d-bc04-36fd6968c35b",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r177": {
+    "query_id": "q30",
+    "need_id": "q30",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "6214b67b-0945-52db-ba98-299735f14832",
+    "ranks": {
+      "S2": 4,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r178": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d502282a-ad5b-539b-8d8a-fdc7e79b1478",
+    "ranks": {
+      "S2": 3,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r179": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "1d931bb3-e09f-53c8-89f1-1087105467a9",
+    "ranks": {
+      "S3": 4,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r180": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "2eeb57e5-b1bf-5dea-8456-aa41e0b4114f",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r181": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "f52f6bd8-1a96-50c9-9fe3-d5972396c3f5",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r182": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "59b4592e-7e57-5de2-a707-721dc994f79f",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r183": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "45bf7f9f-cfac-5b3c-96a9-0e5b0c94764a",
+    "ranks": {
+      "S3": 5,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r184": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "2d67fbb2-9692-518b-9315-1c2546375874",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r185": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "0acd9535-60d7-5a73-b568-ee45a04e298d",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r186": {
+    "query_id": "b-es-1",
+    "need_id": "b-es-1",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "246e4b48-99ed-5776-8d48-e9fef110f9d0",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r187": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "8a15d349-5b26-5fd7-9019-0273c79cfd8b",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r188": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "0b15d0a1-8cb5-532c-8746-1907932e2509",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r189": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b8e4dc1c-eb0e-5ee6-82ae-f1d56b038679",
+    "ranks": {
+      "S2": 3,
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r190": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "3c75a977-f56a-50f0-9d2d-29c5eb459504",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r191": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "74175768-87b9-59e8-a0d0-15163934abf5",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r192": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "b9941953-6e80-5587-9519-bb6a28958b64",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r193": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "f1a269c0-90ef-5153-854e-b9efc459f80e",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r194": {
+    "query_id": "b-es-6",
+    "need_id": "b-es-6",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "bd3412d2-8754-5584-a1cb-2e74e046794a",
+    "ranks": {
+      "S2": 5,
+      "S3": 3,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r195": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "78e7d8b0-d122-5d9e-931d-6f8bb90cb93c",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r196": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7a03ea94-4a7d-52f4-8c0b-6f1cd33089f2",
+    "ranks": {
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r197": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f7b8eb6d-ed59-5f2e-b680-c8e12ac8d14d",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r198": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2f37c0c0-a423-5b45-876a-b0112b064cb0",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r199": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "30e4738a-7c9a-550e-9724-acfece944b74",
+    "ranks": {
+      "S2": 3,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r200": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "55c9bea2-ae35-5ac8-ae54-e9393593d5c9",
+    "ranks": {
+      "S3": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r201": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "c47ac455-9f97-53f9-bd91-a18cf75a1928",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r202": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3794f51e-c257-5ce7-982a-37ddb305001f",
+    "ranks": {
+      "S2": 1,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r203": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0393567f-b43b-5bce-bdea-e36d15ec2411",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r204": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S2": 2,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r205": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0c5985ba-5a21-5238-bbf4-88a79102f822",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r206": {
+    "query_id": "q27",
+    "need_id": "q27",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r207": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "0fd66534-7db8-5bbf-8ba0-411aebc5343c",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r208": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "c8f5091e-8401-56bb-bb87-2864a0d8f408",
+    "ranks": {
+      "S2": 5,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r209": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "9333c6e8-17aa-5c0f-92de-e03bb09599b9",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r210": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "08685936-7dd0-5e36-9dee-909ba03e350e",
+    "ranks": {
+      "S2": 1,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r211": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "7506b052-d299-5383-879b-4edf15bfcfe1",
+    "ranks": {
+      "S3": 2,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r212": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e86b3fab-ade2-5f93-a8bd-c26027c86fa5",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r213": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "1e306bda-a2f4-5a42-ad43-d7350b1e6e84",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r214": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "43dbaf70-084a-5c8a-9a3e-d309a05c341c",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r215": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "130d0055-d9e7-5d93-9871-9565aabc34e7",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r216": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e40693bd-8e1c-5051-93d0-d647702a896f",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r217": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "ecb0074d-3741-521d-839c-55b0498a987e",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r218": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d275b59c-ddaa-5a88-a724-320a8a0c644b",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r219": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "7343f84c-3283-5f32-9b6a-1eb51013a7e0",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r220": {
+    "query_id": "b-es-4",
+    "need_id": "b-es-4",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e30c1cf6-35ac-52a3-9341-704f4e5f0591",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r221": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "00e70b67-b281-5926-886c-54ffa96e39aa",
+    "ranks": {
+      "S3": 3,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r222": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0393567f-b43b-5bce-bdea-e36d15ec2411",
+    "ranks": {
+      "S2": 5,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r223": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "65c03826-29d7-572b-b819-d39803b832fe",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r224": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r225": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f9938c70-ca33-512e-85e1-b85a469c665c",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r226": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "af149fe4-78ba-594f-ba24-2f8a330112ac",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r227": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "033bfd09-73f5-5d95-a4a5-8f944bdf1de2",
+    "ranks": {
+      "S2": 4,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r228": {
+    "query_id": "q42",
+    "need_id": "q42",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "71765aab-13c2-5de9-ad88-50ae60602d69",
+    "ranks": {
+      "S2": 3,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r229": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7071a1e8-ed34-5ed4-b315-94564091476e",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r230": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "c00c7e47-a1dc-5804-ac69-7859942cb767",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": "p143"
+  },
+  "r231": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r232": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b2ba42bf-340e-555b-8069-b386eae67c23",
+    "ranks": {
+      "S3": 4,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r233": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "88d849a9-f794-5679-8025-addca70e982c",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r234": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "96901858-0472-5559-aeda-5952ca0d9f45",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r235": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7b3a4160-a852-502d-a4f7-e6c39796276c",
+    "ranks": {
+      "S3": 3,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r236": {
+    "query_id": "q10",
+    "need_id": "q10",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "40b7c02f-39a3-5c1f-a81d-1af97ba66e46",
+    "ranks": {
+      "S2": 4,
+      "S3": 5,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r237": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "e506987e-2310-5b2a-9bc0-2d2469b58e9f",
+    "ranks": {
+      "S2": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r238": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dbc34c6b-cb87-5d9e-8b84-fd5ffc9d35a8",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r239": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "960c1b5a-bbb6-5c22-80ff-16d5423e0b33",
+    "ranks": {
+      "S2": 4,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r240": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "18fd0821-5111-5c07-812c-6176d87d9f4f",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r241": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b8cd7256-eccf-567c-9ea7-39bc82867904",
+    "ranks": {
+      "S2": 1,
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r242": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "bc1f2568-8c86-5666-960e-16584979eff6",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r243": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3f61bcee-2f81-5d5f-bf6d-3e2e6460143f",
+    "ranks": {
+      "S2": 3,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r244": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "fb8002cd-64b1-577d-8785-8fc90bdf86d0",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r245": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "6dc9c4ef-846b-539c-a6c2-7ff1e3d35160",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r246": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2067cfd3-c969-5fc8-8571-b785f642acd7",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r247": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b923efaa-6795-5772-bacc-687e330dbdc6",
+    "ranks": {
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r248": {
+    "query_id": "q15",
+    "need_id": "q15",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3526e35b-dcf2-5ee7-a640-ce69be2dc709",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r249": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "3b474f74-03cd-560a-9149-911e7b65b527",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r250": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "4de24f3c-fa4d-59c1-abcf-95df784eb142",
+    "ranks": {
+      "S2": 5,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r251": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "e41417e8-095f-5827-9018-f74034d619e0",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r252": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "fd7a073d-efe5-5c05-a9b0-35ede918b165",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r253": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "08aed373-40ea-5e49-82de-c149ec55d4cc",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r254": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "5cdd24ee-092d-5e3a-b9bf-029b444e69b2",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r255": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d0c7b9d7-9c56-571a-b6b3-d1818bc14b22",
+    "ranks": {
+      "S2": 3,
+      "S3": 3,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r256": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "5cf3f004-4b1f-5197-9bbc-d212e4d23b6f",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r257": {
+    "query_id": "b-es-3",
+    "need_id": "b-es-3",
+    "language": "es",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "7cecc47b-a632-5081-aa10-1c2a23b74f59",
+    "ranks": {
+      "S2": 4,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r258": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "34874a2d-2702-5c12-aab0-38f41fcdf0b0",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r259": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "608fd886-af10-5cad-ba99-3677313f0325",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r260": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "dde80a72-e77e-575c-ad8b-c87f900af6c9",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r261": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "df9ddf86-f7ad-5104-8ef1-a08be23565fa",
+    "ranks": {
+      "S2": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r262": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "dfa7c358-b0cf-56c9-b3ad-44fc93e2af57",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r263": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "56fc599b-8eba-52f4-b5c5-3c2ce9c08cfe",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r264": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "ad3c6eb4-d972-5fa3-9b5b-f374cb378d17",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r265": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "d0f8e513-e2c8-5932-bcca-5fed58c68af4",
+    "ranks": {
+      "S2": 4,
+      "S3": 2,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r266": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "0cda7218-222a-56d4-b943-c2bf7ba1eea8",
+    "ranks": {
+      "S2": 5,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r267": {
+    "query_id": "b-en-2",
+    "need_id": "b-en-2",
+    "language": "en",
+    "stratum": "B",
+    "block": 1,
+    "work_id": "44214a7c-dac9-5368-91f1-f4df63a6e853",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r268": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "758bed89-83b3-589d-9987-f630aac4e556",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r269": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5e5a09a6-f313-5435-b254-569c8e72e3da",
+    "ranks": {
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r270": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5007dd51-a751-5fb0-99e6-968e55865ec4",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r271": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "1e9f1d85-e752-5575-889c-29f81b18f6aa",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r272": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "8b68c581-f2f7-5dc3-ab7a-914eec75605d",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r273": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "395ab55f-1d89-5041-9625-18a02c044adb",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r274": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "ec552632-5b5a-543c-b8c9-155fbb9ae702",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r275": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "25918790-53ca-5520-b041-feb9a1c42a4e",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r276": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0f3404dc-08b4-5579-a974-7dd86622218d",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r277": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r278": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "a19333f9-49ff-5dd7-8c07-5568cfa444aa",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r279": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r280": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "e971118a-f171-5b90-9a84-b4d701af1e9d",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r281": {
+    "query_id": "q04",
+    "need_id": "q04",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "da1b4f25-b403-5f7e-a47f-af0c98b7cdb2",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r282": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "544ec132-72ff-5bd4-bedd-ff5d0f4757fa",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r283": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b9dc7bd2-974f-564a-8e21-0cf1bf6c4083",
+    "ranks": {
+      "S2": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r284": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "412f9b86-28b5-5528-bd13-6469875ea244",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r285": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b9e2ccc3-6d60-5881-aaf8-9d4c9b05a2da",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": "p017"
+  },
+  "r286": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "d371bcb9-be0b-5ab2-9faa-a15ef93a94a1",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r287": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "2c5328d7-8d6e-5aec-a834-2655f5a6fe22",
+    "ranks": {
+      "S2": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r288": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "25c827bf-83b1-5c23-b11f-23fb35b8d446",
+    "ranks": {
+      "S3": 4,
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r289": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "0285469e-0eb6-53b9-970d-9655ba07cea3",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r290": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "d415da8b-2d17-5747-9a7d-ca0ce1ff8d3e",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r291": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "57afe469-6e70-5c72-8c5e-3ea7a7bd4608",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r292": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "71765aab-13c2-5de9-ad88-50ae60602d69",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 4,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r293": {
+    "query_id": "q32",
+    "need_id": "q32",
+    "language": "en",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "033bfd09-73f5-5d95-a4a5-8f944bdf1de2",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r294": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b9d688bc-9f95-5952-ae8f-98f70cb69497",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r295": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f7b8eb6d-ed59-5f2e-b680-c8e12ac8d14d",
+    "ranks": {
+      "S3": 3,
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r296": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S3": 2,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r297": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S2": 2,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r298": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "7eecbeb6-04f3-569e-8a0c-bb86128b7e15",
+    "ranks": {
+      "S2": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r299": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "01eb0e71-cc86-5699-9eaf-8293089b8932",
+    "ranks": {
+      "S3": 5,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r300": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "e6de4919-b1c0-52d0-aeaa-baae9c00de20",
+    "ranks": {
+      "S3": 4,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r301": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "3ae6868a-d526-5c8c-80a2-4f0e53e38259",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r302": {
+    "query_id": "q03",
+    "need_id": "q03",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "020dba79-4e8e-581a-b683-70bdd1e83f46",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r303": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "c4e2a35f-4f49-5b8d-8a2c-8fefe8a8b65a",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": "p097"
+  },
+  "r304": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5281901d-a828-59cf-92f7-2d6f71b38ddd",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r305": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "5cabfb4f-144b-5126-8e03-e170d80af019",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r306": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "6ffb2f22-3fe4-584e-bf05-9f652aa8b993",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r307": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "8e06fc12-63ea-57fd-98d8-3aa76fa7eb91",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r308": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "f222ea90-6323-5a8d-98f5-292b91f99f1c",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r309": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "b16a6a2b-2976-5df3-92a1-ad15e6161c48",
+    "ranks": {
+      "S2": 1,
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r310": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "15950ed9-0615-5d81-b374-844dbb288971",
+    "ranks": {
+      "S3": 2,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r311": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "dea7be3c-3c0e-5ed6-900e-20905bbd83b4",
+    "ranks": {
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r312": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "ade6c568-c404-5ea7-bbad-a64046782efb",
+    "ranks": {
+      "S2": 3,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r313": {
+    "query_id": "q36",
+    "need_id": "q36",
+    "language": "es",
+    "stratum": "A",
+    "block": 1,
+    "work_id": "d5acc7e9-cc59-526d-a677-f3f730dbdde9",
+    "ranks": {
+      "S3": 4,
+      "S4": 4,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r314": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "34ea8911-2a55-587d-b3d0-09ce7ae4d3e1",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r315": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e66ae72a-e427-5f77-9561-216a694b5dd9",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r316": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "a00ce42b-7f68-5317-986d-50fd0489a647",
+    "ranks": {
+      "S3": 2,
+      "S4": 4,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r317": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "d2848180-4ae0-5090-9d98-7f3eb7b012c3",
+    "ranks": {
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r318": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c7ccf9e8-887f-5415-acab-94cbd1d63de5",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r319": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8fcfea55-8333-5434-b8a9-584d42ac78db",
+    "ranks": {
+      "S2": 4,
+      "S4": 1,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r320": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8b0d0277-336e-5aa6-9be9-fd0ab7d120cd",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r321": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ecdc7755-8623-5227-a902-852fc261652c",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r322": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cf1cb7d8-4672-59ca-a61b-40543dc6d02a",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r323": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ae90d917-1f9c-5fe0-98dd-893498fafc0b",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": "p060"
+  },
+  "r324": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4f1b52a5-20ca-503a-9d8d-b4d312c20cd6",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r325": {
+    "query_id": "q22",
+    "need_id": "q22",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f9bbf557-905d-5da8-8eba-bdf7f9de6b76",
+    "ranks": {
+      "S2": 3,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r326": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "bb8c6570-ad89-5e71-952c-46c585e73d7f",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r327": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1898c237-7965-59f7-be5f-3afe135e266f",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r328": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2a44741e-d21e-56c5-861b-a5ef8adc9c6d",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r329": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S2": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r330": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "40b7c02f-39a3-5c1f-a81d-1af97ba66e46",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r331": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r332": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e99688b0-3181-5fb0-ac60-132ff667e795",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r333": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e971118a-f171-5b90-9a84-b4d701af1e9d",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r334": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r335": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "58af3c70-d781-5caa-bfbf-d8152b6aa331",
+    "ranks": {
+      "S2": 2,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r336": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b656b461-9115-5783-99e4-ce82745c2046",
+    "ranks": {
+      "S3": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r337": {
+    "query_id": "q01",
+    "need_id": "q01",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "938ec665-4228-54c1-bd3f-9b82c3b155d8",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r338": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "d105657c-3ab7-5a13-a08b-ea32b4592c42",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r339": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5a2a41de-9c74-5776-9364-c65e206a03d0",
+    "ranks": {
+      "S2": 5,
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r340": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9958420b-6043-5c9b-8595-ce79d7a53e06",
+    "ranks": {
+      "S2": 1,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r341": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "14124f01-9c5b-58c0-87be-d80b8dff1705",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r342": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "04b6d4d6-68eb-52b7-a3b7-10503fe18dd3",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r343": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "39a2b77d-bb2f-5ffa-9906-82a4b8cb3e02",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r344": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f0754837-9422-5b2e-a6a3-ed41740e80c8",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r345": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "49024bcb-2fe7-59fc-bc64-5b1855686a8b",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r346": {
+    "query_id": "q40",
+    "need_id": "q40",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "84048bc0-eef8-520e-8c4f-bcc174af8794",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r347": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7eecbeb6-04f3-569e-8a0c-bb86128b7e15",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r348": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c47ac455-9f97-53f9-bd91-a18cf75a1928",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r349": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b2a64277-27a8-58a4-8dea-0554a9987da2",
+    "ranks": {
+      "S2": 1,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r350": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f7b8eb6d-ed59-5f2e-b680-c8e12ac8d14d",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r351": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "75594495-1f84-5528-aecd-aea6dbc15a72",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": "p072"
+  },
+  "r352": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c72ab286-bc06-5b6a-9e77-4b20fb9c0bd3",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r353": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "01eb0e71-cc86-5699-9eaf-8293089b8932",
+    "ranks": {
+      "S2": 3,
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r354": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0393567f-b43b-5bce-bdea-e36d15ec2411",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r355": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b3d7c5d7-9be0-515f-9c72-452d8460109c",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r356": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b9d688bc-9f95-5952-ae8f-98f70cb69497",
+    "ranks": {
+      "S2": 4,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r357": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S2": 2,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r358": {
+    "query_id": "q31",
+    "need_id": "q31",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5a378cb0-1da1-59c4-b0de-2e0457792508",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r359": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r360": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r361": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "d493e9b3-ee96-5ee5-b889-eea978e89d9f",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r362": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "16789e4e-f0dd-5597-a3e1-11fd732eae3d",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r363": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c12c92c0-a3ef-5422-ab8e-840546bd9f03",
+    "ranks": {
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r364": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "edce9eb7-2d9b-53af-a77c-3afc3e0584c4",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r365": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "40057402-de3e-5363-89ee-d63c2aaeff68",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r366": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "35f2c77c-8777-51ed-b0e5-1a1d671b69d6",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r367": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "39ca02fa-73df-514e-a40e-873b8f267109",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r368": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fc494215-8360-5363-8d29-36bf00261be9",
+    "ranks": {
+      "S2": 5,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r369": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0f3404dc-08b4-5579-a974-7dd86622218d",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": "p164"
+  },
+  "r370": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "36974dc2-cd5b-558a-a294-16498cc3d89d",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r371": {
+    "query_id": "q11",
+    "need_id": "q11",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r372": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S2": 1,
+      "S3": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r373": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f1d2f2e5-352a-58fe-b6a2-9fedb5bee55c",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": "p036"
+  },
+  "r374": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "34594ec5-bd80-53d8-b4cd-4147ef2d1b82",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r375": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cf7dae57-356b-5f7d-9c43-d436e6ab38da",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r376": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7071a1e8-ed34-5ed4-b315-94564091476e",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r377": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "699f7ca0-bc05-5f2b-acb1-6f521b833152",
+    "ranks": {
+      "S2": 4,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r378": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7b3a4160-a852-502d-a4f7-e6c39796276c",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r379": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r380": {
+    "query_id": "q09",
+    "need_id": "q09",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "96901858-0472-5559-aeda-5952ca0d9f45",
+    "ranks": {
+      "S2": 3,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r381": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r382": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "578fe550-fb10-55fa-b919-98a73c55eb95",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r383": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8b68c581-f2f7-5dc3-ab7a-914eec75605d",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r384": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ed1f4c01-43dc-5c74-a46d-fa26860de975",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r385": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e757e629-61ad-510f-aa97-c3c6e9ffd8be",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r386": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S2": 5,
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r387": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f69dd19a-f9ce-5eef-b84e-04996baab199",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r388": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "25918790-53ca-5520-b041-feb9a1c42a4e",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r389": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c3652f23-ff1e-5ce9-9cc2-965311be1b30",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r390": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5c86afa7-0750-5564-8f66-438bcb82cee1",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r391": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e8e06d51-fe04-54d4-8f95-f7187e3e2287",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r392": {
+    "query_id": "q12",
+    "need_id": "q12",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "104bd5bd-0222-5e31-963a-31a651e55aae",
+    "ranks": {
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r393": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4819b0ff-06db-5ece-9b27-97dadc66663f",
+    "ranks": {
+      "S2": 3,
+      "S3": 4,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r394": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "368a939d-4cdc-53f9-afbf-152ad6bf0351",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r395": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5d285dcb-1c6f-5927-bef9-1d26bb673020",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r396": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5672456d-f8c9-5f27-9fd5-8878e0362a4f",
+    "ranks": {
+      "S2": 2,
+      "S3": 3,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r397": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7e9c01c1-bf29-51a6-8bf2-e136f6922ee2",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r398": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "85b3c783-419f-5634-ab61-fb6d74f5db47",
+    "ranks": {
+      "S2": 5,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r399": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b024ef54-12cb-5d5c-bd1c-ca86e2506c4e",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r400": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "865adcf2-5bf3-5049-ae09-d1291f9b661d",
+    "ranks": {
+      "S3": 2,
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r401": {
+    "query_id": "q17",
+    "need_id": "q17",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cdae8fa8-d2cd-53bc-834d-b773c5f26498",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r402": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b7c42bb8-2ba8-53f2-9caa-9871ff7ddbff",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r403": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "84c3d27e-19f4-5798-bbac-1a0df494f5da",
+    "ranks": {
+      "S2": 4,
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r404": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4dc21be6-9e51-5a2a-8f69-b5bda7c01768",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": "p025"
+  },
+  "r405": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "450d6f9f-8a94-5d9e-ae0b-5ee657d14d7d",
+    "ranks": {
+      "S2": 2,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r406": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5132cb99-2ee9-5a25-a6fe-88774bc98c4e",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r407": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ddc4c882-b39d-57c7-a780-0692e11dfffe",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r408": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f7979cb5-0ea6-51af-a438-e06ff189faa3",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r409": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "71e5c44a-8849-5782-80b8-d9c64354cf7d",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r410": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9250f1db-a0a4-5a53-b0a5-f9f2401d7b28",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r411": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ea33c8e6-1556-5892-959a-0f4d546d3566",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r412": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f0f3bf06-0f60-5c7a-b5a8-8b99a1eab02c",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r413": {
+    "query_id": "q39",
+    "need_id": "q39",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5a795775-103d-5c61-a525-5dba07491a5f",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r414": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "65c03826-29d7-572b-b819-d39803b832fe",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r415": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f7b8eb6d-ed59-5f2e-b680-c8e12ac8d14d",
+    "ranks": {
+      "S2": 3,
+      "S3": 3,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r416": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5a378cb0-1da1-59c4-b0de-2e0457792508",
+    "ranks": {
+      "S2": 5,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r417": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b257dafc-922a-516b-a2c9-a445ea5588f8",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r418": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2b32b369-ac55-597d-bc04-36fd6968c35b",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r419": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "01eb0e71-cc86-5699-9eaf-8293089b8932",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r420": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "167c0421-eaf5-5094-889a-797df9e57757",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r421": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S2": 1,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r422": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r423": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b9d688bc-9f95-5952-ae8f-98f70cb69497",
+    "ranks": {
+      "S2": 2,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r424": {
+    "query_id": "q37",
+    "need_id": "q37",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "99d3aa2d-fab2-5ad0-b889-6d3f06e30892",
+    "ranks": {
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r425": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "507d57dd-92f1-5faf-8718-6ff55cbe0d79",
+    "ranks": {
+      "S2": 2,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r426": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "493355b8-045c-5174-b713-beb6f512ce32",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r427": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e971118a-f171-5b90-9a84-b4d701af1e9d",
+    "ranks": {
+      "S2": 5,
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r428": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cec77884-b7a4-550c-8d14-4364fbe688dd",
+    "ranks": {
+      "S4": 3,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r429": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e596292b-bf56-5c89-9bd0-a4f33b31d4f7",
+    "ranks": {
+      "S2": 1,
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r430": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "16b7ffa0-5629-5943-80d7-5523efc0f59e",
+    "ranks": {
+      "S2": 3,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r431": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c7e40f1f-7e51-5117-a62b-ccbbca283f6a",
+    "ranks": {
+      "S2": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r432": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r433": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7891bba5-e37b-5016-948d-7a55be99568d",
+    "ranks": {
+      "S4": 4,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r434": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f04d7fd0-a596-5cc6-ac2c-d7fc3a5edddd",
+    "ranks": {
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r435": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "3860fa18-f68e-5e62-a1d0-3660ccc6765f",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r436": {
+    "query_id": "q08",
+    "need_id": "q08",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5e5a09a6-f313-5435-b254-569c8e72e3da",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r437": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "83473b19-e3fe-5ae0-9af5-a4fb48748066",
+    "ranks": {
+      "S2": 4,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r438": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9f80121d-7a05-587f-af48-19b2c959676c",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r439": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r440": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "51c4b236-698d-5130-adc5-38e5dd391ccc",
+    "ranks": {
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r441": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "6999e9ed-3f6b-5a0d-8856-b229fa5a3d0b",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r442": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "3ed61d66-f1e2-5e89-a00b-49b09b4e2160",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r443": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b63f593b-3168-5b85-a768-27a98930d857",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r444": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "68d7d7f5-76fe-5eae-8c92-0ea05c4da9f7",
+    "ranks": {
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r445": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "abc68676-e3b8-59e8-9ef1-6d698647502f",
+    "ranks": {
+      "S2": 3,
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r446": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8b2d05ec-be7a-56bb-bf3d-f0b791c33859",
+    "ranks": {
+      "S2": 5,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r447": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "41346357-36a4-5b8d-8703-46da06ce7eaf",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": "p001"
+  },
+  "r448": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "93c682be-f7a1-51d4-b66b-00940a3db3ed",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r449": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "148c2827-b532-5748-a444-305c4550dfdf",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r450": {
+    "query_id": "q06",
+    "need_id": "q06",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "017e13c1-5df0-5c0a-a53a-05772fae780f",
+    "ranks": {
+      "S2": 1,
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r451": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "50eda256-8668-5fe5-a7eb-d94811451e88",
+    "ranks": {
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r452": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "73f4d700-9c12-59cd-aa02-544fcb2fff07",
+    "ranks": {
+      "S2": 1,
+      "S3": 2,
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r453": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "a33990cd-e69d-504c-9415-74e2af330ec7",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r454": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "354c32c3-d598-5fe6-b8dd-3b6bbcb21c09",
+    "ranks": {
+      "S2": 4,
+      "S3": 4,
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r455": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fdab5b84-d9a9-5fe7-a06e-9622dd3a96f6",
+    "ranks": {
+      "S2": 5,
+      "S3": 3,
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r456": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1600550e-539b-5ecd-b307-f161f0dca20d",
+    "ranks": {
+      "S2": 2,
+      "S3": 1,
+      "S4": 2,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r457": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "73c47c86-81f8-5227-95d5-33a749b17d51",
+    "ranks": {
+      "S3": 5,
+      "S4": 1,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r458": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "3b077cde-930c-525e-8ba8-a939e44a089c",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": "p163"
+  },
+  "r459": {
+    "query_id": "q38",
+    "need_id": "q38",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "43a54b0f-82e4-57b3-a857-20adb663f8e2",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r460": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2c9c11d9-abe4-55a6-94a6-50d99121ca29",
+    "ranks": {
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r461": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e6689583-8b57-5207-b841-ae6ee24d2d81",
+    "ranks": {
+      "S2": 3,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r462": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "45e63cc2-d4ba-5235-acb2-01a25eaeef4d",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r463": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r464": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "40b7c02f-39a3-5c1f-a81d-1af97ba66e46",
+    "ranks": {
+      "S3": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r465": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f02bda68-04c5-532a-a915-d22310b52e30",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r466": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5dda6bdf-0a20-53bd-a698-b02c8e698c31",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r467": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ba5ce04f-08dc-5366-9203-933fd318e4c8",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r468": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "edce9eb7-2d9b-53af-a77c-3afc3e0584c4",
+    "ranks": {
+      "S2": 5,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": "p094"
+  },
+  "r469": {
+    "query_id": "q07",
+    "need_id": "q07",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0cbcec64-23d8-5679-8b15-6b1405663426",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r470": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0393567f-b43b-5bce-bdea-e36d15ec2411",
+    "ranks": {
+      "S2": 5,
+      "S3": 5,
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r471": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "630cb073-10ad-579f-970a-427c6f8e57f8",
+    "ranks": {
+      "S2": 4,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r472": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "00e70b67-b281-5926-886c-54ffa96e39aa",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r473": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "419db66f-fb62-5b5f-a5d1-5341c7a149c4",
+    "ranks": {
+      "S2": 2,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r474": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fb2d4ec3-6f78-5e71-8142-fbe2b42218f6",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r475": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "3310af96-3174-554c-b9a7-3494852fa5fd",
+    "ranks": {
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": "p058"
+  },
+  "r476": {
+    "query_id": "q29",
+    "need_id": "q29",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "af149fe4-78ba-594f-ba24-2f8a330112ac",
+    "ranks": {
+      "S2": 3,
+      "S3": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r477": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f6dee8cc-1568-5c36-b5fe-0387f536611f",
+    "ranks": {
+      "S2": 1,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r478": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b894c6e2-fb2e-5d30-812a-a66d617fcdc3",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r479": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "88e6f175-4540-5119-b964-50aa0f01a554",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r480": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7922b279-d7a2-57b2-96c9-01b69d02b49c",
+    "ranks": {
+      "S2": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r481": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c8ebc572-b97d-553f-8f19-51429c897178",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r482": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8452f092-3cf7-5ab4-ab14-79ad1a1d7c15",
+    "ranks": {
+      "S2": 2,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r483": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "aea8574a-f872-57fd-b956-84dde98a383a",
+    "ranks": {
+      "S3": 2,
+      "S5": 5
+    },
+    "earlier_pair_id": "p128"
+  },
+  "r484": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "6015f80f-d295-5a72-832a-559a4d31cd32",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r485": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "34a0970a-6626-5793-9cfb-835406366032",
+    "ranks": {
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r486": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "bf8ce0c1-0af0-56da-85a5-a95465aab84f",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r487": {
+    "query_id": "q19",
+    "need_id": "q19",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c5bbdf0f-0321-520a-a22b-0d0d4a0118a3",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r488": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "688dba64-69d9-5bd9-95c8-c64c840fbf7b",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r489": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "94f593b9-c02c-5ca2-ae51-5e55234179bf",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r490": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "949e47fd-f014-5346-a1bd-3f64f7dacd9d",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S4": 5,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r491": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5ea7d40b-c215-5d8e-b958-b20008167ae6",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r492": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0b14c1a0-31dc-5585-b60e-b8841b953076",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r493": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "033bfd09-73f5-5d95-a4a5-8f944bdf1de2",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r494": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7a03ea94-4a7d-52f4-8c0b-6f1cd33089f2",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r495": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4e0f5852-9ac7-5c47-be7f-36168047de7e",
+    "ranks": {
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r496": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "25c827bf-83b1-5c23-b11f-23fb35b8d446",
+    "ranks": {
+      "S2": 1,
+      "S3": 3,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r497": {
+    "query_id": "q34",
+    "need_id": "q34",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "adf6cbab-3609-53f4-a2af-ee3145409871",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": "p049"
+  },
+  "r498": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e8604d03-4386-592d-b22c-a12b0f709df2",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r499": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1cc23bf0-edfc-558e-b5bd-669b543eb7e4",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r500": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e971118a-f171-5b90-9a84-b4d701af1e9d",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r501": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4c3280ac-2ffb-56dc-b46d-430ff8a55527",
+    "ranks": {
+      "S2": 5,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r502": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8b2d05ec-be7a-56bb-bf3d-f0b791c33859",
+    "ranks": {
+      "S2": 3,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r503": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r504": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1f0f83a0-bffd-5de8-83e5-1cf8123fd3f0",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r505": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "51c4b236-698d-5130-adc5-38e5dd391ccc",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r506": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "be1fbf70-ce92-556e-a2ce-9b0006f1391c",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r507": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "009756fb-8f4d-51ba-8934-c6cebffc1af6",
+    "ranks": {
+      "S2": 1,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r508": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "148c2827-b532-5748-a444-305c4550dfdf",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r509": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r510": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "57afe469-6e70-5c72-8c5e-3ea7a7bd4608",
+    "ranks": {
+      "S3": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r511": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5e5a09a6-f313-5435-b254-569c8e72e3da",
+    "ranks": {
+      "S4": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r512": {
+    "query_id": "q14",
+    "need_id": "q14",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "06a3d55d-401f-556d-995f-7a7ff30e3604",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r513": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8408630c-d94a-556d-908b-cf8f11b84795",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": "p138"
+  },
+  "r514": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c234c384-9da5-5f07-a2c0-dc2e846587b1",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r515": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1e70719e-e7e3-59ea-946b-030e6dfc6bbb",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r516": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4a846aeb-9e68-53b7-b672-1288b28d9b70",
+    "ranks": {
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r517": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "696231de-8c0f-5134-9b12-fc0579ba0919",
+    "ranks": {
+      "S2": 1,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r518": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "d45423b7-259f-5aaa-83a4-559556703aa7",
+    "ranks": {
+      "S2": 4,
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r519": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2d990836-2579-50d1-bcc1-ac8947245633",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r520": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "a80923a2-d538-516c-9a67-32458293fc1c",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r521": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4908d55c-23b9-54c5-bb3f-3a04299d08b1",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r522": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "19f27763-da0f-5a19-b061-3099c868d64a",
+    "ranks": {
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r523": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b9d2064-7f07-5e70-a874-691bf758a4ef",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r524": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "12bd83e9-6cb0-58bd-9bde-536b80d264d9",
+    "ranks": {
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r525": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "97b8fc2c-1006-5871-a689-31ee6caabc36",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r526": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5cfd18ed-5941-5b0d-ad2b-94e2f8e2effd",
+    "ranks": {
+      "S4": 4,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r527": {
+    "query_id": "q44",
+    "need_id": "q44",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1b486708-29ad-5a02-ac27-d84429bce6d4",
+    "ranks": {
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r528": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1877e538-2d02-5ce0-912e-c687e0b6570c",
+    "ranks": {
+      "S2": 4,
+      "S3": 5,
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r529": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "85110ad5-385e-5541-b11f-f9d063cbf71b",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r530": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fe4aad61-54ca-599b-a3a7-9af243843654",
+    "ranks": {
+      "S2": 3,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r531": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "33b1c47a-1c8c-5ef7-95ad-50d742832421",
+    "ranks": {
+      "S2": 2,
+      "S3": 4,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r532": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fe7fd29b-509d-554c-8303-daedfdceb686",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r533": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7045e5db-4337-5b7a-965f-190a4c0f939e",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r534": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cf2d573c-8e8b-5483-b8fb-6839b32fce25",
+    "ranks": {
+      "S2": 5,
+      "S3": 2,
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r535": {
+    "query_id": "q23",
+    "need_id": "q23",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8c74c7e3-ed1e-5ecc-a54d-ca0fbae18c30",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r536": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4943de4f-4453-583d-84b9-d70cc3d27439",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r537": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1ab09d09-f7d3-5c81-ab37-813a6247cc79",
+    "ranks": {
+      "S2": 1,
+      "S3": 3,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r538": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b9d688bc-9f95-5952-ae8f-98f70cb69497",
+    "ranks": {
+      "S4": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r539": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "167c0421-eaf5-5094-889a-797df9e57757",
+    "ranks": {
+      "S2": 3,
+      "S3": 1,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r540": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "80658f37-38ff-5ca8-b6aa-3f8a48824977",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r541": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2ea8adae-74ba-50d6-ba81-4345e00d9e14",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r542": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "05747af6-9f25-5b10-ac34-7f9f61f18524",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r543": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1483e73c-e21b-5f5a-9ae1-ced76cf13797",
+    "ranks": {
+      "S2": 2,
+      "S3": 2,
+      "S4": 3,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r544": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e6de4919-b1c0-52d0-aeaa-baae9c00de20",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r545": {
+    "query_id": "q28",
+    "need_id": "q28",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "597435c2-93bf-5dd1-9dc2-b857e699e285",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r546": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1e9f1d85-e752-5575-889c-29f81b18f6aa",
+    "ranks": {
+      "S2": 2,
+      "S3": 4,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r547": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "bd383cb5-aec1-57b3-b0c2-1588157e2e00",
+    "ranks": {
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r548": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "25918790-53ca-5520-b041-feb9a1c42a4e",
+    "ranks": {
+      "S2": 1,
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r549": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5e5a09a6-f313-5435-b254-569c8e72e3da",
+    "ranks": {
+      "S2": 4,
+      "S4": 3,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r550": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "5b2c4202-6223-53f8-9615-fb025db62010",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r551": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e971118a-f171-5b90-9a84-b4d701af1e9d",
+    "ranks": {
+      "S2": 5,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r552": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1297f128-0d58-5c19-8124-d16ae772a689",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r553": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "86ca64b9-bab6-53e3-bc46-c15205810b10",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r554": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "6265816b-4819-51c7-9fda-c6713081a0d7",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r555": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "7864b52c-d888-5f4e-a6ad-0e46a17ca6aa",
+    "ranks": {
+      "S2": 3,
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r556": {
+    "query_id": "q13",
+    "need_id": "q13",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "4c804478-e6f6-54ce-884d-36a6f8c56b0d",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r557": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f122e17f-3328-5e77-b27f-89ba26f02af7",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r558": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ea3abb4d-4b0e-535a-85b9-a3a10a2fd6b2",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r559": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cac76bc0-fd96-53ef-9d8a-75e3c5473c7f",
+    "ranks": {
+      "S2": 4,
+      "S3": 1,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r560": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "07d88e8b-0603-5004-ab5a-105f7765709d",
+    "ranks": {
+      "S2": 2,
+      "S3": 4,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r561": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cdae8fa8-d2cd-53bc-834d-b773c5f26498",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r562": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e0544b2d-4f49-57a4-b9e7-39d693fa6e87",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r563": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "a8eefa8e-75b6-5074-9503-f50a96964548",
+    "ranks": {
+      "S2": 5,
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r564": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f646edd5-9fe6-5ffb-ab22-799705f78910",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r565": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c2cc3bbc-3089-57a6-9f07-51e586d39fac",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r566": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "94d50ccb-16be-5ada-8635-02f9adf66af8",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r567": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "d1bc37cf-fe66-5de4-afbc-f8e0c08be1d7",
+    "ranks": {
+      "S2": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r568": {
+    "query_id": "q02",
+    "need_id": "q02",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9a635799-766c-56f0-91b7-611f40129981",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r569": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "c94b2d05-40a7-508a-9d18-06ac05c78d23",
+    "ranks": {
+      "S3": 5,
+      "S4": 4,
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r570": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ce183c66-6cef-59b2-a3f4-a052c817c365",
+    "ranks": {
+      "S2": 1,
+      "S3": 1,
+      "S4": 2,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r571": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1ad6750c-aa5e-5af5-b4dc-11050be8bfbc",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r572": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "981a358d-9daf-5afb-a604-e04e287aee88",
+    "ranks": {
+      "S2": 4,
+      "S4": 3,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r573": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1002c328-476f-5848-a46d-49945305622f",
+    "ranks": {
+      "S4": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r574": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1c259df8-803a-5374-a017-701709abf5b1",
+    "ranks": {
+      "S2": 3,
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r575": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "882db428-36a6-5923-8435-49cba3a7b856",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": "p090"
+  },
+  "r576": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0fbc9c82-4d4f-5781-a10e-95fc72b678dc",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r577": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "89e1432e-57a5-5964-83d9-13b72b042cda",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r578": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "437aa076-aac2-50eb-a39f-f2539c3bfeed",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r579": {
+    "query_id": "q21",
+    "need_id": "q21",
+    "language": "es",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "750d36cf-a92e-59d3-9a00-53e11f38f848",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r580": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "cbcf1e36-709d-5a4b-8a7f-47d4c94f0fc0",
+    "ranks": {
+      "S2": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r581": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "1d8fda5d-38a2-507c-9d17-b2e09498c638",
+    "ranks": {
+      "S3": 4,
+      "S4": 4,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r582": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "20a72ec3-b54c-557c-b4ec-23822cb59fa1",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r583": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "2b211fb4-a073-5c96-beaa-9e74fcc967a2",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": "p199"
+  },
+  "r584": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "bd383cb5-aec1-57b3-b0c2-1588157e2e00",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r585": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "67262705-522a-537c-964b-fa527f64fb7a",
+    "ranks": {
+      "S2": 3,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r586": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "132254b7-e271-5c32-91cd-a544a1eea988",
+    "ranks": {
+      "S4": 1,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r587": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "fe2c446d-b9bf-5a4f-9803-a456f0919474",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r588": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "455a104d-2174-5c40-9f4e-269897c1fb80",
+    "ranks": {
+      "S2": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r589": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "e9512e42-14db-55a2-b39b-365e22c8c1b1",
+    "ranks": {
+      "S2": 2,
+      "S4": 2,
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r590": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "def14455-86d8-5ec6-85a4-1a89dc4a6d1f",
+    "ranks": {
+      "S4": 5,
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r591": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "6265816b-4819-51c7-9fda-c6713081a0d7",
+    "ranks": {
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r592": {
+    "query_id": "q41",
+    "need_id": "q41",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0dc7fa1d-83c1-50db-aa71-0c081bd0194c",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r593": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8c74c7e3-ed1e-5ecc-a54d-ca0fbae18c30",
+    "ranks": {
+      "S2": 3,
+      "S4": 2,
+      "S5": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r594": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "f5c809fe-1e77-5982-910c-17ab29ef67f9",
+    "ranks": {
+      "S5": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r595": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ae471693-7fc7-53ac-ab83-e834397f7496",
+    "ranks": {
+      "S2": 4,
+      "S3": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r596": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "edbeb714-c5fb-53c2-9550-4fe14cf3fe29",
+    "ranks": {
+      "S3": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r597": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "002cfdcf-7010-5ad0-b2eb-71b316c73f9d",
+    "ranks": {
+      "S2": 5
+    },
+    "earlier_pair_id": null
+  },
+  "r598": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ebde1e03-ff5e-5f39-9d02-27967a2f800f",
+    "ranks": {
+      "S3": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r599": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9538e6ea-7262-581e-9262-8ed0d3adead5",
+    "ranks": {
+      "S2": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r600": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "9c852a07-9fcd-54a0-85c0-ea4ad20d7c9e",
+    "ranks": {
+      "S4": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r601": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "0cf71020-fd39-530f-92de-74d6cb92932d",
+    "ranks": {
+      "S3": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r602": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "6109a077-f9d2-5c0e-952f-867a776517fe",
+    "ranks": {
+      "S4": 5,
+      "S5": 3
+    },
+    "earlier_pair_id": null
+  },
+  "r603": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "ebb78cb5-ea22-5ced-b7f0-8aa2eb268583",
+    "ranks": {
+      "S2": 1,
+      "S3": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r604": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "8b0f38fd-8b3d-5353-977d-03dfeedda956",
+    "ranks": {
+      "S5": 2
+    },
+    "earlier_pair_id": null
+  },
+  "r605": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "73529484-15bd-54aa-9ea6-1267a7cda792",
+    "ranks": {
+      "S4": 4
+    },
+    "earlier_pair_id": null
+  },
+  "r606": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "eaf6031a-2dbb-5dbe-be59-a87198314f2e",
+    "ranks": {
+      "S4": 1
+    },
+    "earlier_pair_id": null
+  },
+  "r607": {
+    "query_id": "q20",
+    "need_id": "q20",
+    "language": "en",
+    "stratum": "A",
+    "block": 2,
+    "work_id": "b1804e86-39f8-5867-8893-1c2bbd3b1517",
+    "ranks": {
+      "S5": 5
+    },
+    "earlier_pair_id": null
+  }
+}

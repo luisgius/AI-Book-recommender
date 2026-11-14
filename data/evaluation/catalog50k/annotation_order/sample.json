@@ -1,0 +1,458 @@
+{
+  "sample": {
+    "block_1": {
+      "rule": "strata A and B, languages ['en', 'es']; 30 queries split between the languages as evenly as the counts allow; inside each language every stratum B query first, then a seeded sample of stratum A (random.Random(0).sample over sorted ids); all if at most 30 are eligible",
+      "seed": 0,
+      "target": 30,
+      "queries": 30,
+      "fewer_than_target": false,
+      "available": {
+        "en": {
+          "B": 6,
+          "A": 24
+        },
+        "es": {
+          "B": 6,
+          "A": 20
+        }
+      },
+      "quota": {
+        "en": 15,
+        "es": 15
+      },
+      "selected": {
+        "en": {
+          "B": 6,
+          "A": 9
+        },
+        "es": {
+          "B": 6,
+          "A": 9
+        }
+      },
+      "query_ids": {
+        "en": {
+          "B": [
+            "b-en-1",
+            "b-en-2",
+            "b-en-3",
+            "b-en-4",
+            "b-en-5",
+            "b-en-6"
+          ],
+          "A": [
+            "q04",
+            "q16",
+            "q18",
+            "q24",
+            "q26",
+            "q30",
+            "q32",
+            "q35",
+            "q43"
+          ]
+        },
+        "es": {
+          "B": [
+            "b-es-1",
+            "b-es-2",
+            "b-es-3",
+            "b-es-4",
+            "b-es-5",
+            "b-es-6"
+          ],
+          "A": [
+            "q03",
+            "q05",
+            "q10",
+            "q15",
+            "q25",
+            "q27",
+            "q33",
+            "q36",
+            "q42"
+          ]
+        }
+      }
+    },
+    "block_2": {
+      "rule": "every eligible query not in block 1",
+      "queries": 26,
+      "selected": {
+        "en": {
+          "B": 0,
+          "A": 15
+        },
+        "es": {
+          "B": 0,
+          "A": 11
+        }
+      },
+      "query_ids": {
+        "en": {
+          "B": [],
+          "A": [
+            "q01",
+            "q06",
+            "q08",
+            "q09",
+            "q11",
+            "q13",
+            "q14",
+            "q20",
+            "q22",
+            "q28",
+            "q34",
+            "q38",
+            "q39",
+            "q40",
+            "q41"
+          ]
+        },
+        "es": {
+          "B": [],
+          "A": [
+            "q02",
+            "q07",
+            "q12",
+            "q17",
+            "q19",
+            "q21",
+            "q23",
+            "q29",
+            "q31",
+            "q37",
+            "q44"
+          ]
+        }
+      }
+    }
+  },
+  "sheet": {
+    "pairs": 607,
+    "queries": 56,
+    "blocks": {
+      "block_1": {
+        "pairs": 313,
+        "queries": 30,
+        "query_order": [
+          "b-en-4",
+          "b-es-5",
+          "q18",
+          "q16",
+          "b-en-6",
+          "b-en-1",
+          "b-es-2",
+          "q35",
+          "q43",
+          "q05",
+          "q25",
+          "q33",
+          "q26",
+          "b-en-3",
+          "q24",
+          "b-en-5",
+          "q30",
+          "b-es-1",
+          "b-es-6",
+          "q27",
+          "b-es-4",
+          "q42",
+          "q10",
+          "q15",
+          "b-es-3",
+          "b-en-2",
+          "q04",
+          "q32",
+          "q03",
+          "q36"
+        ],
+        "pairs_per_query": {
+          "b-en-4": 12,
+          "b-es-5": 13,
+          "q18": 11,
+          "q16": 14,
+          "b-en-6": 9,
+          "b-en-1": 8,
+          "b-es-2": 12,
+          "q35": 10,
+          "q43": 9,
+          "q05": 8,
+          "q25": 10,
+          "q33": 11,
+          "q26": 9,
+          "b-en-3": 11,
+          "q24": 12,
+          "b-en-5": 8,
+          "q30": 10,
+          "b-es-1": 9,
+          "b-es-6": 8,
+          "q27": 12,
+          "b-es-4": 14,
+          "q42": 8,
+          "q10": 8,
+          "q15": 12,
+          "b-es-3": 9,
+          "b-en-2": 10,
+          "q04": 14,
+          "q32": 12,
+          "q03": 9,
+          "q36": 11
+        },
+        "pairs_per_query_summary": {
+          "min": 8,
+          "median": 10.0,
+          "max": 14
+        },
+        "overlap_with_earlier_sheet": {
+          "pairs": 15,
+          "earlier_pair_ids": [
+            "p004",
+            "p015",
+            "p017",
+            "p033",
+            "p048",
+            "p054",
+            "p073",
+            "p077",
+            "p089",
+            "p097",
+            "p119",
+            "p143",
+            "p167",
+            "p179",
+            "p186"
+          ],
+          "graded_in_earlier_sheet": 15
+        },
+        "time_estimate": {
+          "pairs": 313,
+          "seconds_per_pair": [
+            30,
+            45
+          ],
+          "minutes": [
+            156,
+            235
+          ],
+          "basis": "30 to 45 s per pair; the pace of the earlier sheet cannot be inferred (no times were recorded)"
+        }
+      },
+      "block_2": {
+        "pairs": 294,
+        "queries": 26,
+        "query_order": [
+          "q22",
+          "q01",
+          "q40",
+          "q31",
+          "q11",
+          "q09",
+          "q12",
+          "q17",
+          "q39",
+          "q37",
+          "q08",
+          "q06",
+          "q38",
+          "q07",
+          "q29",
+          "q19",
+          "q34",
+          "q14",
+          "q44",
+          "q23",
+          "q28",
+          "q13",
+          "q02",
+          "q21",
+          "q41",
+          "q20"
+        ],
+        "pairs_per_query": {
+          "q22": 12,
+          "q01": 12,
+          "q40": 9,
+          "q31": 12,
+          "q11": 13,
+          "q09": 9,
+          "q12": 12,
+          "q17": 9,
+          "q39": 12,
+          "q37": 11,
+          "q08": 12,
+          "q06": 14,
+          "q38": 9,
+          "q07": 10,
+          "q29": 7,
+          "q19": 11,
+          "q34": 10,
+          "q14": 15,
+          "q44": 15,
+          "q23": 8,
+          "q28": 10,
+          "q13": 11,
+          "q02": 12,
+          "q21": 11,
+          "q41": 13,
+          "q20": 15
+        },
+        "pairs_per_query_summary": {
+          "min": 7,
+          "median": 11.5,
+          "max": 15
+        },
+        "overlap_with_earlier_sheet": {
+          "pairs": 14,
+          "earlier_pair_ids": [
+            "p001",
+            "p025",
+            "p036",
+            "p049",
+            "p058",
+            "p060",
+            "p072",
+            "p090",
+            "p094",
+            "p128",
+            "p138",
+            "p163",
+            "p164",
+            "p199"
+          ],
+          "graded_in_earlier_sheet": 14
+        },
+        "time_estimate": {
+          "pairs": 294,
+          "seconds_per_pair": [
+            30,
+            45
+          ],
+          "minutes": [
+            147,
+            220
+          ],
+          "basis": "30 to 45 s per pair; the pace of the earlier sheet cannot be inferred (no times were recorded)"
+        }
+      }
+    }
+  },
+  "power": {
+    "block_1": {
+      "metric": "nDCG@5 on the sheet's pairs",
+      "queries": 30,
+      "by_judge": {
+        "z-ai/glm-5.3-flash": {
+          "ndcg_at_5_mean": {
+            "S2": 0.7367671619572821,
+            "S3": 0.6267802328273943,
+            "S4": 0.8433711328587286,
+            "S5": 0.838769550556819
+          },
+          "contrasts": {
+            "H1": {
+              "queries": 30,
+              "mean_difference": -0.10998692912988796,
+              "sd": 0.30045107268531274,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.15904664256880705
+            },
+            "H3": {
+              "queries": 30,
+              "mean_difference": -0.004601582301909479,
+              "sd": 0.08105965197695532,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.04290970033657973
+            }
+          }
+        },
+        "minimax/minimax-m3.1-flash": {
+          "ndcg_at_5_mean": {
+            "S2": 0.7502930297015308,
+            "S3": 0.6727298851805211,
+            "S4": 0.8497772092253333,
+            "S5": 0.8273124867104561
+          },
+          "contrasts": {
+            "H1": {
+              "queries": 30,
+              "mean_difference": -0.07756314452100971,
+              "sd": 0.24464460865611015,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.12950495826675776
+            },
+            "H3": {
+              "queries": 30,
+              "mean_difference": -0.02246472251487731,
+              "sd": 0.0764474963907147,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.040468211762615336
+            }
+          }
+        }
+      }
+    },
+    "blocks_1_and_2": {
+      "metric": "nDCG@5 on the sheet's pairs",
+      "queries": 56,
+      "by_judge": {
+        "z-ai/glm-5.3-flash": {
+          "ndcg_at_5_mean": {
+            "S2": 0.7066256637501453,
+            "S3": 0.6416346882241528,
+            "S4": 0.832927258206193,
+            "S5": 0.8017805762737387
+          },
+          "contrasts": {
+            "H1": {
+              "queries": 56,
+              "mean_difference": -0.06499097552599271,
+              "sd": 0.27222000112688893,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.10375610013594988
+            },
+            "H3": {
+              "queries": 56,
+              "mean_difference": -0.031146681932454425,
+              "sd": 0.11756772487472912,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.04481069937683315
+            }
+          }
+        },
+        "minimax/minimax-m3.1-flash": {
+          "ndcg_at_5_mean": {
+            "S2": 0.7320781088203983,
+            "S3": 0.6615857243810207,
+            "S4": 0.8210991072982834,
+            "S5": 0.7873109807900879
+          },
+          "contrasts": {
+            "H1": {
+              "queries": 56,
+              "mean_difference": -0.07049238443937747,
+              "sd": 0.20062460830992956,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.076467661683088
+            },
+            "H3": {
+              "queries": 56,
+              "mean_difference": -0.03378812650819561,
+              "sd": 0.1630703416160809,
+              "alpha": 0.05,
+              "power": 0.8,
+              "minimum_detectable_difference": 0.06215392926265914
+            }
+          }
+        }
+      }
+    }
+  }
+}

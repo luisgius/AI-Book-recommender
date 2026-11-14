@@ -241,6 +241,83 @@ def cmd_annotation_agreement(args: argparse.Namespace) -> int:
     return 0
 
 
+def _judge_grades(data_dir: Path) -> Dict[str, Any]:
+    """{judge model: {need_id: {work_id: grade}}} from the saved judgment caches (no network)."""
+    from app.evaluation.catalog_evaluation.results import POOL_FILE, load_grades
+
+    pool = json.loads((data_dir / POOL_FILE).read_text(encoding="utf-8"))
+    return {m: load_grades(data_dir, m, pool) for m in D.JUDGES}
+
+
+def cmd_order_sheet(args: argparse.Namespace) -> int:
+    """V31: the blind two-block sheet of the top 5 of S2-S5, its key, instructions and power (no network)."""
+    from app.evaluation.catalog_evaluation import annotation_order as O
+    from app.evaluation.catalog_evaluation.annotation import KEY_FILE as EARLIER_KEY
+    from app.evaluation.catalog_evaluation.annotation import read_sheet
+    from app.evaluation.catalog_evaluation.runs import LocalCatalog, load_runs
+
+    queries = _queries(args.data_dir)
+    block_1, sample_1 = O.select_queries(queries)
+    block_2, sample_2 = O.remaining_queries(queries, block_1)
+    lists = O.top_lists(block_1 + block_2, load_runs(args.data_dir, O.ORDER_SYSTEMS))
+    ids = sorted({w for by in lists.values() for top in by.values() for w in top})
+    books = dict(zip(ids, LocalCatalog(D.SOURCE_CATALOG).books(ids)))
+    earlier_key = json.loads((args.data_dir / "annotation" / EARLIER_KEY).read_text(encoding="utf-8"))
+    out_dir = args.data_dir / O.ORDER_DIR
+    sheet = O.build_order_sheet([block_1, block_2], lists, books, out_dir, earlier_key)
+    earlier_filled = args.data_dir / O.EARLIER_FILLED_SHEET
+    if earlier_filled.exists():
+        graded = read_sheet(earlier_filled)
+        for block in sheet["blocks"].values():
+            overlap = block["overlap_with_earlier_sheet"]
+            overlap["graded_in_earlier_sheet"] = sum(1 for p in overlap["earlier_pair_ids"] if p in graded)
+    key = json.loads((out_dir / O.KEY_FILE).read_text(encoding="utf-8"))
+    judges = _judge_grades(args.data_dir)
+    power = {"block_1": O.design_power(key, judges, [q.query_id for q in block_1]),
+             "blocks_1_and_2": O.design_power(key, judges)}
+    _write_json(out_dir / O.SAMPLE_FILE, {"sample": {"block_1": sample_1, "block_2": sample_2},
+                                          "sheet": sheet, "power": power})
+    for name, block in sheet["blocks"].items():
+        log(f"{name}: {block['queries']} queries, {block['pairs']} pairs ({block['pairs_per_query_summary']}), "
+            f"overlap with the 200-pair sheet {block['overlap_with_earlier_sheet']['pairs']}, "
+            f"{block['time_estimate']['minutes']} minutes")
+    for name, block in power.items():
+        for model, row in block["by_judge"].items():
+            log(f"{name} ({block['queries']} queries) {model}: " + ", ".join(
+                f"{c} mean {r['mean_difference']:+.3f} sd {r['sd']:.3f} mde {r['minimum_detectable_difference']:.3f}"
+                for c, r in row["contrasts"].items()))
+    log(f"Wrote {out_dir / O.SHEET_FILE}, {O.KEY_FILE}, {O.INSTRUCTIONS_FILE}, {O.SAMPLE_FILE}")
+    return 0
+
+
+def cmd_order_agreement(args: argparse.Namespace) -> int:
+    """V31: the declared analysis of a filled order sheet (no network)."""
+    from app.evaluation.catalog_evaluation import annotation_order as O
+    from app.evaluation.catalog_evaluation.runs import load_runs
+
+    out_dir = args.data_dir / O.ORDER_DIR
+    key = json.loads((out_dir / O.KEY_FILE).read_text(encoding="utf-8"))
+    mismatched = O.check_key_against_runs(key, load_runs(args.data_dir, O.ORDER_SYSTEMS))
+    if mismatched:
+        raise SystemExit(f"The key does not match the stored run files for {mismatched}")
+    earlier = Path(args.earlier_sheet) if args.earlier_sheet else args.data_dir / O.EARLIER_FILLED_SHEET
+    second = Path(args.second_sheet) if args.second_sheet else None
+    document = O.order_agreement(Path(args.sheet), key, _judge_grades(args.data_dir), earlier, second)
+    _write_json(args.output or out_dir / O.RESULT_FILE, document)
+    cells = document["cells"][O.FIRST]
+    log(f"{cells['graded']} of {cells['rows']} pairs graded {cells['graded_by_block']}, {cells['empty']} empty, "
+        f"{len(cells['invalid'])} invalid")
+    block = document[O.FIRST]
+    selection = block["selection"]
+    log(f"Primary set: {selection['primary_set']} ({len(selection['primary'])} queries); "
+        f"partial block 2 queries not used: {selection['partial_not_used']}")
+    for name, figures in block["primary"]["figures"].items():
+        log(f"{name}: " + ", ".join(f"{c} {r.get('difference', float('nan')):+.3f}"
+                                    for c, r in figures["contrasts"].items()) + f"; order {figures['ordering']}")
+    log(f"Reading rule: {block['primary']['reading_rule']}")
+    return 0
+
+
 def cmd_report(args: argparse.Namespace) -> int:
     from app.evaluation.catalog_evaluation.report import build_markdown
     from app.evaluation.catalog_evaluation.report_meta import report_meta
@@ -291,6 +368,15 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--sheet", required=True)
     a.add_argument("--output", type=Path, default=None)
     a.set_defaults(func=cmd_annotation_agreement)
+    sub.add_parser("order-sheet", help="V31: blind sheet of the top 5 of S2-S5 on es/en queries, two blocks (no network)"
+                   ).set_defaults(func=cmd_order_sheet)
+    o = sub.add_parser("order-agreement", help="V31: system order with a person's grades vs the judges (no network)")
+    o.add_argument("--sheet", required=True, help="the filled order sheet (column grade, optionally grade_2)")
+    o.add_argument("--second-sheet", default=None, help="a separate copy where a second person filled grade_2")
+    o.add_argument("--earlier-sheet", default=None,
+                   help="the filled 200-pair sheet (default: annotation/annotation_sheet_filled.csv)")
+    o.add_argument("--output", type=Path, default=None)
+    o.set_defaults(func=cmd_order_agreement)
     rp = sub.add_parser("report", help="results.json and the markdown report from saved files")
     rp.add_argument("--offline", action="store_true", help="no API call and no database connection (always true)")
     rp.add_argument("--output", type=Path, default=None,
