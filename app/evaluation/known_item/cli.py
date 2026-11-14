@@ -1,4 +1,4 @@
-"""Command line of the known-item evaluation: sample | run | report."""
+"""Command line of the known-item evaluation: sample | run | report | compare."""
 
 import argparse
 import json
@@ -57,6 +57,16 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_compare(args: argparse.Namespace) -> int:
+    """Compare --data-dir (the original run) with --with (a replication from the same sample); no network."""
+    from app.evaluation.known_item.compare import REPLICATION_JSON, REPLICATION_MD, write_comparison
+
+    out_dir = args.out_dir or args.other
+    write_comparison(args.data_dir, args.other, out_dir)
+    log(f"Wrote {out_dir / REPLICATION_JSON} and {out_dir / REPLICATION_MD}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m app.evaluation.known_item", description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=D.DATA_DIR)
@@ -67,6 +77,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("run", help="phase 2: run every system against the deployed catalog (paid, cap "
                                f"{D.SPEND_CAP_USD:.2f} USD)").set_defaults(func=cmd_run)
     sub.add_parser("report", help="results.json and KNOWN_ITEM.md from the saved files").set_defaults(func=cmd_report)
+    c = sub.add_parser("compare", help="compare --data-dir (original) with another run folder (no network)")
+    c.add_argument("--with", dest="other", type=Path, required=True, help="the replication's data folder")
+    c.add_argument("--out-dir", type=Path, default=None, help="where to write (default: the --with folder)")
+    c.set_defaults(func=cmd_compare)
     return parser
 
 

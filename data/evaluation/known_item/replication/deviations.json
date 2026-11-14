@@ -1,0 +1,4 @@
+[
+  {"desviacion": "En el paso de embeddings el proveedor respondió siete veces «Model busy, retry later» (HTTP 429); el adaptador repitió cada petición al cabo de uno a cuatro segundos y las 900 consultas quedaron codificadas sin ningún intento fallido",
+   "motivo": "saturación momentánea del proveedor; la repetición la hace el adaptador sin cambios y no cambia ningún resultado"}
+]

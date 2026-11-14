@@ -6,5 +6,7 @@
   {"desviacion": "Veinticuatro peticiones al reranker agotaron el tiempo de espera y el adaptador las repitió al cabo de un segundo; ninguna consulta llegó a los tres intentos fallidos, las 450 consultas de prueba tienen orden reordenado y el registro de gasto no tiene llamadas con error",
    "motivo": "fallos del proveedor; la repetición la hace el adaptador de V14 sin cambios"},
   {"desviacion": "Durante la ejecución, antes de leer ningún resultado, se amplió el código del informe (`report.py`) para incluir las frases de la regla de decisión en español, los límites de la sección 9, esta sección y el gasto por modelo; el análisis (`analysis.py`) y el diseño no se tocaron",
-   "motivo": "el encargo pide que el informe repita los límites, liste las desviaciones y aplique la regla de decisión en una frase por tipo"}
+   "motivo": "el encargo pide que el informe repita los límites, liste las desviaciones y aplique la regla de decisión en una frase por tipo"},
+  {"desviacion": "Corrección de la causa, sin cambiar ningún resultado: el 2026-11-14 el registro de energía del sistema (`pmset -g log`) mostró que el Mac estuvo en reposo por inactividad desde las 11:02 hasta después de la ejecución, con despertares breves (unos 45 segundos) cada 15 minutos, conectado a la corriente; eso explica las esperas atribuidas arriba a Postgres y al límite de dos horas",
+   "motivo": "la causa de la lentitud se encontró después de escribir las entradas anteriores, que se dejan como estaban; la ejecución se repitió con la máquina despierta en `data/evaluation/known_item/replication/` y se informa junto a esta"}
 ]
