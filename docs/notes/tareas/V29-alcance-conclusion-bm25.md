@@ -108,6 +108,7 @@ Gasto real: 0.9695 USD en 1764 llamadas (900 de embeddings, 864 del reranker), c
 
 - **La parte A es post hoc.** Se decidió después de conocer los resultados de V14, no está en su protocolo, se informa sea cual sea su dirección y no sustituye a ningún resultado publicado.
 - **La parte B se diseñó después de conocer los resultados de V14**, a raíz de la revisión. Su protocolo se guardó en git antes de ejecutar ningún sistema, pero no antes de saber qué había salido en V14.
+- **El motivo del protocolo está redactado con más fuerza de la debida.** `PROTOCOL.md` dice que ninguna consulta de V14 pide un libro por su título o por su autor. Lo exacto es que ninguna es solo un título o un nombre de autor: varias consultas de obra conocida del estrato B nombran al autor dentro de la descripción. Lo detectó el verificador de la ronda 14 de la memoria; el protocolo no se corrige porque se guardó antes de medir, y la memoria usa la redacción exacta.
 - **Un título exacto tal como está guardado es el caso más favorable para la búsqueda léxica.** Los usuarios reales escriben títulos parciales o con errores, que no se miden.
 - **El título y los autores están en el texto que indexan las dos ramas**, así que la rama vectorial también los ve.
 - **La muestra es de libros del catálogo, no de peticiones de usuarios.** Dice cómo se encuentra un libro que existe, no con qué frecuencia la gente busca así.
