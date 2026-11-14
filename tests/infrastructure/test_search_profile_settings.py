@@ -1,8 +1,12 @@
 """SearchProfileSettings, database_url() and the cloud wiring of the API dependencies (no network)."""
 
+import inspect
+
 import pytest
 
 from app.api.v1 import dependencies as deps
+from app.domain.services import SearchService
+from app.domain.value_objects import CANDIDATES_HYBRID, DEFAULT_CANDIDATES
 from app.infrastructure.config.settings import SearchProfileSettings, database_url
 
 POOLED = "postgresql://user:secret@ep-x-pooler.example/db"
@@ -11,9 +15,9 @@ DIRECT = "postgresql://user:secret@ep-x.example/db"
 
 def test_defaults_keep_the_local_profile():
     settings = SearchProfileSettings.from_env({})
-    assert settings == SearchProfileSettings("local", "catalog", "bm25", "approximate", "vector")
+    assert settings == SearchProfileSettings("local", "catalog", "bm25", "approximate", "hybrid")
     assert settings.is_cloud is False
-    assert settings.describe() == {"name": "local", "candidates": "vector"}
+    assert settings.describe() == {"name": "local", "candidates": "hybrid"}
 
 
 def test_cloud_profile_from_env():
@@ -22,7 +26,7 @@ def test_cloud_profile_from_env():
         "PG_LEXICAL_RANKING": "TS_RANK_CD", "PG_VECTOR_SEARCH": "exact", "DATABASE_URL": POOLED,
     })
     assert settings.is_cloud
-    assert settings.describe() == {"name": "cloud", "candidates": "vector", "schema": "eval177",
+    assert settings.describe() == {"name": "cloud", "candidates": "hybrid", "schema": "eval177",
                                    "lexical_ranking": "ts_rank_cd", "vector_search": "exact"}
     assert "secret" not in repr(settings)  # the connection string is never stored
 
@@ -41,11 +45,11 @@ def test_invalid_values_are_rejected(env):
 
 
 @pytest.mark.parametrize("profile", ["local", "cloud"])
-def test_search_candidates_default_to_vector_in_both_profiles_and_hybrid_is_selectable(profile):
-    assert SearchProfileSettings.from_env({"SEARCH_PROFILE": profile}).candidates == "vector"
-    hybrid = SearchProfileSettings.from_env({"SEARCH_PROFILE": profile, "SEARCH_CANDIDATES": " Hybrid "})
-    assert hybrid.candidates == "hybrid"
-    assert hybrid.describe()["candidates"] == "hybrid"
+def test_search_candidates_default_to_hybrid_in_both_profiles_and_vector_is_selectable(profile):
+    assert SearchProfileSettings.from_env({"SEARCH_PROFILE": profile}).candidates == "hybrid"
+    vector = SearchProfileSettings.from_env({"SEARCH_PROFILE": profile, "SEARCH_CANDIDATES": " Vector "})
+    assert vector.candidates == "vector"
+    assert vector.describe()["candidates"] == "vector"
 
 
 def test_database_url_pooled_direct_and_fallback():
@@ -135,7 +139,7 @@ def test_health_reports_the_profile(cloud, monkeypatch):
         body = TestClient(app).get("/api/v1/health").json()
     finally:
         app.dependency_overrides.clear()
-    assert body["profile"] == {"name": "cloud", "candidates": "vector", "schema": "eval177",
+    assert body["profile"] == {"name": "cloud", "candidates": "hybrid", "schema": "eval177",
                                "lexical_ranking": "ts_rank_cd", "vector_search": "exact"}
     assert body["database"] == {"reachable": True, "latency_ms": 1.0} and body["status"] == "ok"
 
@@ -149,3 +153,26 @@ def test_the_search_service_takes_the_candidate_mode_of_the_settings(cloud, monk
     monkeypatch.setattr(deps, "get_usage_budget", lambda: None)
 
     assert deps.get_search_service().candidate_mode == candidates
+
+
+def test_the_domain_and_the_application_share_one_default_candidate_mode(cloud, monkeypatch):
+    """
+    One default candidate mode (V30): SearchService's own default, the settings
+    without SEARCH_CANDIDATES (both profiles) and the service the application
+    wires must agree, whoever builds the service. Fails if any of them gets a
+    default of its own.
+    """
+    domain_default = inspect.signature(SearchService.__init__).parameters["candidates"].default
+    assert domain_default == DEFAULT_CANDIDATES == CANDIDATES_HYBRID
+
+    assert SearchProfileSettings().candidates == domain_default
+    for profile in ("local", "cloud"):
+        assert SearchProfileSettings.from_env({"SEARCH_PROFILE": profile}).candidates == domain_default
+
+    # The application's wiring, with settings read from an environment without SEARCH_CANDIDATES
+    monkeypatch.setattr(deps, "_profile_settings", SearchProfileSettings.from_env(
+        {"SEARCH_PROFILE": "cloud", "DATABASE_SCHEMA": "eval177"}))
+    monkeypatch.setattr(deps, "get_llm_client", lambda: None)
+    monkeypatch.setattr(deps, "get_reranker", lambda: None)
+    monkeypatch.setattr(deps, "get_usage_budget", lambda: None)
+    assert deps.get_search_service().candidate_mode == domain_default

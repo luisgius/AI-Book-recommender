@@ -45,10 +45,10 @@ def search_books(
     """
     Search for books.
 
-    The candidates come from the vector search (SEARCH_CANDIDATES=vector,
-    the default) or from BM25 and vector search fused with Reciprocal Rank
-    Fusion (SEARCH_CANDIDATES=hybrid); the reranker, when configured, then
-    orders them. If the embedding or the vector search fails, or the daily
+    The candidates come from BM25 and vector search fused with Reciprocal
+    Rank Fusion (SEARCH_CANDIDATES=hybrid, the default) or from the vector
+    search alone (SEARCH_CANDIDATES=vector); the reranker, when configured,
+    then orders them. If the embedding or the vector search fails, or the daily
     budget of model-backed searches is spent, BM25 alone answers and the
     response says so (degraded, search_mode "lexical_only").
 

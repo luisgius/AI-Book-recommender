@@ -5,7 +5,7 @@
 #   make demo    install everything and start the web UI over the 177-book
 #                local profile, with the LLM off (no API key needed);
 #                make demo LLM=on uses OPENROUTER_API_KEY;
-#                make demo CANDIDATES=hybrid fuses BM25 and vector search
+#                make demo CANDIDATES=vector uses the vector candidates alone
 #   make test    run the test suite
 #   make eval    regenerate the evaluation reports from the cached judgments
 #                (no API call)
@@ -44,18 +44,16 @@ PORT := 8000
 EMBEDDING_MODEL := intfloat/multilingual-e5-large-instruct
 RERANKER := BAAI/bge-reranker-v2-m3
 
-# Candidates of the search (SEARCH_CANDIDATES), as in the application's default:
-# vector (default): the vector search supplies the candidates the reranker
-#   orders; BM25 runs only if the vector search fails. The evaluation on the
-#   deployed 50,000-work catalog (data/evaluation/CATALOG_EVALUATION.md) found
-#   it better than fusing BM25 in (nDCG@10 0.798 against 0.769 with the
-#   reranker, 0.683 against 0.592 without it). On this 177-book catalog the
-#   vector search alone (vec_e5, 0.661) and the fused, re-ranked system
-#   (hybrid_norm_e5_bge_nopad, 0.660) were level; vector + reranker was not
-#   measured here.
-# hybrid: BM25 and vector search fused with RRF before the reranker, the
-#   system hybrid_norm_e5_bge_nopad of data/evaluation/BM25_PADDING.md.
-CANDIDATES := vector
+# Candidates of the search (SEARCH_CANDIDATES), as in the application's default
+# (DEFAULT_CANDIDATES, app/domain/value_objects.py):
+# hybrid (default): BM25 and vector search fused with RRF (k=60) before the
+#   reranker, the system hybrid_norm_e5_bge_nopad of
+#   data/evaluation/BM25_PADDING.md (nDCG@10 0.660 on this 177-book catalog,
+#   level with the vector search alone, vec_e5, 0.661).
+# vector: the vector search supplies the candidates the reranker orders; BM25
+#   runs only if the vector search fails. Vector + reranker was not measured
+#   on this catalog.
+CANDIDATES := hybrid
 
 # LLM of the demo. off (default): no LLM on any machine, even one whose .env
 # holds an OpenRouter key; this is what an examiner without a key gets.
@@ -113,7 +111,7 @@ help:
 	@echo "  make test    run the test suite (pytest)"
 	@echo "  make eval    regenerate the evaluation reports in data/evaluation/ from cached judgments, no API call"
 	@echo "  make clean   remove what make created (.venv if make made it, the demo and evaluation indexes)"
-	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none  LLM=on  CANDIDATES=hybrid"
+	@echo "Options: PYTHON=/path/to/python3  PORT=8001  RERANKER=none  LLM=on  CANDIDATES=vector"
 	@echo "Python found for .venv: $(if $(PYTHON),$(PYTHON),none (need Python 3.11 to 3.13))"
 
 # ---------------------------------------------------------------------------
@@ -167,7 +165,7 @@ demo-notice:
 	@echo "   Python packages (requirements.txt)          about 190 MB"
 	@echo "   intfloat/multilingual-e5-large-instruct     1.14 GB (embeddings)"
 	@echo "   BAAI/bge-reranker-v2-m3                     2.29 GB (re-ranking; skip with RERANKER=none)"
-	@echo " Candidates: $(CANDIDATES)$(if $(filter vector,$(CANDIDATES)), (BM25 only as the fallback; CANDIDATES=hybrid fuses it in),)"
+	@echo " Candidates: $(CANDIDATES)$(if $(filter hybrid,$(CANDIDATES)), (BM25 and vector fused with RRF; CANDIDATES=vector leaves BM25 as the fallback only),)"
 	@echo " Re-ranking: $(RERANKER)"
 	@echo " LLM: $(LLM)$(if $(filter off,$(LLM)), (make demo LLM=on uses OPENROUTER_API_KEY from the environment or .env),)"
 	@echo "=================================================================="

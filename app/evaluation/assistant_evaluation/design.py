@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Tuple
 
+from app.domain.value_objects import CANDIDATES_VECTOR
 from app.evaluation.catalog_evaluation import design as V14
 
 PROTOCOL_PATH = "docs/notes/2026-11-12-protocolo-evaluacion-asistente.md"
@@ -32,7 +33,12 @@ CATALOG_WORKS = V14.CATALOG_WORKS
 # --- The cloud profile as the application builds it ------------------------------
 # The variables the composition root reads; everything else keeps the
 # defaults of app/infrastructure/config/settings.py for SEARCH_PROFILE=cloud.
-CLOUD_ENV: Dict[str, str] = {"SEARCH_PROFILE": "cloud", "DATABASE_SCHEMA": SCHEMA}
+# SEARCH_CANDIDATES is pinned to the mode the stored runs used (V22 and V25:
+# vector candidates, the application's default at the time, recorded as
+# profile.candidates in system.json), so a re-run still evaluates that system
+# after V30 made the hybrid fusion the default again.
+CLOUD_ENV: Dict[str, str] = {"SEARCH_PROFILE": "cloud", "DATABASE_SCHEMA": SCHEMA,
+                             "SEARCH_CANDIDATES": CANDIDATES_VECTOR}
 
 # --- Models (all through OpenRouter) ---------------------------------------------
 SYSTEM_LLM = V14.SYSTEM_LLM

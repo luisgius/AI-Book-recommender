@@ -144,8 +144,8 @@ class SearchResult(BaseModel):
 
     source: Literal['lexical', 'vector', 'hybrid'] = Field(
         description=(
-            "Which search method produced this result: 'vector' (vector candidates, the default), "
-            "'hybrid' (BM25 and vector lists fused with RRF) or 'lexical' (BM25 alone, the fallback)."
+            "Which search method produced this result: 'hybrid' (BM25 and vector lists fused with RRF, "
+            "the default), 'vector' (vector candidates alone) or 'lexical' (BM25 alone, the fallback)."
         )
     )
 

@@ -20,7 +20,7 @@ from .value_objects import (
     ROUTE_SEARCH, ChatMessage, bound_conversation, count_clarifications, last_user_message,
     SearchQuery, SearchFilters, SearchResponse, SearchMetadata, QueryIntent,
     RetrievalStrategy, STRATEGY_POOL_SIZES, INTENT_TO_STRATEGY,
-    CANDIDATES_HYBRID, CANDIDATES_VECTOR, CANDIDATE_MODES,
+    CANDIDATES_HYBRID, CANDIDATES_VECTOR, CANDIDATE_MODES, DEFAULT_CANDIDATES,
 )
 from .ports import (
     BUDGET_LLM_REQUEST,
@@ -94,7 +94,7 @@ class SearchService:
         rerank_depth: int = DEFAULT_RERANK_DEPTH,
         usage_budget: UsageBudget | None = None,
         explanation_workers: int = DEFAULT_EXPLANATION_WORKERS,
-        candidates: str = CANDIDATES_HYBRID,
+        candidates: str = DEFAULT_CANDIDATES,
     ) -> None:
         """
         Initialize the search service with required dependencies.
@@ -120,11 +120,12 @@ class SearchService:
                 skipped and a notice is returned. None (default): no limit.
             explanation_workers: How many explanations are generated at the
                 same time (1 generates them one after another)
-            candidates: Candidate mode, CANDIDATES_VECTOR ("vector") or
-                CANDIDATES_HYBRID ("hybrid", the default here, so the
-                evaluation modules that build their own service keep the
-                published configuration). The application chooses it from
-                SEARCH_CANDIDATES (default "vector", app/api/v1/dependencies.py).
+            candidates: Candidate mode, CANDIDATES_HYBRID ("hybrid": BM25 and
+                vector search fused with RRF) or CANDIDATES_VECTOR ("vector":
+                vector search alone, BM25 only as the fallback). The default
+                is DEFAULT_CANDIDATES (hybrid), the same one the application
+                uses when SEARCH_CANDIDATES is unset. The evaluation modules
+                pass their mode explicitly.
         """
         if candidates not in CANDIDATE_MODES:
             raise ValueError(f"candidates must be one of {CANDIDATE_MODES}, got '{candidates}'")

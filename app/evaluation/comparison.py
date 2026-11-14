@@ -542,6 +542,7 @@ Method:
 def main(argv: Optional[Sequence[str]] = None) -> None:
     """Run the four non-LLM systems, compare them with the baseline and save the report."""
     from app.domain.services import SearchService
+    from app.domain.value_objects import CANDIDATES_HYBRID
     from app.evaluation.evaluation_job import (
         DEFAULT_DB_PATH,
         DEFAULT_INDEXES_DIR,
@@ -579,7 +580,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     embeddings = EmbeddingsStoreFaiss()
     embeddings.load_index(str(Path(args.indexes_dir) / "faiss_index"))
     vector = FaissVectorSearchRepository(embeddings, books)
-    search_service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings)
+    search_service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings,
+                                   candidates=CANDIDATES_HYBRID)  # the published configuration
 
     queries = load_test_queries(args.queries_path)
     raw_judgments = load_relevance_judgments(args.judgments_path)

@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional
 from app.domain.entities import Book, Explanation
 from app.domain.ports import LLMClient
 from app.domain.services import SearchService
-from app.domain.value_objects import QueryIntent, SearchFilters
+from app.domain.value_objects import CANDIDATES_HYBRID, QueryIntent, SearchFilters
 from app.evaluation.evaluation_job import (
     DEFAULT_JUDGMENTS_PATH,
     DEFAULT_QUERIES_PATH,
@@ -189,8 +189,10 @@ def evaluate_llm_path(
     }
 
     fixed = FixedIntentClient()
-    service = SearchService(lexical_repo, vector_repo, embeddings_store, llm_client=fixed)
-    baseline_service = SearchService(lexical_repo, vector_repo, embeddings_store)
+    # Both pinned to the published configuration, whatever the default
+    service = SearchService(lexical_repo, vector_repo, embeddings_store, llm_client=fixed,
+                            candidates=CANDIDATES_HYBRID)
+    baseline_service = SearchService(lexical_repo, vector_repo, embeddings_store, candidates=CANDIDATES_HYBRID)
 
     results: Dict[str, Dict[str, list]] = {BASELINE: {}}
     for q in queries:

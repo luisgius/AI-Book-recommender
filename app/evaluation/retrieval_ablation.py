@@ -65,7 +65,7 @@ import numpy as np
 
 from app.domain.entities import Book, SearchResult
 from app.domain.services import SearchService
-from app.domain.value_objects import SearchQuery, SearchResponse
+from app.domain.value_objects import CANDIDATES_HYBRID, SearchQuery, SearchResponse
 from app.evaluation.comparison import (
     PRIMARY_METRIC,
     _git,
@@ -312,6 +312,7 @@ def make_searcher(
         embeddings_store=embeddings,
         reranker=reranker,
         rerank_depth=rerank_depth,
+        candidates=CANDIDATES_HYBRID,  # the published configuration, whatever the default
     )
 
     def search(text: str) -> Sequence[SearchResult]:

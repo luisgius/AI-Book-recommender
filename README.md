@@ -4,13 +4,14 @@ Trabajo Fin de Grado de Luis Giménez (ETSINF, Universitat Politècnica de Valè
 Repositorio: https://github.com/luisgius/AI-Book-recommender
 
 Es un buscador de libros que acepta peticiones en lenguaje natural y en varios
-idiomas. Una búsqueda semántica (embeddings multilingües e índice vectorial)
-encuentra los candidatos y un cross-encoder reordena los primeros; la búsqueda
-léxica (BM25) responde cuando la semántica no está disponible. La fusión de las
-dos listas con Reciprocal Rank Fusion sigue disponible como configuración
-(`SEARCH_CANDIDATES=hybrid`): fue la configuración por defecto hasta que la
-evaluación sobre el catálogo desplegado la encontró peor que la búsqueda
-semántica sola ([sección 5](#5-resultados-principales)).
+idiomas. Una búsqueda léxica (BM25) y una búsqueda semántica (embeddings
+multilingües e índice vectorial) encuentran los candidatos, que se fusionan con
+Reciprocal Rank Fusion, y un cross-encoder reordena los primeros; si la
+búsqueda semántica no está disponible, responde BM25 sola. Los candidatos de la
+búsqueda semántica sola, sin fusión, siguen disponibles como configuración
+(`SEARCH_CANDIDATES=vector`): con consultas descriptivas puntuaron algo mejor,
+pero con consultas por nombre de autor la fusión fue claramente mejor
+([sección 5](#5-resultados-principales)).
 Un LLM, opcional y siempre condicionado por los libros recuperados (RAG),
 interpreta la consulta y explica con citas verificadas por qué cada libro
 responde a ella. El código sigue una arquitectura hexagonal con dos perfiles de
@@ -67,13 +68,14 @@ máquina tenga una clave.
 
 Configuración que arranca: los modelos locales evaluados, embeddings
 `intfloat/multilingual-e5-large-instruct` y reordenación con
-`BAAI/bge-reranker-v2-m3`, con los candidatos de la búsqueda vectorial y BM25
-(con normalización léxica) solo como respaldo, como en el despliegue. En esta
-colección la combinación vectorial más reordenador no se midió; la búsqueda
-vectorial sola (`vec_e5`, 0.661) y el sistema fusionado y reordenado
-(`hybrid_norm_e5_bge_nopad`, 0.660) quedaron empatados
+`BAAI/bge-reranker-v2-m3`, con los candidatos de BM25 (con normalización
+léxica) y de la búsqueda vectorial fusionados con RRF, como en el despliegue.
+Es el sistema `hybrid_norm_e5_bge_nopad` (0.660), empatado en esta colección
+con la búsqueda vectorial sola (`vec_e5`, 0.661)
 ([`BM25_PADDING.md`](data/evaluation/BM25_PADDING.md)). `make demo
-CANDIDATES=hybrid` arranca ese sistema fusionado.
+CANDIDATES=vector` arranca con los candidatos vectoriales solos y BM25 solo como
+respaldo; en esta colección la combinación vectorial más reordenador no se
+midió.
 
 **Coste de la primera ejecución** (medido el 2026-11-12 en un portátil con Apple
 M5 Pro, macOS y Python 3.13):
@@ -159,7 +161,7 @@ flowchart LR
     API["API FastAPI (/api/v1)"] --> S
     MCP --> S
     subgraph Dominio
-      S["SearchService: candidatos vectoriales (o BM25 + vectores con RRF), reranker,<br/>respaldo BM25, filtros, MMR, explicaciones"]
+      S["SearchService: BM25 + vectores con RRF (o candidatos vectoriales), reranker,<br/>respaldo BM25, filtros, MMR, explicaciones"]
       P["Puertos principales: BookCatalogRepository, LexicalSearchRepository,<br/>VectorSearchRepository, EmbeddingsStore, Reranker,<br/>LLMClient, SearchAgent, UsageBudget"]
     end
     S --- P
@@ -177,15 +179,20 @@ flowchart LR
 Los dos perfiles comparten el mismo `SearchService`; `SEARCH_PROFILE` elige los
 adaptadores y `SEARCH_CANDIDATES` de dónde salen los candidatos, en los dos:
 
-- `vector` (por defecto): la búsqueda vectorial da los candidatos, el reranker
-  los ordena y BM25 no se consulta. Si falla el embedding de la consulta o la
-  búsqueda vectorial, o se agota el presupuesto diario de búsquedas con
-  modelos, responde BM25 y la respuesta lo indica (`degraded`,
-  `search_mode: "lexical_only"`).
-- `hybrid`: BM25 y la búsqueda vectorial se fusionan con RRF (k = 60) antes del
-  reranker, como en los experimentos de las secciones 5 y 3. Los módulos de
-  evaluación construyen su propio `SearchService` en este modo y no leen la
-  variable, así que `make eval` reproduce los informes publicados.
+- `hybrid` (por defecto): BM25 y la búsqueda vectorial se fusionan con RRF
+  (k = 60, pesos iguales) antes del reranker.
+- `vector`: la búsqueda vectorial da los candidatos, el reranker los ordena y
+  BM25 no se consulta.
+
+En los dos modos, si falla el embedding de la consulta o la búsqueda
+vectorial, o se agota el presupuesto diario de búsquedas con modelos, responde
+BM25 y la respuesta lo indica (`degraded`, `search_mode: "lexical_only"`). El
+valor por defecto está en un solo sitio, `DEFAULT_CANDIDATES`
+(`app/domain/value_objects.py`): lo usan el constructor de `SearchService` y
+los ajustes de la aplicación cuando `SEARCH_CANDIDATES` no está definida. Los
+módulos de evaluación construyen su propio `SearchService` con el modo de cada
+informe escrito de forma explícita y no leen la variable, así que `make eval`
+reproduce los informes publicados.
 
 La respuesta de `/api/v1/search` dice en qué modo se buscó (`search_mode`:
 `vector_only`, `hybrid` o `lexical_only`) y da el puesto de cada libro en cada
@@ -280,22 +287,46 @@ personas en este catálogo). nDCG@10 con el juez principal:
 | Solo BM25 | 0.336 [0.287, 0.384] |
 | Solo vectorial (`qwen3-embedding-8b`) | 0.683 [0.647, 0.717] |
 | Fusión híbrida RRF | 0.592 [0.554, 0.628] |
-| Vectorial + reranker `qwen3-reranker-8b` (**configuración actual**) | 0.798 [0.772, 0.823] |
-| Híbrida + reranker (configuración desplegada hasta este cambio) | 0.769 [0.740, 0.797] |
+| Vectorial + reranker `qwen3-reranker-8b` (`SEARCH_CANDIDATES=vector`) | 0.798 [0.772, 0.823] |
+| Híbrida + reranker (**configuración por defecto**) | 0.769 [0.740, 0.797] |
 
-**La fusión híbrida fue peor.** Sin reranker, fusionar BM25 con la búsqueda
-vectorial bajó el nDCG@10 en -0.092 [-0.128, -0.055] (p de Holm < 0.001; con el
-segundo juez, -0.099). Con el reranker, los candidatos de BM25 siguieron
-restando: -0.029 [-0.045, -0.014] (p de Holm < 0.001; con el segundo juez,
--0.035 [-0.054, -0.014]). El protocolo había fijado de antemano que la
-configuración desplegada mantendría BM25 en la fusión salvo que vectorial +
-reranker superase a híbrida + reranker de forma significativa; se cumplió con
-los dos jueces, así que la configuración por defecto pasó a ser vectorial +
-reranker en los dos perfiles, con BM25 solo como respaldo cuando falla la
-búsqueda vectorial (`SEARCH_CANDIDATES`, [sección 4](#4-arquitectura)). La
-fusión sigue disponible con `SEARCH_CANDIDATES=hybrid`. El reordenador por LLM
-sobre la fusión puntuó 0.811, pero añade unos 2.7 s y una llamada al LLM por
-búsqueda, y no se desplegó.
+**Con consultas descriptivas, la fusión híbrida fue peor.** Sin reranker,
+fusionar BM25 con la búsqueda vectorial bajó el nDCG@10 en -0.092
+[-0.128, -0.055] (p de Holm < 0.001; con el segundo juez, -0.099). Con el
+reranker, los candidatos de BM25 siguieron restando: -0.029 [-0.045, -0.014]
+(p de Holm < 0.001; con el segundo juez, -0.035 [-0.054, -0.014]). El protocolo
+había fijado de antemano que la configuración desplegada mantendría BM25 en la
+fusión salvo que vectorial + reranker superase a híbrida + reranker de forma
+significativa; se cumplió con los dos jueces, y durante un tiempo la
+configuración por defecto fue vectorial + reranker. Ninguna de esas consultas
+era solo un título o un nombre de autor, que es donde se espera que BM25 ayude;
+la evaluación siguiente mide ese caso, y con las dos el autor eligió volver a la
+fusión como configuración por defecto (`SEARCH_CANDIDATES`,
+[sección 4](#4-arquitectura)). Los candidatos vectoriales solos siguen
+disponibles con `SEARCH_CANDIDATES=vector`. El reordenador por LLM sobre la
+fusión puntuó 0.811, pero añade unos 2.7 s y una llamada al LLM por búsqueda, y
+no se desplegó.
+
+### Búsqueda de un libro conocido por título y por autor
+
+[`KNOWN_ITEM.md`](data/evaluation/known_item/KNOWN_ITEM.md), con su protocolo
+guardado antes de ejecutar ningún sistema, aunque diseñado después de conocer
+los resultados anteriores: 300 libros del catálogo desplegado (25 por idioma),
+partidos en 150 de desarrollo y 150 de prueba, y de cada uno tres consultas
+mecánicas: el título (T), el título con el primer autor (TA) y el nombre del
+primer autor (A). La verdad de referencia sale del propio catálogo, sin jueces
+LLM. Mitad de prueba, con el reranker en los dos lados:
+
+| Consulta (métrica) | Vectorial + reranker | Híbrida + reranker | Diferencia [IC 95 %], p de Holm |
+|---|---|---|---|
+| T (MRR@10) | 0.979 | 0.980 | +0.001 [+0.000, +0.003], 1.000 |
+| TA (MRR@10) | 0.997 | 0.997 | +0.000 [+0.000, +0.000], 1.000 |
+| A (nDCG@10) | 0.894 | 0.960 | +0.067 [+0.033, +0.107], < 0.001 |
+
+Con títulos la fusión no cambia nada; con nombres de autor los candidatos de
+BM25 ayudan de forma significativa. Una repetición completa de la medida dio la
+misma conclusión en los tres tipos de consulta
+([`REPLICATION.md`](data/evaluation/known_item/replication/REPLICATION.md)).
 
 ### Sobre la colección de evaluación (177 libros)
 
@@ -322,8 +353,14 @@ cambian el nDCG ideal de algunas consultas).
   juicios originales más juicios de un juez LLM; el catálogo desplegado de
   50 000 obras (`CATALOG_EVALUATION.md`) solo tiene juicios de jueces LLM, y la
   hoja de anotación humana de 200 pares está sin rellenar. La configuración
-  actual (vectorial + reranker) se eligió con la segunda; en la primera no se
-  midió esa combinación.
+  por defecto (híbrida + reranker) se eligió con esa evaluación y con la de
+  búsqueda de un libro conocido (`KNOWN_ITEM.md`), que sí tiene verdad de
+  referencia exacta; en la colección de 177 libros quedó empatada con la
+  búsqueda vectorial sola, y vectorial + reranker no se midió allí.
+- **La configuración por defecto es un compromiso.** La fusión pierde 0.029 de
+  nDCG@10 con consultas descriptivas (jueces LLM) y gana 0.067 con consultas
+  por nombre de autor; no se sabe con qué frecuencia busca la gente de cada
+  forma.
 - **Colección pequeña.** 44 consultas y 177 libros: diferencias de nDCG@10
   menores de unos 0.08 son difíciles de detectar, y los resultados pueden no
   trasladarse a un catálogo mayor (`RETRIEVAL_ABLATION.md`).

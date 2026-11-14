@@ -45,7 +45,7 @@ from app.domain.ports import (
     VectorSearchRepository,
 )
 from app.domain.services import SearchService
-from app.domain.value_objects import SearchQuery
+from app.domain.value_objects import CANDIDATES_HYBRID, SearchQuery
 from app.domain.entities import SearchResult
 
 # Evaluation imports
@@ -225,6 +225,7 @@ def run_negative_evaluation(
         lexical_search=bm25_repo,
         vector_search=vector_repo,
         embeddings_store=embeddings_store,
+        candidates=CANDIDATES_HYBRID,  # the published configuration, whatever the default
     )
 
     # Load and run negative tests
@@ -442,6 +443,7 @@ def run_ablation_evaluation(
         lexical_search=bm25_repo,
         vector_search=vector_repo,
         embeddings_store=embeddings_store,
+        candidates=CANDIDATES_HYBRID,  # the published configuration, whatever the default
     )
 
     # Step 3: Resolve judgments
@@ -1198,6 +1200,7 @@ def main(
         lexical_search=bm25_repo,
         vector_search=vector_repo,
         embeddings_store=embeddings_store,
+        candidates=CANDIDATES_HYBRID,  # the published configuration, whatever the default
     )
 
     # Step 3: Resolve judgments (source, source_id) -> UUID

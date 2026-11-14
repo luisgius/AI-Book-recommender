@@ -80,10 +80,10 @@ DATA_NOTICE = (
 )
 
 SEARCH_BOOKS_DESCRIPTION = (
-    "Search this server's book catalog and return the best matches, best first. Retrieval is "
-    "semantic embedding search (fused with BM25 keyword search when the server is configured for "
-    "hybrid retrieval; BM25 alone when semantic search is unavailable), then re-ordered by a "
-    "cross-encoder when the server has one. Use it to find books by "
+    "Search this server's book catalog and return the best matches, best first. Retrieval fuses "
+    "BM25 keyword search with semantic embedding search (semantic search alone when the server is "
+    "configured for vector candidates; BM25 alone when semantic search is unavailable), then "
+    "re-orders by a cross-encoder when the server has one. Use it to find books by "
     "topic, theme, title or author; write the query in natural language. Optional filters: "
     "language (ISO 639-1 code), category (case-insensitive text contained in a category) and a "
     "publication year range (inclusive; books without a known year are left out when a year "

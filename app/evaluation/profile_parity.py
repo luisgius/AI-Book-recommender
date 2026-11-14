@@ -598,7 +598,7 @@ def cold_start(args: argparse.Namespace, log: Callable[[str], None]) -> Dict[str
     (Neon free plan: 5 minutes); the note records how that was ensured.
     """
     from app.domain.services import SearchService
-    from app.domain.value_objects import SearchQuery
+    from app.domain.value_objects import CANDIDATES_HYBRID, SearchQuery
     from app.evaluation.evaluation_job import load_test_queries
     from app.infrastructure.search.pgvector_search_repository import PgVectorSearchRepository
     from app.infrastructure.search.postgres_lexical_search_repository import PostgresLexicalSearchRepository
@@ -622,6 +622,7 @@ def cold_start(args: argparse.Namespace, log: Callable[[str], None]) -> Dict[str
             lexical_search=PostgresLexicalSearchRepository(db, args.schema, "bm25"),
             vector_search=PgVectorSearchRepository(db, args.schema, "exact", expected_identity=E5),
             embeddings_store=PostgresEmbeddingsStore(PrecomputedEncoder(), db, args.schema),  # type: ignore[arg-type]
+            candidates=CANDIDATES_HYBRID,  # the published configuration, whatever the default
         )
 
     def search(service: SearchService) -> float:

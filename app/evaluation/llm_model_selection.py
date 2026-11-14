@@ -1203,6 +1203,7 @@ def production_top_results(
 ) -> List[ExplanationTask]:
     """The top EXPLAINED_RESULTS of the production hybrid (hybrid_rrf, depth 10) per query."""
     from app.domain.services import SearchService
+    from app.domain.value_objects import CANDIDATES_HYBRID
     from app.evaluation.comparison import run_system
     from app.infrastructure.search.bm25_search_repository import BM25SearchRepository
     from app.infrastructure.search.embeddings_store_faiss import EmbeddingsStoreFaiss
@@ -1214,7 +1215,8 @@ def production_top_results(
     embeddings = EmbeddingsStoreFaiss()
     embeddings.load_index(str(Path(indexes_dir) / "faiss_index"))
     vector = FaissVectorSearchRepository(embeddings, list(books))
-    service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings)
+    service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings,
+                            candidates=CANDIDATES_HYBRID)  # the published configuration
     tasks = []
     for query in queries:
         results = run_system("hybrid_rrf", query.text, search_service=service, lexical_repo=bm25,

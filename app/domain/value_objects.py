@@ -50,19 +50,29 @@ INTENT_TO_STRATEGY = {
 
 # Candidate stage of SearchService: where the candidates that are filtered,
 # re-ranked and cut to the top k come from.
+# - CANDIDATES_HYBRID: BM25 and vector search fused with RRF (k=60, equal
+#   weights), the default (DEFAULT_CANDIDATES below).
 # - CANDIDATES_VECTOR: vector search only. Keyword search (BM25) runs only as
 #   the fallback, when the embedding or the vector search fails, or when the
-#   day's budget of model-backed searches is spent. The application's default
-#   since the evaluation on the deployed catalog (V14,
-#   data/evaluation/CATALOG_EVALUATION.md): vector + reranker scored nDCG@10
-#   0.798 against 0.769 for hybrid + reranker, significant under both judges.
-# - CANDIDATES_HYBRID: BM25 and vector search fused with RRF (k=60), the
-#   configuration of the published experiments, which keep it selectable.
+#   day's budget of model-backed searches is spent. Selectable by
+#   configuration (SEARCH_CANDIDATES=vector in the application).
+# In both modes the reranker, when configured, orders the candidates.
 # The strategy of an understood query (STRATEGY_POOL_SIZES) only applies to
 # the hybrid mode: without a keyword list there is no balance to set.
 CANDIDATES_VECTOR = "vector"
 CANDIDATES_HYBRID = "hybrid"
 CANDIDATE_MODES = (CANDIDATES_VECTOR, CANDIDATES_HYBRID)
+
+# The one default candidate mode (V30). SearchService takes it as the default
+# of its constructor and the application's settings (SEARCH_CANDIDATES unset)
+# take it from here, so the domain and the application cannot disagree.
+# Why hybrid: on descriptive queries of the deployed catalog (V14,
+# data/evaluation/CATALOG_EVALUATION.md) the BM25 candidates cost 0.029
+# nDCG@10 under the reranker (LLM judges), but on queries that name an author
+# (V29, data/evaluation/known_item/KNOWN_ITEM.md, ground truth taken from the
+# catalog, no judge) they add 0.067 (Holm p < 0.001), and on titles they make
+# no difference. The author weighed both and kept the hybrid fusion.
+DEFAULT_CANDIDATES = CANDIDATES_HYBRID
 
 
 @dataclass(frozen=True)

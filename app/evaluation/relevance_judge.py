@@ -966,6 +966,7 @@ def _load_agreement_summary(path: str, judge: RelevanceJudge) -> Optional[Dict[s
 def run_fill(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
     """`fill` subcommand: judge the holes in the top k of the four non-LLM systems."""
     from app.domain.services import SearchService
+    from app.domain.value_objects import CANDIDATES_HYBRID
     from app.evaluation.evaluation_job import (
         load_relevance_judgments,
         load_test_queries,
@@ -989,7 +990,8 @@ def run_fill(args: argparse.Namespace, raw_args: Sequence[str]) -> int:
     embeddings = EmbeddingsStoreFaiss()
     embeddings.load_index(str(Path(args.indexes_dir) / "faiss_index"))
     vector = FaissVectorSearchRepository(embeddings, books)
-    search_service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings)
+    search_service = SearchService(lexical_search=bm25, vector_search=vector, embeddings_store=embeddings,
+                                   candidates=CANDIDATES_HYBRID)  # the published configuration
 
     queries: List[TestQuery] = load_test_queries(args.queries_path)
     query_text = {query.query_id: query.text for query in queries}

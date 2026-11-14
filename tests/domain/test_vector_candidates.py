@@ -1,15 +1,16 @@
 """
 Vector candidate mode of SearchService (candidates="vector").
 
-The application's default since the evaluation on the deployed catalog: the
-vector search alone supplies the candidates that are re-ranked, and keyword
-search (BM25) runs only as the fallback. These tests check that:
+Selectable with SEARCH_CANDIDATES=vector (the default is the hybrid fusion,
+DEFAULT_CANDIDATES): the vector search alone supplies the candidates that are
+re-ranked, and keyword search (BM25) runs only as the fallback. These tests
+check that:
 - in the normal case BM25 is never called and no result claims a keyword position;
 - the fallback still reaches BM25 when the embedding fails, when the vector
   index is unavailable and when the daily model budget is spent, with the same
   degraded flag and notice as in the hybrid mode;
 - the understanding path labels its results the same way;
-- the hybrid mode stays selectable and is the domain default.
+- the hybrid mode is the domain default (DEFAULT_CANDIDATES) and still fuses.
 """
 
 from typing import Dict, List
@@ -19,7 +20,7 @@ import pytest
 from app.domain.entities import Book, SearchResult
 from app.domain.ports import BUDGET_MODEL_SEARCH
 from app.domain.services import NOTICE_SEARCH_BUDGET, SearchService
-from app.domain.value_objects import CANDIDATES_HYBRID, CANDIDATES_VECTOR, SearchQuery
+from app.domain.value_objects import CANDIDATES_HYBRID, CANDIDATES_VECTOR, DEFAULT_CANDIDATES, SearchQuery
 from tests.domain.test_reranking import FakeEmbeddings, FakeReranker, StubLLM, make_books
 
 
@@ -75,13 +76,13 @@ def build(candidates: str = CANDIDATES_VECTOR, *, embeddings=None, vector_ready:
     return service, lexical, vector, books
 
 
-def test_the_domain_default_is_the_hybrid_mode_of_the_published_experiments():
+def test_the_domain_default_is_the_hybrid_mode():
     service = SearchService(
         lexical_search=CountingRepo([], "lexical"),
         vector_search=CountingRepo([], "vector"),
         embeddings_store=FakeEmbeddings([]),
     )
-    assert service.candidate_mode == CANDIDATES_HYBRID
+    assert service.candidate_mode == DEFAULT_CANDIDATES == CANDIDATES_HYBRID
 
 
 def test_an_unknown_mode_is_rejected():
