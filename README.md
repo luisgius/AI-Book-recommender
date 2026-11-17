@@ -463,6 +463,8 @@ se hizo, por qué, qué se descartó y cómo se validó.
   `BAAI/bge-reranker-v2-m3` y `all-MiniLM-L6-v2`, descargados de Hugging Face;
   el perfil nube usa modelos por la API de OpenRouter.
 
+El código del proyecto se distribuye con la licencia MIT (fichero [`LICENSE`](LICENSE)). Los datos del catálogo conservan la licencia de su fuente, descrita en esta sección.
+
 ## 11. Coste del despliegue público
 
 Coste fijo cero: el backend corre en el plan Hobby de Vercel y la base de datos
