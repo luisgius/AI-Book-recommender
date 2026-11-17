@@ -123,6 +123,16 @@ git worktree remove $S/deploy
 
 Marcha atrás, si hiciera falta: `vercel promote ai-book-recommender-a66qlahvk-luis-projects-f5315dfc.vercel.app` (o `vercel rollback`).
 
+## Publicación de la rama y primera ejecución de la integración continua
+
+El mismo 2026-11-17 se publicó en GitHub la rama `tfg/validacion-2026-11`, hasta entonces solo local, con el commit `ca2ea97`. Fue la primera vez que se ejecutó el flujo `.github/workflows/tests.yml`:
+
+- Ejecución 44107471816 de GitHub Actions, sobre `ca2ea97`, con resultado `success`.
+- Trabajo `pytest` en `ubuntu-latest` con Python 3.13: de 14:50:14 a 14:55:18 UTC (5 min 4 s).
+- Paso «Run the tests» (`make test`): de 14:50:29 a 14:55:07 UTC (4 min 38 s). Línea final de pytest: `1894 passed, 22 skipped, 9 warnings in 224.41s (0:03:44)`.
+
+Los datos proceden de la API de GitHub (`gh api repos/luisgius/AI-Book-recommender/actions/runs/44107471816/jobs`) y del registro de la ejecución (`gh run view 44107471816 --log`).
+
 ## Límites
 
 - Una sola medida de 36 búsquedas en un momento del día. La diferencia con V18 (p95 del cliente de 3.46 s frente a 2.04 s) depende de la carga de los proveedores y no es una comparación controlada.
@@ -142,4 +152,3 @@ Marcha atrás, si hiciera falta: `vercel promote ai-book-recommender-a66qlahvk-l
 - `docs/notes/tareas/V32-redespliegue-2026-11-17.md` (esta nota).
 - `data/evaluation/results_deployment_check.json` (resultados de V32, V18 en `previous_latency`, sección nueva y datos del despliegue).
 - `data/evaluation/DEPLOYMENT_CHECK.md` (regenerado con `scripts.deployment_check report`).
-- Sin commit, como pedía la tarea.
