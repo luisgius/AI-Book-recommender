@@ -1,17 +1,17 @@
-# Deployment check of the cloud profile (V17; catalog enlarged to 50,000 works in V18)
+# Deployment check of the cloud profile (V17; catalog enlarged to 50,000 works in V18; redeployed in V32)
 
-Run of 2026-11-12T09:30:00+00:00 against https://ai-book-recommender-one.vercel.app from the measuring machine (Spain; requests enter Vercel's network at `arn1` and run in `fra1`).
+Run of 2026-11-17T14:53:18+00:00 against https://ai-book-recommender-one.vercel.app from the measuring machine (Spain; requests enter Vercel's network at `arn1` and run in `fra1`).
 
 ## Deployment
 
 - **Public URL**: https://ai-book-recommender-one.vercel.app (web UI at /ui/, MCP at /mcp, API docs at /docs)
-- **Date**: 2026-11-11 (V17, 30,000 works); 2026-11-12 (V18: catalog enlarged to 50,000 works, then redeployed for the web UI text)
+- **Date**: 2026-11-11 (V17, 30,000 works); 2026-11-12 (V18: catalog enlarged to 50,000 works, then redeployed for the web UI text); 2026-11-17 (V32: redeploy of commit ca2ea97 of branch tfg/validacion-2026-11, which adds the web UI of V19/V26 as committed, the assistant of V20, the query-embedding hedge, cache and zero-retention routing of V24 and the hybrid candidate default of V30)
 - **Vercel project**: ai-book-recommender (team luis-projects-f5315dfc, Hobby plan), framework preset FastAPI, no Git repository connected: deployed from the working directory with `vercel deploy --prod`
-- **Function**: one Python function from app/main.py (variable app): python3.13, region fra1 (Frankfurt, the region of the Neon database), maxDuration 120 s, memory 2048 MB / 1 vCPU (fixed on Hobby), Fluid compute (default of new projects); V17 bundle 49.8 MB, build 10 s, 95 files uploaded. V18 redeploy on 2026-11-12 (deployment dpl_D8cAmq5hHoeWrHAThWXniQXroMkE, build 37 s) from a clean export of the last commit plus the V18 changes under app/, because the working directory held other uncommitted work; the previous production deployment (ai-book-recommender-e1wtlhals) remains available for a rollback
+- **Function**: one Python function from app/main.py (variable app): python3.13, region fra1 (Frankfurt, the region of the Neon database), maxDuration 120 s, memory 2048 MB / 1 vCPU (fixed on Hobby), Fluid compute (default of new projects); V17 bundle 49.8 MB, build 10 s, 95 files uploaded. V18 redeploy on 2026-11-12 (deployment dpl_D8cAmq5hHoeWrHAThWXniQXroMkE, build 37 s) from a clean export of the last commit plus the V18 changes under app/, because the working directory held other uncommitted work; the previous production deployment (ai-book-recommender-e1wtlhals) remains available for a rollback. V32 redeploy on 2026-11-17 at 14:52 UTC (deployment dpl_HfWkUj7afK4jNFh9ZaDEcvLQr8cf, ai-book-recommender-1n8emdp1r, bundle 47.57 MB, deploy command 41 s) from a clean git worktree of HEAD plus .vercel/project.json; the previous production deployment (dpl_D8cAmq5hHoeWrHAThWXniQXroMkE, ai-book-recommender-a66qlahvk) remains available for a rollback
 - **Dependencies**: pyproject.toml (the 66 pins of requirements-cloud.txt); requirements.txt is not uploaded
 - **Static files**: app/ui/static is promoted to Vercel's CDN at build time (x-vercel-cache: HIT on /ui/)
 - **Deployment protection**: Vercel Authentication (Hobby default) on the per-deployment URLs; the production alias is public
-- **Environment variables (production; names only)**: SEARCH_PROFILE, DATABASE_SCHEMA, DATABASE_URL (secret, pooled), OPENROUTER_API_KEY (secret), LLM_PROVIDER, LLM_MODEL, LLM_TIMEOUT_S, LLM_MAX_RETRIES, LLM_CLIENT_MAX_RETRIES, DAILY_SEARCH_LIMIT, DAILY_LLM_LIMIT, BUDGET_SCHEMA, SEARCH_RATE_LIMIT_PER_MINUTE, LLM_RATE_LIMIT_PER_MINUTE, CLIENT_IP_HEADER, MCP_ALLOWED_HOSTS, MCP_ALLOWED_ORIGINS, MCP_RATE_LIMIT_PER_MINUTE, EVALUATE_ENDPOINT_ENABLED, USAGE_ENDPOINT_ENABLED
+- **Environment variables (production; names only)**: SEARCH_PROFILE, DATABASE_SCHEMA, DATABASE_URL (secret, pooled), OPENROUTER_API_KEY (secret), LLM_PROVIDER, LLM_MODEL, LLM_TIMEOUT_S, LLM_MAX_RETRIES, LLM_CLIENT_MAX_RETRIES, DAILY_SEARCH_LIMIT, DAILY_LLM_LIMIT, BUDGET_SCHEMA, SEARCH_RATE_LIMIT_PER_MINUTE, LLM_RATE_LIMIT_PER_MINUTE, CLIENT_IP_HEADER, MCP_ALLOWED_HOSTS, MCP_ALLOWED_ORIGINS, MCP_RATE_LIMIT_PER_MINUTE, EVALUATE_ENDPOINT_ENABLED, USAGE_ENDPOINT_ENABLED. Unchanged in V32 (the same 20 names, checked with `vercel env ls production`): SEARCH_CANDIDATES and the EMBEDDING_* settings are not set, so the code defaults apply (hybrid candidates; hedge to Nebius after 1.0 s, query-vector cache, zero-retention routing)
 - **Database**: Neon project twilight-poetry-45310085 (Free plan, storage limit 1 GiB per branch), branch production, schema catalog_deploy (50000 works; 30000 in V17) and usage_budget (daily counters); database size 626.4 MiB (423.9 MiB with 30,000 works)
 
 ## Health
@@ -21,19 +21,20 @@ Run of 2026-11-12T09:30:00+00:00 against https://ai-book-recommender-one.vercel.
   "status": "ok",
   "profile": {
     "name": "cloud",
+    "candidates": "hybrid",
     "schema": "catalog_deploy",
     "lexical_ranking": "bm25",
     "vector_search": "approximate"
   },
   "database": {
     "reachable": true,
-    "latency_ms": 1.5
+    "latency_ms": 1.9
   },
   "budget": {
     "model_search": 400,
     "llm_request": 60
   },
-  "uptime_s": 15.4,
+  "uptime_s": 30.4,
   "components": {
     "lexical_search": true,
     "vector_search": true,
@@ -57,9 +58,9 @@ Run of 2026-11-12T09:30:00+00:00 against https://ai-book-recommender-one.vercel.
 
 | Path | Status | Bytes | Vercel cache |
 |---|---|---|---|
-| `/ui/` | 200 | 5212 | HIT |
-| `/ui/app.js` | 200 | 10551 | MISS |
-| `/ui/styles.css` | 200 | 4613 | MISS |
+| `/ui/` | 200 | 24237 | HIT |
+| `/ui/app.js` | 200 | 54725 | HIT |
+| `/ui/styles.css` | 200 | 22530 | HIT |
 | `/` | 200 | 118 | MISS |
 
 ## Queries (round 1)
@@ -68,41 +69,41 @@ Run of 2026-11-12T09:30:00+00:00 against https://ai-book-recommender-one.vercel.
 |---|---|---|---|---|---|
 | novelas sobre la guerra civil española | es | topic | hybrid | True | Los cipreses creen en Dios (es); A sangre y fuego. Héroes, bestias y mártires de España (es); Las figuras de cera: novela (es) |
 | libros de filosofía para principiantes | es | topic | hybrid | True | Introducción a la filosofía (es); Historia de la filosofía sin temor ni temblor (es); Ética para Amador (es) |
-| Cien años de soledad | es | exact | hybrid | True | Cien años de soledad (es); La hojarasca (es); Vivir para contarla (es) |
+| Cien años de soledad | es | exact | hybrid | True | Cien años de soledad (es); Vivir para contarla (es); La hojarasca (es) |
 | science fiction novels about artificial intelligence | en | topic | hybrid | True | Virtual Girl (en); Dreaming Metal (en); Robopocalypse (en) |
 | history of the Roman Empire | en | topic | hybrid | True | The History of the Decline and Fall of the Roman Empire (en); The History of Rome, Books 09 to 26 (en); Annals (la) |
 | Jane Austen | en | exact | hybrid | True | The Complete Project Gutenberg Works of Jane Austen: A Linked Index of all PG Editions of Jane Austen (en); A Memoir of Jane Austen (en); Jane Austen, Her Life and Letters: A Family Record (en) |
-| romans policiers qui se déroulent à Paris | fr | topic | hybrid | True | Maigret and the Hotel Majestic (fr); Maigret en meublé (fr); L'Ombre chinoise (fr) |
-| Romane über den Ersten Weltkrieg | de | topic | hybrid | True | Clérambault (en); All quiet on the Western Front (en); Above the Battle (fr) |
+| romans policiers qui se déroulent à Paris | fr | topic | hybrid | True | Maigret en meublé (fr); Maigret and the Hotel Majestic (fr); L'Ombre chinoise (fr) |
+| Romane über den Ersten Weltkrieg | de | topic | hybrid | True | All quiet on the Western Front (en); Clérambault (en); Above the Battle (fr) |
 | romanzi storici ambientati a Firenze | it | topic | hybrid | True | Romola (en); Marietta de' Ricci, ovvero Firenze al tempo dell'assedio (it); Historias florentinas (it) |
-| romances sobre o mar e os pescadores | pt | topic | hybrid | True | O Filho do Pescador (pt); Pêcheur d'Islande (fr); Blow The Man Down: A Romance Of The Coast (en) |
+| romances sobre o mar e os pescadores | pt | topic | hybrid | True | Pêcheur d'Islande (fr); O Filho do Pescador (pt); Blow The Man Down: A Romance Of The Coast (en) |
 | manual de reparación del motor de un Seat Ibiza de 2004 | es | no_answer | hybrid | True | PANA (es); The Driver's Seat (en); Life and Death of a Spanish Town (en) |
-| how to configure a Kubernetes ingress controller | en | no_answer | hybrid | True | Análisis estratégico en salud y gestión a través de la escucha (es); La gobernanza de los puertos atlánticos, siglos xiv-xx : Políticas y estructuras portuarias (es); The Control Revolution (en) |
+| how to configure a Kubernetes ingress controller | en | no_answer | hybrid | True | Análisis estratégico en salud y gestión a través de la escucha (es); The Control Revolution (en); Investigación aplicada en Ingeniería (es) |
 
 ## Warm latency (36 searches: 12 queries x 3 rounds, after one warm-up search; 0 degraded, 0 not 200)
 
 | Part | n | Median ms | p95 ms |
 |---|---|---|---|
-| Client wall clock | 36 | 1120.7 | 2040.4 |
-| Server (latency_ms) | 36 | 960.4 | 1918.0 |
-| Stage `embedding` | 36 | 400.1 | 1021.5 |
-| Stage `lexical` | 36 | 31.6 | 54.6 |
-| Stage `rerank` | 36 | 479.4 | 675.1 |
-| Stage `vector` | 36 | 17.2 | 24.8 |
+| Client wall clock | 36 | 1319.8 | 3464.7 |
+| Server (latency_ms) | 36 | 1151.6 | 2245.6 |
+| Stage `embedding` | 36 | 237.3 | 681.0 |
+| Stage `lexical` | 36 | 36.5 | 473.2 |
+| Stage `rerank` | 36 | 540.5 | 2046.4 |
+| Stage `vector` | 36 | 18.4 | 241.4 |
 
 ## Warm latency before and after the enlargement
 
-Same queries, rounds and client; runs: 30,000 works (V17) at 2026-11-11T22:38:37+00:00; 50,000 works (V18) at 2026-11-12T09:30:00+00:00.
+Same queries, rounds and client; runs: 30,000 works (V17) at 2026-11-11T22:38:37+00:00; 50,000 works (V18) at 2026-11-12T09:30:00+00:00; redeploy 2026-11-17 (V32) at 2026-11-17T14:53:18+00:00.
 
-| Part | 30,000 works (V17): median ms | p95 ms | 50,000 works (V18): median ms | p95 ms |
-|---|---|---|---|---|
-| Client wall clock | 1430.2 | 3276.4 | 1120.7 | 2040.4 |
-| Server (latency_ms) | 1284.3 | 3083.0 | 960.4 | 1918.0 |
-| Stage `embedding` | 384.4 | 1346.5 | 400.1 | 1021.5 |
-| Stage `lexical` | 33.9 | 468.8 | 31.6 | 54.6 |
-| Stage `rerank` | 545.5 | 2530.6 | 479.4 | 675.1 |
-| Stage `vector` | 19.4 | 175.8 | 17.2 | 24.8 |
-| Degraded of searches | 0 of 36 | - | 0 of 36 | - |
+| Part | 30,000 works (V17): median ms | p95 ms | 50,000 works (V18): median ms | p95 ms | redeploy 2026-11-17 (V32): median ms | p95 ms |
+|---|---|---|---|---|---|---|
+| Client wall clock | 1430.2 | 3276.4 | 1120.7 | 2040.4 | 1319.8 | 3464.7 |
+| Server (latency_ms) | 1284.3 | 3083.0 | 960.4 | 1918.0 | 1151.6 | 2245.6 |
+| Stage `embedding` | 384.4 | 1346.5 | 400.1 | 1021.5 | 237.3 | 681.0 |
+| Stage `lexical` | 33.9 | 468.8 | 31.6 | 54.6 | 36.5 | 473.2 |
+| Stage `rerank` | 545.5 | 2530.6 | 479.4 | 675.1 | 540.5 | 2046.4 |
+| Stage `vector` | 19.4 | 175.8 | 17.2 | 24.8 | 18.4 | 241.4 |
+| Degraded of searches | 0 of 36 | - | 0 of 36 | - | 0 of 36 | - |
 
 ## Cold start
 
@@ -124,10 +125,10 @@ The first search after the function and the database had been idle (Neon suspend
 
 - `GET /api/v1/books/0b15d0a1-8cb5-532c-8746-1907932e2509`: 200 (Cien años de soledad; description source {"source": "wikipedia", "language": "es", "license": "CC BY-SA 3.0", "attribution_url": "https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad", "auto_generated": false})
 - `GET /api/v1/books/{id}/similar`: 200 (El coronel no tiene quien le escriba; El amor en los tiempos del cólera; Memoria de mis putas tristes; Vivir para contarla; The Autumn of the Patriarch)
-- Search with explanations: 200, 14076.9 ms, mode hybrid, stages {"lexical": 33.6, "embedding": 249.7, "vector": 18.3, "rerank": 596.7, "explanations": 12639.3}
-  - The Murder Room: grounded=True: La obra pertenece al género de misterio, como se evidencia en sus categorías [CITE: categories]. Además, la trama se desarrolla explícitamente en Londres, según la descripción [CITE: description]. También se trata de una novela detectivesca, lo que refuerza su adecuación a la búsqueda de novelas de misterio [CITE: description].
-  - A Silent Witness: grounded=True: La obra encaja con la consulta porque está clasificada explícitamente como novela de misterio y detectivesca [CITE: categories], y entre sus categorías figura 'London (England)' [CITE: categories], lo que confirma su ambientación londinense. Además, la descripción indica que la historia sigue al joven doctor Humphrey Jardine en una intrigante investigación en Hampstead, con un cadáver desaparecido y un intento de asesinato, antes de que el doctor John Thorndyke se involucre [CITE: description],y
-  - The Dark Eyes of London: grounded=True: La obra es una novela de crimen y misterio [CITE: description] y está catalogada dentro de las historias de detectives y misterio [CITE: categories]. Además, la trama se desarrolla en Londres, como indica la propia categoría de ambientación [CITE: categories], y sigue la investigación del inspector Holt de Scotland Yard [CITE: description], lo que confirma su carácter de misterio londinense.
+- Search with explanations: 200, 4223.6 ms, mode hybrid, stages {"lexical": 233.0, "embedding": 562.6, "vector": 97.2, "rerank": 508.0, "explanations": 2725.0}
+  - The Murder Room: grounded=True: El libro pertenece a los géneros de literatura criminal y ficción de misterio, lo que coincide con la búsqueda de 'novelas de misterio'. Además, la descripción indica explícitamente que es una novela detectivesca y que su acción transcurre en Londres, satisfaciendo el criterio de ambientación londinense.
+  - A Silent Witness: grounded=True: El libro es relevante porque pertenece al género de misterio y detectives, y está ambientado en Londres, como indica explícitamente la categoría 'London (England)'. Además, la descripción lo confirma como una novela detectivesca y menciona escenarios londinenses como 'London’s lanes and lodgings'.
+  - The Dark Eyes of London: grounded=True: La obra pertenece al género de misterio y detectives, tal como se indica en sus categorías. Además, la trama se desarrolla en Londres, ya que la ciudad aparece tanto en las categorías como en el título. La descripción confirma que se trata de una novela de crimen con una investigación policial, elementos centrales del misterio.
 
 ## Disabled endpoints and rate limit
 
@@ -396,3 +397,24 @@ python -m scripts.load_postgres --schema usage_budget --drop     # drops the dai
 - `vercel link` appended `.vercel` and `.env*` to .gitignore and wrote `.env.local` (a Vercel OIDC token, already ignored by `.env.local`); the .gitignore lines were removed again, so `.vercel/` (project and team ids, no secret) shows as untracked and must not be committed.
 - V18: with 50,000 works the warm searches were not slower than with 30,000 (table above). The database stages stayed in the same range (vector median 17.2 ms, BM25 31.6 ms), and the totals were lower, mostly because the model calls were faster on that day. The embedding median was 15.7 ms higher. The two runs are 11 hours apart and both depend on the providers' load, so this is not a controlled comparison.
 - V18: the search with explanations took 14.1 s (12.6 s of explanations), against 26.3 s in V17.
+
+## Redeployment 2026-11-17 (V32)
+
+Redeploy of the committed code of branch tfg/validacion-2026-11 at commit ca2ea97, authorised by the owner on 2026-11-17. The working directory held another session's uncommitted edits to the web UI, so the deployment ran from a clean `git worktree add --detach <scratch>/deploy HEAD` with only `.vercel/project.json` copied in. No database schema or data change and no environment variable change: since the V18 deployment (commit 04569cf) nothing under app/infrastructure/db/, the usage budget, vercel.json, .vercelignore or pyproject.toml changed, and the new settings have code defaults. Before deploying, the committed tree passed the test suite (1894 passed, 22 skipped) and the uploaded file set (app/ without app/evaluation, pyproject.toml, vercel.json) imported with SEARCH_PROFILE=cloud.
+
+| Check | Before (V18 deployment dpl_D8cAmq5h..., 14:49 UTC) | After (V32 deployment dpl_HfWkUj7a..., 14:52-14:58 UTC) |
+|---|---|---|
+| GET /api/v1/health | 200, overall true; no `profile.candidates` field (older code) | 200, overall true, `profile.candidates` hybrid, schema catalog_deploy, budget 400 / 60, LLM deepseek/deepseek-v4.1-flash, reranker qwen/qwen3-reranker-8b ready |
+| /ui/ | 5212 bytes, SHA-256 857816af... (V18 page) | 24237 bytes, SHA-256 910fb1fc..., identical to `git show HEAD:app/ui/static/index.html`; app.js (54725 bytes) and styles.css (22530 bytes) also identical to HEAD |
+| POST /api/v1/assistant/chat | 404 (endpoint not deployed) | 200 in 6.5 s, route search, 3 recommendations (The Murder Room; A Silent Witness; The Dark Eyes of London), 2 LLM calls, 0.00072 USD reported |
+| /mcp (`python -m scripts.mcp_demo`) | - | protocol 2026-07-28, three tools, search_books hybrid and re-ranked (1255 ms), get_book, similar_books, unknown id answered as a tool error |
+
+Warm latency: the table "Warm latency" above and the third column of the comparison table are this run (same script, queries, rounds, spacing and client as V17 and V18; the heading of the comparison table is the script's and still says "enlargement"). 36 of 36 searches answered 200 in hybrid mode, none degraded. Client wall clock median 1319.8 ms, p95 3464.7 ms (V18: 1120.7 and 2040.4); server median 1151.6 ms, p95 2245.6 ms (V18: 960.4 and 1918.0).
+
+- Round 2 was answered from the query-vector cache of V24 (embedding stage 0.0 ms in all 12 searches of that round; rounds 1 and 3 called the provider), so the embedding figures are not comparable with V18 (median of the 24 searches that called the provider: 262.7 ms).
+- The higher p95 comes from the re-ranking provider: rerank p95 2046.4 ms against 675.1 ms in V18. In one search (round 2, "Jane Austen", 5148.9 ms) the reranker timed out twice (Vercel runtime log: "Re-ranking failed, keeping the fused order: POST rerank: ReadTimeout (after 2 attempts)") and the results kept the fused order. The API does not mark this as degraded, so the 0 degraded above does not count it; it is 1 of 36 searches without re-ranking.
+- Search with explanations: 4.2 s (2.7 s of explanations) against 14.1 s in V18.
+- Runtime log of the new deployment from 14:52 to 14:58 UTC: no error on /api/v1; three POST /mcp requests ended with "Task timed out after 120 seconds". They came from another MCP client, not from this check, and the previous deployment logged the same error every few minutes from 14:37 UTC on, before the redeploy, so it is not caused by the new code. Vercel's Hobby plan keeps runtime logs for about 30 minutes, so the earlier history could not be read.
+- Rollback, if needed: `vercel promote ai-book-recommender-a66qlahvk-luis-projects-f5315dfc.vercel.app` (or `vercel rollback`). Not needed.
+- Daily budget used by the V32 checks (estimate; /api/v1/usage is off and the counter table was not read): about 40 model-backed searches (37 of the deployment check, the search with explanations, the MCP search, the assistant's search) and 2 LLM requests, against limits of 400 and 60. Model spend about 0.07 USD at the measured 0.0015 to 0.0017 USD per search plus about 0.002 USD of LLM calls.
+- Not repeated in V32: the cold start, the budget guard end to end and a check in a browser.
